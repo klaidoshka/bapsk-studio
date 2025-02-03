@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accounting-API", "Accounting-API\Accounting-API.csproj", "{825CA4D7-E3A3-48CC-9F76-192F28CFAF03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accounting-Contract", "Accounting-Contract\Accounting-Contract.csproj", "{28D60479-1C31-467B-AFE4-505611155B14}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accounting-Services", "Accounting-Services\Accounting-Services.csproj", "{415202BD-E355-4292-878C-56BE4E16E772}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{825CA4D7-E3A3-48CC-9F76-192F28CFAF03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{825CA4D7-E3A3-48CC-9F76-192F28CFAF03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{825CA4D7-E3A3-48CC-9F76-192F28CFAF03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{825CA4D7-E3A3-48CC-9F76-192F28CFAF03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28D60479-1C31-467B-AFE4-505611155B14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28D60479-1C31-467B-AFE4-505611155B14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28D60479-1C31-467B-AFE4-505611155B14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28D60479-1C31-467B-AFE4-505611155B14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{415202BD-E355-4292-878C-56BE4E16E772}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{415202BD-E355-4292-878C-56BE4E16E772}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{415202BD-E355-4292-878C-56BE4E16E772}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{415202BD-E355-4292-878C-56BE4E16E772}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
