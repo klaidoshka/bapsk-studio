@@ -1,6 +1,7 @@
-@Accounting_API_HostAddress = http://localhost:5125
+@Accounting_API_HostAddress = http://localhost:5125/api/accounting/v1/
 
-GET {{Accounting_API_HostAddress}}/weatherforecast/
+// Request refund
+GET {{Accounting_API_HostAddress}}refund
 Accept: application/json
 
 ###
