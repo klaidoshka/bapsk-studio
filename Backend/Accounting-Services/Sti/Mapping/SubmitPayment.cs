@@ -1,5 +1,3 @@
-using Account.Services;
-using Accounting.Contract.Sti;
 using Accounting.Contract.Sti.Data;
 using Accounting.Services.Util;
 
@@ -7,16 +5,18 @@ namespace Accounting.Services.Sti.Mapping;
 
 public static class SubmitPayment
 {
-    public static submitPaymentInfoRequest ToExternalType(this SubmitPaymentInfoRequest request)
+    public static submitPaymentInfoRequest1 ToExternalType(this SubmitPaymentInfoRequest request)
     {
-        return new submitPaymentInfoRequest
-        {
-            DocId = request.DocumentId,
-            PaymentInfo = request.PaymentInfo.ToExternalType(),
-            RequestId = request.RequestId,
-            SenderIn = request.SenderId,
-            TimeStamp = request.TimeStamp
-        };
+        return new submitPaymentInfoRequest1(
+            new submitPaymentInfoRequest
+            {
+                DocId = request.DocumentId,
+                PaymentInfo = request.PaymentInfo.ToExternalType(),
+                RequestId = request.RequestId,
+                SenderIn = request.SenderId,
+                TimeStamp = request.TimeStamp
+            }
+        );
     }
 
     private static PaymentInfo_TypePayment[] ToExternalType(

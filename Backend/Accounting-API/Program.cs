@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Accounting.API;
 using Accounting.API.Endpoint;
 using Accounting.Contract.Configuration;
@@ -7,6 +9,9 @@ using Accounting.Services.Sti;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.ConfigureCertificate();
+// builder.AddAuthentication();
+// builder.Services.AddAuthorization();
 builder.Services.AddDbContext<DatabaseContext>();
 builder.Services.AddOpenApi();
 
@@ -17,17 +22,28 @@ builder.BindConfiguration("Endpoints", new Endpoints());
 // Services
 builder.Services.AddScoped<IStiService, StiService>();
 
-var app = builder.Build();
+builder.Services.ConfigureHttpJsonOptions(json =>
+{
+    json.SerializerOptions.PropertyNameCaseInsensitive = true;
+    json.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+});
+
+var application = builder.Build();
+
+// application.UseAuthentication();
+// application.UseAuthorization();
 
 // Endpoints
-app
+application
     .MapGroup("/api/v1/accounting/sti")
     .MapStiEndpoints();
 
-if (app.Environment.IsDevelopment())
+if (application.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    application.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
-app.Run();
+// application.UseCors();
+application.UseHttpsRedirection();
+application.UseHsts();
+application.Run();

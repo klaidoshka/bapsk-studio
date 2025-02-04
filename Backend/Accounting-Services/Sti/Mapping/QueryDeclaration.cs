@@ -1,6 +1,4 @@
 using System.Collections.Immutable;
-using Account.Services;
-using Accounting.Contract.Sti;
 using Accounting.Contract.Sti.Data;
 using Accounting.Services.Util;
 
@@ -8,29 +6,33 @@ namespace Accounting.Services.Sti.Mapping;
 
 public static class QueryDeclaration
 {
-    public static queryDeclarationsRequest ToExternalType(this QueryDeclarationsRequest request)
+    public static queryDeclarationsRequest1 ToExternalType(this QueryDeclarationsRequest request)
     {
-        return new queryDeclarationsRequest
-        {
-            Query = request.Query.ToExternalType(),
-            RequestId = request.RequestId,
-            SenderIn = request.SenderIn,
-            TimeStamp = request.TimeStamp
-        };
+        return new queryDeclarationsRequest1(
+            new queryDeclarationsRequest
+            {
+                Query = request.Query.ToExternalType(),
+                RequestId = request.RequestId,
+                SenderIn = request.SenderId,
+                TimeStamp = request.TimeStamp
+            }
+        );
     }
 
     private static queryDeclarationsRequestQuery ToExternalType(this Query query)
     {
-        return new queryDeclarationsRequestQuery
+        var queryNew = new queryDeclarationsRequestQuery
         {
-            DeclState = query.DeclarationState.ConvertToEnum<DeclStateForQuery_Type>(),
-            DeclStateSpecified = query.DeclStateSpecified,
+            DeclState = query.DeclarationState?.ConvertToEnum<DeclStateForQuery_Type>() ?? default,
+            DeclStateSpecified = query.DeclarationState != null,
             DocId = query.DocumentId,
-            StateDateFrom = query.StateDateFrom,
-            StateDateFromSpecified = query.StateDateFromSpecified,
-            StateDateTo = query.StateDateTo,
-            StateDateToSpecified = query.StateDateToSpecified
+            StateDateFrom = query.StateDateFrom ?? default,
+            StateDateFromSpecified = query.StateDateFrom != null,
+            StateDateTo = query.StateDateTo ?? default,
+            StateDateToSpecified = query.StateDateTo != null
         };
+
+        return queryNew;
     }
 
     public static QueryDeclarationsResponse ToInternalType(this queryDeclarationsResponse1 response)
@@ -49,7 +51,8 @@ public static class QueryDeclaration
         };
     }
 
-    private static IReadOnlyList<Contract.Sti.Data.QueryDeclaration> ToInternalType(this DeclList_Type declList)
+    private static IReadOnlyList<Contract.Sti.Data.QueryDeclaration> ToInternalType(
+        this DeclList_Type declList)
     {
         return declList.DeclListItem
             .Select(i => new Contract.Sti.Data.QueryDeclaration

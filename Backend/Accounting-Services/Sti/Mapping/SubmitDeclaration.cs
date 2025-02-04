@@ -1,6 +1,3 @@
-using System.Security.AccessControl;
-using Account.Services;
-using Accounting.Contract.Sti;
 using Accounting.Contract.Sti.Data;
 using Accounting.Services.Util;
 
@@ -8,16 +5,18 @@ namespace Accounting.Services.Sti.Mapping;
 
 public static class SubmitDeclaration
 {
-    public static submitDeclarationRequest ToExternalType(this SubmitDeclarationRequest request)
+    public static submitDeclarationRequest1 ToExternalType(this SubmitDeclarationRequest request)
     {
-        return new submitDeclarationRequest
-        {
-            Declaration = request.Declaration.ToExternalType(),
-            RequestId = request.RequestId,
-            SenderIn = request.SenderIn,
-            Situation = request.Situation,
-            TimeStamp = request.TimeStamp
-        };
+        return new submitDeclarationRequest1(
+            new submitDeclarationRequest
+            {
+                Declaration = request.Declaration.ToExternalType(),
+                RequestId = request.RequestId,
+                SenderIn = request.SenderId,
+                Situation = request.Situation,
+                TimeStamp = request.TimeStamp
+            }
+        );
     }
 
     private static TFDeclaration_Type ToExternalType(this Contract.Sti.Data.SubmitDeclaration type)
@@ -39,7 +38,7 @@ public static class SubmitDeclaration
             BirthDate = customer.BirthDate,
             FirstName = customer.FirstName,
             IdentityDocument = customer.IdentityDocument.ToExternalType(),
-            Item = (customer.ResidentCountryCode?.ConvertToEnum<NonEuCountryCode_Type>() as object) 
+            Item = (customer.ResidentCountryCode?.ConvertToEnum<NonEuCountryCode_Type>() as object)
                    ?? customer.ResidentTerritory?.ToExternalType(),
             LastName = customer.LastName,
             OtherDocument = customer.OtherDocument.ToExternalType(),
@@ -59,7 +58,7 @@ public static class SubmitDeclaration
             DocType = document.DocumentType
         };
     }
-    
+
     private static Customer_TypeResTerritory ToExternalType(this CustomerResTerritory territory)
     {
         return new Customer_TypeResTerritory
@@ -137,7 +136,8 @@ public static class SubmitDeclaration
             .Select(document => new SalesDocument_Type
             {
                 Goods = document.Goods.ToExternalType(),
-                Item = (document.CashRegisterReceipt?.ToExternalType() as object) ?? document.InvoiceNo,
+                Item = (document.CashRegisterReceipt?.ToExternalType() as object) ??
+                       document.InvoiceNo,
                 SalesDate = document.SalesDate
             })
             .ToArray();
@@ -160,7 +160,7 @@ public static class SubmitDeclaration
             })
             .ToArray();
     }
-    
+
     private static CashRegisterReceipt_Type ToExternalType(this CashRegisterReceipt receipt)
     {
         return new CashRegisterReceipt_Type
@@ -176,13 +176,11 @@ public static class SubmitDeclaration
         {
             DeclarationState = response.submitDeclarationResponse.DeclState
                 .ConvertToEnum<SubmitDeclarationState>(),
-            DeclarationStateSpecified = response.submitDeclarationResponse.DeclStateSpecified,
             Errors = response.submitDeclarationResponse.Errors.ToInternalType(),
             ResultDate = response.submitDeclarationResponse.ResultDate,
             ResultStatus = response.submitDeclarationResponse.ResultStatus
                 .ConvertToEnum<ResultStatus>(),
             TransmissionId = response.submitDeclarationResponse.TransmissionID,
-            TransmissionIdSpecified = response.submitDeclarationResponse.TransmissionIDSpecified
         };
     }
 }

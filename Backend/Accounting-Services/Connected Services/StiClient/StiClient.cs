@@ -7,34 +7,49 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Account.Services
+namespace Accounting.Services
 {
     
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-    [System.ServiceModel.ServiceContractAttribute(Namespace="TFVATRefundforForeignTravelerTR", ConfigurationName="Account.Services.VATRefundforForeignTravelerTRPort")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace="TFVATRefundforForeignTravelerTR", ConfigurationName="Accounting.Services.VATRefundforForeignTravelerTRPort")]
     public interface VATRefundforForeignTravelerTRPort
     {
         
         [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        System.Threading.Tasks.Task<Account.Services.submitPaymentInfoResponse1> submitPaymentInfoAsync(Account.Services.submitPaymentInfoRequest1 request);
+        Accounting.Services.submitPaymentInfoResponse1 submitPaymentInfo(Accounting.Services.submitPaymentInfoRequest1 request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
+        System.Threading.Tasks.Task<Accounting.Services.submitPaymentInfoResponse1> submitPaymentInfoAsync(Accounting.Services.submitPaymentInfoRequest1 request);
         
         [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        System.Threading.Tasks.Task<Account.Services.queryDeclarationsResponse1> queryDeclarationsAsync(Account.Services.queryDeclarationsRequest1 request);
+        Accounting.Services.queryDeclarationsResponse1 queryDeclarations(Accounting.Services.queryDeclarationsRequest1 request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
+        System.Threading.Tasks.Task<Accounting.Services.queryDeclarationsResponse1> queryDeclarationsAsync(Accounting.Services.queryDeclarationsRequest1 request);
         
         [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        System.Threading.Tasks.Task<Account.Services.submitDeclarationResponse1> submitDeclarationAsync(Account.Services.submitDeclarationRequest1 request);
+        Accounting.Services.submitDeclarationResponse1 submitDeclaration(Accounting.Services.submitDeclarationRequest1 request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
+        System.Threading.Tasks.Task<Accounting.Services.submitDeclarationResponse1> submitDeclarationAsync(Accounting.Services.submitDeclarationRequest1 request);
         
         [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        System.Threading.Tasks.Task<Account.Services.cancelDeclarationResponse1> cancelDeclarationAsync(Account.Services.cancelDeclarationRequest1 request);
+        Accounting.Services.cancelDeclarationResponse1 cancelDeclaration(Accounting.Services.cancelDeclarationRequest1 request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
+        System.Threading.Tasks.Task<Accounting.Services.cancelDeclarationResponse1> cancelDeclarationAsync(Accounting.Services.cancelDeclarationRequest1 request);
         
         [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        System.Threading.Tasks.Task<Account.Services.getInfoOnExportedGoodsResponse1> getInfoOnExportedGoodsAsync(Account.Services.getInfoOnExportedGoodsRequest1 request);
+        Accounting.Services.getInfoOnExportedGoodsResponse1 getInfoOnExportedGoods(Accounting.Services.getInfoOnExportedGoodsRequest1 request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
+        System.Threading.Tasks.Task<Accounting.Services.getInfoOnExportedGoodsResponse1> getInfoOnExportedGoodsAsync(Accounting.Services.getInfoOnExportedGoodsRequest1 request);
     }
     
     /// <remarks/>
@@ -3336,19 +3351,18 @@ namespace Account.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class submitPaymentInfoRequest1
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="TFVATRefundforForeignTravelerTR", Order=0)]
-        public Account.Services.submitPaymentInfoRequest submitPaymentInfoRequest;
+        public Accounting.Services.submitPaymentInfoRequest submitPaymentInfoRequest;
         
         public submitPaymentInfoRequest1()
         {
         }
         
-        public submitPaymentInfoRequest1(Account.Services.submitPaymentInfoRequest submitPaymentInfoRequest)
+        public submitPaymentInfoRequest1(Accounting.Services.submitPaymentInfoRequest submitPaymentInfoRequest)
         {
             this.submitPaymentInfoRequest = submitPaymentInfoRequest;
         }
@@ -3356,19 +3370,18 @@ namespace Account.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class submitPaymentInfoResponse1
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="TFVATRefundforForeignTravelerTR", Order=0)]
-        public Account.Services.submitPaymentInfoResponse submitPaymentInfoResponse;
+        public Accounting.Services.submitPaymentInfoResponse submitPaymentInfoResponse;
         
         public submitPaymentInfoResponse1()
         {
         }
         
-        public submitPaymentInfoResponse1(Account.Services.submitPaymentInfoResponse submitPaymentInfoResponse)
+        public submitPaymentInfoResponse1(Accounting.Services.submitPaymentInfoResponse submitPaymentInfoResponse)
         {
             this.submitPaymentInfoResponse = submitPaymentInfoResponse;
         }
@@ -3625,19 +3638,18 @@ namespace Account.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class queryDeclarationsRequest1
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="TFVATRefundforForeignTravelerTR", Order=0)]
-        public Account.Services.queryDeclarationsRequest queryDeclarationsRequest;
+        public Accounting.Services.queryDeclarationsRequest queryDeclarationsRequest;
         
         public queryDeclarationsRequest1()
         {
         }
         
-        public queryDeclarationsRequest1(Account.Services.queryDeclarationsRequest queryDeclarationsRequest)
+        public queryDeclarationsRequest1(Accounting.Services.queryDeclarationsRequest queryDeclarationsRequest)
         {
             this.queryDeclarationsRequest = queryDeclarationsRequest;
         }
@@ -3645,19 +3657,18 @@ namespace Account.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class queryDeclarationsResponse1
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="TFVATRefundforForeignTravelerTR", Order=0)]
-        public Account.Services.queryDeclarationsResponse queryDeclarationsResponse;
+        public Accounting.Services.queryDeclarationsResponse queryDeclarationsResponse;
         
         public queryDeclarationsResponse1()
         {
         }
         
-        public queryDeclarationsResponse1(Account.Services.queryDeclarationsResponse queryDeclarationsResponse)
+        public queryDeclarationsResponse1(Accounting.Services.queryDeclarationsResponse queryDeclarationsResponse)
         {
             this.queryDeclarationsResponse = queryDeclarationsResponse;
         }
@@ -3890,19 +3901,18 @@ namespace Account.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class submitDeclarationRequest1
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="TFVATRefundforForeignTravelerTR", Order=0)]
-        public Account.Services.submitDeclarationRequest submitDeclarationRequest;
+        public Accounting.Services.submitDeclarationRequest submitDeclarationRequest;
         
         public submitDeclarationRequest1()
         {
         }
         
-        public submitDeclarationRequest1(Account.Services.submitDeclarationRequest submitDeclarationRequest)
+        public submitDeclarationRequest1(Accounting.Services.submitDeclarationRequest submitDeclarationRequest)
         {
             this.submitDeclarationRequest = submitDeclarationRequest;
         }
@@ -3910,19 +3920,18 @@ namespace Account.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class submitDeclarationResponse1
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="TFVATRefundforForeignTravelerTR", Order=0)]
-        public Account.Services.submitDeclarationResponse submitDeclarationResponse;
+        public Accounting.Services.submitDeclarationResponse submitDeclarationResponse;
         
         public submitDeclarationResponse1()
         {
         }
         
-        public submitDeclarationResponse1(Account.Services.submitDeclarationResponse submitDeclarationResponse)
+        public submitDeclarationResponse1(Accounting.Services.submitDeclarationResponse submitDeclarationResponse)
         {
             this.submitDeclarationResponse = submitDeclarationResponse;
         }
@@ -4059,19 +4068,18 @@ namespace Account.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class cancelDeclarationRequest1
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="TFVATRefundforForeignTravelerTR", Order=0)]
-        public Account.Services.cancelDeclarationRequest cancelDeclarationRequest;
+        public Accounting.Services.cancelDeclarationRequest cancelDeclarationRequest;
         
         public cancelDeclarationRequest1()
         {
         }
         
-        public cancelDeclarationRequest1(Account.Services.cancelDeclarationRequest cancelDeclarationRequest)
+        public cancelDeclarationRequest1(Accounting.Services.cancelDeclarationRequest cancelDeclarationRequest)
         {
             this.cancelDeclarationRequest = cancelDeclarationRequest;
         }
@@ -4079,19 +4087,18 @@ namespace Account.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class cancelDeclarationResponse1
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="TFVATRefundforForeignTravelerTR", Order=0)]
-        public Account.Services.cancelDeclarationResponse cancelDeclarationResponse;
+        public Accounting.Services.cancelDeclarationResponse cancelDeclarationResponse;
         
         public cancelDeclarationResponse1()
         {
         }
         
-        public cancelDeclarationResponse1(Account.Services.cancelDeclarationResponse cancelDeclarationResponse)
+        public cancelDeclarationResponse1(Accounting.Services.cancelDeclarationResponse cancelDeclarationResponse)
         {
             this.cancelDeclarationResponse = cancelDeclarationResponse;
         }
@@ -4103,6 +4110,7 @@ namespace Account.Services
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="TFVATRefundforForeignTravelerTR")]
     public partial class getInfoOnExportedGoodsRequest
     {
+        
         private string requestIdField;
         
         private System.DateTime timeStampField;
@@ -4227,19 +4235,18 @@ namespace Account.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class getInfoOnExportedGoodsRequest1
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="TFVATRefundforForeignTravelerTR", Order=0)]
-        public Account.Services.getInfoOnExportedGoodsRequest getInfoOnExportedGoodsRequest;
+        public Accounting.Services.getInfoOnExportedGoodsRequest getInfoOnExportedGoodsRequest;
         
         public getInfoOnExportedGoodsRequest1()
         {
         }
         
-        public getInfoOnExportedGoodsRequest1(Account.Services.getInfoOnExportedGoodsRequest getInfoOnExportedGoodsRequest)
+        public getInfoOnExportedGoodsRequest1(Accounting.Services.getInfoOnExportedGoodsRequest getInfoOnExportedGoodsRequest)
         {
             this.getInfoOnExportedGoodsRequest = getInfoOnExportedGoodsRequest;
         }
@@ -4247,32 +4254,31 @@ namespace Account.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class getInfoOnExportedGoodsResponse1
     {
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="TFVATRefundforForeignTravelerTR", Order=0)]
-        public Account.Services.getInfoOnExportedGoodsResponse getInfoOnExportedGoodsResponse;
+        public Accounting.Services.getInfoOnExportedGoodsResponse getInfoOnExportedGoodsResponse;
         
         public getInfoOnExportedGoodsResponse1()
         {
         }
         
-        public getInfoOnExportedGoodsResponse1(Account.Services.getInfoOnExportedGoodsResponse getInfoOnExportedGoodsResponse)
+        public getInfoOnExportedGoodsResponse1(Accounting.Services.getInfoOnExportedGoodsResponse getInfoOnExportedGoodsResponse)
         {
             this.getInfoOnExportedGoodsResponse = getInfoOnExportedGoodsResponse;
         }
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-    public interface VATRefundforForeignTravelerTRPortChannel : Account.Services.VATRefundforForeignTravelerTRPort, System.ServiceModel.IClientChannel
+    public interface VATRefundforForeignTravelerTRPortChannel : Accounting.Services.VATRefundforForeignTravelerTRPort, System.ServiceModel.IClientChannel
     {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
-    public partial class VATRefundforForeignTravelerTRPortClient : System.ServiceModel.ClientBase<Account.Services.VATRefundforForeignTravelerTRPort>, Account.Services.VATRefundforForeignTravelerTRPort
+    public partial class VATRefundforForeignTravelerTRPortClient : System.ServiceModel.ClientBase<Accounting.Services.VATRefundforForeignTravelerTRPort>, Accounting.Services.VATRefundforForeignTravelerTRPort
     {
         
         /// <summary>
@@ -4315,69 +4321,54 @@ namespace Account.Services
         {
         }
         
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<Account.Services.submitPaymentInfoResponse1> Account.Services.VATRefundforForeignTravelerTRPort.submitPaymentInfoAsync(Account.Services.submitPaymentInfoRequest1 request)
+        public Accounting.Services.submitPaymentInfoResponse1 submitPaymentInfo(Accounting.Services.submitPaymentInfoRequest1 request)
+        {
+            return base.Channel.submitPaymentInfo(request);
+        }
+        
+        public System.Threading.Tasks.Task<Accounting.Services.submitPaymentInfoResponse1> submitPaymentInfoAsync(Accounting.Services.submitPaymentInfoRequest1 request)
         {
             return base.Channel.submitPaymentInfoAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Account.Services.submitPaymentInfoResponse1> submitPaymentInfoAsync(Account.Services.submitPaymentInfoRequest submitPaymentInfoRequest)
+        public Accounting.Services.queryDeclarationsResponse1 queryDeclarations(Accounting.Services.queryDeclarationsRequest1 request)
         {
-            Account.Services.submitPaymentInfoRequest1 inValue = new Account.Services.submitPaymentInfoRequest1();
-            inValue.submitPaymentInfoRequest = submitPaymentInfoRequest;
-            return ((Account.Services.VATRefundforForeignTravelerTRPort)(this)).submitPaymentInfoAsync(inValue);
+            return base.Channel.queryDeclarations(request);
         }
         
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<Account.Services.queryDeclarationsResponse1> Account.Services.VATRefundforForeignTravelerTRPort.queryDeclarationsAsync(Account.Services.queryDeclarationsRequest1 request)
+        public System.Threading.Tasks.Task<Accounting.Services.queryDeclarationsResponse1> queryDeclarationsAsync(Accounting.Services.queryDeclarationsRequest1 request)
         {
             return base.Channel.queryDeclarationsAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Account.Services.queryDeclarationsResponse1> queryDeclarationsAsync(Account.Services.queryDeclarationsRequest queryDeclarationsRequest)
+        public Accounting.Services.submitDeclarationResponse1 submitDeclaration(Accounting.Services.submitDeclarationRequest1 request)
         {
-            Account.Services.queryDeclarationsRequest1 inValue = new Account.Services.queryDeclarationsRequest1();
-            inValue.queryDeclarationsRequest = queryDeclarationsRequest;
-            return ((Account.Services.VATRefundforForeignTravelerTRPort)(this)).queryDeclarationsAsync(inValue);
+            return base.Channel.submitDeclaration(request);
         }
         
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<Account.Services.submitDeclarationResponse1> Account.Services.VATRefundforForeignTravelerTRPort.submitDeclarationAsync(Account.Services.submitDeclarationRequest1 request)
+        public System.Threading.Tasks.Task<Accounting.Services.submitDeclarationResponse1> submitDeclarationAsync(Accounting.Services.submitDeclarationRequest1 request)
         {
             return base.Channel.submitDeclarationAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Account.Services.submitDeclarationResponse1> submitDeclarationAsync(Account.Services.submitDeclarationRequest submitDeclarationRequest)
+        public Accounting.Services.cancelDeclarationResponse1 cancelDeclaration(Accounting.Services.cancelDeclarationRequest1 request)
         {
-            Account.Services.submitDeclarationRequest1 inValue = new Account.Services.submitDeclarationRequest1();
-            inValue.submitDeclarationRequest = submitDeclarationRequest;
-            return ((Account.Services.VATRefundforForeignTravelerTRPort)(this)).submitDeclarationAsync(inValue);
+            return base.Channel.cancelDeclaration(request);
         }
         
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<Account.Services.cancelDeclarationResponse1> Account.Services.VATRefundforForeignTravelerTRPort.cancelDeclarationAsync(Account.Services.cancelDeclarationRequest1 request)
+        public System.Threading.Tasks.Task<Accounting.Services.cancelDeclarationResponse1> cancelDeclarationAsync(Accounting.Services.cancelDeclarationRequest1 request)
         {
             return base.Channel.cancelDeclarationAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Account.Services.cancelDeclarationResponse1> cancelDeclarationAsync(Account.Services.cancelDeclarationRequest cancelDeclarationRequest)
+        public Accounting.Services.getInfoOnExportedGoodsResponse1 getInfoOnExportedGoods(Accounting.Services.getInfoOnExportedGoodsRequest1 request)
         {
-            Account.Services.cancelDeclarationRequest1 inValue = new Account.Services.cancelDeclarationRequest1();
-            inValue.cancelDeclarationRequest = cancelDeclarationRequest;
-            return ((Account.Services.VATRefundforForeignTravelerTRPort)(this)).cancelDeclarationAsync(inValue);
+            return base.Channel.getInfoOnExportedGoods(request);
         }
         
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        System.Threading.Tasks.Task<Account.Services.getInfoOnExportedGoodsResponse1> Account.Services.VATRefundforForeignTravelerTRPort.getInfoOnExportedGoodsAsync(Account.Services.getInfoOnExportedGoodsRequest1 request)
+        public System.Threading.Tasks.Task<Accounting.Services.getInfoOnExportedGoodsResponse1> getInfoOnExportedGoodsAsync(Accounting.Services.getInfoOnExportedGoodsRequest1 request)
         {
             return base.Channel.getInfoOnExportedGoodsAsync(request);
-        }
-        
-        public System.Threading.Tasks.Task<Account.Services.getInfoOnExportedGoodsResponse1> getInfoOnExportedGoodsAsync(Account.Services.getInfoOnExportedGoodsRequest getInfoOnExportedGoodsRequest)
-        {
-            Account.Services.getInfoOnExportedGoodsRequest1 inValue = new Account.Services.getInfoOnExportedGoodsRequest1();
-            inValue.getInfoOnExportedGoodsRequest = getInfoOnExportedGoodsRequest;
-            return ((Account.Services.VATRefundforForeignTravelerTRPort)(this)).getInfoOnExportedGoodsAsync(inValue);
         }
         
         public virtual System.Threading.Tasks.Task OpenAsync()

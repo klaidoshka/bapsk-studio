@@ -2,28 +2,28 @@ namespace Accounting.Contract.Sti.Data;
 
 public class SubmitPaymentInfoRequest
 {
-    public required string RequestId { get; set; }
-    public required DateTime TimeStamp { get; set; }
-    public required string SenderId { get; set; }
-    public required string DocumentId { get; set; }
-    public required IReadOnlyList<PaymentInfo> PaymentInfo { get; set; }
+    public string RequestId { get; set; }
+    public DateTime TimeStamp { get; set; }
+    public string SenderId { get; set; }
+    public string DocumentId { get; set; }
+    public IReadOnlyList<PaymentInfo> PaymentInfo { get; set; }
 }
 
 public class SubmitPaymentInfoResponse
 {
-    public required ResultStatus ResultStatus { get; set; }
-    public required DateTime ResultDate { get; set; }
-    public required ulong TransmissionId { get; set; }
-    public required bool TransmissionIdSpecified { get; set; }
-    public required IReadOnlyList<StiApiError> Errors { get; set; }
+    public ResultStatus ResultStatus { get; set; }
+    public DateTime ResultDate { get; set; }
+    public ulong TransmissionId { get; set; }
+    public bool TransmissionIdSpecified { get; set; }
+    public IReadOnlyList<StiApiError> Errors { get; set; }
 }
 
 public class PaymentInfo
 {
-    public required PaymentType PaymentType { get; set; }
-    public required decimal Amount { get; set; }
-    public required string Currency { get; set; }
-    public required DateTime PaymentDate { get; set; }
+    public PaymentType PaymentType { get; set; }
+    public decimal Amount { get; set; }
+    public string Currency { get; set; }
+    public DateTime PaymentDate { get; set; }
 }
 
 public enum PaymentType

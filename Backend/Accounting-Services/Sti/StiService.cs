@@ -1,6 +1,5 @@
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
-using Account.Services;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Sti;
 using Accounting.Contract.Sti.Data;
@@ -14,7 +13,8 @@ public class StiService : IStiService
 
     public StiService(
         CertificateSerialNumbers certificateSerialNumbers,
-        Endpoints endpoints)
+        Endpoints endpoints
+    )
     {
         _client = CreateClient(certificateSerialNumbers, endpoints);
     }
@@ -86,7 +86,7 @@ public class StiService : IStiService
         );
 
         client.ClientCredentials.ClientCertificate.SetCertificate(
-            StoreLocation.CurrentUser,
+            StoreLocation.LocalMachine,
             StoreName.My,
             X509FindType.FindBySerialNumber,
             certificateSerialNumbers.StiVatRefund

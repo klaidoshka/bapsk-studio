@@ -1,6 +1,4 @@
 using System.Collections.Immutable;
-using Account.Services;
-using Accounting.Contract.Sti;
 using Accounting.Contract.Sti.Data;
 using Accounting.Services.Util;
 
@@ -8,15 +6,17 @@ namespace Accounting.Services.Sti.Mapping;
 
 public static class ExportedGoods
 {
-    public static getInfoOnExportedGoodsRequest ToExternalType(this ExportedGoodsRequest request)
+    public static getInfoOnExportedGoodsRequest1 ToExternalType(this ExportedGoodsRequest request)
     {
-        return new getInfoOnExportedGoodsRequest
-        {
-            DocId = request.DocId,
-            RequestId = request.RequestId,
-            SenderIn = request.SenderIn,
-            TimeStamp = request.TimeStamp
-        };
+        return new getInfoOnExportedGoodsRequest1(
+            new getInfoOnExportedGoodsRequest
+            {
+                DocId = request.DocumentId,
+                RequestId = request.RequestId,
+                SenderIn = request.SenderId,
+                TimeStamp = request.TimeStamp
+            }
+        );
     }
 
     public static ExportedGoodsResponse ToInternalType(
@@ -55,7 +55,6 @@ public static class ExportedGoods
         {
             CorrectionDate = results.CorrectionDate,
             DocumentId = results.DocId,
-            CorrectionDateSpecified = results.CorrectionDateSpecified,
             CustomsOfficeCode = results.CustomsOfficeCode,
             DocumentCorrectionNo = results.DocCorrNo,
             VerificationDate = results.VerificationDate,
@@ -100,8 +99,7 @@ public static class ExportedGoods
                 Code = c.Code,
                 Description = c.Description,
                 Result = c.Result,
-                TotalAmountVerified = c.TotalAmountVerified,
-                TotalAmountVerifiedSpecified = c.TotalAmountVerifiedSpecified
+                TotalAmountVerified = c.TotalAmountVerified
             })
             .ToImmutableList();
     }

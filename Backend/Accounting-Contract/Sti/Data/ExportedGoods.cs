@@ -2,51 +2,49 @@ namespace Accounting.Contract.Sti.Data;
 
 public class ExportedGoodsRequest
 {
-    public required string RequestId { get; set; }
-    public required DateTime TimeStamp { get; set; }
-    public required string SenderIn { get; set; }
-    public required string DocId { get; set; }
+    public string RequestId { get; set; }
+    public DateTime TimeStamp { get; set; }
+    public string SenderId { get; set; }
+    public string DocumentId { get; set; }
 }
 
 public class ExportedGoodsResponse
 {
-    public required ResultStatus ResultStatus { get; set; }
-    public required DateTime ResultDate { get; set; }
-    public required IReadOnlyList<StiApiError>? Errors { get; set; }
-    public required ExportedGoodsInfo? Info { get; set; }
+    public ResultStatus ResultStatus { get; set; }
+    public DateTime ResultDate { get; set; }
+    public IReadOnlyList<StiApiError>? Errors { get; set; }
+    public ExportedGoodsInfo? Info { get; set; }
 }
 
 public class ExportedGoodsInfo
 {
-    public required StiAssessmentResult StiAssessmentResult { get; set; }
-    public required CustomsVerificationResult CustomsVerificationResult { get; set; }
+    public StiAssessmentResult StiAssessmentResult { get; set; }
+    public CustomsVerificationResult CustomsVerificationResult { get; set; }
 }
 
 public class StiAssessmentResult
 {
-    public required DateTime AssessmentDate { get; set; }
-    public required IReadOnlyList<StiAssessmentResultCondition> Conditions { get; set; }
+    public DateTime AssessmentDate { get; set; }
+    public IReadOnlyList<StiAssessmentResultCondition> Conditions { get; set; }
 }
 
 public class StiAssessmentResultCondition
 {
-    public required string Code { get; set; }
-    public required string Description { get; set; }
-    public required bool Result { get; set; }
-    public required decimal TotalAmountVerified { get; set; }
-    public required bool TotalAmountVerifiedSpecified { get; set; }
+    public string Code { get; set; }
+    public string Description { get; set; }
+    public bool Result { get; set; }
+    public decimal TotalAmountVerified { get; set; }
 }
 
 public class CustomsVerificationResult
 {
-    public required string DocumentId { get; set; }
-    public required string DocumentCorrectionNo { get; set; }
-    public required DateTime VerificationDate { get; set; }
-    public required CustomsVerificationResultType VerificationResult { get; set; }
-    public required string CustomsOfficeCode { get; set; }
-    public required DateTime CorrectionDate { get; set; }
-    public required bool CorrectionDateSpecified { get; set; }
-    public required IReadOnlyList<VerifiedGoods> VerifiedGoods { get; set; }
+    public string DocumentId { get; set; }
+    public string DocumentCorrectionNo { get; set; }
+    public DateTime VerificationDate { get; set; }
+    public CustomsVerificationResultType VerificationResult { get; set; }
+    public string CustomsOfficeCode { get; set; }
+    public DateTime CorrectionDate { get; set; }
+    public IReadOnlyList<VerifiedGoods> VerifiedGoods { get; set; }
 }
 
 public enum CustomsVerificationResultType
@@ -57,11 +55,11 @@ public enum CustomsVerificationResultType
 
 public class VerifiedGoods
 {
-    public required string SequenceNo { get; set; }
-    public required decimal TotalAmount { get; set; }
-    public required decimal Quantity { get; set; }
-    public required string Item { get; set; }
-    public required ItemChoice ItemElementName { get; set; }
-    public required decimal QuantityVerified { get; set; }
-    public required decimal GrossValueVerified { get; set; }
+    public string SequenceNo { get; set; }
+    public decimal TotalAmount { get; set; }
+    public decimal Quantity { get; set; }
+    public string Item { get; set; }
+    public ItemChoice ItemElementName { get; set; }
+    public decimal QuantityVerified { get; set; }
+    public decimal GrossValueVerified { get; set; }
 }

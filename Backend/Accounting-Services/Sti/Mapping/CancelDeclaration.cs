@@ -1,5 +1,3 @@
-using Account.Services;
-using Accounting.Contract.Sti;
 using Accounting.Contract.Sti.Data;
 using Accounting.Services.Util;
 
@@ -7,15 +5,17 @@ namespace Accounting.Services.Sti.Mapping;
 
 public static class CancelDeclaration
 {
-    public static cancelDeclarationRequest ToExternalType(this CancelDeclarationRequest request)
+    public static cancelDeclarationRequest1 ToExternalType(this CancelDeclarationRequest request)
     {
-        return new cancelDeclarationRequest
-        {
-            DocId = request.DocumentId,
-            RequestId = request.RequestId,
-            SenderIn = request.SenderId,
-            TimeStamp = request.TimeStamp
-        };
+        return new cancelDeclarationRequest1(
+            new cancelDeclarationRequest
+            {
+                DocId = request.DocumentId,
+                RequestId = request.RequestId,
+                SenderIn = request.SenderId,
+                TimeStamp = request.TimeStamp
+            }
+        );
     }
 
     public static CancelDeclarationResponse ToInternalType(this cancelDeclarationResponse1 response)

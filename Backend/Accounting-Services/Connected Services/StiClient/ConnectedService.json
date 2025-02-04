@@ -3,12 +3,14 @@
   "version": "2.1.0",
   "ExtendedData": {
     "inputs": [
-      "../../../../VAT/StiClient.wsdl"
+      "../../../../VAT/VATRefundforForeignTravelerTR.wsdl"
     ],
+    "messageContract": true,
     "namespaceMappings": [
       "*, Accounting.Services"
     ],
     "outputFile": "StiClient",
+    "sync": true,
     "targetFramework": "net9.0",
     "typeReuseMode": "All"
   }

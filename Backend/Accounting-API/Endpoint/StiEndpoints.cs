@@ -1,5 +1,7 @@
+using System.ServiceModel;
 using Accounting.Contract.Sti;
 using Accounting.Contract.Sti.Data;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Accounting.API.Endpoint;
 
@@ -18,52 +20,32 @@ public static class StiEndpoints
     {
         endpoints.MapPost(
             "/cancel-declaration",
-            async (CancelDeclarationRequest request, IStiService stiService) =>
-            {
-                var response = await stiService.CancelDeclarationAsync(request);
-
-                return response;
-            }
+            async ([FromBody] CancelDeclarationRequest request, IStiService stiService) =>
+            Results.Json(await stiService.CancelDeclarationAsync(request))
         );
 
         endpoints.MapGet(
             "/exported-goods",
-            async (ExportedGoodsRequest request, IStiService stiService) =>
-            {
-                var response = await stiService.GetInfoOnExportedGoodsAsync(request);
-
-                return response;
-            }
-        );
+            async ([FromBody] ExportedGoodsRequest request, IStiService stiService) => Results.Json(
+                await stiService.GetInfoOnExportedGoodsAsync(request)
+            ));
 
         endpoints.MapGet(
             "/query-declarations",
-            async (QueryDeclarationsRequest request, IStiService stiService) =>
-            {
-                var response = await stiService.QueryDeclarationsAsync(request);
-
-                return response;
-            }
+            async ([FromBody] QueryDeclarationsRequest request, IStiService stiService) =>
+            Results.Json(await stiService.QueryDeclarationsAsync(request))
         );
 
         endpoints.MapPost(
             "/submit-declaration",
-            async (SubmitDeclarationRequest request, IStiService stiService) =>
-            {
-                var response = await stiService.SubmitDeclarationAsync(request);
-
-                return response;
-            }
+            async ([FromBody] SubmitDeclarationRequest request, IStiService stiService) =>
+            Results.Json(await stiService.SubmitDeclarationAsync(request))
         );
 
         endpoints.MapPost(
             "/submit-payment-info",
-            async (SubmitPaymentInfoRequest request, IStiService stiService) =>
-            {
-                var response = await stiService.SubmitPaymentInfoAsync(request);
-
-                return response;
-            }
+            async ([FromBody] SubmitPaymentInfoRequest request, IStiService stiService) =>
+            Results.Json(await stiService.SubmitPaymentInfoAsync(request))
         );
     }
 }
