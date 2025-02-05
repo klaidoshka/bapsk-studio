@@ -25,8 +25,8 @@ public static class SubmitPayment
                 p => new PaymentInfo_TypePayment
                 {
                     Amount = p.Amount,
-                    Date = p.PaymentDate,
-                    Type = p.PaymentType.ConvertToEnum<PaymentInfo_TypePaymentType>()
+                    Date = p.Date,
+                    Type = p.Type.ConvertToEnum<PaymentInfo_TypePaymentType>()
                 }
             )
             .ToArray();
@@ -40,8 +40,9 @@ public static class SubmitPayment
             ResultDate = response.submitPaymentInfoResponse.ResultDate,
             ResultStatus = response.submitPaymentInfoResponse.ResultStatus
                 .ConvertToEnum<ResultStatus>(),
-            TransmissionId = response.submitPaymentInfoResponse.TransmissionID,
-            TransmissionIdSpecified = response.submitPaymentInfoResponse.TransmissionIDSpecified
+            TransmissionId = response.submitPaymentInfoResponse.TransmissionIDSpecified
+                ? response.submitPaymentInfoResponse.TransmissionID
+                : null
         };
     }
 }

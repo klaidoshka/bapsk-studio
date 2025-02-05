@@ -2,8 +2,18 @@ namespace Accounting.Contract.Sti.Data.SubmitPaymentInfo;
 
 public class SubmitPaymentInfo
 {
-    public SubmitPaymentInfoType PaymentType { get; set; }
-    public decimal Amount { get; set; }
-    public string Currency { get; set; }
-    public DateTime PaymentDate { get; set; }
+    /// <summary>
+    /// Amount of payment made (minus any fees for the VAT return service).
+    /// </summary>
+    public required decimal Amount { get; set; }
+
+    /// <summary>
+    /// When the payment was made.
+    /// </summary>
+    public DateTime Date { get; set; }
+
+    /// <summary>
+    /// Return payment type.
+    /// </summary>
+    public required SubmitPaymentInfoType Type { get; set; }
 }

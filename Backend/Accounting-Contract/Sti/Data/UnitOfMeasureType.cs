@@ -1,6 +1,6 @@
 namespace Accounting.Contract.Sti.Data;
 
-public enum ItemChoice
+public enum UnitOfMeasureType
 {
     UnitOfMeasureCode,
     UnitOfMeasureOther

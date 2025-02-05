@@ -13,7 +13,7 @@ public static class EnumConverter
     /// <exception cref="InvalidEnumArgumentException">if target enum has no such value</exception>
     public static TEnumTo ConvertToEnum<TEnumTo>(this Enum value) where TEnumTo : struct, Enum
     {
-        if (Enum.TryParse(value.ToString(), out TEnumTo target))
+        if (Enum.TryParse(value.ToString(), true, out TEnumTo target))
         {
             return target;
         }

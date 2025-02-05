@@ -2,6 +2,13 @@ namespace Accounting.Contract.Sti.Data.SubmitDeclaration;
 
 public class SubmitDeclarationOtherDocument
 {
-    public SubmitDeclarationOtherDocumentNo DocumentNo { get; set; }
-    public string DocumentType { get; set; }
+    /// <summary>
+    /// Number of the document.
+    /// </summary>
+    public required SubmitDeclarationOtherDocumentNo DocumentNo { get; set; }
+
+    /// <summary>
+    /// Type of the document, 100 characters.
+    /// </summary>
+    public required string DocumentType { get; set; }
 }

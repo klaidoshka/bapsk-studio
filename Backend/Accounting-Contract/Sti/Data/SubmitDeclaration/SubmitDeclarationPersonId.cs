@@ -2,6 +2,13 @@ namespace Accounting.Contract.Sti.Data.SubmitDeclaration;
 
 public class SubmitDeclarationPersonId
 {
-    public IsoCountryCode IssuedBy { get; set; }
-    public string Value { get; set; }
+    /// <summary>
+    /// Which country issued the document, 2 character ISO country code.
+    /// </summary>
+    public required IsoCountryCode IssuedBy { get; set; }
+
+    /// <summary>
+    /// Identification number.
+    /// </summary>
+    public required string Value { get; set; }
 }

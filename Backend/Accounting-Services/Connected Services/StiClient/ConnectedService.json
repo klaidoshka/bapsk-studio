@@ -3,7 +3,7 @@
   "version": "2.1.0",
   "ExtendedData": {
     "inputs": [
-      "../../../../VAT/VATRefundforForeignTravelerTR.wsdl"
+      "../../../../Sti/VATRefundforForeignTravelerTR.wsdl"
     ],
     "namespaceMappings": [
       "*, Accounting.Services"

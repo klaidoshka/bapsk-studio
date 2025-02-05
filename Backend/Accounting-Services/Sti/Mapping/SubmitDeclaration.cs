@@ -153,8 +153,8 @@ public static class SubmitDeclaration
                 g => new GoodsItem_Type
                 {
                     Description = g.Description,
-                    Item = g.Item,
-                    ItemElementName = g.ItemElementName.ConvertToEnum<ItemChoiceType>(),
+                    Item = g.UnitOfMeasure,
+                    ItemElementName = g.UnitOfMeasureType.ConvertToEnum<ItemChoiceType>(),
                     Quantity = g.Quantity,
                     SequenceNo = g.SequenceNo,
                     TaxableAmount = g.TaxableAmount,

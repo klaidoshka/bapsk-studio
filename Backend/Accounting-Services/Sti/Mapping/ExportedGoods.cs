@@ -67,8 +67,8 @@ public static class ExportedGoods
                 g => new ExportedGoodsVerifiedGoods
                 {
                     GrossValueVerified = g.GrossValueVerified,
-                    Item = g.Item,
-                    ItemElementName = g.ItemElementName.ConvertToEnum<ItemChoice>(),
+                    UnitOfMeasure = g.Item,
+                    UnitOfMeasureType = g.ItemElementName.ConvertToEnum<UnitOfMeasureType>(),
                     Quantity = g.Quantity,
                     QuantityVerified = g.QuantityVerified,
                     SequenceNo = g.SequenceNo,
