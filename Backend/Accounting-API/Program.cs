@@ -5,7 +5,7 @@ using Accounting.API.Endpoint;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Sti;
 using Accounting.Services;
-using Accounting.Services.Sti;
+using Accounting.Services.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +21,7 @@ builder.Services.AddScoped<IStiService, StiService>();
 builder.ConfigureCertificate();
 // builder.Services.AddAuthentication();
 // builder.Services.AddAuthorization();
-builder.Services.AddDbContext<DatabaseContext>();
+builder.Services.AddDbContext<AccountingDatabase>();
 builder.Services.AddOpenApi();
 
 builder.Services.ConfigureHttpJsonOptions(

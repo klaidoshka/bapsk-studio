@@ -1,3 +1,5 @@
+using Accounting.Contract.Enumeration;
+
 namespace Accounting.Contract.Sti.Data.SubmitDeclaration;
 
 public class SubmitDeclarationIdDocumentNo

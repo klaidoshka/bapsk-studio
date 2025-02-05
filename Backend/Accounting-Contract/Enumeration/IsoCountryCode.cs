@@ -1,4 +1,4 @@
-namespace Accounting.Contract.Sti.Data;
+namespace Accounting.Contract.Enumeration;
 
 public enum IsoCountryCode
 {
