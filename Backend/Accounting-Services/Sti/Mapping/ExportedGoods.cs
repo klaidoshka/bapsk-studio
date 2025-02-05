@@ -6,21 +6,18 @@ namespace Accounting.Services.Sti.Mapping;
 
 public static class ExportedGoods
 {
-    public static getInfoOnExportedGoodsRequest1 ToExternalType(this ExportedGoodsRequest request)
+    public static getInfoOnExportedGoodsRequest ToExternalType(this ExportedGoodsRequest request)
     {
-        return new getInfoOnExportedGoodsRequest1(
-            new getInfoOnExportedGoodsRequest
-            {
-                DocId = request.DocumentId,
-                RequestId = request.RequestId,
-                SenderIn = request.SenderId,
-                TimeStamp = request.TimeStamp
-            }
-        );
+        return new getInfoOnExportedGoodsRequest
+        {
+            DocId = request.DocumentId,
+            RequestId = request.RequestId,
+            SenderIn = request.SenderId,
+            TimeStamp = request.TimeStamp
+        };
     }
 
-    public static ExportedGoodsResponse ToInternalType(
-        this getInfoOnExportedGoodsResponse1 response)
+    public static ExportedGoodsResponse ToInternalType(this getInfoOnExportedGoodsResponse1 response)
     {
         return new ExportedGoodsResponse
         {
@@ -47,9 +44,7 @@ public static class ExportedGoods
         };
     }
 
-    private static CustomsVerificationResult ToInternalType(
-        this CustomsVerificationResults_Type results
-    )
+    private static CustomsVerificationResult ToInternalType(this CustomsVerificationResults_Type results)
     {
         return new CustomsVerificationResult
         {
@@ -67,16 +62,18 @@ public static class ExportedGoods
     private static IReadOnlyList<VerifiedGoods> ToInternalType(this VerifiedGoods_Type[] goods)
     {
         return goods
-            .Select(g => new VerifiedGoods
-            {
-                GrossValueVerified = g.GrossValueVerified,
-                Item = g.Item,
-                ItemElementName = g.ItemElementName.ConvertToEnum<ItemChoice>(),
-                Quantity = g.Quantity,
-                QuantityVerified = g.QuantityVerified,
-                SequenceNo = g.SequenceNo,
-                TotalAmount = g.TotalAmount
-            })
+            .Select(
+                g => new VerifiedGoods
+                {
+                    GrossValueVerified = g.GrossValueVerified,
+                    Item = g.Item,
+                    ItemElementName = g.ItemElementName.ConvertToEnum<ItemChoice>(),
+                    Quantity = g.Quantity,
+                    QuantityVerified = g.QuantityVerified,
+                    SequenceNo = g.SequenceNo,
+                    TotalAmount = g.TotalAmount
+                }
+            )
             .ToImmutableList();
     }
 
@@ -89,18 +86,18 @@ public static class ExportedGoods
         };
     }
 
-    private static IReadOnlyList<StiAssessmentResultCondition> ToInternalType(
-        this STIAssessmentResults_TypeCondition[] conditions
-    )
+    private static IReadOnlyList<StiAssessmentResultCondition> ToInternalType(this STIAssessmentResults_TypeCondition[] conditions)
     {
         return conditions
-            .Select(c => new StiAssessmentResultCondition
-            {
-                Code = c.Code,
-                Description = c.Description,
-                Result = c.Result,
-                TotalAmountVerified = c.TotalAmountVerified
-            })
+            .Select(
+                c => new StiAssessmentResultCondition
+                {
+                    Code = c.Code,
+                    Description = c.Description,
+                    Result = c.Result,
+                    TotalAmountVerified = c.TotalAmountVerified
+                }
+            )
             .ToImmutableList();
     }
 }

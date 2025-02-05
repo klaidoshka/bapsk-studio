@@ -9,24 +9,28 @@ using Accounting.Services.Sti;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.ConfigureCertificate();
-// builder.AddAuthentication();
-// builder.Services.AddAuthorization();
-builder.Services.AddDbContext<DatabaseContext>();
-builder.Services.AddOpenApi();
-
 // Configuration
 builder.BindConfiguration("CertificateSerialNumbers", new CertificateSerialNumbers());
 builder.BindConfiguration("Endpoints", new Endpoints());
+builder.BindConfiguration("Logging", new Logging());
 
 // Services
 builder.Services.AddScoped<IStiService, StiService>();
 
-builder.Services.ConfigureHttpJsonOptions(json =>
-{
-    json.SerializerOptions.PropertyNameCaseInsensitive = true;
-    json.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
-});
+// Misc
+builder.ConfigureCertificate();
+// builder.Services.AddAuthentication();
+// builder.Services.AddAuthorization();
+builder.Services.AddDbContext<DatabaseContext>();
+builder.Services.AddOpenApi();
+
+builder.Services.ConfigureHttpJsonOptions(
+    json =>
+    {
+        json.SerializerOptions.PropertyNameCaseInsensitive = true;
+        json.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+    }
+);
 
 var application = builder.Build();
 
@@ -44,6 +48,6 @@ if (application.Environment.IsDevelopment())
 }
 
 // application.UseCors();
-application.UseHttpsRedirection();
-application.UseHsts();
+// application.UseHttpsRedirection();
+// application.UseHsts();
 application.Run();

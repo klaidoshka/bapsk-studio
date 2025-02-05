@@ -5,30 +5,29 @@ namespace Accounting.Services.Sti.Mapping;
 
 public static class SubmitPayment
 {
-    public static submitPaymentInfoRequest1 ToExternalType(this SubmitPaymentInfoRequest request)
+    public static submitPaymentInfoRequest ToExternalType(this SubmitPaymentInfoRequest request)
     {
-        return new submitPaymentInfoRequest1(
-            new submitPaymentInfoRequest
-            {
-                DocId = request.DocumentId,
-                PaymentInfo = request.PaymentInfo.ToExternalType(),
-                RequestId = request.RequestId,
-                SenderIn = request.SenderId,
-                TimeStamp = request.TimeStamp
-            }
-        );
+        return new submitPaymentInfoRequest
+        {
+            DocId = request.DocumentId,
+            PaymentInfo = request.PaymentInfo.ToExternalType(),
+            RequestId = request.RequestId,
+            SenderIn = request.SenderId,
+            TimeStamp = request.TimeStamp
+        };
     }
 
-    private static PaymentInfo_TypePayment[] ToExternalType(
-        this IReadOnlyList<PaymentInfo> payments)
+    private static PaymentInfo_TypePayment[] ToExternalType(this IReadOnlyList<PaymentInfo> payments)
     {
         return payments
-            .Select(p => new PaymentInfo_TypePayment
-            {
-                Amount = p.Amount,
-                Date = p.PaymentDate,
-                Type = p.PaymentType.ConvertToEnum<PaymentInfo_TypePaymentType>()
-            })
+            .Select(
+                p => new PaymentInfo_TypePayment
+                {
+                    Amount = p.Amount,
+                    Date = p.PaymentDate,
+                    Type = p.PaymentType.ConvertToEnum<PaymentInfo_TypePaymentType>()
+                }
+            )
             .ToArray();
     }
 

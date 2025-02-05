@@ -18,37 +18,22 @@ namespace Accounting.Services
         
         [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        Accounting.Services.submitPaymentInfoResponse1 submitPaymentInfo(Accounting.Services.submitPaymentInfoRequest1 request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         System.Threading.Tasks.Task<Accounting.Services.submitPaymentInfoResponse1> submitPaymentInfoAsync(Accounting.Services.submitPaymentInfoRequest1 request);
         
         [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        Accounting.Services.queryDeclarationsResponse1 queryDeclarations(Accounting.Services.queryDeclarationsRequest1 request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         System.Threading.Tasks.Task<Accounting.Services.queryDeclarationsResponse1> queryDeclarationsAsync(Accounting.Services.queryDeclarationsRequest1 request);
         
         [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        Accounting.Services.submitDeclarationResponse1 submitDeclaration(Accounting.Services.submitDeclarationRequest1 request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         System.Threading.Tasks.Task<Accounting.Services.submitDeclarationResponse1> submitDeclarationAsync(Accounting.Services.submitDeclarationRequest1 request);
         
         [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        Accounting.Services.cancelDeclarationResponse1 cancelDeclaration(Accounting.Services.cancelDeclarationRequest1 request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         System.Threading.Tasks.Task<Accounting.Services.cancelDeclarationResponse1> cancelDeclarationAsync(Accounting.Services.cancelDeclarationRequest1 request);
         
         [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        Accounting.Services.getInfoOnExportedGoodsResponse1 getInfoOnExportedGoods(Accounting.Services.getInfoOnExportedGoodsRequest1 request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="", ReplyAction="*")]
         System.Threading.Tasks.Task<Accounting.Services.getInfoOnExportedGoodsResponse1> getInfoOnExportedGoodsAsync(Accounting.Services.getInfoOnExportedGoodsRequest1 request);
     }
     
@@ -3351,6 +3336,7 @@ namespace Accounting.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class submitPaymentInfoRequest1
     {
@@ -3370,6 +3356,7 @@ namespace Accounting.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class submitPaymentInfoResponse1
     {
@@ -3638,6 +3625,7 @@ namespace Accounting.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class queryDeclarationsRequest1
     {
@@ -3657,6 +3645,7 @@ namespace Accounting.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class queryDeclarationsResponse1
     {
@@ -3901,6 +3890,7 @@ namespace Accounting.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class submitDeclarationRequest1
     {
@@ -3920,6 +3910,7 @@ namespace Accounting.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class submitDeclarationResponse1
     {
@@ -4068,6 +4059,7 @@ namespace Accounting.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class cancelDeclarationRequest1
     {
@@ -4087,6 +4079,7 @@ namespace Accounting.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class cancelDeclarationResponse1
     {
@@ -4235,6 +4228,7 @@ namespace Accounting.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class getInfoOnExportedGoodsRequest1
     {
@@ -4254,6 +4248,7 @@ namespace Accounting.Services
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "2.1.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
     [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
     public partial class getInfoOnExportedGoodsResponse1
     {
@@ -4321,54 +4316,69 @@ namespace Accounting.Services
         {
         }
         
-        public Accounting.Services.submitPaymentInfoResponse1 submitPaymentInfo(Accounting.Services.submitPaymentInfoRequest1 request)
-        {
-            return base.Channel.submitPaymentInfo(request);
-        }
-        
-        public System.Threading.Tasks.Task<Accounting.Services.submitPaymentInfoResponse1> submitPaymentInfoAsync(Accounting.Services.submitPaymentInfoRequest1 request)
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Threading.Tasks.Task<Accounting.Services.submitPaymentInfoResponse1> Accounting.Services.VATRefundforForeignTravelerTRPort.submitPaymentInfoAsync(Accounting.Services.submitPaymentInfoRequest1 request)
         {
             return base.Channel.submitPaymentInfoAsync(request);
         }
         
-        public Accounting.Services.queryDeclarationsResponse1 queryDeclarations(Accounting.Services.queryDeclarationsRequest1 request)
+        public System.Threading.Tasks.Task<Accounting.Services.submitPaymentInfoResponse1> submitPaymentInfoAsync(Accounting.Services.submitPaymentInfoRequest submitPaymentInfoRequest)
         {
-            return base.Channel.queryDeclarations(request);
+            Accounting.Services.submitPaymentInfoRequest1 inValue = new Accounting.Services.submitPaymentInfoRequest1();
+            inValue.submitPaymentInfoRequest = submitPaymentInfoRequest;
+            return ((Accounting.Services.VATRefundforForeignTravelerTRPort)(this)).submitPaymentInfoAsync(inValue);
         }
         
-        public System.Threading.Tasks.Task<Accounting.Services.queryDeclarationsResponse1> queryDeclarationsAsync(Accounting.Services.queryDeclarationsRequest1 request)
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Threading.Tasks.Task<Accounting.Services.queryDeclarationsResponse1> Accounting.Services.VATRefundforForeignTravelerTRPort.queryDeclarationsAsync(Accounting.Services.queryDeclarationsRequest1 request)
         {
             return base.Channel.queryDeclarationsAsync(request);
         }
         
-        public Accounting.Services.submitDeclarationResponse1 submitDeclaration(Accounting.Services.submitDeclarationRequest1 request)
+        public System.Threading.Tasks.Task<Accounting.Services.queryDeclarationsResponse1> queryDeclarationsAsync(Accounting.Services.queryDeclarationsRequest queryDeclarationsRequest)
         {
-            return base.Channel.submitDeclaration(request);
+            Accounting.Services.queryDeclarationsRequest1 inValue = new Accounting.Services.queryDeclarationsRequest1();
+            inValue.queryDeclarationsRequest = queryDeclarationsRequest;
+            return ((Accounting.Services.VATRefundforForeignTravelerTRPort)(this)).queryDeclarationsAsync(inValue);
         }
         
-        public System.Threading.Tasks.Task<Accounting.Services.submitDeclarationResponse1> submitDeclarationAsync(Accounting.Services.submitDeclarationRequest1 request)
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Threading.Tasks.Task<Accounting.Services.submitDeclarationResponse1> Accounting.Services.VATRefundforForeignTravelerTRPort.submitDeclarationAsync(Accounting.Services.submitDeclarationRequest1 request)
         {
             return base.Channel.submitDeclarationAsync(request);
         }
         
-        public Accounting.Services.cancelDeclarationResponse1 cancelDeclaration(Accounting.Services.cancelDeclarationRequest1 request)
+        public System.Threading.Tasks.Task<Accounting.Services.submitDeclarationResponse1> submitDeclarationAsync(Accounting.Services.submitDeclarationRequest submitDeclarationRequest)
         {
-            return base.Channel.cancelDeclaration(request);
+            Accounting.Services.submitDeclarationRequest1 inValue = new Accounting.Services.submitDeclarationRequest1();
+            inValue.submitDeclarationRequest = submitDeclarationRequest;
+            return ((Accounting.Services.VATRefundforForeignTravelerTRPort)(this)).submitDeclarationAsync(inValue);
         }
         
-        public System.Threading.Tasks.Task<Accounting.Services.cancelDeclarationResponse1> cancelDeclarationAsync(Accounting.Services.cancelDeclarationRequest1 request)
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Threading.Tasks.Task<Accounting.Services.cancelDeclarationResponse1> Accounting.Services.VATRefundforForeignTravelerTRPort.cancelDeclarationAsync(Accounting.Services.cancelDeclarationRequest1 request)
         {
             return base.Channel.cancelDeclarationAsync(request);
         }
         
-        public Accounting.Services.getInfoOnExportedGoodsResponse1 getInfoOnExportedGoods(Accounting.Services.getInfoOnExportedGoodsRequest1 request)
+        public System.Threading.Tasks.Task<Accounting.Services.cancelDeclarationResponse1> cancelDeclarationAsync(Accounting.Services.cancelDeclarationRequest cancelDeclarationRequest)
         {
-            return base.Channel.getInfoOnExportedGoods(request);
+            Accounting.Services.cancelDeclarationRequest1 inValue = new Accounting.Services.cancelDeclarationRequest1();
+            inValue.cancelDeclarationRequest = cancelDeclarationRequest;
+            return ((Accounting.Services.VATRefundforForeignTravelerTRPort)(this)).cancelDeclarationAsync(inValue);
         }
         
-        public System.Threading.Tasks.Task<Accounting.Services.getInfoOnExportedGoodsResponse1> getInfoOnExportedGoodsAsync(Accounting.Services.getInfoOnExportedGoodsRequest1 request)
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Threading.Tasks.Task<Accounting.Services.getInfoOnExportedGoodsResponse1> Accounting.Services.VATRefundforForeignTravelerTRPort.getInfoOnExportedGoodsAsync(Accounting.Services.getInfoOnExportedGoodsRequest1 request)
         {
             return base.Channel.getInfoOnExportedGoodsAsync(request);
+        }
+        
+        public System.Threading.Tasks.Task<Accounting.Services.getInfoOnExportedGoodsResponse1> getInfoOnExportedGoodsAsync(Accounting.Services.getInfoOnExportedGoodsRequest getInfoOnExportedGoodsRequest)
+        {
+            Accounting.Services.getInfoOnExportedGoodsRequest1 inValue = new Accounting.Services.getInfoOnExportedGoodsRequest1();
+            inValue.getInfoOnExportedGoodsRequest = getInfoOnExportedGoodsRequest;
+            return ((Accounting.Services.VATRefundforForeignTravelerTRPort)(this)).getInfoOnExportedGoodsAsync(inValue);
         }
         
         public virtual System.Threading.Tasks.Task OpenAsync()

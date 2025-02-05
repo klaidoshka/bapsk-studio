@@ -5,15 +5,6 @@ namespace Accounting.API;
 public static class Extensions
 {
     /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="builder"></param>
-    public static void AddAuthentication(this WebApplicationBuilder builder)
-    {
-        
-    }
-    
-    /// <summary>
     /// Binds a configuration section to a configuration object and registers it as a singleton.
     /// </summary>
     /// <param name="builder">To bind configuration for</param>

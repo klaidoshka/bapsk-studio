@@ -5,18 +5,16 @@ namespace Accounting.Services.Sti.Mapping;
 
 public static class SubmitDeclaration
 {
-    public static submitDeclarationRequest1 ToExternalType(this SubmitDeclarationRequest request)
+    public static submitDeclarationRequest ToExternalType(this SubmitDeclarationRequest request)
     {
-        return new submitDeclarationRequest1(
-            new submitDeclarationRequest
-            {
-                Declaration = request.Declaration.ToExternalType(),
-                RequestId = request.RequestId,
-                SenderIn = request.SenderId,
-                Situation = request.Situation,
-                TimeStamp = request.TimeStamp
-            }
-        );
+        return new submitDeclarationRequest
+        {
+            Declaration = request.Declaration.ToExternalType(),
+            RequestId = request.RequestId,
+            SenderIn = request.SenderId,
+            Situation = request.Situation,
+            TimeStamp = request.TimeStamp
+        };
     }
 
     private static TFDeclaration_Type ToExternalType(this Contract.Sti.Data.SubmitDeclaration type)
@@ -71,15 +69,17 @@ public static class SubmitDeclaration
     private static OtherDocument_Type[] ToExternalType(this IReadOnlyList<OtherDocument> documents)
     {
         return documents
-            .Select(document => new OtherDocument_Type
-            {
-                DocNo = new OtherDocNo_Type
+            .Select(
+                document => new OtherDocument_Type
                 {
-                    issuedBy = document.DocumentNo.IssuedBy.ConvertToEnum<IsoCountryCode_Type>(),
-                    Value = document.DocumentNo.Value
-                },
-                DocType = document.DocumentType
-            })
+                    DocNo = new OtherDocNo_Type
+                    {
+                        issuedBy = document.DocumentNo.IssuedBy.ConvertToEnum<IsoCountryCode_Type>(),
+                        Value = document.DocumentNo.Value
+                    },
+                    DocType = document.DocumentType
+                }
+            )
             .ToArray();
     }
 
@@ -133,31 +133,35 @@ public static class SubmitDeclaration
     private static SalesDocument_Type[] ToExternalType(this IReadOnlyList<SalesDocument> documents)
     {
         return documents
-            .Select(document => new SalesDocument_Type
-            {
-                Goods = document.Goods.ToExternalType(),
-                Item = (document.CashRegisterReceipt?.ToExternalType() as object) ??
-                       document.InvoiceNo,
-                SalesDate = document.SalesDate
-            })
+            .Select(
+                document => new SalesDocument_Type
+                {
+                    Goods = document.Goods.ToExternalType(),
+                    Item = (document.CashRegisterReceipt?.ToExternalType() as object) ??
+                           document.InvoiceNo,
+                    SalesDate = document.SalesDate
+                }
+            )
             .ToArray();
     }
 
     private static GoodsItem_Type[] ToExternalType(this IReadOnlyList<Goods> goods)
     {
         return goods
-            .Select(g => new GoodsItem_Type
-            {
-                Description = g.Description,
-                Item = g.Item,
-                ItemElementName = g.ItemElementName.ConvertToEnum<ItemChoiceType>(),
-                Quantity = g.Quantity,
-                SequenceNo = g.SequenceNo,
-                TaxableAmount = g.TaxableAmount,
-                TotalAmount = g.TotalAmount,
-                VatAmount = g.VatAmount,
-                VatRate = g.VatRate
-            })
+            .Select(
+                g => new GoodsItem_Type
+                {
+                    Description = g.Description,
+                    Item = g.Item,
+                    ItemElementName = g.ItemElementName.ConvertToEnum<ItemChoiceType>(),
+                    Quantity = g.Quantity,
+                    SequenceNo = g.SequenceNo,
+                    TaxableAmount = g.TaxableAmount,
+                    TotalAmount = g.TotalAmount,
+                    VatAmount = g.VatAmount,
+                    VatRate = g.VatRate
+                }
+            )
             .ToArray();
     }
 

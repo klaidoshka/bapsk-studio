@@ -8,8 +8,8 @@ Content-Type: application/json
 
 {
   "RequestId": "12345",
-  "TimeStamp": "2023-10-01T12:34:56Z",
-  "SenderId": "sender-001",
+  "TimeStamp": "2023-10-01T12:34:56",
+  "SenderId": "651561911",
   "DocumentId": "doc-67890"
 }
 
@@ -22,11 +22,10 @@ Content-Type: application/json
 
 {
   "RequestId": "12345",
-  "TimeStamp": "2023-10-01T12:34:56Z",
-  "SenderId": "sender-001",
+  "TimeStamp": "2023-10-01T12:34:56",
+  "SenderId": "651561911",
   "DocumentId": "doc-67890"
 }
-
 
 ###
 
@@ -37,7 +36,7 @@ Content-Type: application/json
 
 {
   "RequestId": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-  "TimeStamp": "2023-10-01T12:34:56Z",
+  "TimeStamp": "2023-10-01T12:34:56",
   "SenderId": "651561911",
   "Query": {
     "StateDateFrom": "2023-09-01T00:00:00",
@@ -62,7 +61,7 @@ Content-Type: application/json
         "IssuedBy": "LT",
         "Value": "123456789"
       },
-      "BirthDate": "1980-01-01T00:00:00Z",
+      "BirthDate": "1980-01-01T00:00:00",
       "IdentityDocument": {
         "DocumentNo": {
           "IssuedBy": "LT",
@@ -87,15 +86,15 @@ Content-Type: application/json
     },
     "Header": {
       "Affirmation": "Y",
-      "CompletionDate": "2023-10-01T12:34:56Z",
-      "DocumentCorrectionNo": "DCN001",
+      "CompletionDate": "2023-10-01T12:34:56",
+      "DocumentCorrectionNo": "1",
       "DocumentId": "DOC123456"
     },
     "Salesman": {
       "Name": "SalesmanName",
       "VatPayerCode": {
         "IssuedBy": "LT",
-        "Value": "VAT123456"
+        "Value": "123456789"
       }
     },
     "SalesDocuments": [
@@ -109,7 +108,7 @@ Content-Type: application/json
             "SequenceNo": "1",
             "Description": "GoodsDescription",
             "Quantity": 10,
-            "Item": "Item001",
+            "Item": "KGM",
             "ItemElementName": "UnitOfMeasureCode",
             "TaxableAmount": 100.00,
             "VatRate": 21.00,
@@ -118,17 +117,17 @@ Content-Type: application/json
           }
         ],
         "InvoiceNo": "INV001",
-        "SalesDate": "2023-10-01T12:34:56Z"
+        "SalesDate": "2023-10-01T12:34:56"
       }
     ],
     "Intermediary": {
-      "IntermediaryId": "INT001",
+      "IntermediaryId": "651561911",
       "Name": "IntermediaryName"
     }
   },
   "RequestId": "REQ123456",
-  "TimeStamp": "2023-10-01T12:34:56Z",
-  "SenderId": "sender-001",
+  "TimeStamp": "2023-10-01T12:34:56",
+  "SenderId": "651561911",
   "Situation": 1
 }
 
@@ -141,21 +140,21 @@ Content-Type: application/json
 
 {
   "RequestId": "REQ123456",
-  "TimeStamp": "2023-10-01T12:34:56Z",
-  "SenderId": "sender-001",
+  "TimeStamp": "2023-10-01T12:34:56",
+  "SenderId": "651561911",
   "DocumentId": "DOC123456",
   "PaymentInfo": [
     {
       "PaymentType": "Item1",
       "Amount": 100.00,
       "Currency": "USD",
-      "PaymentDate": "2023-10-01T12:34:56Z"
+      "PaymentDate": "2023-10-01T12:34:56"
     },
     {
       "PaymentType": "Item2",
       "Amount": 200.00,
       "Currency": "EUR",
-      "PaymentDate": "2023-10-02T12:34:56Z"
+      "PaymentDate": "2023-10-02T12:34:56"
     }
   ]
 }

@@ -1,6 +1,8 @@
+using System.ComponentModel.DataAnnotations;
 using System.ServiceModel;
 using Accounting.Contract.Sti;
 using Accounting.Contract.Sti.Data;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Accounting.API.Endpoint;
@@ -26,9 +28,9 @@ public static class StiEndpoints
 
         endpoints.MapGet(
             "/exported-goods",
-            async ([FromBody] ExportedGoodsRequest request, IStiService stiService) => Results.Json(
-                await stiService.GetInfoOnExportedGoodsAsync(request)
-            ));
+            async ([FromBody] ExportedGoodsRequest request, IStiService stiService) =>
+            Results.Json(await stiService.GetInfoOnExportedGoodsAsync(request))
+        );
 
         endpoints.MapGet(
             "/query-declarations",

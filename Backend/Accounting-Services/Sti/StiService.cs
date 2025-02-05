@@ -7,53 +7,44 @@ using Accounting.Services.Sti.Mapping;
 
 namespace Accounting.Services.Sti;
 
-public class StiService : IStiService
+public class StiService : IStiService, IAsyncDisposable
 {
     private readonly VATRefundforForeignTravelerTRPortClient _client;
 
     public StiService(
         CertificateSerialNumbers certificateSerialNumbers,
-        Endpoints endpoints
+        Endpoints endpoints,
+        Logging logging
     )
     {
-        _client = CreateClient(certificateSerialNumbers, endpoints);
+        _client = CreateClient(certificateSerialNumbers, endpoints, logging);
     }
 
-    public async Task<CancelDeclarationResponse> CancelDeclarationAsync(
-        CancelDeclarationRequest request
-    )
+    public async Task<CancelDeclarationResponse> CancelDeclarationAsync(CancelDeclarationRequest request)
     {
         return (await _client.cancelDeclarationAsync(request.ToExternalType()))
             .ToInternalType();
     }
 
-    public async Task<ExportedGoodsResponse> GetInfoOnExportedGoodsAsync(
-        ExportedGoodsRequest request
-    )
+    public async Task<ExportedGoodsResponse> GetInfoOnExportedGoodsAsync(ExportedGoodsRequest request)
     {
         return (await _client.getInfoOnExportedGoodsAsync(request.ToExternalType()))
             .ToInternalType();
     }
 
-    public async Task<QueryDeclarationsResponse> QueryDeclarationsAsync(
-        QueryDeclarationsRequest request
-    )
+    public async Task<QueryDeclarationsResponse> QueryDeclarationsAsync(QueryDeclarationsRequest request)
     {
         return (await _client.queryDeclarationsAsync(request.ToExternalType()))
             .ToInternalType();
     }
 
-    public async Task<SubmitDeclarationResponse> SubmitDeclarationAsync(
-        SubmitDeclarationRequest request
-    )
+    public async Task<SubmitDeclarationResponse> SubmitDeclarationAsync(SubmitDeclarationRequest request)
     {
         return (await _client.submitDeclarationAsync(request.ToExternalType()))
             .ToInternalType();
     }
 
-    public async Task<SubmitPaymentInfoResponse> SubmitPaymentInfoAsync(
-        SubmitPaymentInfoRequest request
-    )
+    public async Task<SubmitPaymentInfoResponse> SubmitPaymentInfoAsync(SubmitPaymentInfoRequest request)
     {
         return (await _client.submitPaymentInfoAsync(request.ToExternalType()))
             .ToInternalType();
@@ -61,7 +52,8 @@ public class StiService : IStiService
 
     private static VATRefundforForeignTravelerTRPortClient CreateClient(
         CertificateSerialNumbers certificateSerialNumbers,
-        Endpoints endpoints
+        Endpoints endpoints,
+        Logging logging
     )
     {
         if (certificateSerialNumbers.StiVatRefund is null || endpoints.StiVatRefund is null)
@@ -72,7 +64,7 @@ public class StiService : IStiService
         }
 
         var client = new VATRefundforForeignTravelerTRPortClient(
-            new BasicHttpsBinding
+            new BasicHttpsBinding(BasicHttpsSecurityMode.Transport)
             {
                 Security = new BasicHttpsSecurity
                 {
@@ -85,6 +77,11 @@ public class StiService : IStiService
             new EndpointAddress(endpoints.StiVatRefund)
         );
 
+        if (logging.LogSoap == true)
+        {
+            client.Endpoint.EndpointBehaviors.Add(new MessageLoggingBehavior());
+        }
+
         client.ClientCredentials.ClientCertificate.SetCertificate(
             StoreLocation.LocalMachine,
             StoreName.My,
@@ -93,5 +90,10 @@ public class StiService : IStiService
         );
 
         return client;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _client.CloseAsync();
     }
 }

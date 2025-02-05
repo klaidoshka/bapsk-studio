@@ -5,12 +5,10 @@
     "inputs": [
       "../../../../VAT/VATRefundforForeignTravelerTR.wsdl"
     ],
-    "messageContract": true,
     "namespaceMappings": [
       "*, Accounting.Services"
     ],
     "outputFile": "StiClient",
-    "sync": true,
     "targetFramework": "net9.0",
     "typeReuseMode": "All"
   }
