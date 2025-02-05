@@ -1,41 +1,53 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Accounting.API;
+using Accounting.API.Endpoint;
+using Accounting.Contract.Configuration;
+using Accounting.Contract.Sti;
+using Accounting.Services;
+using Accounting.Services.Service;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// Configuration
+builder.BindConfiguration("CertificateSerialNumbers", new CertificateSerialNumbers());
+builder.BindConfiguration("Endpoints", new Endpoints());
+builder.BindConfiguration("Logging", new Logging());
+
+// Services
+builder.Services.AddScoped<IStiService, StiService>();
+
+// Misc
+builder.ConfigureCertificate();
+// builder.Services.AddAuthentication();
+// builder.Services.AddAuthorization();
+builder.Services.AddDbContext<AccountingDatabase>();
 builder.Services.AddOpenApi();
 
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
-app.UseHttpsRedirection();
-
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
+builder.Services.ConfigureHttpJsonOptions(
+    json =>
     {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast");
+        json.SerializerOptions.PropertyNameCaseInsensitive = true;
+        json.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+    }
+);
 
-app.Run();
+var application = builder.Build();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+// application.UseAuthentication();
+// application.UseAuthorization();
+
+// Endpoints
+application
+    .MapGroup("/api/v1/accounting/sti")
+    .MapStiEndpoints();
+
+if (application.Environment.IsDevelopment())
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    application.MapOpenApi();
 }
+
+// application.UseCors();
+// application.UseHttpsRedirection();
+// application.UseHsts();
+application.Run();

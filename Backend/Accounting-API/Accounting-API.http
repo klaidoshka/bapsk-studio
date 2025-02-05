@@ -1,6 +1,160 @@
-@Accounting_API_HostAddress = http://localhost:5125
+@Accounting_API_HostAddress = http://localhost:5125/api/v1/accounting
+@STI_API_HostAddress = {{Accounting_API_HostAddress}}/sti
 
-GET {{Accounting_API_HostAddress}}/weatherforecast/
+// Cancel declaration
+POST {{STI_API_HostAddress}}/cancel-declaration
 Accept: application/json
+Content-Type: application/json
+
+{
+  "RequestId": "12345",
+  "TimeStamp": "2023-10-01T12:34:56",
+  "SenderId": "651561911",
+  "DocumentId": "doc-67890"
+}
 
 ###
+
+// Request exported goods
+GET {{STI_API_HostAddress}}/exported-goods
+Accept: application/json
+Content-Type: application/json
+
+{
+  "RequestId": "12345",
+  "TimeStamp": "2023-10-01T12:34:56",
+  "SenderId": "651561911",
+  "DocumentId": "doc-67890"
+}
+
+###
+
+// Query declarations
+GET {{STI_API_HostAddress}}/query-declarations
+Accept: application/json
+Content-Type: application/json
+
+{
+  "RequestId": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+  "TimeStamp": "2023-10-01T12:34:56",
+  "SenderId": "651561911",
+  "Query": {
+    "StateDateFrom": "2023-09-01T00:00:00",
+    "StateDateTo": "2023-09-30T23:59:59",
+    "DeclarationState": "ACCEPTED_CORRECT"
+  }
+}
+
+###
+
+// Submit declaration
+POST {{STI_API_HostAddress}}/submit-declaration
+Accept: application/json
+Content-Type: application/json
+
+{
+  "Declaration": {
+    "Customer": {
+      "FirstName": "John",
+      "LastName": "Doe",
+      "PersonId": {
+        "IssuedBy": "LT",
+        "Value": "123456789"
+      },
+      "BirthDate": "1980-01-01T00:00:00",
+      "IdentityDocument": {
+        "DocumentNo": {
+          "IssuedBy": "LT",
+          "Value": "ID123456"
+        },
+        "DocumentType": 1
+      },
+      "OtherDocument": [
+        {
+          "DocumentNo": {
+            "IssuedBy": "LT",
+            "Value": "OD123456"
+          },
+          "DocumentType": "TypeA"
+        }
+      ],
+      "ResidentCountryCode": "GB",
+      "ResidentTerritory": {
+        "TerritoryCode": "TC001",
+        "TerritoryName": "TerritoryName"
+      }
+    },
+    "Header": {
+      "Affirmation": "Y",
+      "CompletionDate": "2023-10-01T12:34:56",
+      "DocumentCorrectionNo": "1",
+      "DocumentId": "DOC123456"
+    },
+    "Salesman": {
+      "Name": "SalesmanName",
+      "VatPayerCode": {
+        "IssuedBy": "LT",
+        "Value": "123456789"
+      }
+    },
+    "SalesDocuments": [
+      {
+        "CashRegisterReceipt": {
+          "CashRegisterNo": "CR001",
+          "ReceiptNo": "R001"
+        },
+        "Goods": [
+          {
+            "SequenceNo": "1",
+            "Description": "GoodsDescription",
+            "Quantity": 10,
+            "Item": "KGM",
+            "ItemElementName": "UnitOfMeasureCode",
+            "TaxableAmount": 100.00,
+            "VatRate": 21.00,
+            "VatAmount": 21.00,
+            "TotalAmount": 121.00
+          }
+        ],
+        "InvoiceNo": "INV001",
+        "SalesDate": "2023-10-01T12:34:56"
+      }
+    ],
+    "Intermediary": {
+      "IntermediaryId": "651561911",
+      "Name": "IntermediaryName"
+    }
+  },
+  "RequestId": "REQ123456",
+  "TimeStamp": "2023-10-01T12:34:56",
+  "SenderId": "651561911",
+  "Situation": 1
+}
+
+###
+
+// Submit payment info
+POST {{STI_API_HostAddress}}/submit-payment-info
+Accept: application/json
+Content-Type: application/json
+
+{
+  "RequestId": "REQ123456",
+  "TimeStamp": "2023-10-01T12:34:56",
+  "SenderId": "651561911",
+  "DocumentId": "DOC123456",
+  "PaymentInfo": [
+    {
+      "PaymentType": "Item1",
+      "Amount": 100.00,
+      "Currency": "USD",
+      "PaymentDate": "2023-10-01T12:34:56"
+    },
+    {
+      "PaymentType": "Item2",
+      "Amount": 200.00,
+      "Currency": "EUR",
+      "PaymentDate": "2023-10-02T12:34:56"
+    }
+  ]
+}
