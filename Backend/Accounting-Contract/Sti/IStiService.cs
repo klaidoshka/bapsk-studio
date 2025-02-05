@@ -1,4 +1,9 @@
 using Accounting.Contract.Sti.Data;
+using Accounting.Contract.Sti.Data.CancelDeclaration;
+using Accounting.Contract.Sti.Data.ExportedGoods;
+using Accounting.Contract.Sti.Data.QueryDeclarations;
+using Accounting.Contract.Sti.Data.SubmitDeclaration;
+using Accounting.Contract.Sti.Data.SubmitPaymentInfo;
 
 namespace Accounting.Contract.Sti;
 

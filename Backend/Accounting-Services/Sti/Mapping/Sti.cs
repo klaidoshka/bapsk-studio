@@ -5,10 +5,10 @@ namespace Accounting.Services.Sti.Mapping;
 
 public static class Sti
 {
-    public static IReadOnlyList<StiApiError> ToInternalType(this Errors_TypeError[] errors)
+    public static IReadOnlyList<StiError> ToInternalType(this Errors_TypeError[] errors)
     {
         return errors
-            .Select(e => new StiApiError
+            .Select(e => new StiError
             {
                 Description = e.Description,
                 Details = e.Details,

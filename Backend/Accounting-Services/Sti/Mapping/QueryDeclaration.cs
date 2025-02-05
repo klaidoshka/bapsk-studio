@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Accounting.Contract.Sti.Data;
+using Accounting.Contract.Sti.Data.QueryDeclarations;
 using Accounting.Services.Util;
 
 namespace Accounting.Services.Sti.Mapping;
@@ -17,7 +18,7 @@ public static class QueryDeclaration
         };
     }
 
-    private static queryDeclarationsRequestQuery ToExternalType(this Query query)
+    private static queryDeclarationsRequestQuery ToExternalType(this QueryDeclarationsQuery query)
     {
         var queryNew = new queryDeclarationsRequestQuery
         {
@@ -49,14 +50,14 @@ public static class QueryDeclaration
         };
     }
 
-    private static IReadOnlyList<Contract.Sti.Data.QueryDeclaration> ToInternalType(this DeclList_Type declList)
+    private static IReadOnlyList<QueryDeclarationsDeclaration> ToInternalType(this DeclList_Type declList)
     {
         return declList
             .DeclListItem
             .Select(
-                i => new Contract.Sti.Data.QueryDeclaration
+                i => new QueryDeclarationsDeclaration
                 {
-                    DeclarationState = i.DeclState.ConvertToEnum<QueryDeclarationState>(),
+                    DeclarationState = i.DeclState.ConvertToEnum<QueryDeclarationsState>(),
                     DocumentCorrectionNoCustoms = i.DocCorrNoCostums,
                     DocumentCorrectionNoLast = i.DocCorrNoLast,
                     DocumentId = i.DocId,

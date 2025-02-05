@@ -1,4 +1,5 @@
 using Accounting.Contract.Sti.Data;
+using Accounting.Contract.Sti.Data.CancelDeclaration;
 using Accounting.Services.Util;
 
 namespace Accounting.Services.Sti.Mapping;

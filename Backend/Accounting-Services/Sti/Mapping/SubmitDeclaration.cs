@@ -1,4 +1,5 @@
 using Accounting.Contract.Sti.Data;
+using Accounting.Contract.Sti.Data.SubmitDeclaration;
 using Accounting.Services.Util;
 
 namespace Accounting.Services.Sti.Mapping;
@@ -17,7 +18,7 @@ public static class SubmitDeclaration
         };
     }
 
-    private static TFDeclaration_Type ToExternalType(this Contract.Sti.Data.SubmitDeclaration type)
+    private static TFDeclaration_Type ToExternalType(this Contract.Sti.Data.SubmitDeclaration.SubmitDeclaration type)
     {
         return new TFDeclaration_Type
         {
@@ -29,7 +30,7 @@ public static class SubmitDeclaration
         };
     }
 
-    private static Customer_Type ToExternalType(this Customer customer)
+    private static Customer_Type ToExternalType(this SubmitDeclarationCustomer customer)
     {
         return new Customer_Type
         {
@@ -44,7 +45,7 @@ public static class SubmitDeclaration
         };
     }
 
-    private static IdentityDocument_Type ToExternalType(this IdentityDocument document)
+    private static IdentityDocument_Type ToExternalType(this SubmitDeclarationIdentityDocument document)
     {
         return new IdentityDocument_Type
         {
@@ -57,7 +58,7 @@ public static class SubmitDeclaration
         };
     }
 
-    private static Customer_TypeResTerritory ToExternalType(this CustomerResTerritory territory)
+    private static Customer_TypeResTerritory ToExternalType(this SubmitDeclarationCustomerResidenceTerritory territory)
     {
         return new Customer_TypeResTerritory
         {
@@ -66,7 +67,7 @@ public static class SubmitDeclaration
         };
     }
 
-    private static OtherDocument_Type[] ToExternalType(this IReadOnlyList<OtherDocument> documents)
+    private static OtherDocument_Type[] ToExternalType(this IReadOnlyList<SubmitDeclarationOtherDocument> documents)
     {
         return documents
             .Select(
@@ -83,7 +84,7 @@ public static class SubmitDeclaration
             .ToArray();
     }
 
-    private static PersonIn_Type ToExternalType(this PersonIn personIn)
+    private static PersonIn_Type ToExternalType(this SubmitDeclarationPersonId personIn)
     {
         return new PersonIn_Type
         {
@@ -92,7 +93,7 @@ public static class SubmitDeclaration
         };
     }
 
-    private static DocHeader_Type ToExternalType(this DocumentHeader header)
+    private static DocHeader_Type ToExternalType(this SubmitDeclarationDocumentHeader header)
     {
         return new DocHeader_Type
         {
@@ -103,7 +104,7 @@ public static class SubmitDeclaration
         };
     }
 
-    private static Intermediary_Type ToExternalType(this Intermediary intermediary)
+    private static Intermediary_Type ToExternalType(this SubmitDeclarationIntermediary intermediary)
     {
         return new Intermediary_Type
         {
@@ -112,7 +113,7 @@ public static class SubmitDeclaration
         };
     }
 
-    private static SalesMan_Type ToExternalType(this Salesman salesman)
+    private static SalesMan_Type ToExternalType(this SubmitDeclarationSalesman salesman)
     {
         return new SalesMan_Type
         {
@@ -121,7 +122,7 @@ public static class SubmitDeclaration
         };
     }
 
-    private static LtVatPayerCode_Type ToExternalType(this LtVatPayerCode code)
+    private static LtVatPayerCode_Type ToExternalType(this SubmitDeclarationLtVatPayerCode code)
     {
         return new LtVatPayerCode_Type
         {
@@ -130,7 +131,7 @@ public static class SubmitDeclaration
         };
     }
 
-    private static SalesDocument_Type[] ToExternalType(this IReadOnlyList<SalesDocument> documents)
+    private static SalesDocument_Type[] ToExternalType(this IReadOnlyList<SubmitDeclarationSalesDocument> documents)
     {
         return documents
             .Select(
@@ -145,7 +146,7 @@ public static class SubmitDeclaration
             .ToArray();
     }
 
-    private static GoodsItem_Type[] ToExternalType(this IReadOnlyList<Goods> goods)
+    private static GoodsItem_Type[] ToExternalType(this IReadOnlyList<SubmitDeclarationGoods> goods)
     {
         return goods
             .Select(
@@ -165,7 +166,7 @@ public static class SubmitDeclaration
             .ToArray();
     }
 
-    private static CashRegisterReceipt_Type ToExternalType(this CashRegisterReceipt receipt)
+    private static CashRegisterReceipt_Type ToExternalType(this SubmitDeclarationCashRegisterReceipt receipt)
     {
         return new CashRegisterReceipt_Type
         {

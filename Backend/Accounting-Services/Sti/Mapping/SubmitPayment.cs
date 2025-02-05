@@ -1,4 +1,5 @@
 using Accounting.Contract.Sti.Data;
+using Accounting.Contract.Sti.Data.SubmitPaymentInfo;
 using Accounting.Services.Util;
 
 namespace Accounting.Services.Sti.Mapping;
@@ -17,7 +18,7 @@ public static class SubmitPayment
         };
     }
 
-    private static PaymentInfo_TypePayment[] ToExternalType(this IReadOnlyList<PaymentInfo> payments)
+    private static PaymentInfo_TypePayment[] ToExternalType(this IReadOnlyList<SubmitPaymentInfo> payments)
     {
         return payments
             .Select(

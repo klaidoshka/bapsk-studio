@@ -1,6 +1,6 @@
 namespace Accounting.Contract.Sti.Data;
 
-public class StiApiError
+public class StiError
 {
     public string SequenceNo { get; set; }
     public string ErrorCode { get; set; }

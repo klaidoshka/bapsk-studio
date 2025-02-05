@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Accounting.Contract.Sti.Data;
+using Accounting.Contract.Sti.Data.ExportedGoods;
 using Accounting.Services.Util;
 
 namespace Accounting.Services.Sti.Mapping;
@@ -44,9 +45,9 @@ public static class ExportedGoods
         };
     }
 
-    private static CustomsVerificationResult ToInternalType(this CustomsVerificationResults_Type results)
+    private static ExportedGoodsCustomsVerificationResult ToInternalType(this CustomsVerificationResults_Type results)
     {
-        return new CustomsVerificationResult
+        return new ExportedGoodsCustomsVerificationResult
         {
             CorrectionDate = results.CorrectionDate,
             DocumentId = results.DocId,
@@ -55,15 +56,15 @@ public static class ExportedGoods
             VerificationDate = results.VerificationDate,
             VerifiedGoods = results.VerifiedGoods.ToInternalType(),
             VerificationResult = results.VerificationResult
-                .ConvertToEnum<CustomsVerificationResultType>()
+                .ConvertToEnum<ExportedGoodsCustomsVerificationResultType>()
         };
     }
 
-    private static IReadOnlyList<VerifiedGoods> ToInternalType(this VerifiedGoods_Type[] goods)
+    private static IReadOnlyList<ExportedGoodsVerifiedGoods> ToInternalType(this VerifiedGoods_Type[] goods)
     {
         return goods
             .Select(
-                g => new VerifiedGoods
+                g => new ExportedGoodsVerifiedGoods
                 {
                     GrossValueVerified = g.GrossValueVerified,
                     Item = g.Item,
@@ -77,20 +78,20 @@ public static class ExportedGoods
             .ToImmutableList();
     }
 
-    private static StiAssessmentResult ToInternalType(this STIAssessmentResults_Type results)
+    private static ExportedGoodsStiAssessmentResult ToInternalType(this STIAssessmentResults_Type results)
     {
-        return new StiAssessmentResult
+        return new ExportedGoodsStiAssessmentResult
         {
             AssessmentDate = results.AssessmentDate,
             Conditions = results.Condition.ToInternalType()
         };
     }
 
-    private static IReadOnlyList<StiAssessmentResultCondition> ToInternalType(this STIAssessmentResults_TypeCondition[] conditions)
+    private static IReadOnlyList<ExportedGoodsStiAssessmentResultCondition> ToInternalType(this STIAssessmentResults_TypeCondition[] conditions)
     {
         return conditions
             .Select(
-                c => new StiAssessmentResultCondition
+                c => new ExportedGoodsStiAssessmentResultCondition
                 {
                     Code = c.Code,
                     Description = c.Description,

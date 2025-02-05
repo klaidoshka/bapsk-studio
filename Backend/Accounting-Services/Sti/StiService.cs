@@ -3,6 +3,11 @@ using System.ServiceModel;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Sti;
 using Accounting.Contract.Sti.Data;
+using Accounting.Contract.Sti.Data.CancelDeclaration;
+using Accounting.Contract.Sti.Data.ExportedGoods;
+using Accounting.Contract.Sti.Data.QueryDeclarations;
+using Accounting.Contract.Sti.Data.SubmitDeclaration;
+using Accounting.Contract.Sti.Data.SubmitPaymentInfo;
 using Accounting.Services.Sti.Mapping;
 
 namespace Accounting.Services.Sti;
