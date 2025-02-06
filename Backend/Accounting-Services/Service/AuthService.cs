@@ -180,7 +180,7 @@ public class AuthService : IAuthService
             )
         )
         {
-            failures.Add("Specified cannot be used to register an user");
+            failures.Add("Specified email cannot be used to register an user");
         }
 
         if (

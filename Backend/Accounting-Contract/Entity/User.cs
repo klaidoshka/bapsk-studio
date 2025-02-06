@@ -4,12 +4,19 @@ namespace Accounting.Contract.Entity;
 
 public class User
 {
-    public required DateTime BirthDate { get; set; }
-    public required IsoCountryCode Country { get; set; }
-    public required string Email { get; set; }
-    public required string EmailNormalized { get; set; }
-    public required Guid Id { get; set; }
-    public required string FirstName { get; set; }
-    public required string LastName { get; set; }
-    public required string PasswordHash { get; set; }
+    public DateTime BirthDate { get; set; }
+
+    public IsoCountryCode Country { get; set; }
+
+    public string Email { get; set; }
+
+    public string EmailNormalized { get; set; }
+
+    public Guid Id { get; set; }
+
+    public string FirstName { get; set; }
+
+    public string LastName { get; set; }
+
+    public string PasswordHash { get; set; }
 }

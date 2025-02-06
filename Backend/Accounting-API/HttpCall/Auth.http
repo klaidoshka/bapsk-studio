@@ -12,10 +12,6 @@ Content-Type: application/json
   "Password": "P@ssw0rd!"
 }
 
-> {%
-  client.global.set("jwtToken", response.body);
-%}
-
 ###
 
 POST {{Auth_Host}}/register
@@ -34,22 +30,15 @@ Content-Type: application/json
   "Password": "P@ssw0rd!"
 }
 
-> {%
-  client.global.set("jwtToken", response.body);
-%}
-
 ###
 
 POST {{Auth_Host}}/refresh
 Accept: application/json
 Content-Type: application/json
 
-{{jwtToken}}
-
 ###
 
 POST {{Auth_Host}}/logout
 Accept: application/json
 Content-Type: application/json
-
-{{jwtToken}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjQzMDJhZjk2LTAzYmItNDJhZi1hYThlLTBhOTQzOGU4YWZkYSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImR1bW15QGV4YW1wbGUuY29tIiwic2Vzc2lvbklkIjoiZDQ3Y2VmYzgtN2IyNi00M2Q4LThjM2UtODQ4MGNlYmNmOTI3IiwiZXhwIjoxNzcwMzkxNjU0LCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo3MDg0IiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo0MjAwIn0.7HzqA2rA-WPBlJYNKTSoCP-Hir-2-huz0dUAv73oE7I

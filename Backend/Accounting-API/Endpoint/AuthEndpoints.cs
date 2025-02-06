@@ -55,7 +55,7 @@ public static class AuthEndpoints
             {
                 var refreshToken = GetRefreshTokenFromRequest(httpContext.Request);
 
-                if (refreshToken == null)
+                if (string.IsNullOrWhiteSpace(refreshToken))
                 {
                     return Results.Unauthorized();
                 }

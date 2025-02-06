@@ -1,4 +1,7 @@
 using System.Security.Cryptography.X509Certificates;
+using Accounting.Contract;
+using Accounting.Contract.Configuration;
+using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.API;
 
@@ -40,11 +43,45 @@ public static class Extensions
     /// <param name="builder">To bind configuration for</param>
     /// <param name="section">To bind onto configuration</param>
     /// <typeparam name="TConfiguration">Configuration class type</typeparam>
-    public static void AddConfiguration<TConfiguration>(this WebApplicationBuilder builder, string section)
+    /// <returns>Configuration instance</returns>
+    public static TConfiguration AddConfiguration<TConfiguration>(this WebApplicationBuilder builder, string section)
         where TConfiguration : class
     {
-        builder.Services.AddSingleton(
-            builder.Configuration.GetSection(section).Get<TConfiguration>()
+        var configuration = builder.Configuration.GetSection(section).Get<TConfiguration>();
+
+        builder.Services.AddSingleton(configuration);
+
+        return configuration;
+    }
+
+    /// <summary>
+    /// Adds a database context to the service collection.
+    /// </summary>
+    /// <param name="services">To add database context to</param>
+    /// <param name="databaseOptions">Configuration of database</param>
+    /// <exception cref="NotSupportedException">If unsupported database dialect is used</exception>
+    public static void AddDbContext(this IServiceCollection services, DatabaseOptions databaseOptions)
+    {
+        services.AddDbContext<AccountingDatabase>(
+            optionsBuilder =>
+            {
+                ServerVersion version = databaseOptions.Dialect.ToLowerInvariant() switch
+                {
+                    "mariadb" => new MariaDbServerVersion(databaseOptions.ServerVersion),
+                    "mysql"   => new MySqlServerVersion(databaseOptions.ServerVersion),
+                    _ => throw new NotSupportedException(
+                        $"Dialect {databaseOptions.Dialect} is not supported."
+                    )
+                };
+
+                optionsBuilder.UseMySql(
+                    databaseOptions.ConnectionString,
+                    version,
+                    mySqlOptionsBuilder => mySqlOptionsBuilder
+                        .EnableStringComparisonTranslations()
+                        .EnableRetryOnFailure(3)
+                );
+            }
         );
     }
 }

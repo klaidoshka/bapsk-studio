@@ -3,7 +3,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Accounting.API;
 using Accounting.API.Endpoint;
-using Accounting.Contract;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Service;
 using Accounting.Services.Service;
@@ -14,12 +13,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configuration
 builder.AddConfiguration<CertificateSerialNumbers>("CertificateSerialNumbers");
-builder.AddConfiguration<DatabaseOptions>("DatabaseOptions");
 builder.AddConfiguration<Endpoints>("Endpoints");
 builder.AddConfiguration<JwtSettings>("JwtSettings");
 builder.AddConfiguration<Logging>("Logging");
 
+var databaseOptions = builder.AddConfiguration<DatabaseOptions>("DatabaseOptions");
+
 // Services
+builder.Services.AddDbContext(databaseOptions);
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IHashService, HashService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -27,8 +28,6 @@ builder.Services.AddScoped<IStiService, StiService>();
 
 // Misc
 builder.AddCertificate();
-
-builder.Services.AddDbContext<AccountingDatabase>();
 
 builder
     .Services
@@ -76,13 +75,13 @@ application.UseAuthentication();
 application.UseAuthorization();
 
 application
+    .MapGroup("/api/v1/auth")
+    .MapAuthEndpoints();
+
+application
     .MapGroup("/api/v1/accounting/sti")
     .RequireAuthorization()
     .MapStiEndpoints();
-
-application
-    .MapGroup("/api/v1/auth")
-    .MapAuthEndpoints();
 
 if (application.Environment.IsDevelopment())
 {
