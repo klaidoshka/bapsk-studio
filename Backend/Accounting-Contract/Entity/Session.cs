@@ -1,11 +1,23 @@
-namespace Accounting.Services.Entity;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Accounting.Contract.Entity;
 
 public class Session
 {
-    public required string Agent { get; set; }
-    public required DateTime CreatedAt { get; set; }
-    public required Guid Id { get; set; }
-    public required string IpAddress { get; set; }
-    public required string Location { get; set; }
-    public required Guid UserId { get; set; }
+    public string Agent { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    public Guid Id { get; set; }
+
+    public string IpAddress { get; set; }
+
+    public string Location { get; set; }
+
+    public string RefreshToken { get; set; }
+
+    public Guid UserId { get; set; }
+
+    [ForeignKey(nameof(UserId))]
+    public User User { get; set; }
 }

@@ -1,6 +1,6 @@
 using Accounting.Contract.Enumeration;
 
-namespace Accounting.Services.Entity;
+namespace Accounting.Contract.Entity;
 
 public class User
 {

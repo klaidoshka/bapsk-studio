@@ -4,7 +4,7 @@ using Accounting.Contract.Sti.Data.QueryDeclarations;
 using Accounting.Contract.Sti.Data.SubmitDeclaration;
 using Accounting.Contract.Sti.Data.SubmitPaymentInfo;
 
-namespace Accounting.Contract.Sti;
+namespace Accounting.Contract.Service;
 
 /// <summary>
 /// Service responsible for interacting with the STI API via Client.

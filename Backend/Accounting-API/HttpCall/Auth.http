@@ -1,0 +1,55 @@
+@Auth_Host = http://localhost:5125/api/v1/auth
+
+POST {{Auth_Host}}/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+  "Email": "dummy@example.com",
+  "IpAddress": "192.168.1.1",
+  "Location": "New York, USA",
+  "Password": "P@ssw0rd!"
+}
+
+> {%
+  client.global.set("jwtToken", response.body);
+%}
+
+###
+
+POST {{Auth_Host}}/register
+Accept: application/json
+Content-Type: application/json
+
+{
+  "Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+  "BirthDate": "1990-01-01T00:00:00Z",
+  "Country": "LT",
+  "Email": "dummy@example.com",
+  "FirstName": "John",
+  "IpAddress": "192.168.1.1",
+  "LastName": "Doe",
+  "Location": "New York, USA",
+  "Password": "P@ssw0rd!"
+}
+
+> {%
+  client.global.set("jwtToken", response.body);
+%}
+
+###
+
+POST {{Auth_Host}}/refresh
+Accept: application/json
+Content-Type: application/json
+
+{{jwtToken}}
+
+###
+
+POST {{Auth_Host}}/logout
+Accept: application/json
+Content-Type: application/json
+
+{{jwtToken}}

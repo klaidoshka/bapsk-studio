@@ -1,8 +1,19 @@
-namespace Accounting.Services.Auth;
+namespace Accounting.Contract.Auth;
 
 public class JwtToken
 {
-    public required string Token { get; set; }
-    public required DateTime ExpiresAt { get; set; }
+    /// <summary>
+    /// Access token value.
+    /// </summary>
+    public required string AccessToken { get; set; }
+
+    /// <summary>
+    /// Refresh token value.
+    /// </summary>
+    public required string RefreshToken { get; set; }
+
+    /// <summary>
+    /// Session identifier for the token.
+    /// </summary>
     public required Guid SessionId { get; set; }
 }
