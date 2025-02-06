@@ -10,7 +10,7 @@ public interface IAuthService
     /// </summary>
     /// <param name="request">Request to use for login</param>
     /// <returns>In-progress task that resolves into JwtToken</returns>
-    Task<JwtToken> LoginAsync(LoginRequest request);
+    Task<JwtTokenPair> LoginAsync(LoginRequest request);
 
     /// <summary>
     /// Logs out user with specified session id.
@@ -24,14 +24,14 @@ public interface IAuthService
     /// </summary>
     /// <param name="refreshToken">Refresh token to use for generating a new access token</param>
     /// <returns>In-progress task that resolves into a new JwtToken</returns>
-    Task<JwtToken> RefreshTokenAsync(string refreshToken);
+    Task<JwtTokenPair> RefreshTokenAsync(string refreshToken);
 
     /// <summary>
     /// Registers and logs in user with specified credentials.
     /// </summary>
     /// <param name="request">Request to use for registration</param>
     /// <returns>In-progress task that resolves into JwtToken</returns>
-    Task<JwtToken> RegisterAsync(RegisterRequest request);
+    Task<JwtTokenPair> RegisterAsync(RegisterRequest request);
 
     /// <summary>
     /// Checks if specified login request is valid.

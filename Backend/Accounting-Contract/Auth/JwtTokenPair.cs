@@ -1,6 +1,6 @@
 namespace Accounting.Contract.Auth;
 
-public class JwtToken
+public class JwtTokenPair
 {
     /// <summary>
     /// Access token value.
@@ -11,9 +11,4 @@ public class JwtToken
     /// Refresh token value.
     /// </summary>
     public required string RefreshToken { get; set; }
-
-    /// <summary>
-    /// Session identifier for the token.
-    /// </summary>
-    public required Guid SessionId { get; set; }
 }

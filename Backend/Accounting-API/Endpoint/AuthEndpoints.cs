@@ -10,12 +10,17 @@ public static class AuthEndpoints
     {
         builder.MapPost(
             "/login",
-            async ([FromBody] LoginRequest request, IAuthService authService) =>
+            async ([FromBody] LoginRequest request, HttpResponse response, IAuthService authService) =>
             {
                 var validation = authService.ValidateLoginRequest(request);
 
                 return await validation.ToResultAsync(
-                    () => authService.LoginAsync(request)
+                    async () =>
+                    {
+                        var token = await authService.LoginAsync(request);
+
+                        PutTokensIntoResponse(token, response);
+                    }
                 );
             }
         );
@@ -23,16 +28,21 @@ public static class AuthEndpoints
         builder
             .MapPost(
                 "/logout",
-                async ([FromBody] JwtToken token, IAuthService authService, IJwtService jwtService) =>
+                async (HttpContext httpContext, IAuthService authService, IJwtService jwtService) =>
                 {
-                    var validation = await authService.ValidateRefreshTokenAsync(token.RefreshToken);
+                    var refreshToken = GetRefreshTokenFromRequest(httpContext.Request);
+
+                    var validation = await authService.ValidateRefreshTokenAsync(refreshToken);
 
                     return await validation.ToResultAsync(
-                        () =>
+                        async () =>
                         {
-                            var sessionId = jwtService.ExtractSessionId(token.RefreshToken)!.Value;
+                            var sessionId = jwtService.ExtractSessionId(refreshToken)!.Value;
 
-                            return authService.LogoutAsync(sessionId);
+                            await authService.LogoutAsync(sessionId);
+
+                            httpContext.Response.Cookies.Delete("accessToken");
+                            httpContext.Response.Cookies.Delete("refreshToken");
                         }
                     );
                 }
@@ -41,12 +51,24 @@ public static class AuthEndpoints
 
         builder.MapPost(
             "/refresh",
-            async ([FromBody] JwtToken token, IAuthService authService) =>
+            async (HttpContext httpContext, IAuthService authService) =>
             {
-                var validation = await authService.ValidateRefreshTokenAsync(token.RefreshToken);
+                var refreshToken = GetRefreshTokenFromRequest(httpContext.Request);
+
+                if (refreshToken == null)
+                {
+                    return Results.Unauthorized();
+                }
+
+                var validation = await authService.ValidateRefreshTokenAsync(refreshToken);
 
                 return await validation.ToResultAsync(
-                    () => authService.RefreshTokenAsync(token.RefreshToken)
+                    async () =>
+                    {
+                        var token = await authService.RefreshTokenAsync(refreshToken);
+
+                        PutTokensIntoResponse(token, httpContext.Response);
+                    }
                 );
             }
         );
@@ -60,6 +82,36 @@ public static class AuthEndpoints
                 return await validation.ToResultAsync(
                     () => authService.RegisterAsync(request)
                 );
+            }
+        );
+    }
+
+    private static string? GetRefreshTokenFromRequest(HttpRequest request)
+    {
+        return request.Cookies["refreshToken"];
+    }
+
+    private static void PutTokensIntoResponse(JwtTokenPair token, HttpResponse response)
+    {
+        response.Cookies.Append(
+            "accessToken",
+            token.AccessToken,
+            new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false, // TODO: Set to true when using HTTPS
+                SameSite = SameSiteMode.Strict
+            }
+        );
+
+        response.Cookies.Append(
+            "refreshToken",
+            token.RefreshToken,
+            new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = false, // TODO: Set to true when using HTTPS
+                SameSite = SameSiteMode.Strict
             }
         );
     }

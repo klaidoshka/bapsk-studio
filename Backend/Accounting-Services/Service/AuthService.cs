@@ -24,7 +24,7 @@ public class AuthService : IAuthService
         _jwtService = jwtService;
     }
 
-    public async Task<JwtToken> LoginAsync(LoginRequest request)
+    public async Task<JwtTokenPair> LoginAsync(LoginRequest request)
     {
         var user = await _database.Users.FirstOrDefaultAsync(
             u => u.EmailNormalized.Equals(
@@ -40,11 +40,10 @@ public class AuthService : IAuthService
 
         var sessionId = Guid.NewGuid();
 
-        var token = new JwtToken
+        var token = new JwtTokenPair
         {
             AccessToken = _jwtService.GenerateAccessToken(user, sessionId),
-            RefreshToken = _jwtService.GenerateRefreshToken(user, sessionId),
-            SessionId = sessionId
+            RefreshToken = _jwtService.GenerateRefreshToken(user, sessionId)
         };
 
         await _database.Sessions.AddAsync(
@@ -77,7 +76,7 @@ public class AuthService : IAuthService
         }
     }
 
-    public async Task<JwtToken> RefreshTokenAsync(string refreshToken)
+    public async Task<JwtTokenPair> RefreshTokenAsync(string refreshToken)
     {
         var validation = await ValidateRefreshTokenAsync(refreshToken);
 
@@ -98,11 +97,10 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Session not found");
         }
 
-        var token = new JwtToken
+        var token = new JwtTokenPair
         {
             AccessToken = _jwtService.GenerateAccessToken(session.User, session.Id),
-            RefreshToken = _jwtService.GenerateRefreshToken(session.User, session.Id),
-            SessionId = session.Id
+            RefreshToken = _jwtService.GenerateRefreshToken(session.User, session.Id)
         };
 
         session.RefreshToken = token.RefreshToken;
@@ -112,7 +110,7 @@ public class AuthService : IAuthService
         return token;
     }
 
-    public async Task<JwtToken> RegisterAsync(RegisterRequest request)
+    public async Task<JwtTokenPair> RegisterAsync(RegisterRequest request)
     {
         var user = new User
         {
