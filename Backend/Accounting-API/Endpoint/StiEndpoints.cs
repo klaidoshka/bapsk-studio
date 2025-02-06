@@ -1,4 +1,4 @@
-using Accounting.Contract.Sti;
+using Accounting.Contract.Service;
 using Accounting.Contract.Sti.Data.CancelDeclaration;
 using Accounting.Contract.Sti.Data.ExportedGoods;
 using Accounting.Contract.Sti.Data.QueryDeclarations;

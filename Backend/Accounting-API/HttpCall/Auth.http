@@ -1,0 +1,44 @@
+@Auth_Host = http://localhost:5125/api/v1/auth
+
+POST {{Auth_Host}}/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+  "Email": "dummy@example.com",
+  "IpAddress": "192.168.1.1",
+  "Location": "New York, USA",
+  "Password": "P@ssw0rd!"
+}
+
+###
+
+POST {{Auth_Host}}/register
+Accept: application/json
+Content-Type: application/json
+
+{
+  "Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+  "BirthDate": "1990-01-01T00:00:00Z",
+  "Country": "LT",
+  "Email": "dummy@example.com",
+  "FirstName": "John",
+  "IpAddress": "192.168.1.1",
+  "LastName": "Doe",
+  "Location": "New York, USA",
+  "Password": "P@ssw0rd!"
+}
+
+###
+
+POST {{Auth_Host}}/refresh
+Accept: application/json
+Content-Type: application/json
+
+###
+
+POST {{Auth_Host}}/logout
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjQzMDJhZjk2LTAzYmItNDJhZi1hYThlLTBhOTQzOGU4YWZkYSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImR1bW15QGV4YW1wbGUuY29tIiwic2Vzc2lvbklkIjoiZDQ3Y2VmYzgtN2IyNi00M2Q4LThjM2UtODQ4MGNlYmNmOTI3IiwiZXhwIjoxNzcwMzkxNjU0LCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo3MDg0IiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo0MjAwIn0.7HzqA2rA-WPBlJYNKTSoCP-Hir-2-huz0dUAv73oE7I
