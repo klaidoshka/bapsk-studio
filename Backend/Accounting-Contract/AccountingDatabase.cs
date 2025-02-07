@@ -12,6 +12,7 @@ public class AccountingDatabase : DbContext
     public DbSet<Instance> Instances { get; set; }
     public DbSet<InstanceUserMeta> InstanceUserMetas { get; set; }
     public DbSet<Session> Sessions { get; set; }
+    public DbSet<StiDeclarationByApi> StiDeclarationsByApi { get; set; }
     public DbSet<User> Users { get; set; }
 
     public AccountingDatabase(DbContextOptions<AccountingDatabase> options) : base(options) { }

@@ -35,8 +35,9 @@ public class SubmitDeclarationRequest
 
     /// <summary>
     /// Length of 1 digit:
-    /// 1 - When instant declaration is requested
-    /// 2 - When deferred declaration is requested
+    /// 1 - When instant declaration is requested by the salesman.
+    /// 2 - When deferred declaration is requested by the salesman,
+    ///     since the buyer has been given a paper declaration.
     /// </summary>
     public required int Situation { get; set; }
 

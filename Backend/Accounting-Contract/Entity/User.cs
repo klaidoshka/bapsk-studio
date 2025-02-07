@@ -1,7 +1,10 @@
 using Accounting.Contract.Enumeration;
+using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Contract.Entity;
 
+[PrimaryKey(nameof(Id))]
+[Index(nameof(EmailNormalized), IsUnique = true)]
 public class User
 {
     /// <summary>

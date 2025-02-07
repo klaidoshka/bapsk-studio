@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Contract.Entity;
 
+[PrimaryKey(nameof(Id))]
 public class DataEntry
 {
     /// <summary>

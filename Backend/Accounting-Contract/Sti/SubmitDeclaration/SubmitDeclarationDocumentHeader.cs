@@ -8,12 +8,13 @@ public class SubmitDeclarationDocumentHeader
     public required SubmitDeclarationDocumentHeaderAffirmation Affirmation { get; set; }
 
     /// <summary>
+    /// When was the declaration document filled.
     /// The same or earlier than the date (TimeStamp) of the submit request.
     /// </summary>
     public required DateTime CompletionDate { get; set; }
 
     /// <summary>
-    /// Declaration correction number.
+    /// Declaration correction number. Starts from 1.
     /// </summary>
     public required string DocumentCorrectionNo { get; set; }
 
