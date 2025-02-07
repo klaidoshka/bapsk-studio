@@ -2,11 +2,11 @@ using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Service;
-using Accounting.Contract.Sti.Data.CancelDeclaration;
-using Accounting.Contract.Sti.Data.ExportedGoods;
-using Accounting.Contract.Sti.Data.QueryDeclarations;
-using Accounting.Contract.Sti.Data.SubmitDeclaration;
-using Accounting.Contract.Sti.Data.SubmitPaymentInfo;
+using Accounting.Contract.Sti.CancelDeclaration;
+using Accounting.Contract.Sti.ExportedGoods;
+using Accounting.Contract.Sti.QueryDeclarations;
+using Accounting.Contract.Sti.SubmitDeclaration;
+using Accounting.Contract.Sti.SubmitPaymentInfo;
 using Accounting.Services.Sti;
 using Accounting.Services.Sti.Mapping;
 
@@ -99,6 +99,7 @@ public class StiService : IStiService, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
+        GC.SuppressFinalize(this);
         await _client.CloseAsync();
     }
 }

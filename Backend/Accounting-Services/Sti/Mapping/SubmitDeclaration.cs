@@ -1,5 +1,5 @@
-using Accounting.Contract.Sti.Data;
-using Accounting.Contract.Sti.Data.SubmitDeclaration;
+using Accounting.Contract.Sti;
+using Accounting.Contract.Sti.SubmitDeclaration;
 using Accounting.Services.Util;
 
 namespace Accounting.Services.Sti.Mapping;
@@ -18,7 +18,7 @@ public static class SubmitDeclaration
         };
     }
 
-    private static TFDeclaration_Type ToExternalType(this Contract.Sti.Data.SubmitDeclaration.SubmitDeclaration type)
+    private static TFDeclaration_Type ToExternalType(this Contract.Sti.SubmitDeclaration.SubmitDeclaration type)
     {
         return new TFDeclaration_Type
         {
