@@ -1,10 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Contract.Entity;
 
-[PrimaryKey(nameof(Id))]
 public class DataType
 {
     /// <summary>
@@ -16,7 +14,7 @@ public class DataType
     /// <summary>
     /// Unique identifier of the user who created the data type.
     /// </summary>
-    public Guid CreatedById { get; set; }
+    public int CreatedById { get; set; }
 
     /// <summary>
     /// Description of the data type, can be undefined.
@@ -30,7 +28,9 @@ public class DataType
     /// <summary>
     /// Unique identifier of the data type.
     /// </summary>
-    public Guid Id { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
     /// <summary>
     /// Marks the data type as soft-deleted, but does not remove it from the database.
@@ -46,7 +46,7 @@ public class DataType
     /// <summary>
     /// Unique identifier of the instance that the data type belongs to.
     /// </summary>
-    public Guid InstanceId { get; set; }
+    public int InstanceId { get; set; }
 
     /// <summary>
     /// Name of the data type.

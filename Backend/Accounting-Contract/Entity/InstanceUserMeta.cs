@@ -1,15 +1,16 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Contract.Entity;
 
-[PrimaryKey(nameof(Id))]
 public class InstanceUserMeta
 {
     /// <summary>
     /// Unique identifier for the instance user meta.
     /// </summary>
-    public Guid Id { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
     /// <summary>
     /// Navigation property for the instance.
@@ -20,7 +21,7 @@ public class InstanceUserMeta
     /// <summary>
     /// Unique identifier for the instance.
     /// </summary>
-    public Guid InstanceId { get; set; }
+    public int InstanceId { get; set; }
 
     /// <summary>
     /// Navigation property for the user.
@@ -31,5 +32,5 @@ public class InstanceUserMeta
     /// <summary>
     /// Unique identifier for the user.
     /// </summary>
-    public Guid UserId { get; set; }
+    public int UserId { get; set; }
 }

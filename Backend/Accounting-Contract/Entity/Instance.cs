@@ -1,10 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Contract.Entity;
 
-[PrimaryKey(nameof(Id))]
 public class Instance
 {
     /// <summary>
@@ -21,7 +19,7 @@ public class Instance
     /// <summary>
     /// Unique identifier of the user who created the instance.
     /// </summary>
-    public Guid CreatedById { get; set; }
+    public int CreatedById { get; set; }
 
     /// <summary>
     /// Description of the instance, can be undefined.
@@ -31,7 +29,9 @@ public class Instance
     /// <summary>
     /// Unique identifier of the instance.
     /// </summary>
-    public Guid Id { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
     /// <summary>
     /// Name of the instance.

@@ -2,13 +2,13 @@ namespace Accounting.Contract.Entity;
 
 public enum FieldType
 {
-    Boolean = 0,
-    BooleanArray = 1,
-    Date = 2,
-    Decimal = 3,
-    DecimalArray = 4,
-    Int = 5,
-    IntArray = 6,
-    String = 7,
-    StringArray = 8
+    Boolean = 1,
+    BooleanArray = 2,
+    Date = 3,
+    Decimal = 4,
+    DecimalArray = 5,
+    Int = 6,
+    IntArray = 7,
+    String = 8,
+    StringArray = 9
 }

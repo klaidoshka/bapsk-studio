@@ -1,10 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Contract.Entity;
 
-[PrimaryKey(nameof(Id))]
 public class DataTypeField
 {
     /// <summary>
@@ -16,7 +14,7 @@ public class DataTypeField
     /// <summary>
     /// Unique identifier of the data type that the field belongs to.
     /// </summary>
-    public Guid DataTypeId { get; set; }
+    public int DataTypeId { get; set; }
 
     /// <summary>
     /// Default value of the field, can be undefined.
@@ -26,7 +24,9 @@ public class DataTypeField
     /// <summary>
     /// Unique identifier of the field.
     /// </summary>
-    public Guid Id { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
     /// <summary>
     /// Marks the field as required or not.

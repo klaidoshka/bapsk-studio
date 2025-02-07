@@ -1,10 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Contract.Entity;
 
-[PrimaryKey(nameof(Id))]
 public class DataEntryField
 {
     /// <summary>
@@ -16,7 +14,7 @@ public class DataEntryField
     /// <summary>
     /// Unique identifier of the DataEntry entity.
     /// </summary>
-    public Guid DataEntryId { get; set; }
+    public int DataEntryId { get; set; }
 
     /// <summary>
     /// Navigation property for the DataTypeField entity.
@@ -27,12 +25,14 @@ public class DataEntryField
     /// <summary>
     /// Unique identifier of the DataTypeField entity.
     /// </summary>
-    public Guid DataTypeFieldId { get; set; }
+    public int DataTypeFieldId { get; set; }
 
     /// <summary>
     /// Unique identifier of the DataEntryField entity.
     /// </summary>
-    public Guid Id { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
     /// <summary>
     /// Value of the field.

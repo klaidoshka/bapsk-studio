@@ -1,9 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Accounting.Contract.Enumeration;
 using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Contract.Entity;
 
-[PrimaryKey(nameof(Id))]
 [Index(nameof(EmailNormalized), IsUnique = true)]
 public class User
 {
@@ -23,14 +24,16 @@ public class User
     public string Email { get; set; }
 
     /// <summary>
-    /// Normalized (CAPITALIZED) email address of the user.
+    /// Normalized (LOWERED) email address of the user.
     /// </summary>
     public string EmailNormalized { get; set; }
 
     /// <summary>
     /// Unique identifier of the user.
     /// </summary>
-    public Guid Id { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
     /// <summary>
     /// First name of the user.
@@ -57,4 +60,9 @@ public class User
     /// Password hash of the user.
     /// </summary>
     public string PasswordHash { get; set; }
+
+    /// <summary>
+    /// Navigation property for the sessions created by the user.
+    /// </summary>
+    public virtual ICollection<Session> Sessions { get; set; }
 }

@@ -1,9 +1,8 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Contract.Entity;
 
-[PrimaryKey(nameof(Id))]
 public class Session
 {
     /// <summary>
@@ -19,6 +18,7 @@ public class Session
     /// <summary>
     /// Unique identifier of the session.
     /// </summary>
+    [Key]
     public Guid Id { get; set; }
 
     /// <summary>
@@ -45,5 +45,5 @@ public class Session
     /// <summary>
     /// Unique identifier of the user who created the session.
     /// </summary>
-    public Guid UserId { get; set; }
+    public int UserId { get; set; }
 }

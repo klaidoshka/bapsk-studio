@@ -117,9 +117,8 @@ public class AuthService : IAuthService
             BirthDate = request.BirthDate,
             Country = request.Country,
             Email = request.Email,
-            EmailNormalized = request.Email.ToLower(),
+            EmailNormalized = request.Email.ToLowerInvariant(),
             FirstName = request.FirstName,
-            Id = Guid.NewGuid(),
             LastName = request.LastName,
             PasswordHash = _hashService.Hash(request.Password)
         };

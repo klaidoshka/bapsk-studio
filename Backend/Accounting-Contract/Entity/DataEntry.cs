@@ -1,9 +1,8 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Contract.Entity;
 
-[PrimaryKey(nameof(Id))]
 public class DataEntry
 {
     /// <summary>
@@ -20,7 +19,7 @@ public class DataEntry
     /// <summary>
     /// Unique identifier of the user who created the data entry.
     /// </summary>
-    public Guid CreatedById { get; set; }
+    public int CreatedById { get; set; }
 
     /// <summary>
     /// Navigation property for the data type of the data entry.
@@ -31,7 +30,7 @@ public class DataEntry
     /// <summary>
     /// Unique identifier of the data type of the data entry.
     /// </summary>
-    public Guid DataTypeId { get; set; }
+    public int DataTypeId { get; set; }
 
     /// <summary>
     /// Navigation property for the fields of the data entry.
@@ -41,7 +40,9 @@ public class DataEntry
     /// <summary>
     /// Unique identifier of the data entry.
     /// </summary>
-    public Guid Id { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
     /// <summary>
     /// Marks the data entry as deleted, but does not remove it from the database.
@@ -63,5 +64,5 @@ public class DataEntry
     /// <summary>
     /// Unique identifier of the user who last modified the data entry.
     /// </summary>
-    public Guid? ModifiedById { get; set; }
+    public int? ModifiedById { get; set; }
 }
