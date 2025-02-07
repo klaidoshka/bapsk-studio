@@ -99,6 +99,7 @@ public class StiService : IStiService, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
+        GC.SuppressFinalize(this);
         await _client.CloseAsync();
     }
 }
