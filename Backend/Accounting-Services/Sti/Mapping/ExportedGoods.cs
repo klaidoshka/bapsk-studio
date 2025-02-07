@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
-using Accounting.Contract.Sti.Data;
-using Accounting.Contract.Sti.Data.ExportedGoods;
+using Accounting.Contract.Sti;
+using Accounting.Contract.Sti.ExportedGoods;
 using Accounting.Services.Util;
 
 namespace Accounting.Services.Sti.Mapping;

@@ -1,8 +1,8 @@
-using Accounting.Contract.Sti.Data.CancelDeclaration;
-using Accounting.Contract.Sti.Data.ExportedGoods;
-using Accounting.Contract.Sti.Data.QueryDeclarations;
-using Accounting.Contract.Sti.Data.SubmitDeclaration;
-using Accounting.Contract.Sti.Data.SubmitPaymentInfo;
+using Accounting.Contract.Sti.CancelDeclaration;
+using Accounting.Contract.Sti.ExportedGoods;
+using Accounting.Contract.Sti.QueryDeclarations;
+using Accounting.Contract.Sti.SubmitDeclaration;
+using Accounting.Contract.Sti.SubmitPaymentInfo;
 
 namespace Accounting.Contract.Service;
 
