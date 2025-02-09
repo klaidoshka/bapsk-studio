@@ -22,7 +22,13 @@ var databaseOptions = builder.AddConfiguration<DatabaseOptions>("DatabaseOptions
 // Services
 builder.Services.AddDbContext(databaseOptions);
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IDataEntryFieldService, DataEntryFieldService>();
+builder.Services.AddScoped<IDataEntryService, DataEntryService>();
+builder.Services.AddScoped<IDataTypeFieldService, DataTypeFieldService>();
+builder.Services.AddScoped<IDataTypeService, DataTypeService>();
 builder.Services.AddScoped<IHashService, HashService>();
+builder.Services.AddScoped<IInstanceService, InstanceService>();
+builder.Services.AddScoped<IInstanceUserMetaService, InstanceUserMetaService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IStiService, StiService>();
 

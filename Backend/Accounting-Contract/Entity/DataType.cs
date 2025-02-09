@@ -6,15 +6,9 @@ namespace Accounting.Contract.Entity;
 public class DataType
 {
     /// <summary>
-    /// Navigation property for the user who created the data type.
+    /// Navigation property for the fields that the data type has.
     /// </summary>
-    [ForeignKey(nameof(CreatedById))]
-    public User CreatedBy { get; set; }
-
-    /// <summary>
-    /// Unique identifier of the user who created the data type.
-    /// </summary>
-    public int CreatedById { get; set; }
+    public virtual ICollection<DataTypeField> Fields { get; set; }
 
     /// <summary>
     /// Description of the data type, can be undefined.

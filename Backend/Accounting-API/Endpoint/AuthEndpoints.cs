@@ -32,6 +32,11 @@ public static class AuthEndpoints
                 {
                     var refreshToken = GetRefreshTokenFromRequest(httpContext.Request);
 
+                    if (string.IsNullOrWhiteSpace(refreshToken))
+                    {
+                        return Results.Unauthorized();
+                    }
+
                     var validation = await authService.ValidateRefreshTokenAsync(refreshToken);
 
                     return await validation.ToResultAsync(
