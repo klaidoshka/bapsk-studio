@@ -48,28 +48,24 @@ public class InstanceUserMetaService : IInstanceUserMetaService
         return userMeta;
     }
 
-    public async Task DeleteAsync(InstanceUserMetaDeleteRequest request)
+    public async Task DeleteAsync(int id, int managerId)
     {
-        var instance = await _database.Instances
-                           .Include(i => i.UserMetas)
-                           .ThenInclude(um => um.User)
-                           .FirstOrDefaultAsync(i => i.Id == request.InstanceId)
-                       ?? throw new ArgumentException("Instance to remove user from was not found.");
+        var instanceUserMeta = await _database.InstanceUserMetas
+                                   .Include(ium => ium.Instance)
+                                   .FirstOrDefaultAsync(ium => ium.Id == id)
+                               ?? throw new ArgumentException("Instance user meta not found.");
 
-        if (instance.CreatedById != request.ManagerId)
+        if (instanceUserMeta.Instance.CreatedById != managerId)
         {
             throw new ArgumentException("Manager is not the creator of the instance. Only the creator can remove users.");
         }
 
-        if (request.UserId == request.ManagerId)
+        if (instanceUserMeta.UserId == managerId)
         {
             throw new ArgumentException("Creator cannot be removed from the instance. Delete the instance instead.");
         }
 
-        var userMeta = instance.UserMetas.FirstOrDefault(um => um.UserId == request.UserId)
-                       ?? throw new ArgumentException("User is not added to the instance.");
-
-        _database.InstanceUserMetas.Remove(userMeta);
+        _database.InstanceUserMetas.Remove(instanceUserMeta);
 
         await _database.SaveChangesAsync();
     }

@@ -1,0 +1,33 @@
+@DataEntry_API_IP = http://localhost:5125/api/v1/accounting/data-type
+
+POST {{DataEntry_API_IP}}
+
+{
+    "CreatorId": 1,
+    "Description": "Description of the field",
+    "InstanceId": 1,
+    "Name": "Name"
+}
+
+###
+
+DELETE {{DataEntry_API_IP}}/1
+
+###
+
+PATCH {{DataEntry_API_IP}}/1
+
+{
+    "Description": 1,
+    "Id": 1,
+    "ManagerId": 1,
+    "Name": "Name Edited"
+}
+
+###
+
+GET {{DataEntry_API_IP}}/1
+
+###
+
+GET {{DataEntry_API_IP}}?instanceId=1

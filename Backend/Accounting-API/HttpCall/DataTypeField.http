@@ -1,0 +1,38 @@
+@DataEntryField_API_IP = http://localhost:5125/api/v1/accounting/data-type-field
+
+POST {{DataEntryField_API_IP}}
+
+{
+    "DataTypeId": 1,
+    "DefaultValue": "Description of the field",
+    "InstanceId": 1,
+    "IsRequired": true,
+    "ManagerId": 1,
+    "Name": "Name",
+    "Type": Text
+}
+
+###
+
+DELETE {{DataEntryField_API_IP}}/1
+
+###
+
+PATCH {{DataEntryField_API_IP}}/1
+
+{
+    "DefaultValue": "Description of the field",
+    "Id": 1,
+    "IsRequired": true,
+    "ManagerId": 1,
+    "Name": "Name Updated",
+    "Type": Text
+}
+
+###
+
+GET {{DataEntryField_API_IP}}/1
+
+###
+
+GET {{DataEntryField_API_IP}}?dataTypeId=1

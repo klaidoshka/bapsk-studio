@@ -87,8 +87,7 @@ public class AuthService : IAuthService
 
         var sessionId = _jwtService.ExtractSessionId(refreshToken);
 
-        var session = await _database
-            .Sessions
+        var session = await _database.Sessions
             .Include(s => s.User)
             .FirstOrDefaultAsync(s => s.Id == sessionId);
 

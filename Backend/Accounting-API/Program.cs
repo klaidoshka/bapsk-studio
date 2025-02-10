@@ -2,7 +2,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Accounting.API;
-using Accounting.API.Endpoint;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Service;
 using Accounting.Services.Service;
@@ -26,6 +25,7 @@ builder.Services.AddScoped<IDataEntryFieldService, DataEntryFieldService>();
 builder.Services.AddScoped<IDataEntryService, DataEntryService>();
 builder.Services.AddScoped<IDataTypeFieldService, DataTypeFieldService>();
 builder.Services.AddScoped<IDataTypeService, DataTypeService>();
+builder.Services.AddScoped<IFieldTypeService, FieldTypeService>();
 builder.Services.AddScoped<IHashService, HashService>();
 builder.Services.AddScoped<IInstanceService, InstanceService>();
 builder.Services.AddScoped<IInstanceUserMetaService, InstanceUserMetaService>();
@@ -63,7 +63,6 @@ builder
     );
 
 builder.Services.AddAuthorization();
-
 builder.Services.AddOpenApi();
 
 builder.Services.ConfigureHttpJsonOptions(
@@ -77,17 +76,8 @@ builder.Services.ConfigureHttpJsonOptions(
 var application = builder.Build();
 
 application.UseAuthentication();
-
 application.UseAuthorization();
-
-application
-    .MapGroup("/api/v1/auth")
-    .MapAuthEndpoints();
-
-application
-    .MapGroup("/api/v1/accounting/sti")
-    .RequireAuthorization()
-    .MapStiEndpoints();
+application.MapEndpoints();
 
 if (application.Environment.IsDevelopment())
 {
@@ -95,7 +85,5 @@ if (application.Environment.IsDevelopment())
 }
 
 application.UseHttpsRedirection();
-
 application.UseHsts();
-
 application.Run();

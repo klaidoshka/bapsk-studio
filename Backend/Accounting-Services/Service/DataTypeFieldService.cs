@@ -9,10 +9,12 @@ namespace Accounting.Services.Service;
 public class DataTypeFieldService : IDataTypeFieldService
 {
     private readonly AccountingDatabase _database;
+    private readonly IFieldTypeService _fieldTypeService;
 
-    public DataTypeFieldService(AccountingDatabase database)
+    public DataTypeFieldService(AccountingDatabase database, IFieldTypeService fieldTypeService)
     {
         _database = database;
+        _fieldTypeService = fieldTypeService;
     }
 
     public async Task CreateAsync(DataTypeFieldCreateRequest request)
@@ -40,7 +42,9 @@ public class DataTypeFieldService : IDataTypeFieldService
         var field = new DataTypeField
         {
             DataTypeId = request.DataTypeId,
-            DefaultValue = request.DefaultValue,
+            DefaultValue = request.DefaultValue == null
+                ? null
+                : _fieldTypeService.Serialize(request.Type, request.DefaultValue),
             IsRequired = request.IsRequired ?? true,
             Name = request.Name,
             Type = request.Type
@@ -82,7 +86,9 @@ public class DataTypeFieldService : IDataTypeFieldService
             throw new ArgumentException("Manager does not have permission to edit this field.");
         }
 
-        field.DefaultValue = request.DefaultValue;
+        field.DefaultValue = request.DefaultValue == null
+            ? null
+            : _fieldTypeService.Serialize(request.Type, request.DefaultValue);
         field.IsRequired = request.IsRequired ?? true;
         field.Name = request.Name;
         field.Type = request.Type;

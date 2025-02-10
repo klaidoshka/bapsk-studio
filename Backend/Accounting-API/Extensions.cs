@@ -1,4 +1,5 @@
 using System.Security.Cryptography.X509Certificates;
+using Accounting.API.Endpoint;
 using Accounting.Contract;
 using Accounting.Contract.Configuration;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +50,11 @@ public static class Extensions
     {
         var configuration = builder.Configuration.GetSection(section).Get<TConfiguration>();
 
+        if (configuration == null)
+        {
+            throw new InvalidOperationException($"Configuration section {section} is not found.");
+        }
+
         builder.Services.AddSingleton(configuration);
 
         return configuration;
@@ -68,7 +74,7 @@ public static class Extensions
                 ServerVersion version = databaseOptions.Dialect.ToLowerInvariant() switch
                 {
                     "mariadb" => new MariaDbServerVersion(databaseOptions.ServerVersion),
-                    "mysql"   => new MySqlServerVersion(databaseOptions.ServerVersion),
+                    "mysql" => new MySqlServerVersion(databaseOptions.ServerVersion),
                     _ => throw new NotSupportedException(
                         $"Dialect {databaseOptions.Dialect} is not supported."
                     )
@@ -77,11 +83,54 @@ public static class Extensions
                 optionsBuilder.UseMySql(
                     databaseOptions.ConnectionString,
                     version,
-                    mySqlOptionsBuilder => mySqlOptionsBuilder
-                        .EnableStringComparisonTranslations()
-                        .EnableRetryOnFailure(3)
+                    mySqlOptionsBuilder => mySqlOptionsBuilder.EnableStringComparisonTranslations()
                 );
             }
         );
+    }
+
+    /// <summary>
+    /// Maps the API endpoints.
+    /// </summary>
+    /// <param name="application">Application to map endpoints in</param>
+    public static void MapEndpoints(this WebApplication application)
+    {
+        var apiRouteGroup = application.MapGroup("/api/v1");
+
+        var accountingRouteGroup = apiRouteGroup
+            .MapGroup("/accounting")
+            .RequireAuthorization();
+
+        apiRouteGroup
+            .MapGroup("/auth")
+            .MapAuthEndpoints();
+
+        accountingRouteGroup
+            .MapGroup("/data-entry")
+            .MapDataEntryEndpoints();
+
+        accountingRouteGroup
+            .MapGroup("/data-entry-field")
+            .MapDataEntryFieldEndpoints();
+
+        accountingRouteGroup
+            .MapGroup("/data-type")
+            .MapDataTypeEndpoints();
+
+        accountingRouteGroup
+            .MapGroup("/data-type-field")
+            .MapDataTypeFieldEndpoints();
+
+        accountingRouteGroup
+            .MapGroup("/instance")
+            .MapInstanceEndpoints();
+
+        accountingRouteGroup
+            .MapGroup("/instance-user-meta")
+            .MapInstanceMetaEndpoints();
+
+        accountingRouteGroup
+            .MapGroup("/sti")
+            .MapStiEndpoints();
     }
 }

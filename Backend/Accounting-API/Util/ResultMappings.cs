@@ -1,6 +1,6 @@
 using Accounting.Contract.Result;
 
-namespace Accounting.API;
+namespace Accounting.API.Util;
 
 public static class ResultMappings
 {

@@ -9,10 +9,12 @@ namespace Accounting.Services.Service;
 public class DataEntryFieldService : IDataEntryFieldService
 {
     private readonly AccountingDatabase _database;
+    private readonly IFieldTypeService _fieldTypeService;
 
-    public DataEntryFieldService(AccountingDatabase database)
+    public DataEntryFieldService(AccountingDatabase database, IFieldTypeService fieldTypeService)
     {
         _database = database;
+        _fieldTypeService = fieldTypeService;
     }
 
     public async Task<DataEntryField> CreateAsync(DataEntryFieldCreateRequest request)
@@ -26,27 +28,28 @@ public class DataEntryFieldService : IDataEntryFieldService
 
         if (entry.Fields.Any(f => f.DataTypeFieldId == request.DataTypeFieldId))
         {
-            throw new ArgumentException("Field already exists in data entry.");
+            throw new ArgumentException("Field already defined in data entry.");
         }
 
-        if (entry.DataType.Fields.All(f => f.Id != request.DataTypeFieldId))
-        {
-            throw new ArgumentException("Field does not exist in data type.");
-        }
+        var typeField = entry.DataType.Fields.FirstOrDefault(f => f.Id == request.DataTypeFieldId)
+                        ?? throw new ArgumentException("Field does not exist in data type.");
 
-        // TODO: Add validation for field type value
-        var field = (await _database.DataEntryFields.AddAsync(
+        _fieldTypeService
+            .ValidateValue(typeField, request.Value)
+            .AssertValid();
+
+        var entryField = (await _database.DataEntryFields.AddAsync(
             new DataEntryField
             {
                 DataEntry = entry,
                 DataTypeFieldId = request.DataTypeFieldId,
-                Value = request.Value
+                Value = _fieldTypeService.Serialize(typeField.Type, request.Value)
             }
         )).Entity;
 
         await _database.SaveChangesAsync();
 
-        return field;
+        return entryField;
     }
 
     public async Task DeleteAsync(int id)
@@ -73,9 +76,11 @@ public class DataEntryFieldService : IDataEntryFieldService
                         .FirstOrDefaultAsync(de => de.Id == request.Id)
                     ?? throw new ArgumentException("Field not found.");
 
-        // TODO: Add validation for field type value
+        _fieldTypeService
+            .ValidateValue(field.DataTypeField.Type, request.Value)
+            .AssertValid();
 
-        field.Value = request.Value;
+        field.Value = _fieldTypeService.Serialize(field.DataTypeField.Type, request.Value);
 
         await _database.SaveChangesAsync();
     }

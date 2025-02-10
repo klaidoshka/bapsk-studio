@@ -4,5 +4,5 @@ public class DataEntryEditRequest
 {
     public int Id { get; set; }
     public int ManagerId { get; set; }
-    public Dictionary<int, string> Values { get; set; }
+    public Dictionary<int, object> Values { get; set; }
 }

@@ -4,5 +4,5 @@ public class DataEntryFieldCreateRequest
 {
     public int DataEntryId { get; set; }
     public int DataTypeFieldId { get; set; }
-    public string Value { get; set; }
+    public object Value { get; set; }
 }

@@ -5,6 +5,13 @@ namespace Accounting.Contract.Service;
 public interface IJwtService
 {
     /// <summary>
+    /// Extracts the session from the specified token.
+    /// </summary>
+    /// <param name="token">Token to extract session from</param>
+    /// <returns>Session within the token or null if not found</returns>
+    public Session? ExtractSession(string token);
+
+    /// <summary>
     /// Extracts the session id from the specified token.
     /// </summary>
     /// <param name="token">Token to extract session id from</param>

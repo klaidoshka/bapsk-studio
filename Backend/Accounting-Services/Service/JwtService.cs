@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Accounting.Contract;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
@@ -10,11 +11,22 @@ namespace Accounting.Services.Service;
 
 public class JwtService : IJwtService
 {
+    private readonly AccountingDatabase _database;
     private readonly JwtSettings _jwtSettings;
 
-    public JwtService(JwtSettings jwtSettings)
+    public JwtService(AccountingDatabase database, JwtSettings jwtSettings)
     {
+        _database = database;
         _jwtSettings = jwtSettings;
+    }
+
+    public Session? ExtractSession(string token)
+    {
+        var sessionId = ExtractSessionId(token);
+
+        return sessionId == null
+            ? null
+            : _database.Sessions.FirstOrDefault(s => s.Id == sessionId);
     }
 
     public Guid? ExtractSessionId(string token)

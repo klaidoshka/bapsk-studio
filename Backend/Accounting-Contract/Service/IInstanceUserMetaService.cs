@@ -15,8 +15,9 @@ public interface IInstanceUserMetaService
     /// <summary>
     /// Removes a user from an instance.
     /// </summary>
-    /// <param name="request">Request to process</param>
-    public Task DeleteAsync(InstanceUserMetaDeleteRequest request);
+    /// <param name="id">Id of the instance user meta to delete</param>
+    /// <param name="managerId">Manager, who's deleting meta, id</param>
+    public Task DeleteAsync(int id, int managerId);
 
     /// <summary>
     /// Gets instance's user meta.

@@ -9,10 +9,12 @@ namespace Accounting.Services.Service;
 public class DataEntryService : IDataEntryService
 {
     private readonly AccountingDatabase _database;
+    private readonly IFieldTypeService _fieldTypeService;
 
-    public DataEntryService(AccountingDatabase database)
+    public DataEntryService(AccountingDatabase database, IFieldTypeService fieldTypeService)
     {
         _database = database;
+        _fieldTypeService = fieldTypeService;
     }
 
     public async Task<DataEntry> CreateAsync(DataEntryCreateRequest request)
@@ -29,6 +31,10 @@ public class DataEntryService : IDataEntryService
             throw new ArgumentException("Creator does not have permission to create data entries in this instance.");
         }
 
+        _fieldTypeService
+            .ValidateValues(dataType.Fields, request.Values)
+            .AssertValid();
+
         var fields = dataType.Fields
             .Select(
                 f =>
@@ -38,31 +44,21 @@ public class DataEntryService : IDataEntryService
                         return new DataEntryField
                         {
                             DataTypeField = f,
-                            Value = value
+                            Value = _fieldTypeService.Serialize(f.Type, value)
                         };
                     }
 
-                    if (f.IsRequired)
-                    {
-                        throw new ArgumentException($"Field {f.Name} is missing required value.");
-                    }
-
-                    if (f.DefaultValue == null)
-                    {
-                        return null;
-                    }
-
-                    return new DataEntryField
-                    {
-                        DataTypeField = f,
-                        Value = f.DefaultValue
-                    };
+                    return f.DefaultValue == null
+                        ? null
+                        : new DataEntryField
+                        {
+                            DataTypeField = f,
+                            Value = f.DefaultValue
+                        };
                 }
             )
             .Where(f => f is not null)
             .ToList();
-
-        // TODO: Add validation for field type values
 
         var dataEntry = (await _database.DataEntries.AddAsync(
             new DataEntry
@@ -102,7 +98,9 @@ public class DataEntryService : IDataEntryService
                         .Include(de => de.DataType)
                         .ThenInclude(dt => dt.Instance)
                         .ThenInclude(i => i.CreatedBy)
+                        .Include(de => de.DataType.Fields)
                         .Include(de => de.Fields)
+                        .ThenInclude(f => f.DataTypeField)
                         .FirstOrDefaultAsync(de => de.Id == request.Id)
                     ?? throw new ArgumentException("Data entry not found.");
 
@@ -111,12 +109,15 @@ public class DataEntryService : IDataEntryService
             throw new ArgumentException("Manager does not have permission to edit this data entry.");
         }
 
+        _fieldTypeService
+            .ValidateValues(entry.DataType.Fields, request.Values)
+            .AssertValid();
+
         foreach (var field in entry.Fields)
         {
             if (request.Values.TryGetValue(field.DataTypeFieldId, out var value))
             {
-                // TODO: Add validation for field type value
-                field.Value = value;
+                field.Value = _fieldTypeService.Serialize(field.DataTypeField.Type, value);
             }
             else
             {

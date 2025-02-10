@@ -1,0 +1,31 @@
+@Instance_API_IP = http://localhost:5125/api/v1/accounting/instance
+
+POST {{Instance_API_IP}}
+
+{
+    "CreatorId": 1,
+    "Description": "First Instance To Be Created By The Creator",
+    "Name": "First Instance"
+}
+
+###
+
+DELETE {{Instance_API_IP}}/1
+
+###
+
+PATCH {{Instance_API_IP}}/1
+
+{
+    "Description": "First Instance To Be Created By The Creator",
+    "Id": 1,
+    "Name": "First Instance"
+}
+
+###
+
+GET {{Instance_API_IP}}/1
+
+###
+
+GET {{Instance_API_IP}}?userId=1
