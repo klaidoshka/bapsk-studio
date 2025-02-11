@@ -1,5 +1,6 @@
 using Accounting.Contract;
 using Accounting.Contract.Entity;
+using Accounting.Contract.Result;
 using Accounting.Contract.Service;
 using Accounting.Contract.Service.Request;
 using Microsoft.EntityFrameworkCore;
@@ -24,15 +25,15 @@ public class DataEntryFieldService : IDataEntryFieldService
                         .Include(de => de.DataType)
                         .ThenInclude(dt => dt.Fields)
                         .FirstOrDefaultAsync(de => de.Id == request.DataEntryId)
-                    ?? throw new ArgumentException("Data entry not found.");
+                    ?? throw new ValidationException("Data entry not found.");
 
         if (entry.Fields.Any(f => f.DataTypeFieldId == request.DataTypeFieldId))
         {
-            throw new ArgumentException("Field already defined in data entry.");
+            throw new ValidationException("Field already defined in data entry.");
         }
 
         var typeField = entry.DataType.Fields.FirstOrDefault(f => f.Id == request.DataTypeFieldId)
-                        ?? throw new ArgumentException("Field does not exist in data type.");
+                        ?? throw new ValidationException("Field does not exist in data type.");
 
         _fieldTypeService
             .ValidateValue(typeField, request.Value)
@@ -57,11 +58,11 @@ public class DataEntryFieldService : IDataEntryFieldService
         var field = await _database.DataEntryFields
                         .Include(de => de.DataTypeField)
                         .FirstOrDefaultAsync(de => de.Id == id)
-                    ?? throw new ArgumentException("Field not found.");
+                    ?? throw new ValidationException("Field not found.");
 
         if (field.DataTypeField.DefaultValue == null)
         {
-            throw new ArgumentException("Cannot delete a required field from data entry.");
+            throw new ValidationException("Cannot delete a required field from data entry.");
         }
 
         _database.DataEntryFields.Remove(field);
@@ -74,7 +75,7 @@ public class DataEntryFieldService : IDataEntryFieldService
         var field = await _database.DataEntryFields
                         .Include(de => de.DataTypeField)
                         .FirstOrDefaultAsync(de => de.Id == request.Id)
-                    ?? throw new ArgumentException("Field not found.");
+                    ?? throw new ValidationException("Field not found.");
 
         _fieldTypeService
             .ValidateValue(field.DataTypeField.Type, request.Value)
@@ -88,7 +89,7 @@ public class DataEntryFieldService : IDataEntryFieldService
     public async Task<DataEntryField> GetAsync(int id)
     {
         return await _database.DataEntryFields.FindAsync(id)
-               ?? throw new ArgumentException("Field not found.");
+               ?? throw new ValidationException("Field not found.");
     }
 
     public async Task<IEnumerable<DataEntryField>> GetByDataEntryIdAsync(int dataEntryId)

@@ -1,6 +1,9 @@
 @DataEntryField_API_IP = http://localhost:5125/api/v1/accounting/data-entry-field
 
 POST {{DataEntryField_API_IP}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
 
 {
     "CreatorId": 1,
@@ -14,10 +17,16 @@ POST {{DataEntryField_API_IP}}
 ###
 
 DELETE {{DataEntryField_API_IP}}/1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
 
 ###
 
 PATCH {{DataEntryField_API_IP}}/1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
 
 {
     "ManagerId": 1,
@@ -31,7 +40,13 @@ PATCH {{DataEntryField_API_IP}}/1
 ###
 
 GET {{DataEntryField_API_IP}}/1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
 
 ###
 
 GET {{DataEntryField_API_IP}}?dataEntryId=1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}

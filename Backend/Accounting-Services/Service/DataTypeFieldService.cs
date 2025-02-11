@@ -1,5 +1,6 @@
 using Accounting.Contract;
 using Accounting.Contract.Entity;
+using Accounting.Contract.Result;
 using Accounting.Contract.Service;
 using Accounting.Contract.Service.Request;
 using Microsoft.EntityFrameworkCore;
@@ -17,42 +18,34 @@ public class DataTypeFieldService : IDataTypeFieldService
         _fieldTypeService = fieldTypeService;
     }
 
-    public async Task CreateAsync(DataTypeFieldCreateRequest request)
+    public async Task<DataTypeField> CreateAsync(DataTypeFieldCreateRequest request)
     {
-        var instance = await _database.Instances
-                           .Include(i => i.CreatedBy)
-                           .FirstOrDefaultAsync(i => i.Id == request.InstanceId)
-                       ?? throw new ArgumentException("Instance not found.");
-
-        if (instance.CreatedBy.Id != request.ManagerId)
-        {
-            throw new ArgumentException("Manager does not have permission to add fields to this instance.");
-        }
-
         var dataType = await _database.DataTypes
                            .Include(dt => dt.Fields)
                            .FirstOrDefaultAsync(dt => dt.Id == request.DataTypeId)
-                       ?? throw new ArgumentException("Data type not found.");
+                       ?? throw new ValidationException("Data type not found.");
 
         if (dataType.InstanceId != request.InstanceId)
         {
-            throw new ArgumentException("Data type does not belong to this instance.");
+            throw new ValidationException("Data type does not belong to this instance.");
         }
 
-        var field = new DataTypeField
-        {
-            DataTypeId = request.DataTypeId,
-            DefaultValue = request.DefaultValue == null
-                ? null
-                : _fieldTypeService.Serialize(request.Type, request.DefaultValue),
-            IsRequired = request.IsRequired ?? true,
-            Name = request.Name,
-            Type = request.Type
-        };
-
-        await _database.DataTypeFields.AddAsync(field);
+        var field = (await _database.DataTypeFields.AddAsync(
+            new DataTypeField
+            {
+                DataTypeId = request.DataTypeId,
+                DefaultValue = request.DefaultValue == null
+                    ? null
+                    : _fieldTypeService.Serialize(request.Type, request.DefaultValue),
+                IsRequired = request.IsRequired ?? true,
+                Name = request.Name,
+                Type = request.Type
+            }
+        )).Entity;
 
         await _database.SaveChangesAsync();
+
+        return field;
     }
 
     public async Task DeleteAsync(int id, int managerId)
@@ -61,12 +54,7 @@ public class DataTypeFieldService : IDataTypeFieldService
                         .Include(df => df.DataType)
                         .ThenInclude(dt => dt.Instance)
                         .FirstOrDefaultAsync(df => df.Id == id)
-                    ?? throw new ArgumentException("Field not found.");
-
-        if (field.DataType.Instance.CreatedById != managerId)
-        {
-            throw new ArgumentException("Manager does not have permission to remove fields from this instance.");
-        }
+                    ?? throw new ValidationException("Field not found.");
 
         _database.DataTypeFields.Remove(field);
 
@@ -79,12 +67,7 @@ public class DataTypeFieldService : IDataTypeFieldService
                         .Include(df => df.DataType)
                         .ThenInclude(dt => dt.Instance)
                         .FirstOrDefaultAsync(df => df.Id == request.Id)
-                    ?? throw new ArgumentException("Field not found.");
-
-        if (field.DataType.Instance.CreatedById != request.ManagerId)
-        {
-            throw new ArgumentException("Manager does not have permission to edit this field.");
-        }
+                    ?? throw new ValidationException("Field not found.");
 
         field.DefaultValue = request.DefaultValue == null
             ? null
@@ -99,7 +82,7 @@ public class DataTypeFieldService : IDataTypeFieldService
     public async Task<DataTypeField> GetAsync(int id)
     {
         return await _database.DataTypeFields.FindAsync(id)
-               ?? throw new ArgumentException("Field not found.");
+               ?? throw new ValidationException("Field not found.");
     }
 
     public async Task<IEnumerable<DataTypeField>> GetByDataTypeIdAsync(int dataTypeId)

@@ -1,5 +1,6 @@
 using Accounting.Contract;
 using Accounting.Contract.Entity;
+using Accounting.Contract.Result;
 using Accounting.Contract.Service;
 using Accounting.Contract.Service.Request;
 using Microsoft.EntityFrameworkCore;
@@ -18,14 +19,15 @@ public class InstanceService : IInstanceService
     public async Task<Instance> CreateAsync(InstanceCreateRequest request)
     {
         var creator = await _database.Users.FindAsync(request.CreatorId)
-                      ?? throw new ArgumentException("Creator was not found.");
+                      ?? throw new ValidationException("Creator was not found.");
 
         var instance = new Instance
         {
             CreatedAt = DateTime.UtcNow,
             CreatedBy = creator,
             Description = request.Description,
-            Name = request.Name
+            Name = request.Name,
+            UserMetas = new List<InstanceUserMeta>()
         };
 
         instance.UserMetas.Add(new InstanceUserMeta { User = creator });
@@ -40,16 +42,22 @@ public class InstanceService : IInstanceService
     public async Task DeleteAsync(int instanceId)
     {
         var instance = await _database.Instances.FindAsync(instanceId)
-                       ?? throw new ArgumentException("Instance to delete was not found.");
+                       ?? throw new ValidationException("Instance to delete was not found.");
 
         _database.Instances.Remove(instance);
 
         await _database.SaveChangesAsync();
     }
 
-    public Task EditAsync(InstanceEditRequest request)
+    public async Task EditAsync(InstanceEditRequest request)
     {
-        throw new NotImplementedException();
+        var instance = await _database.Instances.FindAsync(request.Id)
+                       ?? throw new ValidationException("Instance to edit was not found.");
+
+        instance.Description = request.Description;
+        instance.Name = request.Name;
+
+        await _database.SaveChangesAsync();
     }
 
     public async Task<IEnumerable<Instance>> GetAsync()
@@ -60,7 +68,7 @@ public class InstanceService : IInstanceService
     public async Task<Instance> GetAsync(int instanceId)
     {
         return await _database.Instances.FindAsync(instanceId)
-               ?? throw new ArgumentException("Instance not found.");
+               ?? throw new ValidationException("Instance not found.");
     }
 
     public async Task<IEnumerable<Instance>> GetByUserIdAsync(int userId)

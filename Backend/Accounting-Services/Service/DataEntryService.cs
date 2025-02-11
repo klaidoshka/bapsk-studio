@@ -1,5 +1,6 @@
 using Accounting.Contract;
 using Accounting.Contract.Entity;
+using Accounting.Contract.Result;
 using Accounting.Contract.Service;
 using Accounting.Contract.Service.Request;
 using Microsoft.EntityFrameworkCore;
@@ -24,12 +25,7 @@ public class DataEntryService : IDataEntryService
                            .ThenInclude(i => i.CreatedBy)
                            .Include(dt => dt.Fields)
                            .FirstOrDefaultAsync(dt => dt.Id == request.DataTypeId)
-                       ?? throw new ArgumentException("Data type not found.");
-
-        if (dataType.Instance.CreatedById != request.CreatorId)
-        {
-            throw new ArgumentException("Creator does not have permission to create data entries in this instance.");
-        }
+                       ?? throw new ValidationException("Data type not found.");
 
         _fieldTypeService
             .ValidateValues(dataType.Fields, request.Values)
@@ -77,10 +73,10 @@ public class DataEntryService : IDataEntryService
         return dataEntry;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(int id, int managerId)
     {
         var entry = await _database.DataEntries.FindAsync(id)
-                    ?? throw new ArgumentException("Data entry not found.");
+                    ?? throw new ValidationException("Data entry not found.");
 
         if (entry.IsDeleted == true)
         {
@@ -88,6 +84,8 @@ public class DataEntryService : IDataEntryService
         }
 
         entry.IsDeleted = true;
+        entry.ModifiedAt = DateTime.UtcNow;
+        entry.ModifiedById = managerId;
 
         await _database.SaveChangesAsync();
     }
@@ -102,12 +100,7 @@ public class DataEntryService : IDataEntryService
                         .Include(de => de.Fields)
                         .ThenInclude(f => f.DataTypeField)
                         .FirstOrDefaultAsync(de => de.Id == request.Id)
-                    ?? throw new ArgumentException("Data entry not found.");
-
-        if (entry.DataType.Instance.CreatedById != request.ManagerId)
-        {
-            throw new ArgumentException("Manager does not have permission to edit this data entry.");
-        }
+                    ?? throw new ValidationException("Data entry not found.");
 
         _fieldTypeService
             .ValidateValues(entry.DataType.Fields, request.Values)
@@ -134,7 +127,7 @@ public class DataEntryService : IDataEntryService
     public async Task<DataEntry> GetAsync(int id)
     {
         return await _database.DataEntries.FindAsync(id)
-               ?? throw new ArgumentException("Data entry not found.");
+               ?? throw new ValidationException("Data entry not found.");
     }
 
     public async Task<IEnumerable<DataEntry>> GetByDataTypeIdAsync(int dataTypeId)

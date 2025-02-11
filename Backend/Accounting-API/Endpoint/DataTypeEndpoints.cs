@@ -14,15 +14,30 @@ public static class DataTypeEndpoints
             async (
                 [FromBody] DataTypeCreateRequest request,
                 IDataTypeService dataTypeService
-            ) => await dataTypeService.CreateAsync(request)
+            ) => Results.Json(await dataTypeService.CreateAsync(request))
         );
 
         builder.MapDelete(
             "/{id:int}",
             async (
                 int id,
-                IDataTypeService dataTypeService
-            ) => await dataTypeService.DeleteAsync(id)
+                IDataTypeService dataTypeService,
+                IJwtService jwtService,
+                HttpRequest request
+            ) =>
+            {
+                var accessToken = request.ToAccessToken()!;
+                var session = jwtService.ExtractSession(accessToken);
+
+                if (session == null)
+                {
+                    throw new UnauthorizedAccessException("Invalid access token.");
+                }
+
+                await dataTypeService.DeleteAsync(id, session.UserId);
+
+                return Results.Ok();
+            }
         );
 
         builder.MapPatch(
@@ -36,6 +51,8 @@ public static class DataTypeEndpoints
                 request.Id = id;
 
                 await dataTypeService.EditAsync(request);
+
+                return Results.Ok();
             }
         );
 
@@ -44,7 +61,7 @@ public static class DataTypeEndpoints
             async (
                 int id,
                 IDataTypeService dataTypeService
-            ) => await dataTypeService.GetAsync(id)
+            ) => Results.Json(await dataTypeService.GetAsync(id))
         );
 
         builder.MapGet(
@@ -52,7 +69,7 @@ public static class DataTypeEndpoints
             async (
                 int instanceId,
                 IDataTypeService dataTypeService
-            ) => await dataTypeService.GetByInstanceIdAsync(instanceId)
+            ) => Results.Json(await dataTypeService.GetByInstanceIdAsync(instanceId))
         );
     }
 
@@ -63,7 +80,7 @@ public static class DataTypeEndpoints
             async (
                 [FromBody] DataTypeFieldCreateRequest request,
                 IDataTypeFieldService dataTypeFieldService
-            ) => await dataTypeFieldService.CreateAsync(request)
+            ) => Results.Json(await dataTypeFieldService.CreateAsync(request))
         );
 
         builder.MapDelete(
@@ -84,6 +101,8 @@ public static class DataTypeEndpoints
                 }
 
                 await dataTypeFieldService.DeleteAsync(id, session.UserId);
+
+                return Results.Ok();
             }
         );
 
@@ -98,6 +117,8 @@ public static class DataTypeEndpoints
                 request.Id = id;
 
                 await dataTypeFieldService.EditAsync(request);
+
+                return Results.Ok();
             }
         );
 
@@ -106,7 +127,7 @@ public static class DataTypeEndpoints
             async (
                 int id,
                 IDataTypeFieldService dataTypeFieldService
-            ) => await dataTypeFieldService.GetAsync(id)
+            ) => Results.Json(await dataTypeFieldService.GetAsync(id))
         );
 
         builder.MapGet(
@@ -114,7 +135,7 @@ public static class DataTypeEndpoints
             async (
                 int dataTypeId,
                 IDataTypeFieldService dataTypeFieldService
-            ) => await dataTypeFieldService.GetByDataTypeIdAsync(dataTypeId)
+            ) => Results.Json(await dataTypeFieldService.GetByDataTypeIdAsync(dataTypeId))
         );
     }
 }

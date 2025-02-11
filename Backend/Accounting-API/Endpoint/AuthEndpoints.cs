@@ -88,7 +88,7 @@ public static class AuthEndpoints
             {
                 var validation = await authService.ValidateRegisterRequestAsync(request);
 
-                await validation.ToResultAsync(
+                return await validation.ToResultAsync(
                     async () => (await authService.RegisterAsync(request)).AccessToken
                 );
             }

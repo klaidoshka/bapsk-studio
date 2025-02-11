@@ -16,7 +16,8 @@ public interface IDataTypeService
     /// Deletes a data type.
     /// </summary>
     /// <param name="id">Data type id to delete</param>
-    public Task DeleteAsync(int id);
+    /// <param name="managerId">Manager, who's deleting data type, id</param>
+    public Task DeleteAsync(int id, int managerId);
 
     /// <summary>
     /// Edits a data type.

@@ -14,7 +14,7 @@ public static class InstanceEndpoints
             async (
                 [FromBody] InstanceCreateRequest request,
                 IInstanceService instanceService
-            ) => await instanceService.CreateAsync(request)
+            ) => Results.Json(await instanceService.CreateAsync(request))
         );
 
         builder.MapDelete(
@@ -22,7 +22,12 @@ public static class InstanceEndpoints
             async (
                 int id,
                 IInstanceService instanceService
-            ) => await instanceService.DeleteAsync(id)
+            ) =>
+            {
+                await instanceService.DeleteAsync(id);
+
+                return Results.Ok();
+            }
         );
 
         builder.MapPatch(
@@ -36,6 +41,8 @@ public static class InstanceEndpoints
                 request.Id = id;
 
                 await instanceService.EditAsync(request);
+
+                return Results.Ok();
             }
         );
 
@@ -44,7 +51,7 @@ public static class InstanceEndpoints
             async (
                 int id,
                 IInstanceService instanceService
-            ) => await instanceService.GetAsync(id)
+            ) => Results.Json(await instanceService.GetAsync(id))
         );
 
         builder.MapGet(
@@ -52,7 +59,7 @@ public static class InstanceEndpoints
             async (
                 int userId,
                 IInstanceService instanceService
-            ) => await instanceService.GetByUserIdAsync(userId)
+            ) => Results.Json(await instanceService.GetByUserIdAsync(userId))
         );
     }
 
@@ -63,7 +70,7 @@ public static class InstanceEndpoints
             async (
                 [FromBody] InstanceUserMetaCreateRequest request,
                 IInstanceUserMetaService instanceUserMetaService
-            ) => await instanceUserMetaService.CreateAsync(request)
+            ) => Results.Json(await instanceUserMetaService.CreateAsync(request))
         );
 
         builder.MapDelete(
@@ -84,6 +91,8 @@ public static class InstanceEndpoints
                 }
 
                 await instanceUserMetaService.DeleteAsync(id, session.UserId);
+
+                return Results.Ok();
             }
         );
 
@@ -92,7 +101,7 @@ public static class InstanceEndpoints
             async (
                 int id,
                 IInstanceUserMetaService instanceUserMetaService
-            ) => await instanceUserMetaService.GetAsync(id)
+            ) => Results.Json(await instanceUserMetaService.GetAsync(id))
         );
 
         builder.MapGet(
@@ -100,7 +109,7 @@ public static class InstanceEndpoints
             async (
                 int instanceId,
                 IInstanceUserMetaService instanceUserMetaService
-            ) => await instanceUserMetaService.GetByInstanceIdAsync(instanceId)
+            ) => Results.Json(await instanceUserMetaService.GetByInstanceIdAsync(instanceId))
         );
     }
 }

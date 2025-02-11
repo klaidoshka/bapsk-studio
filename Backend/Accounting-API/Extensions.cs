@@ -95,11 +95,11 @@ public static class Extensions
     /// <param name="application">Application to map endpoints in</param>
     public static void MapEndpoints(this WebApplication application)
     {
-        var apiRouteGroup = application.MapGroup("/api/v1");
-
-        var accountingRouteGroup = apiRouteGroup
-            .MapGroup("/accounting")
+        var apiRouteGroup = application
+            .MapGroup("/api/v1")
             .RequireAuthorization();
+
+        var accountingRouteGroup = apiRouteGroup.MapGroup("/accounting");
 
         apiRouteGroup
             .MapGroup("/auth")

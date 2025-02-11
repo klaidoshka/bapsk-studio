@@ -9,7 +9,8 @@ public interface IDataTypeFieldService
     /// Creates a field into a data type.
     /// </summary>
     /// <param name="request">Request to process</param>
-    public Task CreateAsync(DataTypeFieldCreateRequest request);
+    /// <returns>Created data type field</returns>
+    public Task<DataTypeField> CreateAsync(DataTypeFieldCreateRequest request);
 
     /// <summary>
     /// Deletes a field from a data type.

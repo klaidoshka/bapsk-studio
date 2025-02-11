@@ -1,3 +1,4 @@
+using Accounting.API.Util;
 using Accounting.Contract.Service;
 using Accounting.Contract.Service.Request;
 using Microsoft.AspNetCore.Mvc;
@@ -10,23 +11,38 @@ public static class DataEntryEndpoints
     {
         builder.MapPost(
             string.Empty,
-            async Task (
+            async (
                 [FromBody] DataEntryCreateRequest request,
                 IDataEntryService dataEntryService
-            ) => await dataEntryService.CreateAsync(request)
+            ) => Results.Json(await dataEntryService.CreateAsync(request))
         );
 
         builder.MapDelete(
             "/{id:int}",
             async (
                 int id,
-                IDataEntryService dataEntryService
-            ) => await dataEntryService.DeleteAsync(id)
+                IDataEntryService dataEntryService,
+                IJwtService jwtService,
+                HttpRequest request
+            ) =>
+            {
+                var accessToken = request.ToAccessToken()!;
+                var session = jwtService.ExtractSession(accessToken);
+
+                if (session == null)
+                {
+                    throw new UnauthorizedAccessException("Invalid access token.");
+                }
+
+                await dataEntryService.DeleteAsync(id, session.UserId);
+
+                return Results.Ok();
+            }
         );
 
         builder.MapPatch(
             "/{id:int}",
-            async Task (
+            async (
                 int id,
                 [FromBody] DataEntryEditRequest request,
                 IDataEntryService dataEntryService
@@ -35,6 +51,8 @@ public static class DataEntryEndpoints
                 request.Id = id;
 
                 await dataEntryService.EditAsync(request);
+
+                return Results.Ok();
             }
         );
 
@@ -43,7 +61,7 @@ public static class DataEntryEndpoints
             async (
                 int id,
                 IDataEntryService dataEntryService
-            ) => await dataEntryService.GetAsync(id)
+            ) => Results.Json(await dataEntryService.GetAsync(id))
         );
 
         builder.MapGet(
@@ -51,7 +69,7 @@ public static class DataEntryEndpoints
             async (
                 int dataTypeId,
                 IDataEntryService dataEntryService
-            ) => await dataEntryService.GetByDataTypeIdAsync(dataTypeId)
+            ) => Results.Json(await dataEntryService.GetByDataTypeIdAsync(dataTypeId))
         );
     }
 
@@ -62,7 +80,7 @@ public static class DataEntryEndpoints
             async (
                 [FromBody] DataEntryFieldCreateRequest request,
                 IDataEntryFieldService dataEntryFieldService
-            ) => await dataEntryFieldService.CreateAsync(request)
+            ) => Results.Json(await dataEntryFieldService.CreateAsync(request))
         );
 
         builder.MapDelete(
@@ -70,7 +88,12 @@ public static class DataEntryEndpoints
             async (
                 int id,
                 IDataEntryFieldService dataEntryFieldService
-            ) => await dataEntryFieldService.DeleteAsync(id)
+            ) =>
+            {
+                await dataEntryFieldService.DeleteAsync(id);
+
+                return Results.Ok();
+            }
         );
 
         builder.MapPatch(
@@ -84,6 +107,8 @@ public static class DataEntryEndpoints
                 request.Id = id;
 
                 await dataEntryFieldService.EditAsync(request);
+
+                return Results.Ok();
             }
         );
 
@@ -92,7 +117,7 @@ public static class DataEntryEndpoints
             async (
                 int id,
                 IDataEntryFieldService dataEntryFieldService
-            ) => await dataEntryFieldService.GetAsync(id)
+            ) => Results.Json(await dataEntryFieldService.GetAsync(id))
         );
 
         builder.MapGet(
@@ -100,7 +125,7 @@ public static class DataEntryEndpoints
             async (
                 int dataEntryId,
                 IDataEntryFieldService dataEntryFieldService
-            ) => await dataEntryFieldService.GetByDataEntryIdAsync(dataEntryId)
+            ) => Results.Json(await dataEntryFieldService.GetByDataEntryIdAsync(dataEntryId))
         );
     }
 }

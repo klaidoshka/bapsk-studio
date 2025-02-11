@@ -5,6 +5,7 @@
 POST {{STI_API_HostAddress}}/cancel-declaration
 Accept: application/json
 Content-Type: application/json
+Authorization: Bearer {{accessToken}}
 
 {
   "RequestId": "12345",
@@ -19,6 +20,7 @@ Content-Type: application/json
 GET {{STI_API_HostAddress}}/exported-goods
 Accept: application/json
 Content-Type: application/json
+Authorization: Bearer {{accessToken}}
 
 {
   "RequestId": "12345",
@@ -33,6 +35,7 @@ Content-Type: application/json
 GET {{STI_API_HostAddress}}/query-declarations
 Accept: application/json
 Content-Type: application/json
+Authorization: Bearer {{accessToken}}
 
 {
   "RequestId": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
@@ -51,6 +54,7 @@ Content-Type: application/json
 POST {{STI_API_HostAddress}}/submit-declaration
 Accept: application/json
 Content-Type: application/json
+Authorization: Bearer {{accessToken}}
 
 {
   "Declaration": {
@@ -137,6 +141,7 @@ Content-Type: application/json
 POST {{STI_API_HostAddress}}/submit-payment-info
 Accept: application/json
 Content-Type: application/json
+Authorization: Bearer {{accessToken}}
 
 {
   "RequestId": "REQ123456",

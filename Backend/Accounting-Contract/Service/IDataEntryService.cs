@@ -16,7 +16,8 @@ public interface IDataEntryService
     /// Deletes a data entry.
     /// </summary>
     /// <param name="id">Data entry id to delete</param>
-    public Task DeleteAsync(int id);
+    /// <param name="managerId">Manager, who's deleting data entry, id</param>
+    public Task DeleteAsync(int id, int managerId);
 
     /// <summary>
     /// Edits a data entry.
