@@ -6,12 +6,9 @@ Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-    "CreatorId": 1,
-    "DataTypeId": 1,
-    "Values": {
-        1: "Value 1",
-        2: "Value 2",
-    }
+  "DataEntryId": 1,
+  "DataTypeFieldId": 1,
+  "Value": "Value 1 duplicated"
 }
 
 ###
@@ -29,12 +26,8 @@ Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-    "ManagerId": 1,
-    "Id": 1,
-    "Values": {
-        1: "Value 1 Edited",
-        2: "Value 2",
-    }
+  "Id": 1,
+  "Value": "Value 1 Edited"
 }
 
 ###

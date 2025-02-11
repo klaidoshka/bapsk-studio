@@ -6,9 +6,9 @@ Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-    "CreatorId": 1,
-    "Description": "First Instance To Be Created By The Creator",
-    "Name": "First Instance"
+  "CreatorId": 1,
+  "Description": "First Instance To Be Created By The Creator",
+  "Name": "First Instance"
 }
 
 ###
@@ -20,20 +20,20 @@ Authorization: Bearer {{accessToken}}
 
 ###
 
-PUT {{Instance_API_IP}}/1
+PUT {{Instance_API_IP}}/2
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-    "Description": "First Instance To Be Created By The Creator",
-    "Id": 1,
-    "Name": "First Instance"
+  "Description": "Second Instance To Be Created By The Creator",
+  "Id": 2,
+  "Name": "Second Instance"
 }
 
 ###
 
-GET {{Instance_API_IP}}/1
+GET {{Instance_API_IP}}/2
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}

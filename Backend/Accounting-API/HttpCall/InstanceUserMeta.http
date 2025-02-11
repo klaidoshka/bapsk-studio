@@ -6,9 +6,9 @@ Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-    "InstanceId": 1,
-    "UserId": "2",
-    "ManagerId": "1"
+  "InstanceId": 1,
+  "UserId": "2",
+  "ManagerId": "1"
 }
 
 ###

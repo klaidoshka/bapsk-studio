@@ -99,8 +99,12 @@ public class DataEntryService : IDataEntryService
                         .Include(de => de.DataType.Fields)
                         .Include(de => de.Fields)
                         .ThenInclude(f => f.DataTypeField)
-                        .FirstOrDefaultAsync(de => de.Id == request.Id)
-                    ?? throw new ValidationException("Data entry not found.");
+                        .FirstOrDefaultAsync(de => de.Id == request.Id);
+
+        if (entry == null || entry.IsDeleted == true)
+        {
+            throw new ValidationException("Data entry not found.");
+        }
 
         _fieldTypeService
             .ValidateValues(entry.DataType.Fields, request.Values)
@@ -126,14 +130,23 @@ public class DataEntryService : IDataEntryService
 
     public async Task<DataEntry> GetAsync(int id)
     {
-        return await _database.DataEntries.FindAsync(id)
-               ?? throw new ValidationException("Data entry not found.");
+        var dataEntry = await _database.DataEntries.FindAsync(id);
+
+        if (dataEntry == null || dataEntry.IsDeleted == true)
+        {
+            throw new ValidationException("Data entry not found.");
+        }
+
+        return dataEntry;
     }
 
     public async Task<IEnumerable<DataEntry>> GetByDataTypeIdAsync(int dataTypeId)
     {
         return await _database.DataEntries
-            .Where(de => de.DataTypeId == dataTypeId)
+            .Where(
+                de => de.DataTypeId == dataTypeId &&
+                      de.IsDeleted != true
+            )
             .ToListAsync();
     }
 }

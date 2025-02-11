@@ -28,7 +28,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
     {
         context.Response.ContentType = "application/json";
 
-        if (exception ! is ValidationException)
+        if (exception is not ValidationException)
         {
             _logger.LogError(exception, "An unexpected error occurred.");
         }

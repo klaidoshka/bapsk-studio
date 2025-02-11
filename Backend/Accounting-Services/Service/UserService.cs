@@ -56,10 +56,9 @@ public class UserService : IUserService
 
     public async Task EditAsync(UserEditRequest request)
     {
-        var user = await _database.Users.FindAsync(request.Id)
-                   ?? throw new ValidationException("User not found.");
+        var user = await _database.Users.FindAsync(request.Id);
 
-        if (user.IsDeleted)
+        if (user == null || user.IsDeleted)
         {
             throw new ValidationException("User not found.");
         }

@@ -6,9 +6,9 @@ Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-  "DataTypeId": 1,
+  "DataTypeId": 3,
   "DefaultValue": "Description of the field",
-  "InstanceId": 1,
+  "InstanceId": 2,
   "IsRequired": true,
   "ManagerId": 1,
   "Name": "Name",
@@ -47,7 +47,7 @@ Authorization: Bearer {{accessToken}}
 
 ###
 
-GET {{DataEntryField_API_IP}}?dataTypeId=1
+GET {{DataEntryField_API_IP}}?dataTypeId=3
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}

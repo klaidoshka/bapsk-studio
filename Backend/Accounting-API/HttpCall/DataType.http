@@ -6,43 +6,42 @@ Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-    "CreatorId": 1,
-    "Description": "Description of the field",
-    "InstanceId": 1,
-    "Name": "Name"
+  "Description": "Description of the data type",
+  "InstanceId": 2,
+  "Name": "Name"
 }
 
 ###
 
-DELETE {{DataEntry_API_IP}}/1
+DELETE {{DataEntry_API_IP}}/3
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 ###
 
-PUT {{DataEntry_API_IP}}/1
+PUT {{DataEntry_API_IP}}/3
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 {
-    "Description": 1,
-    "Id": 1,
-    "ManagerId": 1,
-    "Name": "Name Edited"
+  "Description": "Description Edited",
+  "Id": 1,
+  "ManagerId": 1,
+  "Name": "Name Edited"
 }
 
 ###
 
-GET {{DataEntry_API_IP}}/1
+GET {{DataEntry_API_IP}}/3
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}
 
 ###
 
-GET {{DataEntry_API_IP}}?instanceId=1
+GET {{DataEntry_API_IP}}?instanceId=2
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}

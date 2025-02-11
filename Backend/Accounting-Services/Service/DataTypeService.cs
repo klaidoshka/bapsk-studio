@@ -18,14 +18,19 @@ public class DataTypeService : IDataTypeService
 
     public async Task<DataType> CreateAsync(DataTypeCreateRequest request)
     {
-        var dataType = new DataType
+        if (!await _database.Instances.AnyAsync(i => i.Id == request.InstanceId))
         {
-            Description = request.Description,
-            InstanceId = request.InstanceId,
-            Name = request.Name
-        };
+            throw new ValidationException("Instance not found.");
+        }
 
-        await _database.DataTypes.AddAsync(dataType);
+        var dataType = (await _database.DataTypes.AddAsync(
+            new DataType
+            {
+                Description = request.Description,
+                InstanceId = request.InstanceId,
+                Name = request.Name
+            }
+        )).Entity;
 
         await _database.SaveChangesAsync();
 
@@ -54,8 +59,12 @@ public class DataTypeService : IDataTypeService
     {
         var dataType = await _database.DataTypes
                            .Include(d => d.Instance)
-                           .FirstOrDefaultAsync(d => d.Id == request.Id)
-                       ?? throw new ValidationException("Data type not found.");
+                           .FirstOrDefaultAsync(d => d.Id == request.Id);
+
+        if (dataType == null || dataType.IsDeleted == true)
+        {
+            throw new ValidationException("Data type not found.");
+        }
 
         dataType.Description = request.Description;
         dataType.Name = request.Name;
@@ -65,14 +74,24 @@ public class DataTypeService : IDataTypeService
 
     public async Task<DataType> GetAsync(int id)
     {
-        return await _database.DataTypes.FirstOrDefaultAsync(dt => dt.Id == id)
-               ?? throw new ValidationException("Data type not found.");
+        var dataType = await _database.DataTypes.FirstOrDefaultAsync(dt => dt.Id == id);
+
+        if (dataType == null || dataType.IsDeleted == true)
+        {
+            throw new ValidationException("Data type not found.");
+        }
+
+        return dataType;
     }
 
     public async Task<IEnumerable<DataType>> GetByInstanceIdAsync(int instanceId)
     {
         return await _database.DataTypes
-            .Where(dt => dt.InstanceId == instanceId)
+            .Where(
+                dt =>
+                    dt.InstanceId == instanceId &&
+                    dt.IsDeleted != true
+            )
             .ToListAsync();
     }
 }
