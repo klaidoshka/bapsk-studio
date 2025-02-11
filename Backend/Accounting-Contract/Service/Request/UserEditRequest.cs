@@ -1,0 +1,13 @@
+using Accounting.Contract.Enumeration;
+
+namespace Accounting.Contract.Service.Request;
+
+public class UserEditRequest
+{
+    public DateTime BirthDate { get; set; }
+    public IsoCountryCode Country { get; set; }
+    public string Email { get; set; }
+    public string FirstName { get; set; }
+    public int Id { get; set; }
+    public string LastName { get; set; }
+}

@@ -1,4 +1,4 @@
-namespace Accounting.Contract.Result;
+namespace Accounting.Contract.Response;
 
 public class Validation(IEnumerable<string>? failures)
 {

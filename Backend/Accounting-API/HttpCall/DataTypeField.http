@@ -24,7 +24,7 @@ Authorization: Bearer {{accessToken}}
 
 ###
 
-PATCH {{DataEntryField_API_IP}}/1
+PUT {{DataEntryField_API_IP}}/1
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}

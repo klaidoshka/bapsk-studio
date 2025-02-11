@@ -1,6 +1,6 @@
 using Accounting.Contract;
 using Accounting.Contract.Entity;
-using Accounting.Contract.Result;
+using Accounting.Contract.Response;
 using Accounting.Contract.Service;
 using Accounting.Contract.Service.Request;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,4 @@
-namespace Accounting.Contract.Result;
+namespace Accounting.Contract.Response;
 
 public class ValidationException(Validation validation) : Exception(
     "Validation failed:\n" + string.Join("\n", validation.FailureMessages)

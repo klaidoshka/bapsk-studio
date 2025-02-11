@@ -95,9 +95,6 @@ namespace Accounting.Contract.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CreatedById")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
@@ -114,8 +111,6 @@ namespace Accounting.Contract.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedById");
 
                     b.HasIndex("InstanceId");
 
@@ -281,6 +276,9 @@ namespace Accounting.Contract.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -343,19 +341,11 @@ namespace Accounting.Contract.Migrations
 
             modelBuilder.Entity("Accounting.Contract.Entity.DataType", b =>
                 {
-                    b.HasOne("Accounting.Contract.Entity.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Accounting.Contract.Entity.Instance", "Instance")
                         .WithMany()
                         .HasForeignKey("InstanceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("CreatedBy");
 
                     b.Navigation("Instance");
                 });
@@ -363,7 +353,7 @@ namespace Accounting.Contract.Migrations
             modelBuilder.Entity("Accounting.Contract.Entity.DataTypeField", b =>
                 {
                     b.HasOne("Accounting.Contract.Entity.DataType", "DataType")
-                        .WithMany()
+                        .WithMany("Fields")
                         .HasForeignKey("DataTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -413,6 +403,11 @@ namespace Accounting.Contract.Migrations
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.DataEntry", b =>
+                {
+                    b.Navigation("Fields");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.DataType", b =>
                 {
                     b.Navigation("Fields");
                 });

@@ -1,0 +1,14 @@
+@Session_API_IP = http://localhost:5125/api/v1/session
+
+// @name Session By Id
+GET {{Session_API_IP}}/51d415f9-707b-4271-982b-df50b381d373
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###
+
+GET {{Session_API_IP}}?userId=1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}

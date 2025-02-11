@@ -99,12 +99,21 @@ public static class Extensions
             .MapGroup("/api/v1")
             .RequireAuthorization();
 
-        var accountingRouteGroup = apiRouteGroup.MapGroup("/accounting");
-
         apiRouteGroup
             .MapGroup("/auth")
+            .AllowAnonymous()
             .MapAuthEndpoints();
 
+        apiRouteGroup
+            .MapGroup("/session")
+            .MapSessionEndpoints();
+
+        apiRouteGroup
+            .MapGroup("/user")
+            .MapUserEndpoints();
+
+        var accountingRouteGroup = apiRouteGroup.MapGroup("/accounting");
+        
         accountingRouteGroup
             .MapGroup("/data-entry")
             .MapDataEntryEndpoints();

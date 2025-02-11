@@ -1,4 +1,5 @@
 using Accounting.API.Util;
+using Accounting.Contract.Dto;
 using Accounting.Contract.Service;
 using Accounting.Contract.Service.Request;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,7 @@ public static class InstanceEndpoints
             async (
                 [FromBody] InstanceCreateRequest request,
                 IInstanceService instanceService
-            ) => Results.Json(await instanceService.CreateAsync(request))
+            ) => Results.Json((await instanceService.CreateAsync(request)).ToDto())
         );
 
         builder.MapDelete(
@@ -30,7 +31,7 @@ public static class InstanceEndpoints
             }
         );
 
-        builder.MapPatch(
+        builder.MapPut(
             "/{id:int}",
             async (
                 int id,
@@ -51,7 +52,7 @@ public static class InstanceEndpoints
             async (
                 int id,
                 IInstanceService instanceService
-            ) => Results.Json(await instanceService.GetAsync(id))
+            ) => Results.Json((await instanceService.GetAsync(id)).ToDto())
         );
 
         builder.MapGet(
@@ -59,7 +60,11 @@ public static class InstanceEndpoints
             async (
                 int userId,
                 IInstanceService instanceService
-            ) => Results.Json(await instanceService.GetByUserIdAsync(userId))
+            ) => Results.Json(
+                (await instanceService.GetByUserIdAsync(userId))
+                .Select(i => i.ToDto())
+                .ToList()
+            )
         );
     }
 
@@ -70,7 +75,7 @@ public static class InstanceEndpoints
             async (
                 [FromBody] InstanceUserMetaCreateRequest request,
                 IInstanceUserMetaService instanceUserMetaService
-            ) => Results.Json(await instanceUserMetaService.CreateAsync(request))
+            ) => Results.Json((await instanceUserMetaService.CreateAsync(request)).ToDto())
         );
 
         builder.MapDelete(
@@ -101,7 +106,7 @@ public static class InstanceEndpoints
             async (
                 int id,
                 IInstanceUserMetaService instanceUserMetaService
-            ) => Results.Json(await instanceUserMetaService.GetAsync(id))
+            ) => Results.Json((await instanceUserMetaService.GetAsync(id)).ToDto())
         );
 
         builder.MapGet(
@@ -109,7 +114,11 @@ public static class InstanceEndpoints
             async (
                 int instanceId,
                 IInstanceUserMetaService instanceUserMetaService
-            ) => Results.Json(await instanceUserMetaService.GetByInstanceIdAsync(instanceId))
+            ) => Results.Json(
+                (await instanceUserMetaService.GetByInstanceIdAsync(instanceId))
+                .Select(i => i.ToDto())
+                .ToList()
+            )
         );
     }
 }

@@ -1,4 +1,5 @@
 using Accounting.API.Util;
+using Accounting.Contract.Dto;
 using Accounting.Contract.Service;
 using Accounting.Contract.Service.Request;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,7 @@ public static class DataTypeEndpoints
             async (
                 [FromBody] DataTypeCreateRequest request,
                 IDataTypeService dataTypeService
-            ) => Results.Json(await dataTypeService.CreateAsync(request))
+            ) => Results.Json((await dataTypeService.CreateAsync(request)).ToDto())
         );
 
         builder.MapDelete(
@@ -40,7 +41,7 @@ public static class DataTypeEndpoints
             }
         );
 
-        builder.MapPatch(
+        builder.MapPut(
             "/{id:int}",
             async (
                 int id,
@@ -61,7 +62,7 @@ public static class DataTypeEndpoints
             async (
                 int id,
                 IDataTypeService dataTypeService
-            ) => Results.Json(await dataTypeService.GetAsync(id))
+            ) => Results.Json((await dataTypeService.GetAsync(id)).ToDto())
         );
 
         builder.MapGet(
@@ -69,7 +70,11 @@ public static class DataTypeEndpoints
             async (
                 int instanceId,
                 IDataTypeService dataTypeService
-            ) => Results.Json(await dataTypeService.GetByInstanceIdAsync(instanceId))
+            ) => Results.Json(
+                (await dataTypeService.GetByInstanceIdAsync(instanceId))
+                .Select(i => i.ToDto())
+                .ToList()
+            )
         );
     }
 
@@ -80,7 +85,7 @@ public static class DataTypeEndpoints
             async (
                 [FromBody] DataTypeFieldCreateRequest request,
                 IDataTypeFieldService dataTypeFieldService
-            ) => Results.Json(await dataTypeFieldService.CreateAsync(request))
+            ) => Results.Json((await dataTypeFieldService.CreateAsync(request)).ToDto())
         );
 
         builder.MapDelete(
@@ -106,7 +111,7 @@ public static class DataTypeEndpoints
             }
         );
 
-        builder.MapPatch(
+        builder.MapPut(
             "/{id:int}",
             async (
                 int id,
@@ -127,7 +132,7 @@ public static class DataTypeEndpoints
             async (
                 int id,
                 IDataTypeFieldService dataTypeFieldService
-            ) => Results.Json(await dataTypeFieldService.GetAsync(id))
+            ) => Results.Json((await dataTypeFieldService.GetAsync(id)).ToDto())
         );
 
         builder.MapGet(
@@ -135,7 +140,11 @@ public static class DataTypeEndpoints
             async (
                 int dataTypeId,
                 IDataTypeFieldService dataTypeFieldService
-            ) => Results.Json(await dataTypeFieldService.GetByDataTypeIdAsync(dataTypeId))
+            ) => Results.Json(
+                (await dataTypeFieldService.GetByDataTypeIdAsync(dataTypeId))
+                .Select(i => i.ToDto())
+                .ToList()
+            )
         );
     }
 }

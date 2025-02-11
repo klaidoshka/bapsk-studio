@@ -36,6 +36,11 @@ public class User
     public int Id { get; set; }
 
     /// <summary>
+    /// Marks the user as deleted.
+    /// </summary>
+    public bool IsDeleted { get; set; }
+
+    /// <summary>
     /// First name of the user.
     /// </summary>
     public string FirstName { get; set; }

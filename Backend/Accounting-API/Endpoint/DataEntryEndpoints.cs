@@ -1,4 +1,5 @@
 using Accounting.API.Util;
+using Accounting.Contract.Dto;
 using Accounting.Contract.Service;
 using Accounting.Contract.Service.Request;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,7 @@ public static class DataEntryEndpoints
             async (
                 [FromBody] DataEntryCreateRequest request,
                 IDataEntryService dataEntryService
-            ) => Results.Json(await dataEntryService.CreateAsync(request))
+            ) => Results.Json((await dataEntryService.CreateAsync(request)).ToDto())
         );
 
         builder.MapDelete(
@@ -40,7 +41,7 @@ public static class DataEntryEndpoints
             }
         );
 
-        builder.MapPatch(
+        builder.MapPut(
             "/{id:int}",
             async (
                 int id,
@@ -61,7 +62,7 @@ public static class DataEntryEndpoints
             async (
                 int id,
                 IDataEntryService dataEntryService
-            ) => Results.Json(await dataEntryService.GetAsync(id))
+            ) => Results.Json((await dataEntryService.GetAsync(id)).ToDto())
         );
 
         builder.MapGet(
@@ -69,7 +70,11 @@ public static class DataEntryEndpoints
             async (
                 int dataTypeId,
                 IDataEntryService dataEntryService
-            ) => Results.Json(await dataEntryService.GetByDataTypeIdAsync(dataTypeId))
+            ) => Results.Json(
+                (await dataEntryService.GetByDataTypeIdAsync(dataTypeId))
+                .Select(i => i.ToDto())
+                .ToList()
+            )
         );
     }
 
@@ -80,7 +85,7 @@ public static class DataEntryEndpoints
             async (
                 [FromBody] DataEntryFieldCreateRequest request,
                 IDataEntryFieldService dataEntryFieldService
-            ) => Results.Json(await dataEntryFieldService.CreateAsync(request))
+            ) => Results.Json((await dataEntryFieldService.CreateAsync(request)).ToDto())
         );
 
         builder.MapDelete(
@@ -96,7 +101,7 @@ public static class DataEntryEndpoints
             }
         );
 
-        builder.MapPatch(
+        builder.MapPut(
             "/{id:int}",
             async (
                 int id,
@@ -117,7 +122,7 @@ public static class DataEntryEndpoints
             async (
                 int id,
                 IDataEntryFieldService dataEntryFieldService
-            ) => Results.Json(await dataEntryFieldService.GetAsync(id))
+            ) => Results.Json((await dataEntryFieldService.GetAsync(id)).ToDto())
         );
 
         builder.MapGet(
@@ -125,7 +130,11 @@ public static class DataEntryEndpoints
             async (
                 int dataEntryId,
                 IDataEntryFieldService dataEntryFieldService
-            ) => Results.Json(await dataEntryFieldService.GetByDataEntryIdAsync(dataEntryId))
+            ) => Results.Json(
+                (await dataEntryFieldService.GetByDataEntryIdAsync(dataEntryId))
+                .Select(i => i.ToDto())
+                .ToList()
+            )
         );
     }
 }

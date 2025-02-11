@@ -11,27 +11,28 @@ public static class AuthEndpoints
     {
         builder.MapPost(
             "/login",
-            async ([FromBody] LoginRequest request, HttpResponse response, IAuthService authService) =>
+            async (
+                [FromBody] LoginRequest request,
+                HttpResponse response,
+                IAuthService authService
+            ) =>
             {
-                var validation = authService.ValidateLoginRequest(request);
+                var token = await authService.LoginAsync(request);
 
-                return await validation.ToResultAsync(
-                    async () =>
-                    {
-                        var token = await authService.LoginAsync(request);
+                response.PutJwt(token);
 
-                        response.PutJwt(token);
-
-                        return token.AccessToken;
-                    }
-                );
+                return Results.Ok(token.AccessToken);
             }
         );
 
         builder
             .MapPost(
                 "/logout",
-                async (HttpContext httpContext, IAuthService authService, IJwtService jwtService) =>
+                async (
+                    HttpContext httpContext,
+                    IAuthService authService,
+                    IJwtService jwtService
+                ) =>
                 {
                     var refreshToken = httpContext.Request.ToRefreshToken();
 
@@ -40,25 +41,23 @@ public static class AuthEndpoints
                         return Results.Unauthorized();
                     }
 
-                    var validation = await authService.ValidateRefreshTokenAsync(refreshToken);
+                    var sessionId = jwtService.ExtractSessionId(refreshToken)!.Value;
 
-                    return await validation.ToResultAsync(
-                        async () =>
-                        {
-                            var sessionId = jwtService.ExtractSessionId(refreshToken)!.Value;
+                    await authService.LogoutAsync(sessionId);
 
-                            await authService.LogoutAsync(sessionId);
+                    httpContext.Response.ClearJwt();
 
-                            httpContext.Response.ClearJwt();
-                        }
-                    );
+                    return Results.Ok();
                 }
             )
             .RequireAuthorization();
 
         builder.MapPost(
             "/refresh",
-            async (HttpContext httpContext, IAuthService authService) =>
+            async (
+                HttpContext httpContext,
+                IAuthService authService
+            ) =>
             {
                 var refreshToken = httpContext.Request.ToRefreshToken();
 
@@ -67,31 +66,20 @@ public static class AuthEndpoints
                     return Results.Unauthorized();
                 }
 
-                var validation = await authService.ValidateRefreshTokenAsync(refreshToken);
+                var token = await authService.RefreshTokenAsync(refreshToken);
 
-                return await validation.ToResultAsync(
-                    async () =>
-                    {
-                        var token = await authService.RefreshTokenAsync(refreshToken);
+                httpContext.Response.PutJwt(token);
 
-                        httpContext.Response.PutJwt(token);
-
-                        return token.AccessToken;
-                    }
-                );
+                return Results.Ok(token.AccessToken);
             }
         );
 
         builder.MapPost(
             "/register",
-            async ([FromBody] RegisterRequest request, IAuthService authService) =>
-            {
-                var validation = await authService.ValidateRegisterRequestAsync(request);
-
-                return await validation.ToResultAsync(
-                    async () => (await authService.RegisterAsync(request)).AccessToken
-                );
-            }
+            async (
+                [FromBody] RegisterRequest request,
+                IAuthService authService
+            ) => Results.Ok((object?)(await authService.RegisterAsync(request)).AccessToken)
         );
     }
 }
