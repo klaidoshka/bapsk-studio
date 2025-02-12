@@ -1,107 +1,180 @@
-import {Component, inject, OnInit} from '@angular/core';
+import {Component, inject, OnInit, signal} from '@angular/core';
+import {ConfirmationService, MessageService} from 'primeng/api';
+import {InstanceService} from '../../service/instance.service';
+import {AuthService} from '../../service/auth.service';
+import {first} from 'rxjs';
+import Instance from '../../model/instance.model';
+import ErrorResponse from '../../model/error-response.model';
+import {TableModule} from 'primeng/table';
 import {Dialog} from 'primeng/dialog';
 import {FormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
-import {Button} from 'primeng/button';
-import {TableModule} from 'primeng/table';
-import {ConfirmationService, MessageService} from 'primeng/api';
-import {DatePipe} from '@angular/common';
-
-interface Instance {
-  id?: number;
-  name: string;
-  description?: string;
-  createdAt?: Date;
-}
+import {ButtonDirective} from 'primeng/button';
+import {Textarea} from 'primeng/textarea';
+import {ConfirmDialogModule} from 'primeng/confirmdialog';
 
 @Component({
-  selector: 'app-instance-page',
+  selector: 'instance-page',
+  templateUrl: './instance-page.component.html',
+  standalone: true,
   imports: [
+    TableModule,
     Dialog,
     FormsModule,
     InputText,
-    TableModule,
-    DatePipe,
-    Button
+    ButtonDirective,
+    Textarea,
+    ConfirmDialogModule
   ],
-  templateUrl: './instance-page.component.html',
-  providers: [ConfirmationService, MessageService]
+  providers: [MessageService, ConfirmationService],
 })
 export class InstancePageComponent implements OnInit {
+  private authService = inject(AuthService);
   private confirmationService = inject(ConfirmationService);
+  private instanceService = inject(InstanceService);
   private messageService = inject(MessageService);
 
   instances: Instance[] = [];
-  instanceDialog: boolean = false;
-  instance: Instance = {name: '', createdAt: new Date()};
-  selectedInstances: Instance[] = [];
+  editingInstance: Instance | null = null;
+  displayDialog = signal<boolean>(false);
+  description = signal<string | null>(null);
+  name = signal<string | null>(null);
 
   ngOnInit() {
-    // Load instances (this should be replaced with a service call)
-    this.instances = [
-      {id: 1, name: 'Instance 1', description: 'Description 1', createdAt: new Date()},
-      {id: 2, name: 'Instance 2', description: 'Description 2', createdAt: new Date()}
-    ];
+    this.authService.getUser().subscribe({
+      next: (user) => {
+        if (!user) {
+          return;
+        }
+
+        this.instanceService.getByUserId(user.id).subscribe({
+          next: (instances) => {
+            this.instances = instances;
+          }
+        });
+      }
+    })
   }
 
-  openNew() {
-    this.instance = {name: '', createdAt: new Date()};
-    this.instanceDialog = true;
-  }
+  async createInstance() {
+    if (!this.name()) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Name is required'
+      });
+      return;
+    }
 
-  editInstance(instance: Instance) {
-    this.instance = {...instance};
-    this.instanceDialog = true;
-  }
-
-  deleteInstance(instance: Instance) {
-    this.confirmationService.confirm({
-      message: 'Are you sure you want to delete ' + instance.name + '?',
-      accept: () => {
-        this.instances = this.instances.filter(i => i.id !== instance.id);
+    this.instanceService.create({
+      name: this.name()!,
+      description: this.description()
+    })
+    .pipe(first())
+    .subscribe({
+      next: (instance) => {
+        this.instances.push(instance);
+        this.name.set(null);
+        this.description.set(null);
         this.messageService.add({
           severity: 'success',
-          summary: 'Successful',
-          detail: 'Instance Deleted',
-          life: 3000
+          summary: 'Success',
+          detail: 'Instance created successfully'
+        });
+      },
+      error: (response: ErrorResponse) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: response.error.messages[0]
         });
       }
     });
   }
 
-  hideDialog() {
-    this.instanceDialog = false;
+  async deleteInstance(instance: Instance) {
+    this.confirmationService.confirm({
+      message: 'Are you sure you want to delete this instance?',
+      accept: () => {
+        this.instanceService.delete(instance.id!).pipe(first()).subscribe({
+          next: () => {
+            this.instances = this.instances.filter((i) => i.id !== instance.id);
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Instance deleted successfully'
+            });
+          },
+          error: (response: ErrorResponse) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: response.error.messages[0]
+            });
+          }
+        });
+      }
+    })
   }
 
-  saveInstance() {
-    if (this.instance.id) {
-      this.instances[this.findIndexById(this.instance.id)] = this.instance;
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Successful',
-        detail: 'Instance Updated',
-        life: 3000
+  async openCreation() {
+    this.name.set(null);
+    this.description.set(null);
+    this.editingInstance = null;
+    this.displayDialog.set(true);
+  }
+
+  async openEdit(instance: Instance) {
+    this.name.set(instance.name);
+    this.description.set(instance.description);
+    this.editingInstance = instance;
+    this.displayDialog.set(true);
+  }
+
+  async saveInstance() {
+    if (this.editingInstance) {
+      if (!this.name()) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Name is required'
+        });
+        return;
+      }
+
+      this.instanceService.edit({
+        id: this.editingInstance.id!,
+        name: this.name()!,
+        description: this.description()
+      }).pipe(first()).subscribe({
+        next: () => {
+          const index = this.instances.findIndex(i => i.id === this.editingInstance?.id);
+
+          this.instances[index] = {
+            ...this.editingInstance!,
+            name: this.name()!,
+            description: this.description()
+          };
+
+          this.displayDialog.set(false);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Instance edited successfully'
+          });
+        },
+        error: (response: ErrorResponse) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: response.error.messages[0]
+          });
+        }
       });
     } else {
-      this.instance.id = this.createId();
-      this.instances.push(this.instance);
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Successful',
-        detail: 'Instance Created',
-        life: 3000
-      });
+      // Create logic
+      await this.createInstance();
+      this.displayDialog.set(false);
     }
-    this.instances = [...this.instances];
-    this.instanceDialog = false;
-    this.instance = {name: '', createdAt: new Date()};
-  }
-
-  findIndexById(id: number): number {
-    return this.instances.findIndex(instance => instance.id === id);
-  }
-
-  createId(): number {
-    return Math.floor(Math.random() * 1000);
   }
 }

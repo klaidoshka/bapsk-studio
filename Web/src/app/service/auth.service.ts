@@ -41,6 +41,10 @@ export class AuthService {
     return this.userSubject.asObservable();
   }
 
+  getUserValue(): User | null {
+    return this.userSubject.value;
+  }
+
   isAuthenticated(): Observable<boolean> {
     return this.stateSubject.asObservable();
   }

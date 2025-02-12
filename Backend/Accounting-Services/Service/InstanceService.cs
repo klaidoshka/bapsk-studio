@@ -75,7 +75,8 @@ public class InstanceService : IInstanceService
     {
         return await _database.Instances
             .Include(i => i.UserMetas)
-            .Where(i => i.UserMetas.Any(um => um.UserId == userId))
+            .ThenInclude(um => um.User)
+            .Where(i => i.UserMetas.Any(um => um.UserId == userId && !um.User.IsDeleted))
             .ToListAsync();
     }
 }

@@ -1,1 +1,130 @@
-<p>data-type-page works!</p>
+<div class="p-4">
+  <h1 class="text-2xl font-bold mb-4">Data Types</h1>
+
+  <div class="mb-4">
+    <label for="instance" class="block text-sm font-medium text-gray-700">Select Instance</label>
+    <p-dropdown id="instance" [options]="instances" [(ngModel)]="selectedInstance"
+                optionLabel="name" placeholder="Select an instance"
+                (onChange)="loadDataTypes(selectedInstance?.id ?? null)"></p-dropdown>
+  </div>
+
+  <button pButton type="button" label="Create Data Type" class="p-button-sm mb-4"
+          (click)="openCreation()" [disabled]="!selectedInstance"></button>
+
+  <p-confirm-dialog></p-confirm-dialog>
+
+  <p-table [value]="dataTypes" class="w-full" (onRowSelect)="onDataTypeSelect($event)">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-dataType>
+      <tr>
+        <td>{{ dataType.name }}</td>
+        <td>{{ dataType.description }}</td>
+        <td>
+          <button pButton type="button" label="Edit"
+                  class="p-button-rounded p-button-info p-button-sm mr-2"
+                  (click)="openEdit(dataType)"></button>
+          <button pButton type="button" label="Delete"
+                  class="p-button-rounded p-button-danger p-button-sm"
+                  (click)="deleteDataType(dataType)"></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-dialog header="Manage Data Type" [(visible)]="displayDialog" [modal]="true"
+            [closable]="false" [style]="{width: '30vw'}">
+    <div class="p-fluid space-y-4">
+      <div class="p-field">
+        <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+        <input id="name" type="text" pInputText [(ngModel)]="name"
+               class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+      </div>
+      <div class="p-field">
+        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+        <textarea id="description" pTextarea [(ngModel)]="description"
+                  class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button pButton type="button" label="Cancel" class="p-button-text p-button-sm"
+              (click)="displayDialog = false"></button>
+      <button pButton type="button" label="Save" class="p-button-sm"
+              (click)="saveDataType()"></button>
+    </ng-template>
+  </p-dialog>
+
+  <div *ngIf="selectedDataType">
+    <h2 class="text-xl font-bold mt-6 mb-4">Data Type Fields</h2>
+    <button pButton type="button" label="Create Data Type Field" class="p-button-sm mb-4"
+            (click)="openFieldCreation()"></button>
+
+    <p-table [value]="dataTypeFields" class="w-full">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Name</th>
+          <th>Default Value</th>
+          <th>Is Required</th>
+          <th>Type</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-dataTypeField>
+        <tr>
+          <td>{{ dataTypeField.name }}</td>
+          <td>{{ dataTypeField.defaultValue }}</td>
+          <td>{{ dataTypeField.isRequired }}</td>
+          <td>{{ dataTypeField.type }}</td>
+          <td>
+            <button pButton type="button" label="Edit"
+                    class="p-button-rounded p-button-info p-button-sm mr-2"
+                    (click)="openFieldEdit(dataTypeField)"></button>
+            <button pButton type="button" label="Delete"
+                    class="p-button-rounded p-button-danger p-button-sm"
+                    (click)="deleteDataTypeField(dataTypeField)"></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <p-dialog header="Manage Data Type Field" [(visible)]="displayFieldDialog" [modal]="true"
+              [closable]="false" [style]="{width: '30vw'}">
+      <div class="p-fluid space-y-4">
+        <div class="p-field">
+          <label for="fieldName" class="block text-sm font-medium text-gray-700">Name</label>
+          <input id="fieldName" type="text" pInputText [(ngModel)]="fieldName"
+                 class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        </div>
+        <div class="p-field">
+          <label for="defaultValue" class="block text-sm font-medium text-gray-700">Default
+            Value</label>
+          <input id="defaultValue" type="text" pInputText [(ngModel)]="defaultValue"
+                 class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        </div>
+        <div class="p-field">
+          <label for="isRequired" class="block text-sm font-medium text-gray-700">Is
+            Required</label>
+          <p-checkbox id="isRequired" [(ngModel)]="isRequired"></p-checkbox>
+        </div>
+        <div class="p-field">
+          <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
+          <p-dropdown id="type" [options]="fieldTypes" [(ngModel)]="type" optionLabel="label"
+                      placeholder="Select a type"></p-dropdown>
+        </div>
+      </div>
+
+      <ng-template pTemplate="footer">
+        <button pButton type="button" label="Cancel" class="p-button-text p-button-sm"
+                (click)="displayFieldDialog = false"></button>
+        <button pButton type="button" label="Save" class="p-button-sm"
+                (click)="saveDataTypeField()"></button>
+      </ng-template>
+    </p-dialog>
+  </div>
+</div>

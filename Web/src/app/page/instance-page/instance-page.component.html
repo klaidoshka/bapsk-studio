@@ -1,81 +1,55 @@
-<div class="container mx-auto p-4">
-  <h1 class="text-2xl font-bold mb-4">Instance Management</h1>
+<div class="p-4">
+  <h1 class="text-2xl font-bold mb-4">Instances</h1>
 
-  <p-table
-    [value]="instances"
-    [(selection)]="selectedInstances"
-    dataKey="id"
-    class="mb-4">
+  <button pButton type="button" label="Create Instance" class="p-button-sm mb-4"
+          (click)="openCreation()"></button>
+  
+  <p-confirm-dialog></p-confirm-dialog>
+
+  <p-table [value]="instances" class="w-full">
     <ng-template pTemplate="header">
       <tr>
-        <th pSortableColumn="name">Name
-          <p-sortIcon field="name"></p-sortIcon>
-        </th>
-        <th pSortableColumn="description">Description
-          <p-sortIcon field="description"></p-sortIcon>
-        </th>
-        <th pSortableColumn="createdAt">Created At
-          <p-sortIcon field="createdAt"></p-sortIcon>
-        </th>
+        <th>Name</th>
+        <th>Description</th>
         <th>Actions</th>
       </tr>
     </ng-template>
-
     <ng-template pTemplate="body" let-instance>
       <tr>
         <td>{{ instance.name }}</td>
         <td>{{ instance.description }}</td>
-        <td>{{ instance.createdAt | date }}</td>
         <td>
-          <p-button type="button" icon="pi pi-pencil"
-                    class="p-button-rounded p-button-success mr-2"
-                    (click)="editInstance(instance)"></p-button>
-          <p-button type="button" icon="pi pi-trash"
-                    class="p-button-rounded p-button-danger"
-                    (click)="deleteInstance(instance)"></p-button>
+          <button pButton type="button" label="Edit"
+                  class="p-button-rounded p-button-info p-button-sm mr-2"
+                  (click)="openEdit(instance)"></button>
+          <button pButton type="button" label="Delete"
+                  class="p-button-rounded p-button-danger p-button-sm"
+                  (click)="deleteInstance(instance)"></button>
         </td>
       </tr>
     </ng-template>
   </p-table>
 
-  <p-button
-    type="button"
-    label="New Instance"
-    icon="pi pi-plus"
-    class="p-button-success mb-4"
-    (click)="openNew()"></p-button>
-
-  <p-dialog
-    header="Instance Details"
-    [(visible)]="instanceDialog"
-    [modal]="true"
-    [style]="{width: '450px'}">
-
-    <div class="p-fluid">
+  <p-dialog header="Manage Instance" [(visible)]="displayDialog" [modal]="true"
+            [closable]="false" [style]="{width: '30vw'}">
+    <div class="p-fluid space-y-4">
       <div class="p-field">
-        <label for="name">Name</label>
-        <input id="name" type="text" pInputText [(ngModel)]="instance.name" required/>
+        <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+        <input id="name" type="text" pInputText [(ngModel)]="name"
+               class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
       </div>
       <div class="p-field">
-        <label for="description">Description</label>
-        <input id="description" type="text" pInputText [(ngModel)]="instance.description"/>
+        <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+        <textarea id="description" pTextarea [(ngModel)]="description"
+                  class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
       </div>
     </div>
 
-    <p-footer>
-      <p-button
-        type="button"
-        label="Cancel"
-        icon="pi pi-times"
-        class="p-button-text"
-        (click)="hideDialog()"></p-button>
-
-      <p-button
-        type="button"
-        label="Save"
-        icon="pi pi-check"
-        class="p-button-text"
-        (click)="saveInstance()"></p-button>
-    </p-footer>
+    <ng-template pTemplate="footer">
+      <button pButton type="button" label="Cancel" class="p-button-text p-button-sm"
+              (click)="displayDialog.set(false)"></button>
+      <button pButton type="button" label="Save" class="p-button-sm"
+              (click)="saveInstance()"></button>
+    </ng-template>
   </p-dialog>
 </div>

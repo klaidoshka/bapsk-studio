@@ -18,9 +18,38 @@ import {InstancePageComponent} from './page/instance-page/instance-page.componen
 export const routes: Routes = [
   {
     path: "",
-    pathMatch: "full",
     component: HomePageComponent,
     canActivate: [AuthenticatedOnlyGuard],
+    canActivateChild: [AuthenticatedOnlyChildGuard],
+    children: [
+      {
+        path: "data",
+        children: [
+          {
+            path: "types",
+            component: DataTypePageComponent
+          },
+          {
+            path: "entries",
+            component: DataEntryPageComponent
+          }
+        ]
+      },
+      {
+        path: "instances",
+        component: InstancePageComponent
+      },
+      {
+        path: "profile",
+        children: [
+          {
+            path: "sessions",
+            component: SessionPageComponent
+          }
+        ],
+        component: ProfilePageComponent,
+      },
+    ]
   },
   {
     path: "auth",
@@ -37,38 +66,6 @@ export const routes: Routes = [
         component: RegisterComponent
       }
     ]
-  },
-  {
-    path: "data",
-    canActivate: [AuthenticatedOnlyGuard],
-    canActivateChild: [AuthenticatedOnlyChildGuard],
-    children: [
-      {
-        path: "types",
-        component: DataTypePageComponent
-      },
-      {
-        path: "entries",
-        component: DataEntryPageComponent
-      }
-    ]
-  },
-  {
-    path: "instances",
-    canActivate: [AuthenticatedOnlyGuard],
-    component: InstancePageComponent
-  },
-  {
-    path: "profile",
-    canActivate: [AuthenticatedOnlyGuard],
-    canActivateChild: [AuthenticatedOnlyChildGuard],
-    children: [
-      {
-        path: "sessions",
-        component: SessionPageComponent
-      }
-    ],
-    component: ProfilePageComponent,
   },
   {
     path: "**",

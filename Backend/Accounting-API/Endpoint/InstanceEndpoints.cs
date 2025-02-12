@@ -14,8 +14,23 @@ public static class InstanceEndpoints
             string.Empty,
             async (
                 [FromBody] InstanceCreateRequest request,
+                HttpRequest httpRequest,
+                IJwtService jwtService,
                 IInstanceService instanceService
-            ) => Results.Json((await instanceService.CreateAsync(request)).ToDto())
+            ) =>
+            {
+                var token = httpRequest.ToAccessToken()!;
+                var session = jwtService.ExtractSession(token);
+
+                if (session == null)
+                {
+                    throw new UnauthorizedAccessException("Invalid access token.");
+                }
+
+                request.CreatorId = session.UserId;
+
+                return Results.Json((await instanceService.CreateAsync(request)).ToDto());
+            }
         );
 
         builder.MapDelete(
