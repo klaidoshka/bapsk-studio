@@ -1,0 +1,60 @@
+<h2>Login</h2>
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+  <!-- Display messages if any -->
+  @if (messages.length > 0) {
+  <ul>
+    @for (message of messages; track message) {
+    <li>{{ message }}</li>
+    }
+  </ul>
+  }
+
+  <!-- Email Input -->
+  <div class="form-field">
+    <label for="email">Email:</label>
+    <input
+      type="email"
+      id="email"
+      formControlName="email"
+      pInputText
+      required
+    />
+    @let emailInvalid = getErrorMessage('email'); @if (emailInvalid) {
+    <div class="error-message">
+      {{ emailInvalid }}
+    </div>
+    }
+  </div>
+
+  <!-- Password Input -->
+  <div class="form-field">
+    <label for="password">Password:</label>
+    <input
+      type="password"
+      id="password"
+      formControlName="password"
+      pInputText
+      required
+    />
+    @let passwordInvalid = getErrorMessage('password');
+    @if (passwordInvalid) {
+    <div class="error-message">
+      {{ passwordInvalid }}
+    </div>
+    }
+  </div>
+
+  <!-- Submit Button -->
+  <div class="form-actions">
+    <p-button
+      type="submit"
+      label="Login"
+      icon="pi pi-check"
+      iconPos="right"
+      [loading]="isSubmitting"
+      [disabled]="loginForm.invalid"
+    />
+  </div>
+</form>
+
+<p>Don't have an account? <a routerLink="/auth/register">Register here</a></p>

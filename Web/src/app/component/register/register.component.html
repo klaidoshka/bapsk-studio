@@ -1,0 +1,142 @@
+<h2>Register</h2>
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+  <!-- Display messages if any -->
+  @if (messages.length > 0) {
+  <ul>
+    @for (message of messages; track message) {
+    <li>{{ message }}</li>
+    }
+  </ul>
+  }
+
+  <div class="form-container">
+    <!-- Left Column -->
+    <div class="form-column">
+      <!-- First Name -->
+      <div class="form-field">
+        <label for="firstName">First Name:</label>
+        <input
+          type="text"
+          id="firstName"
+          formControlName="firstName"
+          pInputText
+          required
+        />
+        @let firstNameInvalid = getErrorMessage('firstName'); @if
+        (firstNameInvalid) {
+        <div class="error-message">
+          {{ firstNameInvalid }}
+        </div>
+        }
+      </div>
+
+      <!-- Last Name -->
+      <div class="form-field">
+        <label for="lastName">Last Name:</label>
+        <input
+          type="text"
+          id="lastName"
+          formControlName="lastName"
+          pInputText
+          required
+        />
+        @let lastNameInvalid = getErrorMessage('lastName'); @if
+        (lastNameInvalid) {
+        <div class="error-message">
+          {{ lastNameInvalid }}
+        </div>
+        }
+      </div>
+
+      <!-- Birth Date -->
+      <div class="form-field">
+        <label for="birthDate">Birth Date:</label>
+        <p-datepicker
+          id="birthDate"
+          formControlName="birthDate"
+          [showIcon]="true"
+          [maxDate]="maxDate"
+          required
+        />
+        @let birthDateInvalid = getErrorMessage('birthDate'); @if
+        (birthDateInvalid) {
+        <div class="error-message">
+          {{ birthDateInvalid }}
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="form-column">
+      <!-- Email -->
+      <div class="form-field">
+        <label for="email">Email:</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          pInputText
+          required
+        />
+        @let emailInvalid = getErrorMessage('email'); @if (emailInvalid) {
+        <div class="error-message">
+          {{ emailInvalid }}
+        </div>
+        }
+      </div>
+
+      <!-- Password -->
+      <div class="form-field">
+        <label for="password">Password:</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          pInputText
+          required
+        />
+        @let passwordInvalid = getErrorMessage('password'); @if
+        (passwordInvalid) {
+        <div class="error-message">
+          {{ passwordInvalid }}
+        </div>
+        }
+      </div>
+
+      <!-- Country Dropdown -->
+      <div class="form-field">
+        <label for="country">Country:</label>
+        <p-autocomplete
+          id="country"
+          formControlName="country"
+          optionLabel="name"
+          placeholder="Select a Country"
+          [dropdown]="true"
+          [suggestions]="filteredCountries"
+          (completeMethod)="filterCountries($event)"
+          required
+        />
+        @let countryInvalid = getErrorMessage('country'); @if (countryInvalid) {
+        <div class="error-message">
+          {{ countryInvalid }}
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Submit Button -->
+  <div class="form-actions">
+    <p-button
+      type="submit"
+      label="Register"
+      icon="pi pi-check"
+      iconPos="right"
+      [loading]="isSubmitting"
+      [disabled]="registerForm.invalid"
+    />
+  </div>
+</form>
+
+<p>Already have an account? <a routerLink="/auth/login">Login here</a></p>
