@@ -14,7 +14,6 @@ import {TextService} from "../../service/text.service";
 @Component({
   selector: "app-register",
   templateUrl: "./register.component.html",
-  styleUrls: ["./register.component.scss"],
   imports: [
     AutoCompleteModule,
     RouterLink,

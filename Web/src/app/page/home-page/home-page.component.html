@@ -1,4 +1,15 @@
-<div>
-  Hello! HomePage.
-  <router-outlet></router-outlet>
+<div class="flex min-h-screen">
+  <!-- Sidebar -->
+  <div class="w-1/5 bg-gray-800 text-white p-4 space-y-4">
+    <a routerLink="/instances" class="block hover:underline">Instances</a>
+    <a routerLink="/data/types" class="block hover:underline">Data Types</a>
+    <a routerLink="/data/entries" class="block hover:underline">Data Entries</a>
+    <a routerLink="/profile" class="block hover:underline">Profile</a>
+    <a routerLink="/profile/sessions" class="block hover:underline">Sessions</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="w-4/5 p-4">
+    <router-outlet></router-outlet>
+  </div>
 </div>

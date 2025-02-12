@@ -23,7 +23,8 @@ export class AppComponent implements OnInit {
       key: "logout",
       target: event.target as EventTarget,
       header: "Are you really leaving?",
-      icon: "pi pi-sign-out",
+      closeOnEscape: true,
+      icon: "pi pi-exclamation-triangle",
       rejectButtonProps: {
         label: "No",
         severity: "secondary",
@@ -38,7 +39,8 @@ export class AppComponent implements OnInit {
         this.authService.logout().subscribe({
           next: () => {
             this.messageService.add({
-              severity: "info",
+              key: "root",
+              severity: "success",
               summary: "Logged out",
               detail: "You have logged out from the system"
             });
@@ -50,7 +52,7 @@ export class AppComponent implements OnInit {
     });
   }
 
-  isLoggedIn = signal<boolean>(false);
+  isLoggedIn = signal<boolean>(this.authService.isAuthenticatedValue());
 
   ngOnInit(): void {
     this.authService.isAuthenticated().subscribe({

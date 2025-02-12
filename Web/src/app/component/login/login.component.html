@@ -1,60 +1,72 @@
-<h2>Login</h2>
-<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+<h2 class="text-2xl font-bold mb-4 text-gray-700">Login</h2>
+
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+
   <!-- Display messages if any -->
   @if (messages.length > 0) {
-  <ul>
-    @for (message of messages; track message) {
-    <li>{{ message }}</li>
-    }
-  </ul>
+    <div class="mb-4">
+      <ul class="list-disc list-inside text-red-500">
+        @for (message of messages; track message) {
+          <li>{{ message }}</li>
+        }
+      </ul>
+    </div>
   }
 
   <!-- Email Input -->
   <div class="form-field">
-    <label for="email">Email:</label>
+    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
     <input
-      type="email"
-      id="email"
-      formControlName="email"
-      pInputText
-      required
+        type="email"
+        id="email"
+        formControlName="email"
+        pInputText
+        class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        required
     />
-    @let emailInvalid = getErrorMessage('email'); @if (emailInvalid) {
-    <div class="error-message">
-      {{ emailInvalid }}
-    </div>
+    @let emailInvalid = getErrorMessage('email');
+    @if (emailInvalid) {
+      <div class="text-xs text-red-500 mt-1">
+        {{ emailInvalid }}
+      </div>
     }
   </div>
 
   <!-- Password Input -->
   <div class="form-field">
-    <label for="password">Password:</label>
+    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
     <input
-      type="password"
-      id="password"
-      formControlName="password"
-      pInputText
-      required
+        type="password"
+        id="password"
+        formControlName="password"
+        pInputText
+        class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        required
     />
     @let passwordInvalid = getErrorMessage('password');
     @if (passwordInvalid) {
-    <div class="error-message">
-      {{ passwordInvalid }}
-    </div>
+      <div class="text-xs text-red-500 mt-1">
+        {{ passwordInvalid }}
+      </div>
     }
   </div>
 
   <!-- Submit Button -->
-  <div class="form-actions">
+  <div class="flex justify-center">
     <p-button
-      type="submit"
-      label="Login"
-      icon="pi pi-check"
-      iconPos="right"
-      [loading]="isSubmitting"
-      [disabled]="loginForm.invalid"
-    />
+        type="submit"
+        label="Login"
+        icon="pi pi-check"
+        iconPos="right"
+        [loading]="isSubmitting"
+        [disabled]="loginForm.invalid"
+        class="w-full md:w-auto"
+    ></p-button>
   </div>
 </form>
 
-<p>Don't have an account? <a routerLink="/auth/register">Register here</a></p>
+<p class="mt-4 text-sm text-center text-gray-600">Don't have an account yet?</p>
+
+<p class="text-center">
+  <a routerLink="/auth/register" class="text-indigo-600 hover:underline">Register here</a>
+</p>

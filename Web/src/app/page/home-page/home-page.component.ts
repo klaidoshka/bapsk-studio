@@ -9,7 +9,6 @@ import {ToastModule} from "primeng/toast";
   selector: "app-home-page",
   imports: [ButtonModule, ConfirmDialogModule, RouterModule, ToastModule],
   templateUrl: "./home-page.component.html",
-  styleUrl: "./home-page.component.scss",
   providers: [ConfirmationService, MessageService]
 })
 export class HomePageComponent {}

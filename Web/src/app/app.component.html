@@ -1,0 +1,25 @@
+<p-toast key="root"></p-toast>
+
+<header
+    class="flex justify-between items-center p-2 mt-2 bg-gray-800 bg-opacity-50 text-white sticky top-0">
+  <div class="flex items-center space-x-4">
+    <a routerLink="/" class="text-xl font-bold">Accounting</a>
+  </div>
+
+  @if (isLoggedIn()) {
+    <p-confirmDialog key="logout"></p-confirmDialog>
+
+    <div>
+      <p-button
+          (click)="confirmLogout($event)"
+          label="Logout"
+          severity="danger"
+          [outlined]="true"
+      ></p-button>
+    </div>
+  }
+</header>
+
+<main class="container w-11/12 mx-auto mt-4">
+  <router-outlet></router-outlet>
+</main>

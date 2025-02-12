@@ -6,16 +6,19 @@ import {LoginRequest} from "../../model/auth.model";
 import ErrorResponse from "../../model/error-response.model";
 import {AuthService} from "../../service/auth.service";
 import {TextService} from "../../service/text.service";
+import {MessageService} from "primeng/api";
+import {InputText} from "primeng/inputtext";
 
 @Component({
   selector: "app-login",
   templateUrl: "./login.component.html",
-  styleUrls: ["./login.component.scss"],
-  imports: [Button, ReactiveFormsModule, FormsModule, RouterLink]
+  imports: [Button, ReactiveFormsModule, FormsModule, RouterLink, InputText],
+  providers: [MessageService]
 })
 export class LoginComponent implements OnInit {
   private authService = inject(AuthService);
   private formBuilder = inject(FormBuilder);
+  private messageService = inject(MessageService);
   private router = inject(Router);
   private textService = inject(TextService);
 
@@ -57,11 +60,17 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(request).subscribe({
       next: (response) => {
-        if (response) {
-          this.authService.acceptAuthResponse(response);
-          this.router.navigate(["/"]);
-        }
+        this.authService.acceptAuthResponse(response);
         this.isSubmitting = false;
+
+        this.router.navigate(["/"]).then(() => {
+          this.messageService.add({
+            key: "root",
+            severity: "success",
+            summary: "Logged in",
+            detail: "You have successfully logged in"
+          });
+        })
       },
       error: (response: ErrorResponse) => {
         this.messages = response.error?.messages || [

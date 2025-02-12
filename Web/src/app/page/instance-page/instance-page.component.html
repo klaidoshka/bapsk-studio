@@ -1,0 +1,81 @@
+<div class="container mx-auto p-4">
+  <h1 class="text-2xl font-bold mb-4">Instance Management</h1>
+
+  <p-table
+    [value]="instances"
+    [(selection)]="selectedInstances"
+    dataKey="id"
+    class="mb-4">
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="name">Name
+          <p-sortIcon field="name"></p-sortIcon>
+        </th>
+        <th pSortableColumn="description">Description
+          <p-sortIcon field="description"></p-sortIcon>
+        </th>
+        <th pSortableColumn="createdAt">Created At
+          <p-sortIcon field="createdAt"></p-sortIcon>
+        </th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-instance>
+      <tr>
+        <td>{{ instance.name }}</td>
+        <td>{{ instance.description }}</td>
+        <td>{{ instance.createdAt | date }}</td>
+        <td>
+          <p-button type="button" icon="pi pi-pencil"
+                    class="p-button-rounded p-button-success mr-2"
+                    (click)="editInstance(instance)"></p-button>
+          <p-button type="button" icon="pi pi-trash"
+                    class="p-button-rounded p-button-danger"
+                    (click)="deleteInstance(instance)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-button
+    type="button"
+    label="New Instance"
+    icon="pi pi-plus"
+    class="p-button-success mb-4"
+    (click)="openNew()"></p-button>
+
+  <p-dialog
+    header="Instance Details"
+    [(visible)]="instanceDialog"
+    [modal]="true"
+    [style]="{width: '450px'}">
+
+    <div class="p-fluid">
+      <div class="p-field">
+        <label for="name">Name</label>
+        <input id="name" type="text" pInputText [(ngModel)]="instance.name" required/>
+      </div>
+      <div class="p-field">
+        <label for="description">Description</label>
+        <input id="description" type="text" pInputText [(ngModel)]="instance.description"/>
+      </div>
+    </div>
+
+    <p-footer>
+      <p-button
+        type="button"
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-text"
+        (click)="hideDialog()"></p-button>
+
+      <p-button
+        type="button"
+        label="Save"
+        icon="pi pi-check"
+        class="p-button-text"
+        (click)="saveInstance()"></p-button>
+    </p-footer>
+  </p-dialog>
+</div>

@@ -10,8 +10,8 @@ import {ApiRouter} from "./api-router.service";
 export class AuthService {
   private apiRouter = inject(ApiRouter);
   private httpClient = inject(HttpClient);
-  private accessTokenKey = "accessToken";
-  private stateSubject = new BehaviorSubject<boolean>(false);
+  private accessTokenKey = "__accounting_accessToken__";
+  private stateSubject = new BehaviorSubject<boolean>(this.getAccessToken() !== null);
   private userSubject = new BehaviorSubject<User | null>(null);
   private isRefreshing = false;
 
@@ -25,11 +25,11 @@ export class AuthService {
     localStorage.removeItem(this.accessTokenKey);
 
     if (this.stateSubject.value) {
-        this.stateSubject.next(false);
+      this.stateSubject.next(false);
     }
 
     if (this.userSubject.value) {
-        this.userSubject.next(null);
+      this.userSubject.next(null);
     }
   }
 
@@ -55,8 +55,8 @@ export class AuthService {
 
   login(request: LoginRequest): Observable<AuthResponse> {
     return this.httpClient.post<AuthResponse>(
-      this.apiRouter.authLogin(),
-      request
+        this.apiRouter.authLogin(),
+        request
     );
   }
 
@@ -66,9 +66,9 @@ export class AuthService {
     }
 
     return this.httpClient.post<void>(this.apiRouter.authLogout(), {}).pipe(
-      finalize(() => {
-        this.cleanupCredentials();
-      })
+        finalize(() => {
+          this.cleanupCredentials();
+        })
     );
   }
 
@@ -78,8 +78,8 @@ export class AuthService {
 
   register(request: RegisterRequest): Observable<AuthResponse> {
     return this.httpClient.post<AuthResponse>(
-      this.apiRouter.authRegister(),
-      request
+        this.apiRouter.authRegister(),
+        request
     );
   }
 

@@ -1,5 +1,5 @@
 import {inject} from "@angular/core";
-import {CanActivateFn, Router} from "@angular/router";
+import {CanActivateChildFn, CanActivateFn, Router} from "@angular/router";
 import {map} from "rxjs";
 import {AuthService} from "../service/auth.service";
 
@@ -18,3 +18,7 @@ export const AuthenticatedOnlyGuard: CanActivateFn = (route, state) => {
     })
   );
 };
+
+export const AuthenticatedOnlyChildGuard: CanActivateChildFn = (route, state) => {
+  return AuthenticatedOnlyGuard(route, state);
+}
