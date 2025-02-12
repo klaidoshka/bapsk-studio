@@ -1,7 +1,7 @@
 using Accounting.API.Util;
 using Accounting.Contract.Dto;
+using Accounting.Contract.Request;
 using Accounting.Contract.Service;
-using Accounting.Contract.Service.Request;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Accounting.API.Endpoint;

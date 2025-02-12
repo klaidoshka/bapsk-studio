@@ -1,14 +1,9 @@
 using Accounting.Contract.Enumeration;
 
-namespace Accounting.Contract.Auth;
+namespace Accounting.Contract.Request;
 
 public class RegisterRequest
 {
-    /// <summary>
-    /// Agent used to log in.
-    /// </summary>
-    public required string Agent { get; set; }
-
     /// <summary>
     /// Birthdate of the user
     /// </summary>
@@ -30,19 +25,14 @@ public class RegisterRequest
     public required string FirstName { get; set; }
 
     /// <summary>
-    /// Ip address used to log in.
-    /// </summary>
-    public required string IpAddress { get; set; }
-
-    /// <summary>
     /// Last name of the user
     /// </summary>
     public required string LastName { get; set; }
 
     /// <summary>
-    /// Location used to log in.
+    /// Registration user's meta
     /// </summary>
-    public required string Location { get; set; }
+    public AuthRequestUserMeta? Meta { get; set; }
 
     /// <summary>
     /// Password of the user

@@ -1,6 +1,6 @@
 using Accounting.Contract.Entity;
 
-namespace Accounting.Contract.Service.Request;
+namespace Accounting.Contract.Request;
 
 public class DataTypeFieldCreateRequest
 {

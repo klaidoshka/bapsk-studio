@@ -1,5 +1,5 @@
 using Accounting.Contract;
-using Accounting.Contract.Auth;
+using Accounting.Contract.Request;
 using Accounting.Contract.Response;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
@@ -20,9 +20,35 @@ public class AuthValidator : IAuthValidator
         _hashService = hashService;
     }
 
+    public Validation ValidateAuthMeta(AuthRequestUserMeta meta)
+    {
+        var failures = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(meta.Agent))
+        {
+            failures.Add("Agent is required in authentication meta.");
+        }
+
+        if (string.IsNullOrWhiteSpace(meta.IpAddress))
+        {
+            failures.Add("IP address is required in authentication meta.");
+        }
+
+        return new Validation(failures);
+    }
+
     public Validation ValidateLoginRequest(LoginRequest request)
     {
         var failures = new List<string>();
+
+        if (request.Meta is null)
+        {
+            failures.Add("Meta is required in login request.");
+        }
+        else
+        {
+            failures.AddRange(ValidateAuthMeta(request.Meta).FailureMessages);
+        }
 
         if (string.IsNullOrWhiteSpace(request.Password))
         {
@@ -40,6 +66,15 @@ public class AuthValidator : IAuthValidator
     public async Task<Validation> ValidateRegisterRequestAsync(RegisterRequest request)
     {
         var failures = new List<string>();
+
+        if (request.Meta is null)
+        {
+            failures.Add("Meta is required in login request.");
+        }
+        else
+        {
+            failures.AddRange(ValidateAuthMeta(request.Meta).FailureMessages);
+        }
 
         if (string.IsNullOrWhiteSpace(request.Password))
         {

@@ -1,5 +1,7 @@
 using Accounting.API.Util;
-using Accounting.Contract.Auth;
+using Accounting.Contract.Dto;
+using Accounting.Contract.Request;
+using Accounting.Contract.Response;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,15 +15,24 @@ public static class AuthEndpoints
             "/login",
             async (
                 [FromBody] LoginRequest request,
+                HttpRequest httpRequest,
                 HttpResponse response,
                 IAuthService authService
             ) =>
             {
+                request.Meta = await httpRequest.GetAuthRequestUserMetaAsync();
+
                 var token = await authService.LoginAsync(request);
 
                 response.PutJwt(token);
 
-                return Results.Ok(token.AccessToken);
+                return Results.Ok(
+                    new AuthResponse
+                    {
+                        AccessToken = token.AccessToken,
+                        User = token.User.ToDto()
+                    }
+                );
             }
         );
 
@@ -70,7 +81,13 @@ public static class AuthEndpoints
 
                 httpContext.Response.PutJwt(token);
 
-                return Results.Ok(token.AccessToken);
+                return Results.Ok(
+                    new AuthResponse
+                    {
+                        AccessToken = token.AccessToken,
+                        User = token.User.ToDto()
+                    }
+                );
             }
         );
 
@@ -78,8 +95,25 @@ public static class AuthEndpoints
             "/register",
             async (
                 [FromBody] RegisterRequest request,
+                HttpRequest httpRequest,
+                HttpResponse response,
                 IAuthService authService
-            ) => Results.Ok((object?)(await authService.RegisterAsync(request)).AccessToken)
+            ) =>
+            {
+                request.Meta = await httpRequest.GetAuthRequestUserMetaAsync();
+
+                var token = await authService.RegisterAsync(request);
+
+                response.PutJwt(token);
+
+                return Results.Ok(
+                    new AuthResponse
+                    {
+                        AccessToken = token.AccessToken,
+                        User = token.User.ToDto()
+                    }
+                );
+            }
         );
     }
 }

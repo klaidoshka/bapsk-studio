@@ -1,10 +1,10 @@
-using Accounting.Contract.Auth;
+using Accounting.Contract.Dto;
 
 namespace Accounting.API.Util;
 
 public static class JwtMappings
 {
-    private const string RefreshTokenCookieName = "refreshToken";
+    private const string RefreshTokenCookieName = "__accounting_refreshToken__";
 
     /// <summary>
     /// Clears the JWT from the response.
@@ -27,9 +27,10 @@ public static class JwtMappings
             token.RefreshToken,
             new CookieOptions
             {
+                Expires = token.RefreshTokenExpiresAt,
                 HttpOnly = true,
-                Secure = false, // TODO: Set to true when using HTTPS
-                SameSite = SameSiteMode.Strict
+                SameSite = SameSiteMode.Lax,
+                Secure = false // TODO: Set to true when using HTTPS
             }
         );
     }

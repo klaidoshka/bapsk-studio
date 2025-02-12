@@ -1,10 +1,13 @@
 using Accounting.Contract;
-using Accounting.Contract.Auth;
-using Accounting.Contract.Entity;
+using Accounting.Contract.Configuration;
+using Accounting.Contract.Dto;
+using Accounting.Contract.Request;
 using Accounting.Contract.Response;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;
+using Session = Accounting.Contract.Entity.Session;
+using User = Accounting.Contract.Entity.User;
 
 namespace Accounting.Services.Service;
 
@@ -14,18 +17,21 @@ public class AuthService : IAuthService
     private readonly AccountingDatabase _database;
     private readonly IHashService _hashService;
     private readonly IJwtService _jwtService;
+    private readonly JwtSettings _jwtSettings;
 
     public AuthService(
         IAuthValidator authValidator,
         AccountingDatabase database,
         IHashService hashService,
-        IJwtService jwtService
+        IJwtService jwtService,
+        JwtSettings jwtSettings
     )
     {
         _authValidator = authValidator;
         _database = database;
         _hashService = hashService;
         _jwtService = jwtService;
+        _jwtSettings = jwtSettings;
     }
 
     public async Task<JwtTokenPair> LoginAsync(LoginRequest request)
@@ -49,17 +55,19 @@ public class AuthService : IAuthService
         var token = new JwtTokenPair
         {
             AccessToken = _jwtService.GenerateAccessToken(user, sessionId),
-            RefreshToken = _jwtService.GenerateRefreshToken(user, sessionId)
+            RefreshToken = _jwtService.GenerateRefreshToken(user, sessionId),
+            RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.RefreshTokenExpiryMinutes),
+            User = user
         };
 
         await _database.Sessions.AddAsync(
             new Session
             {
-                Agent = request.Agent,
+                Agent = request.Meta!.Agent!,
                 CreatedAt = DateTime.UtcNow,
                 Id = sessionId,
-                IpAddress = request.IpAddress,
-                Location = request.Location,
+                IpAddress = request.Meta!.IpAddress!,
+                Location = request.Meta!.Location ?? "Unknown location",
                 RefreshToken = token.RefreshToken,
                 UserId = user.Id
             }
@@ -107,7 +115,9 @@ public class AuthService : IAuthService
         var token = new JwtTokenPair
         {
             AccessToken = _jwtService.GenerateAccessToken(session.User, session.Id),
-            RefreshToken = _jwtService.GenerateRefreshToken(session.User, session.Id)
+            RefreshToken = _jwtService.GenerateRefreshToken(session.User, session.Id),
+            RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.RefreshTokenExpiryMinutes),
+            User = session.User
         };
 
         session.RefreshToken = token.RefreshToken;
@@ -140,10 +150,8 @@ public class AuthService : IAuthService
         return await LoginAsync(
             new LoginRequest
             {
-                Agent = request.Agent,
                 Email = request.Email,
-                IpAddress = request.IpAddress,
-                Location = request.Location,
+                Meta = request.Meta,
                 Password = request.Password
             }
         );

@@ -37,6 +37,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
         {
             ApplicationException _ => new ExceptionResponse(HttpStatusCode.BadRequest, "Application exception occurred."),
             ArgumentException _ => new ExceptionResponse(HttpStatusCode.NotFound, "The request had invalid arguments."),
+            BadHttpRequestException _ => new ExceptionResponse(HttpStatusCode.NotAcceptable, "The request was not acceptable."),
             KeyNotFoundException _ => new ExceptionResponse(HttpStatusCode.NotFound, "The requested resource was not found."),
             UnauthorizedAccessException _ => new ExceptionResponse(HttpStatusCode.Unauthorized, "Unauthorized."),
             ValidationException it => new ExceptionResponse(HttpStatusCode.BadRequest, it.Validation.FailureMessages),

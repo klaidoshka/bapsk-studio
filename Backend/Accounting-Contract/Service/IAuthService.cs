@@ -1,4 +1,5 @@
-using Accounting.Contract.Auth;
+using Accounting.Contract.Dto;
+using Accounting.Contract.Request;
 
 namespace Accounting.Contract.Service;
 

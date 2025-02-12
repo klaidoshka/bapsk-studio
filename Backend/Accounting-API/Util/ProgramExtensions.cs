@@ -4,9 +4,9 @@ using Accounting.Contract;
 using Accounting.Contract.Configuration;
 using Microsoft.EntityFrameworkCore;
 
-namespace Accounting.API;
+namespace Accounting.API.Util;
 
-public static class Extensions
+public static class ProgramExtensions
 {
     /// <summary>
     /// Configures the certificate for the application.
