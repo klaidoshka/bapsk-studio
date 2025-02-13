@@ -8,16 +8,15 @@ public interface IDataTypeService
     /// <summary>
     /// Creates a new data type.
     /// </summary>
-    /// <param name="request"></param>
+    /// <param name="request">Request to process</param>
     /// <returns>Created data type</returns>
     public Task<DataType> CreateAsync(DataTypeCreateRequest request);
 
     /// <summary>
     /// Deletes a data type.
     /// </summary>
-    /// <param name="id">Data type id to delete</param>
-    /// <param name="managerId">Manager, who's deleting data type, id</param>
-    public Task DeleteAsync(int id, int managerId);
+    /// <param name="request">Request to process</param>
+    public Task DeleteAsync(DataTypeDeleteRequest request);
 
     /// <summary>
     /// Edits a data type.
@@ -28,14 +27,13 @@ public interface IDataTypeService
     /// <summary>
     /// Gets a data type by id.
     /// </summary>
-    /// <param name="id">Data type id</param>
-    /// <returns>Data type of specified id</returns>
-    public Task<DataType> GetAsync(int id);
+    /// <param name="request">Request to process</param>
+    public Task<DataType> GetAsync(DataTypeGetRequest request);
 
     /// <summary>
     /// Gets all data types of an instance.
     /// </summary>
-    /// <param name="instanceId">Instance id to get data types of</param>
+    /// <param name="request">Request to process</param>
     /// <returns>Data types of the instance</returns>
-    public Task<IEnumerable<DataType>> GetByInstanceIdAsync(int instanceId);
+    public Task<IEnumerable<DataType>> GetByInstanceIdAsync(DataTypeGetByInstanceRequest request);
 }

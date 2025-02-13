@@ -11,7 +11,7 @@ export interface CreateRequest {
 }
 
 export interface EditRequest {
-  id: number;
+  instanceId: number;
   name: string;
   description: string | null;
 }

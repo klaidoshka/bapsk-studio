@@ -20,14 +20,14 @@ export class InstanceService {
   }
 
   edit(request: EditRequest): Observable<void> {
-    return this.httpClient.put<void>(this.apiRouter.instanceEdit(request.id), request);
+    return this.httpClient.put<void>(this.apiRouter.instanceEdit(request.instanceId), request);
   }
 
   get(id: number): Observable<Instance> {
     return this.httpClient.get<Instance>(this.apiRouter.instanceGet(id));
   }
 
-  getByUserId(userId: number): Observable<Instance[]> {
-    return this.httpClient.get<Instance[]>(this.apiRouter.instanceGetByUserId(userId));
+  getByUser(): Observable<Instance[]> {
+    return this.httpClient.get<Instance[]>(this.apiRouter.instanceGetByUser());
   }
 }

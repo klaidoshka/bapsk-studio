@@ -20,7 +20,7 @@ export class DataTypeService {
   }
 
   edit(request: DataTypeEditRequest): Observable<void> {
-    return this.httpClient.put<void>(this.apiRouter.dataTypeEdit(request.id), request);
+    return this.httpClient.put<void>(this.apiRouter.dataTypeEdit(request.dataTypeId), request);
   }
 
   get(id: number): Observable<DataType> {

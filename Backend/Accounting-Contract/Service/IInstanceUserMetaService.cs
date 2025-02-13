@@ -15,21 +15,20 @@ public interface IInstanceUserMetaService
     /// <summary>
     /// Removes a user from an instance.
     /// </summary>
-    /// <param name="id">Id of the instance user meta to delete</param>
-    /// <param name="managerId">Manager, who's deleting meta, id</param>
-    public Task DeleteAsync(int id, int managerId);
+    /// <param name="request">Request to process</param>
+    public Task DeleteAsync(InstanceUserMetaDeleteRequest request);
 
     /// <summary>
     /// Gets instance's user meta.
     /// </summary>
-    /// <param name="id">User meta's id</param>
+    /// <param name="request">Request to process</param>
     /// <returns>Instance's user meta</returns>
-    public Task<InstanceUserMeta> GetAsync(int id);
+    public Task<InstanceUserMeta> GetAsync(InstanceUserMetaGetRequest request);
 
     /// <summary>
     /// Gets all users for an instance.
     /// </summary>
-    /// <param name="instanceId">Instance id to get metas for</param>
+    /// <param name="request">Request to process</param>
     /// <returns>Instance's user metas</returns>
-    public Task<IEnumerable<InstanceUserMeta>> GetByInstanceIdAsync(int instanceId);
+    public Task<IEnumerable<InstanceUserMeta>> GetByInstanceIdAsync(InstanceUserMetaGetByInstanceRequest request);
 }

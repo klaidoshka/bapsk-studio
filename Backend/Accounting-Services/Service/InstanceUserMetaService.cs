@@ -1,8 +1,8 @@
 using Accounting.Contract;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Request;
-using Accounting.Contract.Response;
 using Accounting.Contract.Service;
+using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Services.Service;
@@ -10,32 +10,27 @@ namespace Accounting.Services.Service;
 public class InstanceUserMetaService : IInstanceUserMetaService
 {
     private readonly AccountingDatabase _database;
+    private readonly IInstanceUserMetaValidator _instanceUserMetaValidator;
 
-    public InstanceUserMetaService(AccountingDatabase database)
+    public InstanceUserMetaService(AccountingDatabase database, IInstanceUserMetaValidator instanceUserMetaValidator)
     {
         _database = database;
+        _instanceUserMetaValidator = instanceUserMetaValidator;
     }
 
     public async Task<InstanceUserMeta> CreateAsync(InstanceUserMetaCreateRequest request)
     {
+        (await _instanceUserMetaValidator.ValidateInstanceUserMetaCreateRequestAsync(request)).AssertValid();
+
         var instance = await _database.Instances
-                           .Include(i => i.UserMetas)
-                           .FirstOrDefaultAsync(i => i.Id == request.InstanceId)
-                       ?? throw new ValidationException("Instance to add user to was not found.");
-
-        if (instance.UserMetas.Any(um => um.UserId == request.UserId))
-        {
-            throw new ValidationException("User is already added to the instance.");
-        }
-
-        var user = await _database.Users.FindAsync(request.UserId)
-                   ?? throw new ValidationException("User to add to instance was not found.");
+            .Include(i => i.UserMetas)
+            .FirstAsync(i => i.Id == request.InstanceId);
 
         var userMeta = (await _database.InstanceUserMetas.AddAsync(
             new InstanceUserMeta
             {
                 Instance = instance,
-                User = user
+                UserId = request.UserId
             }
         )).Entity;
 
@@ -44,33 +39,32 @@ public class InstanceUserMetaService : IInstanceUserMetaService
         return userMeta;
     }
 
-    public async Task DeleteAsync(int id, int managerId)
+    public async Task DeleteAsync(InstanceUserMetaDeleteRequest request)
     {
-        var instanceUserMeta = await _database.InstanceUserMetas
-                                   .Include(ium => ium.Instance)
-                                   .FirstOrDefaultAsync(ium => ium.Id == id)
-                               ?? throw new ValidationException("Instance user meta not found.");
+        (await _instanceUserMetaValidator.ValidateInstanceUserMetaDeleteRequestAsync(request)).AssertValid();
 
-        if (instanceUserMeta.UserId == managerId)
-        {
-            throw new ValidationException("Creator cannot be removed from the instance, instead delete instance.");
-        }
+        var instanceUserMeta = await _database.InstanceUserMetas
+            .Include(ium => ium.Instance)
+            .FirstAsync(ium => ium.Id == request.InstanceUserMetaId);
 
         _database.InstanceUserMetas.Remove(instanceUserMeta);
 
         await _database.SaveChangesAsync();
     }
 
-    public async Task<InstanceUserMeta> GetAsync(int id)
+    public async Task<InstanceUserMeta> GetAsync(InstanceUserMetaGetRequest request)
     {
-        return await _database.InstanceUserMetas.FindAsync(id)
-               ?? throw new ValidationException("Instance user meta not found.");
+        (await _instanceUserMetaValidator.ValidateInstanceUserMetaGetRequestAsync(request)).AssertValid();
+
+        return (await _database.InstanceUserMetas.FindAsync(request.InstanceUserMetaId))!;
     }
 
-    public async Task<IEnumerable<InstanceUserMeta>> GetByInstanceIdAsync(int instanceId)
+    public async Task<IEnumerable<InstanceUserMeta>> GetByInstanceIdAsync(InstanceUserMetaGetByInstanceRequest request)
     {
+        (await _instanceUserMetaValidator.ValidateInstanceUserMetaGetByInstanceRequestAsync(request)).AssertValid();
+
         return await _database.InstanceUserMetas
-            .Where(ium => ium.InstanceId == instanceId)
+            .Where(ium => ium.InstanceId == request.InstanceId)
             .ToListAsync();
     }
 }

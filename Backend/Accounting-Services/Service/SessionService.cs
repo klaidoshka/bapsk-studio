@@ -1,7 +1,8 @@
 using Accounting.Contract;
 using Accounting.Contract.Entity;
-using Accounting.Contract.Response;
+using Accounting.Contract.Request;
 using Accounting.Contract.Service;
+using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Services.Service;
@@ -9,22 +10,25 @@ namespace Accounting.Services.Service;
 public class SessionService : ISessionService
 {
     private readonly AccountingDatabase _database;
+    private readonly ISessionValidator _sessionValidator;
 
-    public SessionService(AccountingDatabase database)
+    public SessionService(AccountingDatabase database, ISessionValidator sessionValidator)
     {
         _database = database;
+        _sessionValidator = sessionValidator;
     }
 
-    public async Task<Session> GetAsync(Guid id)
+    public async Task<Session> GetAsync(SessionGetRequest request)
     {
-        return await _database.Sessions.FindAsync(id)
-               ?? throw new ValidationException("Session not found.");
+        (await _sessionValidator.ValidateSessionGetRequestAsync(request)).AssertValid();
+
+        return (await _database.Sessions.FindAsync(request.SessionId))!;
     }
 
-    public async Task<IEnumerable<Session>> GetByUserIdAsync(int userId)
+    public async Task<IEnumerable<Session>> GetByUserIdAsync(SessionGetByUserRequest request)
     {
         return await _database.Sessions
-            .Where(s => s.UserId == userId)
+            .Where(s => s.UserId == request.RequesterId)
             .ToListAsync();
     }
 }

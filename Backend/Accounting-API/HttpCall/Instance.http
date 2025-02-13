@@ -40,7 +40,7 @@ Authorization: Bearer {{accessToken}}
 
 ###
 
-GET {{Instance_API_IP}}?userId=1
+GET {{Instance_API_IP}}
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}

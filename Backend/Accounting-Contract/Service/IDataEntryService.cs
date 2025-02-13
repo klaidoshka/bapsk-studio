@@ -15,9 +15,8 @@ public interface IDataEntryService
     /// <summary>
     /// Deletes a data entry.
     /// </summary>
-    /// <param name="id">Data entry id to delete</param>
-    /// <param name="managerId">Manager, who's deleting data entry, id</param>
-    public Task DeleteAsync(int id, int managerId);
+    /// <param name="request">Request to process</param>
+    public Task DeleteAsync(DataEntryDeleteRequest request);
 
     /// <summary>
     /// Edits a data entry.
@@ -28,14 +27,14 @@ public interface IDataEntryService
     /// <summary>
     /// Gets a data entry by id.
     /// </summary>
-    /// <param name="id">Data entry id</param>
+    /// <param name="request">Request to process</param>
     /// <returns>Data entry of specified id</returns>
-    public Task<DataEntry> GetAsync(int id);
+    public Task<DataEntry> GetAsync(DataEntryGetRequest request);
 
     /// <summary>
     /// Gets all data entries of a data type.
     /// </summary>
-    /// <param name="dataTypeId">Data type id</param>
+    /// <param name="request">Request to process</param>
     /// <returns>Data entries of the data type</returns>
-    public Task<IEnumerable<DataEntry>> GetByDataTypeIdAsync(int dataTypeId);
+    public Task<IEnumerable<DataEntry>> GetByDataTypeIdAsync(DataEntryGetByDataTypeRequest request);
 }

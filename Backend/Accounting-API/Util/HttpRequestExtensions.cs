@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Accounting.Contract.Request;
+using Accounting.Contract.Service;
 
 namespace Accounting.API.Util;
 
@@ -50,5 +51,18 @@ public static class HttpRequestExtensions
             IpAddress = ipAddress,
             Location = location
         };
+    }
+
+    public static async Task<int> GetUserIdAsync(this HttpRequest request, IJwtService jwtService)
+    {
+        var accessToken = request.ToAccessToken()!;
+        var session = await jwtService.ExtractSessionAsync(accessToken);
+
+        if (session == null)
+        {
+            throw new UnauthorizedAccessException("Invalid access token.");
+        }
+
+        return session.UserId;
     }
 }

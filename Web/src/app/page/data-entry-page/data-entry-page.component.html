@@ -1,1 +1,53 @@
-<p>data-entry-page works!</p>
+<p-toast key="data-entry-page"></p-toast>
+
+<div class="p-4">
+  <p-dropdown
+    [options]="instances"
+    [(ngModel)]="selectedInstance"
+    (onChange)="selectInstance($event.value)"
+    optionLabel="name"
+    placeholder="Select Instance">
+  </p-dropdown>
+
+  <p-dropdown
+    [options]="dataTypes"
+    [(ngModel)]="selectedDataType"
+    (onChange)="selectDataType($event.value)"
+    optionLabel="name"
+    placeholder="Select Data Type"
+    [disabled]="!selectedInstance">
+  </p-dropdown>
+
+  <button pButton type="button" label="Add Data Entry" (click)="openCreation()"></button>
+
+  <p-table [value]="dataEntries">
+    <ng-template pTemplate="header">
+      <tr>
+        <th *ngFor="let field of selectedDataType()?.fields">{{ field.name }}</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-dataEntry>
+      <tr>
+        <td *ngFor="let field of dataEntry.fields">{{ field.value }}</td>
+        <td>
+          <button pButton type="button" icon="pi pi-pencil" (click)="openEdit(dataEntry)"></button>
+          <button pButton type="button" icon="pi pi-trash"
+                  (click)="deleteDataEntry(dataEntry)"></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-dialog [(visible)]="displayDialog">
+    <form [formGroup]="form" (ngSubmit)="saveDataEntry()">
+      <div *ngFor="let field of fields.controls; let i = index" [formGroupName]="i">
+        <input pInputText formControlName="value" placeholder="Value">
+        <button type="button" (click)="removeField(i)">Remove</button>
+      </div>
+      <button type="button" (click)="addField(null)">Add Entry</button>
+      <button type="submit">Save</button>
+    </form>
+  </p-dialog>
+</div>

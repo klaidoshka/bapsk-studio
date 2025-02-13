@@ -4,7 +4,9 @@ using System.Text;
 using Accounting.Contract;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Entity;
+using Accounting.Contract.Response;
 using Accounting.Contract.Service;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Accounting.Services.Service;
@@ -20,13 +22,17 @@ public class JwtService : IJwtService
         _jwtSettings = jwtSettings;
     }
 
-    public Session? ExtractSession(string token)
+    public async Task<Session> ExtractSessionAsync(string token)
     {
         var sessionId = ExtractSessionId(token);
 
-        return sessionId == null
-            ? null
-            : _database.Sessions.FirstOrDefault(s => s.Id == sessionId);
+        if (sessionId is null)
+        {
+            throw new ValidationException("Session id not found in token");
+        }
+
+        return await _database.Sessions.FirstOrDefaultAsync(s => s.Id == sessionId)
+               ?? throw new ValidationException("Session not found");
     }
 
     public Guid? ExtractSessionId(string token)

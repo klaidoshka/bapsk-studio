@@ -119,16 +119,8 @@ public static class ProgramExtensions
             .MapDataEntryEndpoints();
 
         accountingRouteGroup
-            .MapGroup("/data-entry-field")
-            .MapDataEntryFieldEndpoints();
-
-        accountingRouteGroup
             .MapGroup("/data-type")
             .MapDataTypeEndpoints();
-
-        accountingRouteGroup
-            .MapGroup("/data-type-field")
-            .MapDataTypeFieldEndpoints();
 
         accountingRouteGroup
             .MapGroup("/instance")

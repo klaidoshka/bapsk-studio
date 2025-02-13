@@ -1,8 +1,8 @@
 using Accounting.Contract;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Request;
-using Accounting.Contract.Response;
 using Accounting.Contract.Service;
+using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Services.Service;
@@ -10,27 +10,30 @@ namespace Accounting.Services.Service;
 public class InstanceService : IInstanceService
 {
     private readonly AccountingDatabase _database;
+    private readonly IInstanceValidator _instanceValidator;
 
-    public InstanceService(AccountingDatabase database)
+    public InstanceService(AccountingDatabase database, IInstanceValidator instanceValidator)
     {
         _database = database;
+        _instanceValidator = instanceValidator;
     }
 
     public async Task<Instance> CreateAsync(InstanceCreateRequest request)
     {
-        var creator = await _database.Users.FindAsync(request.CreatorId)
-                      ?? throw new ValidationException("Creator was not found.");
+        (await _instanceValidator.ValidateInstanceCreateRequestAsync(request)).AssertValid();
+
+        var user = (await _database.Users.FindAsync(request.RequesterId))!;
 
         var instance = new Instance
         {
             CreatedAt = DateTime.UtcNow,
-            CreatedBy = creator,
+            CreatedBy = user,
             Description = request.Description,
             Name = request.Name,
             UserMetas = new List<InstanceUserMeta>()
         };
 
-        instance.UserMetas.Add(new InstanceUserMeta { User = creator });
+        instance.UserMetas.Add(new InstanceUserMeta { User = user });
 
         instance = (await _database.Instances.AddAsync(instance)).Entity;
 
@@ -39,10 +42,11 @@ public class InstanceService : IInstanceService
         return instance;
     }
 
-    public async Task DeleteAsync(int instanceId)
+    public async Task DeleteAsync(InstanceDeleteRequest request)
     {
-        var instance = await _database.Instances.FindAsync(instanceId)
-                       ?? throw new ValidationException("Instance to delete was not found.");
+        (await _instanceValidator.ValidateInstanceDeleteRequestAsync(request)).AssertValid();
+
+        var instance = (await _database.Instances.FindAsync(request.InstanceId))!;
 
         _database.Instances.Remove(instance);
 
@@ -51,8 +55,9 @@ public class InstanceService : IInstanceService
 
     public async Task EditAsync(InstanceEditRequest request)
     {
-        var instance = await _database.Instances.FindAsync(request.Id)
-                       ?? throw new ValidationException("Instance to edit was not found.");
+        (await _instanceValidator.ValidateInstanceEditRequestAsync(request)).AssertValid();
+
+        var instance = (await _database.Instances.FindAsync(request.InstanceId))!;
 
         instance.Description = request.Description;
         instance.Name = request.Name;
@@ -60,23 +65,19 @@ public class InstanceService : IInstanceService
         await _database.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<Instance>> GetAsync()
+    public async Task<Instance> GetAsync(InstanceGetRequest request)
     {
-        return await _database.Instances.ToListAsync();
+        (await _instanceValidator.ValidateInstanceGetRequestAsync(request)).AssertValid();
+
+        return (await _database.Instances.FindAsync(request.InstanceId))!;
     }
 
-    public async Task<Instance> GetAsync(int instanceId)
-    {
-        return await _database.Instances.FindAsync(instanceId)
-               ?? throw new ValidationException("Instance not found.");
-    }
-
-    public async Task<IEnumerable<Instance>> GetByUserIdAsync(int userId)
+    public async Task<IEnumerable<Instance>> GetByUserIdAsync(InstanceGetByUserRequest request)
     {
         return await _database.Instances
             .Include(i => i.UserMetas)
             .ThenInclude(um => um.User)
-            .Where(i => i.UserMetas.Any(um => um.UserId == userId && !um.User.IsDeleted))
+            .Where(i => i.UserMetas.Any(um => um.UserId == request.RequesterId && !um.User.IsDeleted))
             .ToListAsync();
     }
 }

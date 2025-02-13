@@ -19,15 +19,7 @@ public static class InstanceEndpoints
                 IInstanceService instanceService
             ) =>
             {
-                var token = httpRequest.ToAccessToken()!;
-                var session = jwtService.ExtractSession(token);
-
-                if (session == null)
-                {
-                    throw new UnauthorizedAccessException("Invalid access token.");
-                }
-
-                request.CreatorId = session.UserId;
+                request.RequesterId = await httpRequest.GetUserIdAsync(jwtService);
 
                 return Results.Json((await instanceService.CreateAsync(request)).ToDto());
             }
@@ -37,10 +29,18 @@ public static class InstanceEndpoints
             "/{id:int}",
             async (
                 int id,
-                IInstanceService instanceService
+                IInstanceService instanceService,
+                HttpRequest httpRequest,
+                IJwtService jwtService
             ) =>
             {
-                await instanceService.DeleteAsync(id);
+                await instanceService.DeleteAsync(
+                    new InstanceDeleteRequest
+                    {
+                        InstanceId = id,
+                        RequesterId = await httpRequest.GetUserIdAsync(jwtService)
+                    }
+                );
 
                 return Results.Ok();
             }
@@ -51,10 +51,13 @@ public static class InstanceEndpoints
             async (
                 int id,
                 [FromBody] InstanceEditRequest request,
+                HttpRequest httpRequest,
+                IJwtService jwtService,
                 IInstanceService instanceService
             ) =>
             {
-                request.Id = id;
+                request.InstanceId = id;
+                request.RequesterId = await httpRequest.GetUserIdAsync(jwtService);
 
                 await instanceService.EditAsync(request);
 
@@ -66,17 +69,33 @@ public static class InstanceEndpoints
             "/{id:int}",
             async (
                 int id,
+                HttpRequest httpRequest,
+                IJwtService jwtService,
                 IInstanceService instanceService
-            ) => Results.Json((await instanceService.GetAsync(id)).ToDto())
+            ) => Results.Json(
+                (await instanceService.GetAsync(
+                    new InstanceGetRequest
+                    {
+                        InstanceId = id,
+                        RequesterId = await httpRequest.GetUserIdAsync(jwtService)
+                    }
+                )).ToDto()
+            )
         );
 
         builder.MapGet(
             string.Empty,
             async (
-                int userId,
+                HttpRequest httpRequest,
+                IJwtService jwtService,
                 IInstanceService instanceService
             ) => Results.Json(
-                (await instanceService.GetByUserIdAsync(userId))
+                (await instanceService.GetByUserIdAsync(
+                    new InstanceGetByUserRequest
+                    {
+                        RequesterId = await httpRequest.GetUserIdAsync(jwtService)
+                    }
+                ))
                 .Select(i => i.ToDto())
                 .ToList()
             )
@@ -89,8 +108,15 @@ public static class InstanceEndpoints
             string.Empty,
             async (
                 [FromBody] InstanceUserMetaCreateRequest request,
+                HttpRequest httpRequest,
+                IJwtService jwtService,
                 IInstanceUserMetaService instanceUserMetaService
-            ) => Results.Json((await instanceUserMetaService.CreateAsync(request)).ToDto())
+            ) =>
+            {
+                request.RequesterId = await httpRequest.GetUserIdAsync(jwtService);
+
+                return Results.Json((await instanceUserMetaService.CreateAsync(request)).ToDto());
+            }
         );
 
         builder.MapDelete(
@@ -102,15 +128,13 @@ public static class InstanceEndpoints
                 HttpRequest request
             ) =>
             {
-                var token = request.ToAccessToken()!;
-                var session = jwtService.ExtractSession(token);
-
-                if (session == null)
-                {
-                    throw new UnauthorizedAccessException("Invalid access token.");
-                }
-
-                await instanceUserMetaService.DeleteAsync(id, session.UserId);
+                await instanceUserMetaService.DeleteAsync(
+                    new InstanceUserMetaDeleteRequest
+                    {
+                        InstanceUserMetaId = id,
+                        RequesterId = await request.GetUserIdAsync(jwtService)
+                    }
+                );
 
                 return Results.Ok();
             }
@@ -120,17 +144,35 @@ public static class InstanceEndpoints
             "/{id:int}",
             async (
                 int id,
+                HttpRequest httpRequest,
+                IJwtService jwtService,
                 IInstanceUserMetaService instanceUserMetaService
-            ) => Results.Json((await instanceUserMetaService.GetAsync(id)).ToDto())
+            ) => Results.Json(
+                (await instanceUserMetaService.GetAsync(
+                    new InstanceUserMetaGetRequest
+                    {
+                        InstanceUserMetaId = id,
+                        RequesterId = await httpRequest.GetUserIdAsync(jwtService)
+                    }
+                )).ToDto()
+            )
         );
 
         builder.MapGet(
             string.Empty,
             async (
                 int instanceId,
+                HttpRequest httpRequest,
+                IJwtService jwtService,
                 IInstanceUserMetaService instanceUserMetaService
             ) => Results.Json(
-                (await instanceUserMetaService.GetByInstanceIdAsync(instanceId))
+                (await instanceUserMetaService.GetByInstanceIdAsync(
+                    new InstanceUserMetaGetByInstanceRequest
+                    {
+                        InstanceId = instanceId,
+                        RequesterId = await httpRequest.GetUserIdAsync(jwtService)
+                    }
+                ))
                 .Select(i => i.ToDto())
                 .ToList()
             )

@@ -130,7 +130,7 @@ public class AuthService : IAuthService
     public async Task<JwtTokenPair> RegisterAsync(RegisterRequest request)
     {
         (await _authValidator.ValidateRegisterRequestAsync(request)).AssertValid();
-        
+
         var user = new User
         {
             BirthDate = request.BirthDate,

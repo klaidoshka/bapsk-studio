@@ -15,8 +15,8 @@ public interface IInstanceService
     /// <summary>
     /// Deletes an instance.
     /// </summary>
-    /// <param name="instanceId">Instance id to delete</param>
-    public Task DeleteAsync(int instanceId);
+    /// <param name="request">Request to process</param>
+    public Task DeleteAsync(InstanceDeleteRequest request);
 
     /// <summary>
     /// Edits an instance.
@@ -25,22 +25,16 @@ public interface IInstanceService
     public Task EditAsync(InstanceEditRequest request);
 
     /// <summary>
-    /// Gets all instances.
-    /// </summary>
-    /// <returns></returns>
-    public Task<IEnumerable<Instance>> GetAsync();
-
-    /// <summary>
     /// Gets an instance by id.
     /// </summary>
-    /// <param name="instanceId">Instance id to get instance of</param>
+    /// <param name="request">Request to process</param>
     /// <returns>Instance of provided id</returns>
-    public Task<Instance> GetAsync(int instanceId);
+    public Task<Instance> GetAsync(InstanceGetRequest request);
 
     /// <summary>
     /// Gets all instances the provided user is in.
     /// </summary>
-    /// <param name="userId">User id to get instances from</param>
+    /// <param name="request">Request to process</param>
     /// <returns>Instances user is able to work in</returns>
-    public Task<IEnumerable<Instance>> GetByUserIdAsync(int userId);
+    public Task<IEnumerable<Instance>> GetByUserIdAsync(InstanceGetByUserRequest request);
 }

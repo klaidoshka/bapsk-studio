@@ -1,4 +1,6 @@
+using Accounting.API.Util;
 using Accounting.Contract.Dto;
+using Accounting.Contract.Request;
 using Accounting.Contract.Service;
 
 namespace Accounting.API.Endpoint;
@@ -11,17 +13,33 @@ public static class SessionEndpoints
             "{id:guid}",
             async (
                 Guid id,
+                HttpRequest httpRequest,
+                IJwtService jwtService,
                 ISessionService sessionService
-            ) => Results.Json((await sessionService.GetAsync(id)).ToDto())
+            ) => Results.Json(
+                (await sessionService.GetAsync(
+                    new SessionGetRequest
+                    {
+                        RequesterId = await httpRequest.GetUserIdAsync(jwtService),
+                        SessionId = id
+                    }
+                )).ToDto()
+            )
         );
 
         builder.MapGet(
             string.Empty,
             async (
-                int userId,
+                HttpRequest httpRequest,
+                IJwtService jwtService,
                 ISessionService sessionService
             ) => Results.Json(
-                (await sessionService.GetByUserIdAsync(userId))
+                (await sessionService.GetByUserIdAsync(
+                    new SessionGetByUserRequest
+                    {
+                        RequesterId = await httpRequest.GetUserIdAsync(jwtService)
+                    }
+                ))
                 .Select(s => s.ToDto())
                 .ToList()
             )

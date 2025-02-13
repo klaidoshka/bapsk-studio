@@ -9,7 +9,7 @@ public interface IJwtService
     /// </summary>
     /// <param name="token">Token to extract session from</param>
     /// <returns>Session within the token or null if not found</returns>
-    public Session? ExtractSession(string token);
+    public Task<Session> ExtractSessionAsync(string token);
 
     /// <summary>
     /// Extracts the session id from the specified token.

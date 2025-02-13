@@ -8,7 +8,7 @@ Authorization: Bearer {{accessToken}}
 
 ###
 
-GET {{Session_API_IP}}?userId=1
+GET {{Session_API_IP}}
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{accessToken}}

@@ -47,7 +47,7 @@ export class InstancePageComponent implements OnInit {
           return;
         }
 
-        this.instanceService.getByUserId(user.id).subscribe({
+        this.instanceService.getByUser().subscribe({
           next: (instances) => {
             this.instances = instances;
           }
@@ -143,7 +143,7 @@ export class InstancePageComponent implements OnInit {
       }
 
       this.instanceService.edit({
-        id: this.editingInstance.id!,
+        instanceId: this.editingInstance.id!,
         name: this.name()!,
         description: this.description()
       }).pipe(first()).subscribe({

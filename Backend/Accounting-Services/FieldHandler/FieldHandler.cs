@@ -6,6 +6,21 @@ namespace Accounting.Services.FieldHandler;
 public abstract class FieldHandler(FieldType type)
 {
     /// <summary>
+    /// Base handlers for each field type.
+    /// </summary>
+    public static readonly Dictionary<FieldType, FieldHandler> Handlers = new()
+    {
+        { FieldType.Check, new CheckFieldHandler() },
+        { FieldType.Date, new DateFieldHandler() },
+        { FieldType.Decimal, new DecimalFieldHandler() },
+        { FieldType.DecimalArray, new DecimalArrayFieldHandler() },
+        { FieldType.Int, new IntFieldHandler() },
+        { FieldType.IntArray, new IntArrayFieldHandler() },
+        { FieldType.Text, new TextFieldHandler() },
+        { FieldType.TextArray, new TextArrayFieldHandler() }
+    };
+    
+    /// <summary>
     /// Type of the field.
     /// </summary>
     public FieldType Type { get; } = type;

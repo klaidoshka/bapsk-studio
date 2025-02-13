@@ -1,8 +1,8 @@
 using Accounting.Contract;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Request;
-using Accounting.Contract.Response;
 using Accounting.Contract.Service;
+using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Services.Service;
@@ -10,51 +10,56 @@ namespace Accounting.Services.Service;
 public class DataEntryService : IDataEntryService
 {
     private readonly AccountingDatabase _database;
+    private readonly IDataEntryValidator _dataEntryValidator;
     private readonly IFieldTypeService _fieldTypeService;
 
-    public DataEntryService(AccountingDatabase database, IFieldTypeService fieldTypeService)
+    public DataEntryService(
+        AccountingDatabase database,
+        IDataEntryValidator dataEntryValidator,
+        IFieldTypeService fieldTypeService
+    )
     {
         _database = database;
+        _dataEntryValidator = dataEntryValidator;
         _fieldTypeService = fieldTypeService;
     }
 
     public async Task<DataEntry> CreateAsync(DataEntryCreateRequest request)
     {
+        (await _dataEntryValidator.ValidateDataEntryCreateRequestAsync(request)).AssertValid();
+
         var dataType = await _database.DataTypes
-                           .Include(dt => dt.Instance)
-                           .ThenInclude(i => i.CreatedBy)
-                           .Include(dt => dt.Fields)
-                           .FirstOrDefaultAsync(dt => dt.Id == request.DataTypeId)
-                       ?? throw new ValidationException("Data type not found.");
+            .Include(dt => dt.Instance)
+            .ThenInclude(i => i.CreatedBy)
+            .Include(dt => dt.Fields)
+            .FirstAsync(dt => dt.Id == request.DataTypeId);
 
-        _fieldTypeService
-            .ValidateValues(dataType.Fields, request.Values)
-            .AssertValid();
+        var requestFieldsById = request.Fields.ToDictionary(f => f.DataTypeFieldId);
+        var fields = new List<DataEntryField>();
 
-        var fields = dataType.Fields
-            .Select(
-                f =>
-                {
-                    if (request.Values.TryGetValue(f.Id, out var value))
+        foreach (var field in dataType.Fields)
+        {
+            if (requestFieldsById.TryGetValue(field.Id, out var value))
+            {
+                fields.Add(
+                    new DataEntryField
                     {
-                        return new DataEntryField
-                        {
-                            DataTypeField = f,
-                            Value = _fieldTypeService.Serialize(f.Type, value)
-                        };
+                        DataTypeField = field,
+                        Value = _fieldTypeService.Serialize(field.Type, value)
                     }
-
-                    return f.DefaultValue == null
-                        ? null
-                        : new DataEntryField
-                        {
-                            DataTypeField = f,
-                            Value = f.DefaultValue
-                        };
-                }
-            )
-            .Where(f => f is not null)
-            .ToList();
+                );
+            }
+            else if (field.DefaultValue != null)
+            {
+                fields.Add(
+                    new DataEntryField
+                    {
+                        DataTypeField = field,
+                        Value = field.DefaultValue
+                    }
+                );
+            }
+        }
 
         var dataEntry = (await _database.DataEntries.AddAsync(
             new DataEntry
@@ -73,46 +78,37 @@ public class DataEntryService : IDataEntryService
         return dataEntry;
     }
 
-    public async Task DeleteAsync(int id, int managerId)
+    public async Task DeleteAsync(DataEntryDeleteRequest request)
     {
-        var entry = await _database.DataEntries.FindAsync(id)
-                    ?? throw new ValidationException("Data entry not found.");
+        (await _dataEntryValidator.ValidateDataEntryDeleteRequestAsync(request)).AssertValid();
 
-        if (entry.IsDeleted == true)
-        {
-            return;
-        }
+        var entry = await _database.DataEntries.FirstAsync(de => de.Id == request.DataEntryId);
 
         entry.IsDeleted = true;
         entry.ModifiedAt = DateTime.UtcNow;
-        entry.ModifiedById = managerId;
+        entry.ModifiedById = request.RequesterId;
 
         await _database.SaveChangesAsync();
     }
 
     public async Task EditAsync(DataEntryEditRequest request)
     {
+        (await _dataEntryValidator.ValidateDataEntryEditRequestAsync(request)).AssertValid();
+
         var entry = await _database.DataEntries
-                        .Include(de => de.DataType)
-                        .ThenInclude(dt => dt.Instance)
-                        .ThenInclude(i => i.CreatedBy)
-                        .Include(de => de.DataType.Fields)
-                        .Include(de => de.Fields)
-                        .ThenInclude(f => f.DataTypeField)
-                        .FirstOrDefaultAsync(de => de.Id == request.Id);
+            .Include(de => de.DataType)
+            .ThenInclude(dt => dt.Instance)
+            .ThenInclude(i => i.CreatedBy)
+            .Include(de => de.DataType.Fields)
+            .Include(de => de.Fields)
+            .ThenInclude(f => f.DataTypeField)
+            .FirstAsync(de => de.Id == request.DataEntryId);
 
-        if (entry == null || entry.IsDeleted == true)
-        {
-            throw new ValidationException("Data entry not found.");
-        }
-
-        _fieldTypeService
-            .ValidateValues(entry.DataType.Fields, request.Values)
-            .AssertValid();
+        var requestFieldsById = request.Fields.ToDictionary(f => f.DataEntryFieldId);
 
         foreach (var field in entry.Fields)
         {
-            if (request.Values.TryGetValue(field.DataTypeFieldId, out var value))
+            if (requestFieldsById.TryGetValue(field.DataTypeFieldId, out var value))
             {
                 field.Value = _fieldTypeService.Serialize(field.DataTypeField.Type, value);
             }
@@ -128,25 +124,22 @@ public class DataEntryService : IDataEntryService
         await _database.SaveChangesAsync();
     }
 
-    public async Task<DataEntry> GetAsync(int id)
+    public async Task<DataEntry> GetAsync(DataEntryGetRequest request)
     {
-        var dataEntry = await _database.DataEntries.FindAsync(id);
+        (await _dataEntryValidator.ValidateDataEntryGetRequestAsync(request)).AssertValid();
 
-        if (dataEntry == null || dataEntry.IsDeleted == true)
-        {
-            throw new ValidationException("Data entry not found.");
-        }
-
-        return dataEntry;
+        return await _database.DataEntries
+            .Include(de => de.Fields)
+            .FirstAsync(de => de.Id == request.DataEntryId);
     }
 
-    public async Task<IEnumerable<DataEntry>> GetByDataTypeIdAsync(int dataTypeId)
+    public async Task<IEnumerable<DataEntry>> GetByDataTypeIdAsync(DataEntryGetByDataTypeRequest request)
     {
+        (await _dataEntryValidator.ValidateDataEntryGetByDataTypeRequestAsync(request)).AssertValid();
+
         return await _database.DataEntries
-            .Where(
-                de => de.DataTypeId == dataTypeId &&
-                      de.IsDeleted != true
-            )
+            .Include(de => de.Fields)
+            .Where(de => de.DataTypeId == request.DataTypeId && !de.IsDeleted)
             .ToListAsync();
     }
 }

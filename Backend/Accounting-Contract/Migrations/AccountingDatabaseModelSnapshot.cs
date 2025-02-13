@@ -39,7 +39,7 @@ namespace Accounting.Contract.Migrations
                     b.Property<int>("DataTypeId")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("IsDeleted")
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime?>("ModifiedAt")
@@ -102,7 +102,7 @@ namespace Accounting.Contract.Migrations
                     b.Property<int>("InstanceId")
                         .HasColumnType("int");
 
-                    b.Property<bool?>("IsDeleted")
+                    b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("Name")
@@ -304,7 +304,7 @@ namespace Accounting.Contract.Migrations
                         .IsRequired();
 
                     b.HasOne("Accounting.Contract.Entity.DataType", "DataType")
-                        .WithMany()
+                        .WithMany("Entries")
                         .HasForeignKey("DataTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -409,6 +409,8 @@ namespace Accounting.Contract.Migrations
 
             modelBuilder.Entity("Accounting.Contract.Entity.DataType", b =>
                 {
+                    b.Navigation("Entries");
+
                     b.Navigation("Fields");
                 });
 

@@ -1,7 +1,7 @@
 <p-toast key="root"></p-toast>
 
 <header
-    class="flex justify-between items-center p-2 mt-2 bg-gray-800 bg-opacity-50 text-white sticky top-0">
+  class="flex justify-between items-center rounded p-2 ml-3 mr-3 mt-2 bg-gray-800 bg-opacity-50 text-white sticky top-0">
   <div class="flex items-center space-x-4">
     <a routerLink="/" class="text-xl font-bold">Accounting</a>
   </div>
@@ -11,10 +11,10 @@
 
     <div>
       <p-button
-          (click)="confirmLogout($event)"
-          label="Logout"
-          severity="danger"
-          [outlined]="true"
+        (click)="confirmLogout($event)"
+        label="Logout"
+        severity="danger"
+        [outlined]="true"
       ></p-button>
     </div>
   }

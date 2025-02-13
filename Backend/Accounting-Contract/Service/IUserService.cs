@@ -3,6 +3,7 @@ using Accounting.Contract.Request;
 
 namespace Accounting.Contract.Service;
 
+// TODO: Address requester id
 public interface IUserService
 {
     /// <summary>

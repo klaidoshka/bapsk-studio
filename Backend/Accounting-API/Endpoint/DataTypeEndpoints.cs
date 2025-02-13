@@ -14,8 +14,15 @@ public static class DataTypeEndpoints
             string.Empty,
             async (
                 [FromBody] DataTypeCreateRequest request,
-                IDataTypeService dataTypeService
-            ) => Results.Json((await dataTypeService.CreateAsync(request)).ToDto())
+                IDataTypeService dataTypeService,
+                HttpRequest httpRequest,
+                IJwtService jwtService
+            ) =>
+            {
+                request.RequesterId = await httpRequest.GetUserIdAsync(jwtService);
+
+                return Results.Json((await dataTypeService.CreateAsync(request)).ToDto());
+            }
         );
 
         builder.MapDelete(
@@ -27,15 +34,13 @@ public static class DataTypeEndpoints
                 HttpRequest request
             ) =>
             {
-                var accessToken = request.ToAccessToken()!;
-                var session = jwtService.ExtractSession(accessToken);
-
-                if (session == null)
-                {
-                    throw new UnauthorizedAccessException("Invalid access token.");
-                }
-
-                await dataTypeService.DeleteAsync(id, session.UserId);
+                await dataTypeService.DeleteAsync(
+                    new DataTypeDeleteRequest
+                    {
+                        DataTypeId = id,
+                        RequesterId = await request.GetUserIdAsync(jwtService)
+                    }
+                );
 
                 return Results.Ok();
             }
@@ -46,10 +51,13 @@ public static class DataTypeEndpoints
             async (
                 int id,
                 [FromBody] DataTypeEditRequest request,
-                IDataTypeService dataTypeService
+                IDataTypeService dataTypeService,
+                HttpRequest httpRequest,
+                IJwtService jwtService
             ) =>
             {
-                request.Id = id;
+                request.DataTypeId = id;
+                request.RequesterId = await httpRequest.GetUserIdAsync(jwtService);
 
                 await dataTypeService.EditAsync(request);
 
@@ -61,87 +69,35 @@ public static class DataTypeEndpoints
             "/{id:int}",
             async (
                 int id,
-                IDataTypeService dataTypeService
-            ) => Results.Json((await dataTypeService.GetAsync(id)).ToDto())
+                IDataTypeService dataTypeService,
+                HttpRequest httpRequest,
+                IJwtService jwtService
+            ) => Results.Json(
+                (await dataTypeService.GetAsync(
+                    new DataTypeGetRequest
+                    {
+                        DataTypeId = id,
+                        RequesterId = await httpRequest.GetUserIdAsync(jwtService)
+                    }
+                )).ToDto()
+            )
         );
 
         builder.MapGet(
             string.Empty,
             async (
                 int instanceId,
-                IDataTypeService dataTypeService
+                IDataTypeService dataTypeService,
+                HttpRequest httpRequest,
+                IJwtService jwtService
             ) => Results.Json(
-                (await dataTypeService.GetByInstanceIdAsync(instanceId))
-                .Select(i => i.ToDto())
-                .ToList()
-            )
-        );
-    }
-
-    public static void MapDataTypeFieldEndpoints(this RouteGroupBuilder builder)
-    {
-        builder.MapPost(
-            string.Empty,
-            async (
-                [FromBody] DataTypeFieldCreateRequest request,
-                IDataTypeFieldService dataTypeFieldService
-            ) => Results.Json((await dataTypeFieldService.CreateAsync(request)).ToDto())
-        );
-
-        builder.MapDelete(
-            "/{id:int}",
-            async (
-                int id,
-                IDataTypeFieldService dataTypeFieldService,
-                IJwtService jwtService,
-                HttpRequest request
-            ) =>
-            {
-                var accessToken = request.ToAccessToken()!;
-                var session = jwtService.ExtractSession(accessToken);
-
-                if (session == null)
-                {
-                    throw new UnauthorizedAccessException("Invalid access token.");
-                }
-
-                await dataTypeFieldService.DeleteAsync(id, session.UserId);
-
-                return Results.Ok();
-            }
-        );
-
-        builder.MapPut(
-            "/{id:int}",
-            async (
-                int id,
-                [FromBody] DataTypeFieldEditRequest request,
-                IDataTypeFieldService dataTypeFieldService
-            ) =>
-            {
-                request.Id = id;
-
-                await dataTypeFieldService.EditAsync(request);
-
-                return Results.Ok();
-            }
-        );
-
-        builder.MapGet(
-            "/{id:int}",
-            async (
-                int id,
-                IDataTypeFieldService dataTypeFieldService
-            ) => Results.Json((await dataTypeFieldService.GetAsync(id)).ToDto())
-        );
-
-        builder.MapGet(
-            string.Empty,
-            async (
-                int dataTypeId,
-                IDataTypeFieldService dataTypeFieldService
-            ) => Results.Json(
-                (await dataTypeFieldService.GetByDataTypeIdAsync(dataTypeId))
+                (await dataTypeService.GetByInstanceIdAsync(
+                    new DataTypeGetByInstanceRequest
+                    {
+                        InstanceId = instanceId,
+                        RequesterId = await httpRequest.GetUserIdAsync(jwtService)
+                    }
+                ))
                 .Select(i => i.ToDto())
                 .ToList()
             )

@@ -47,7 +47,7 @@ public class DataEntry
     /// <summary>
     /// Marks the data entry as deleted, but does not remove it from the database.
     /// </summary>
-    public bool? IsDeleted { get; set; }
+    public bool IsDeleted { get; set; }
 
     /// <summary>
     /// Last date and time the data entry was modified.

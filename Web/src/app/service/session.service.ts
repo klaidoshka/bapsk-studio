@@ -11,7 +11,7 @@ export class SessionService {
   private apiRouter = inject(ApiRouter);
   private httpClient = inject(HttpClient);
 
-  getByUserId(userId: number): Observable<Session[]> {
-    return this.httpClient.get<Session[]>(this.apiRouter.instanceGetByUserId(userId));
+  getByUser(): Observable<Session[]> {
+    return this.httpClient.get<Session[]>(this.apiRouter.sessionGetByUser());
   }
 }
