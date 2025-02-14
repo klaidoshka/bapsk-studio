@@ -21,11 +21,11 @@ import {DropdownModule} from 'primeng/dropdown';
 import {TableModule} from 'primeng/table';
 import DataType from '../../model/data-type.model';
 import {DataTypeService} from '../../service/data-type.service';
-import {ButtonDirective} from 'primeng/button';
-import {Toast} from 'primeng/toast';
-import {NgForOf} from '@angular/common';
-import {Dialog} from 'primeng/dialog';
-import {InputText} from 'primeng/inputtext';
+import {ButtonModule} from 'primeng/button';
+import {ToastModule} from 'primeng/toast';
+import {DialogModule} from 'primeng/dialog';
+import {InputTextModule} from 'primeng/inputtext';
+import {forkJoin} from 'rxjs';
 
 @Component({
   selector: 'app-data-entry-page',
@@ -35,11 +35,10 @@ import {InputText} from 'primeng/inputtext';
     DropdownModule,
     TableModule,
     ReactiveFormsModule,
-    ButtonDirective,
-    Toast,
-    NgForOf,
-    Dialog,
-    InputText
+    ButtonModule,
+    ToastModule,
+    DialogModule,
+    InputTextModule
   ],
   providers: [ConfirmationService, MessageService]
 })
@@ -82,16 +81,21 @@ export class DataEntryPageComponent implements OnInit {
     return this.form.get('fields') as FormArray;
   }
 
-  addField(field: DataEntryField | null) {
-    this.fields.push(this.createFieldGroup(field));
+  addField() {
+    const fieldGroup = this.formBuilder.group({});
+    this.selectedDataType()?.fields?.forEach(dataTypeField => {
+      fieldGroup.addControl(dataTypeField.name, this.formBuilder.control('', Validators.required));
+    });
+    this.fields.push(fieldGroup);
   }
 
-  createFieldGroup(field: DataEntryField | null): FormGroup {
-    return this.formBuilder.group({
-      id: [field?.id || null],
-      dataTypeFieldId: [field?.dataTypeFieldId || null],
-      value: [field?.value, Validators.required]
+  addFieldForEdit(field: DataEntryField) {
+    const fieldGroup = this.formBuilder.group({
+      id: [field.id],
+      dataTypeFieldId: [field.dataTypeFieldId],
+      value: [field.value, Validators.required]
     });
+    this.fields.push(fieldGroup);
   }
 
   removeField(index: number) {
@@ -100,6 +104,7 @@ export class DataEntryPageComponent implements OnInit {
 
   openCreation() {
     this.resetForm();
+    this.addField();
     this.displayDialog.set(true);
   }
 
@@ -107,7 +112,7 @@ export class DataEntryPageComponent implements OnInit {
     this.form.patchValue({id: dataEntry.id});
     this.fields.clear();
     this.editableDataEntry.set(dataEntry);
-    dataEntry.fields?.forEach(field => this.addField(field));
+    dataEntry.fields?.forEach(field => this.addFieldForEdit(field));
     this.displayDialog.set(true);
   }
 
@@ -151,22 +156,46 @@ export class DataEntryPageComponent implements OnInit {
   }
 
   createDataEntry(dataEntry: DataEntry) {
-    const createRequest: DataEntryCreateRequest = {
-      dataTypeId: this.selectedDataType()!.id!,
-      fields: dataEntry.fields
-    };
+    const createRequests: DataEntryCreateRequest[] = dataEntry.fields.map((fieldGroup: {
+      [key: string]: any
+    }) => {
+      const fields = Object.keys(fieldGroup).map(key => ({
+        dataTypeFieldId: this.selectedDataType()!.fields!.find(f => f.name === key)!.id,
+        value: fieldGroup[key]
+      }));
+      return {
+        dataTypeId: this.selectedDataType()!.id!,
+        fields: fields
+      };
+    });
 
-    this.dataEntryService.create(createRequest).subscribe(() => {
-      this.loadDataEntries(this.selectedDataType());
+    console.log(createRequests);
 
-      this.displayDialog.set(false);
+    const httpRequests = createRequests.map(createRequest =>
+      this.dataEntryService.create(createRequest)
+    );
 
-      this.messageService.add({
-        key: "data-entry-page",
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Data entry created'
-      });
+    forkJoin(httpRequests).subscribe({
+      next: () => {
+        this.loadDataEntries(this.selectedDataType());
+        this.displayDialog.set(false);
+        this.messageService.add({
+          key: "data-entry-page",
+          severity: 'success',
+          summary: 'Success',
+          detail: 'All data entries created successfully'
+        });
+      },
+      error: () => {
+        this.loadDataEntries(this.selectedDataType());
+        this.displayDialog.set(false);
+        this.messageService.add({
+          key: "data-entry-page",
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Not all data entries were created successfully'
+        });
+      }
     });
   }
 
@@ -188,7 +217,10 @@ export class DataEntryPageComponent implements OnInit {
     });
   }
 
-  loadDataEntries(dataType: DataType | null) {
+  loadDataEntries(dataType
+                  :
+                    DataType | null
+  ) {
     if (dataType == null || dataType.id == null) {
       this.dataEntries = [];
       return;
@@ -199,7 +231,10 @@ export class DataEntryPageComponent implements OnInit {
     });
   }
 
-  loadDataTypes(instance: Instance | null) {
+  loadDataTypes(instance
+                :
+                  Instance | null
+  ) {
     if (instance == null || instance.id == null) {
       this.dataTypes = [];
       return;
@@ -210,12 +245,18 @@ export class DataEntryPageComponent implements OnInit {
     });
   }
 
-  selectDataType(dataType: DataType | null) {
+  selectDataType(dataType
+                 :
+                   DataType | null
+  ) {
     this.selectedDataType.set(dataType);
     this.loadDataEntries(dataType);
   }
 
-  selectInstance(instance: Instance | null) {
+  selectInstance(instance
+                 :
+                   Instance | null
+  ) {
     this.selectedInstance.set(instance);
     this.loadDataTypes(instance);
   }

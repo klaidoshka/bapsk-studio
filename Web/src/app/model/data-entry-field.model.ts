@@ -7,7 +7,6 @@ export default interface DataEntryField {
 }
 
 export interface DataEntryFieldCreateRequest {
-  dataEntryId: number;
   dataTypeFieldId: number;
   value: string;
 }

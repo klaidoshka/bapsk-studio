@@ -18,23 +18,29 @@
     [disabled]="!selectedInstance">
   </p-dropdown>
 
-  <button pButton type="button" label="Add Data Entry" (click)="openCreation()"></button>
+  <button pButton type="button" label="Add Data Entries" (click)="openCreation()"
+          class="p-button-sm rounded-md"></button>
 
   <p-table [value]="dataEntries">
     <ng-template pTemplate="header">
       <tr>
-        <th *ngFor="let field of selectedDataType()?.fields">{{ field.name }}</th>
+        @for (field of selectedDataType()?.fields; track $index) {
+          <th>{{ field.name }}</th>
+        }
         <th>Actions</th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-dataEntry>
       <tr>
-        <td *ngFor="let field of dataEntry.fields">{{ field.value }}</td>
+        @for (field of dataEntry.fields; track $index) {
+          <td>{{ field.value }}</td>
+        }
         <td>
-          <button pButton type="button" icon="pi pi-pencil" (click)="openEdit(dataEntry)"></button>
-          <button pButton type="button" icon="pi pi-trash"
-                  (click)="deleteDataEntry(dataEntry)"></button>
+          <button pButton type="button" icon="pi pi-pencil" (click)="openEdit(dataEntry)"
+                  class="p-button-sm rounded-md"></button>
+          <button pButton type="button" icon="pi pi-trash" (click)="deleteDataEntry(dataEntry)"
+                  class="p-button-sm rounded-md"></button>
         </td>
       </tr>
     </ng-template>
@@ -42,12 +48,27 @@
 
   <p-dialog [(visible)]="displayDialog">
     <form [formGroup]="form" (ngSubmit)="saveDataEntry()">
-      <div *ngFor="let field of fields.controls; let i = index" [formGroupName]="i">
-        <input pInputText formControlName="value" placeholder="Value">
-        <button type="button" (click)="removeField(i)">Remove</button>
+      <div formArrayName="fields">
+        @for (_ of fields.controls; track $index) {
+          <div [formGroupName]="$index" class="flex items-center gap-4 mb-2">
+            @for (field of selectedDataType()?.fields; track $index) {
+              <input pInputText [formControlName]="field.name" placeholder="{{ field.name }}"
+                     class="input-text">
+            }
+            @if (editableDataEntry() == null) {
+              <button type="button" (click)="removeField($index)"
+                      class="p-button-sm bg-red-500 text-white rounded-md">Remove
+              </button>
+            }
+          </div>
+        }
       </div>
-      <button type="button" (click)="addField(null)">Add Entry</button>
-      <button type="submit">Save</button>
+      @if (editableDataEntry() == null) {
+        <button type="button" (click)="addField()"
+                class="p-button-sm bg-blue-500 text-white rounded-md">Add Entry
+        </button>
+      }
+      <button type="submit" class="p-button-sm bg-green-500 text-white rounded-md">Save</button>
     </form>
   </p-dialog>
 </div>

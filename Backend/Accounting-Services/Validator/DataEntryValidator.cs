@@ -33,17 +33,16 @@ public class DataEntryValidator : IDataEntryValidator
             return new Validation("You are not allowed to create data entries in this instance.");
         }
 
-        var validations = await Task.WhenAll(
-            request.Fields.Select(
-                async f => (await ValidateDataEntryFieldCreateRequestAsync(f)).FailureMessages
-            )
-        );
+        var failures = new List<string>();
 
-        return new Validation(
-            validations
-                .SelectMany(v => v)
-                .ToList()
-        );
+        foreach (var field in request.Fields)
+        {
+            failures.AddRange(
+                (await ValidateDataEntryFieldCreateRequestAsync(field)).FailureMessages
+            );
+        }
+
+        return new Validation(failures);
     }
 
     public async Task<Validation> ValidateDataEntryDeleteRequestAsync(DataEntryDeleteRequest request)
@@ -80,17 +79,16 @@ public class DataEntryValidator : IDataEntryValidator
             return new Validation("You are not allowed to edit this data entry.");
         }
 
-        var validations = await Task.WhenAll(
-            request.Fields.Select(
-                async f => (await ValidateDataEntryFieldEditRequestAsync(f)).FailureMessages
-            )
-        );
+        var failures = new List<string>();
 
-        return new Validation(
-            validations
-                .SelectMany(v => v)
-                .ToList()
-        );
+        foreach (var field in request.Fields)
+        {
+            failures.AddRange(
+                (await ValidateDataEntryFieldEditRequestAsync(field)).FailureMessages
+            );
+        }
+
+        return new Validation(failures);
     }
 
     public async Task<Validation> ValidateDataEntryGetRequestAsync(DataEntryGetRequest request)
@@ -130,27 +128,13 @@ public class DataEntryValidator : IDataEntryValidator
 
     public async Task<Validation> ValidateDataEntryFieldCreateRequestAsync(DataEntryFieldCreateRequest request)
     {
-        var dataEntry = await _database.DataEntries
-            .Include(de => de.Fields)
-            .Include(de => de.DataType)
-            .ThenInclude(dt => dt.Fields)
-            .FirstOrDefaultAsync(de => de.Id == request.DataEntryId);
-
-        if (dataEntry == null)
-        {
-            return new Validation("Data entry not found.");
-        }
-
-        var dataTypeField = dataEntry.DataType.Fields.FirstOrDefault(f => f.Id == request.DataTypeFieldId);
+        var dataTypeField = await _database.DataTypeFields
+            .Include(f => f.DataType)
+            .FirstOrDefaultAsync(f => f.Id == request.DataTypeFieldId);
 
         if (dataTypeField == null)
         {
             return new Validation("Field does not exist in data type.");
-        }
-
-        if (dataEntry.Fields.Any(f => f.DataTypeFieldId == request.DataTypeFieldId))
-        {
-            return new Validation("Field already defined in data entry.");
         }
 
         return new Validation(

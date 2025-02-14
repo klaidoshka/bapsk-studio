@@ -36,7 +36,7 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => {
       initAuthService(inject(AuthService), inject(Router));
     }),
-    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
@@ -44,7 +44,14 @@ export const appConfig: ApplicationConfig = {
     providePrimeNG({
       ripple: true,
       theme: {
-        preset: Aura
+        preset: Aura,
+        options: {
+          darkModeSelector: '.dark',
+          cssLayer: {
+            name: 'primeng',
+            order: 'tailwind, primeng',
+          }
+        }
       }
     })
   ]
