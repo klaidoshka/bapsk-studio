@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from "@angular/core";
+import {Component, inject, OnInit, signal} from "@angular/core";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Router, RouterLink} from "@angular/router";
 import {AutoCompleteCompleteEvent, AutoCompleteModule} from "primeng/autocomplete";
@@ -30,15 +30,15 @@ export class RegisterComponent implements OnInit {
   private router = inject(Router);
   private textService = inject(TextService);
 
-  filteredCountries: IsoCountry[] = [];
-  isSubmitting = false;
-  maxDate: Date = this.getDateMinusYears(13);
-  messages: string[] = [];
-  registerForm!: FormGroup;
+  $filteredCountries: IsoCountry[] = [];
+  $isSubmitting = signal<boolean>(false);
+  $maxDate = signal(this.getDateMinusYears(13)).asReadonly();
+  $messages = signal<string[]>([]);
+  $registerForm!: FormGroup;
 
   ngOnInit(): void {
-    this.registerForm = this.formBuilder.group({
-      birthDate: [this.maxDate, Validators.required],
+    this.$registerForm = this.formBuilder.group({
+      birthDate: [this.$maxDate(), Validators.required],
       country: [IsoCountries[129], Validators.required],
       email: ["", [Validators.required, Validators.email]],
       firstName: ["", Validators.required],
@@ -56,7 +56,7 @@ export class RegisterComponent implements OnInit {
   }
 
   getErrorMessage(field: string): string | null {
-    const control = this.registerForm.get(field);
+    const control = this.$registerForm.get(field);
 
     if (!control || !control.touched || !control.invalid) return "";
     if (control.errors?.["required"])
@@ -71,29 +71,29 @@ export class RegisterComponent implements OnInit {
   filterCountries(event: AutoCompleteCompleteEvent) {
     const query = event.query.toLowerCase();
 
-    this.filteredCountries = IsoCountries.filter((country) =>
+    this.$filteredCountries = IsoCountries.filter((country) =>
       country.name.toLowerCase().startsWith(query)
     );
   }
 
   async onSubmit(): Promise<void> {
-    if (this.isSubmitting) return;
-    if (this.messages.length > 0) this.messages = [];
+    if (this.$isSubmitting()) return;
+    if (this.$messages.length > 0) this.$messages.set([]);
 
-    if (this.registerForm.invalid) {
-      this.messages = ["Please fill out all required fields correctly."];
+    if (this.$registerForm.invalid) {
+      this.$messages.set(["Please fill out all required fields correctly."]);
       return;
     }
 
-    this.isSubmitting = true;
+    this.$isSubmitting.set(true);
 
     const request: RegisterRequest = {
-      birthDate: this.registerForm.value.birthDate,
-      country: this.registerForm.value.country.code,
-      email: this.registerForm.value.email,
-      firstName: this.registerForm.value.firstName,
-      lastName: this.registerForm.value.lastName,
-      password: this.registerForm.value.password
+      birthDate: this.$registerForm.value.birthDate,
+      country: this.$registerForm.value.country.code,
+      email: this.$registerForm.value.email,
+      firstName: this.$registerForm.value.firstName,
+      lastName: this.$registerForm.value.lastName,
+      password: this.$registerForm.value.password
     };
 
     this.authService.register(request).subscribe({
@@ -102,13 +102,13 @@ export class RegisterComponent implements OnInit {
           this.authService.acceptAuthResponse(response);
           this.router.navigate(["/"]);
         }
-        this.isSubmitting = false;
+        this.$isSubmitting.set(false);
       },
       error: (response: ErrorResponse) => {
-        this.messages = response.error?.messages || [
+        this.$messages.set(response.error?.messages || [
           "Failed to register, please try again later..."
-        ];
-        this.isSubmitting = false;
+        ]);
+        this.$isSubmitting.set(false);
       }
     });
   }

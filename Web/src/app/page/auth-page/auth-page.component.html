@@ -1,15 +1,16 @@
 <div class="min-h-screen flex items-center justify-center">
-  <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full space-y-6">
+  <div class="bg-surface-0 shadow-md rounded-lg p-8 max-w-lg w-full space-y-6">
+    <div class="flex justify-center space-x-4">
+      <i class="pi pi-lock text-4xl text-gray-400"></i>
+    </div>
+
     <div class="text-center">
       <h1 class="text-3xl font-bold text-gray-800">Welcome to Accounting</h1>
-      <p class="text-gray-600">Please login or register to continue</p>
+      <p class="text-gray-600">Please authenticate yourself to continue</p>
     </div>
-    <div class="flex justify-center space-x-4">
-      <i class="pi pi-user text-4xl text-gray-400"></i>
-      <i class="pi pi-lock text-4xl text-gray-400"></i>
-      <i class="pi pi-pencil text-4xl text-gray-400"></i>
-    </div>
+
     <hr class="border-gray-300">
-    <router-outlet></router-outlet>
+
+    <router-outlet/>
   </div>
 </div>

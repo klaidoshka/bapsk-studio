@@ -1,4 +1,4 @@
-import {Component, inject, OnInit} from "@angular/core";
+import {Component, inject, OnInit, signal} from "@angular/core";
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Router, RouterLink} from "@angular/router";
 import {Button} from "primeng/button";
@@ -22,19 +22,19 @@ export class LoginComponent implements OnInit {
   private router = inject(Router);
   private textService = inject(TextService);
 
-  loginForm!: FormGroup;
-  isSubmitting = false;
-  messages: string[] = [];
+  $loginForm!: FormGroup;
+  $isSubmitting = signal<boolean>(false);
+  $messages = signal<string[]>([]);
 
   ngOnInit(): void {
-    this.loginForm = this.formBuilder.group({
+    this.$loginForm = this.formBuilder.group({
       email: ["", [Validators.required, Validators.email]],
       password: ["", [Validators.required, Validators.minLength(8)]]
     });
   }
 
   getErrorMessage(field: string): string | null {
-    const control = this.loginForm.get(field);
+    const control = this.$loginForm.get(field);
 
     if (!control || !control.touched || !control.invalid) return "";
     if (control.errors?.["required"])
@@ -47,21 +47,21 @@ export class LoginComponent implements OnInit {
   }
 
   async onSubmit(): Promise<void> {
-    if (this.isSubmitting) return;
-    if (this.messages.length != 0) this.messages = [];
-    if (this.loginForm.invalid) return;
+    if (this.$isSubmitting()) return;
+    if (this.$messages.length != 0) this.$messages.set([]);
+    if (this.$loginForm.invalid) return;
 
-    this.isSubmitting = true;
+    this.$isSubmitting.set(true);
 
     const request: LoginRequest = {
-      email: this.loginForm.value.email,
-      password: this.loginForm.value.password
+      email: this.$loginForm.value.email,
+      password: this.$loginForm.value.password
     };
 
     this.authService.login(request).subscribe({
       next: (response) => {
         this.authService.acceptAuthResponse(response);
-        this.isSubmitting = false;
+        this.$isSubmitting.set(false);
 
         this.router.navigate(["/"]).then(() => {
           this.messageService.add({
@@ -73,10 +73,10 @@ export class LoginComponent implements OnInit {
         })
       },
       error: (response: ErrorResponse) => {
-        this.messages = response.error?.messages || [
+        this.$messages.set(response.error?.messages || [
           "Failed to log you in, please try again..."
-        ];
-        this.isSubmitting = false;
+        ]);
+        this.$isSubmitting.set(false);
       }
     });
   }
