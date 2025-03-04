@@ -11,7 +11,7 @@ public static class DataEntryEndpoints
     public static void MapDataEntryEndpoints(this RouteGroupBuilder builder)
     {
         builder.MapPost(
-            string.Empty,
+            String.Empty,
             async (
                 [FromBody] DataEntryCreateRequest request,
                 IDataEntryService dataEntryService,
@@ -84,7 +84,7 @@ public static class DataEntryEndpoints
         );
 
         builder.MapGet(
-            string.Empty,
+            String.Empty,
             async (
                 int dataTypeId,
                 IDataEntryService dataEntryService,

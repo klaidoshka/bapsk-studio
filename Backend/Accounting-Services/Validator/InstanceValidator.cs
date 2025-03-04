@@ -26,7 +26,7 @@ public class InstanceValidator : IInstanceValidator
             return new Validation("Instance creator was not found.");
         }
 
-        if (string.IsNullOrWhiteSpace(request.Name))
+        if (String.IsNullOrWhiteSpace(request.Name))
         {
             return new Validation("Instance must have a name.");
         }
@@ -64,7 +64,7 @@ public class InstanceValidator : IInstanceValidator
             return new Validation("Instance was not found.");
         }
 
-        if (string.IsNullOrWhiteSpace(request.Name))
+        if (String.IsNullOrWhiteSpace(request.Name))
         {
             return new Validation("Instance must have a name.");
         }

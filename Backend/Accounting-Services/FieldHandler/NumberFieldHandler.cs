@@ -3,26 +3,26 @@ using Accounting.Contract.Response;
 
 namespace Accounting.Services.FieldHandler;
 
-public class IntFieldHandler() : FieldHandler(FieldType.Int)
+public class NumberFieldHandler() : FieldHandler(FieldType.Number)
 {
     public override object Deserialize(string value)
     {
-        return ToInt(value);
+        return ToDouble(value);
     }
 
     public override string Serialize(object value)
     {
-        return ToInt(value).ToString();
+        return ToDouble(value).ToString();
     }
 
-    private static int ToInt(object value)
+    private static double ToDouble(object value)
     {
         return value switch
         {
+            double doubleValue => doubleValue,
             int intValue => intValue,
-            double doubleValue => (int)doubleValue,
-            string stringValue => int.Parse(stringValue),
-            _ => throw new InvalidOperationException("Value cannot be deserialized to an int.")
+            string stringValue => Double.Parse(stringValue),
+            _ => throw new InvalidOperationException("Value cannot be deserialized to a decimal.")
         };
     }
 
@@ -30,7 +30,7 @@ public class IntFieldHandler() : FieldHandler(FieldType.Int)
     {
         try
         {
-            ToInt(value);
+            ToDouble(value);
 
             return new Validation();
         }

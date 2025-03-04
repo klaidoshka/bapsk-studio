@@ -38,19 +38,25 @@ public interface IDataEntryValidator
     /// </summary>
     /// <param name="request">Request to process</param>
     /// <returns>Validation result</returns>
-    public Task<Validation> ValidateDataEntryGetByDataTypeRequestAsync(DataEntryGetByDataTypeRequest request);
+    public Task<Validation> ValidateDataEntryGetByDataTypeRequestAsync(
+        DataEntryGetByDataTypeRequest request
+    );
 
     /// <summary>
     /// Validates the data type field create request.
     /// </summary>
     /// <param name="request">Request to process</param>
     /// <returns>Validation result</returns>
-    public Task<Validation> ValidateDataEntryFieldCreateRequestAsync(DataEntryFieldCreateRequest request);
+    public Task<Validation> ValidateDataEntryFieldCreateRequestAsync(
+        DataEntryFieldCreateRequest request
+    );
 
     /// <summary>
     /// Validates the data type field edit request.
     /// </summary>
     /// <param name="request">Request to process</param>
     /// <returns>Validation result</returns>
-    public Task<Validation> ValidateDataEntryFieldEditRequestAsync(DataEntryFieldEditRequest request);
+    public Task<Validation> ValidateDataEntryFieldEditRequestAsync(
+        DataEntryFieldEditRequest request
+    );
 }

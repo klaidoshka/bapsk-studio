@@ -78,7 +78,10 @@ builder.Services.ConfigureHttpJsonOptions(
     json =>
     {
         json.SerializerOptions.PropertyNameCaseInsensitive = true;
-        json.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+
+        json.SerializerOptions.Converters.Add(
+            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+        );
     }
 );
 

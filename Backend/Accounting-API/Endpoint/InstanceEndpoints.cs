@@ -11,7 +11,7 @@ public static class InstanceEndpoints
     public static void MapInstanceEndpoints(this RouteGroupBuilder builder)
     {
         builder.MapPost(
-            string.Empty,
+            String.Empty,
             async (
                 [FromBody] InstanceCreateRequest request,
                 HttpRequest httpRequest,
@@ -84,7 +84,7 @@ public static class InstanceEndpoints
         );
 
         builder.MapGet(
-            string.Empty,
+            String.Empty,
             async (
                 HttpRequest httpRequest,
                 IJwtService jwtService,
@@ -105,7 +105,7 @@ public static class InstanceEndpoints
     public static void MapInstanceMetaEndpoints(this RouteGroupBuilder builder)
     {
         builder.MapPost(
-            string.Empty,
+            String.Empty,
             async (
                 [FromBody] InstanceUserMetaCreateRequest request,
                 HttpRequest httpRequest,
@@ -159,7 +159,7 @@ public static class InstanceEndpoints
         );
 
         builder.MapGet(
-            string.Empty,
+            String.Empty,
             async (
                 int instanceId,
                 HttpRequest httpRequest,

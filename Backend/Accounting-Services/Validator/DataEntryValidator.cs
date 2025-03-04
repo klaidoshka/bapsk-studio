@@ -17,10 +17,13 @@ public class DataEntryValidator : IDataEntryValidator
         _fieldTypeValidator = fieldTypeValidator;
     }
 
-    public async Task<Validation> ValidateDataEntryCreateRequestAsync(DataEntryCreateRequest request)
+    public async Task<Validation> ValidateDataEntryCreateRequestAsync(
+        DataEntryCreateRequest request
+    )
     {
         var dataType = await _database.DataTypes
             .Include(dt => dt.Instance)
+            .Include(dt => dt.Fields)
             .FirstOrDefaultAsync(dt => dt.Id == request.DataTypeId);
 
         if (dataType == null)
@@ -42,10 +45,26 @@ public class DataEntryValidator : IDataEntryValidator
             );
         }
 
+        var requestFieldsById = request.Fields.ToDictionary(f => f.DataTypeFieldId);
+
+        var missingFields = dataType.Fields
+            .Where(
+                f =>
+                    !requestFieldsById.ContainsKey(f.Id) &&
+                    f.IsRequired &&
+                    f.DefaultValue == null
+            )
+            .Select(field => $"Field with id {field.Id} is required, but not provided.")
+            .ToList();
+
+        failures.AddRange(missingFields);
+
         return new Validation(failures);
     }
 
-    public async Task<Validation> ValidateDataEntryDeleteRequestAsync(DataEntryDeleteRequest request)
+    public async Task<Validation> ValidateDataEntryDeleteRequestAsync(
+        DataEntryDeleteRequest request
+    )
     {
         var dataEntry = await _database.DataEntries
             .Include(de => de.DataType)
@@ -109,7 +128,9 @@ public class DataEntryValidator : IDataEntryValidator
             : new Validation();
     }
 
-    public async Task<Validation> ValidateDataEntryGetByDataTypeRequestAsync(DataEntryGetByDataTypeRequest request)
+    public async Task<Validation> ValidateDataEntryGetByDataTypeRequestAsync(
+        DataEntryGetByDataTypeRequest request
+    )
     {
         var dataType = await _database.DataTypes
             .Include(dt => dt.Instance)
@@ -126,7 +147,9 @@ public class DataEntryValidator : IDataEntryValidator
             : new Validation();
     }
 
-    public async Task<Validation> ValidateDataEntryFieldCreateRequestAsync(DataEntryFieldCreateRequest request)
+    public async Task<Validation> ValidateDataEntryFieldCreateRequestAsync(
+        DataEntryFieldCreateRequest request
+    )
     {
         var dataTypeField = await _database.DataTypeFields
             .Include(f => f.DataType)
@@ -142,19 +165,14 @@ public class DataEntryValidator : IDataEntryValidator
         );
     }
 
-    public async Task<Validation> ValidateDataEntryFieldEditRequestAsync(DataEntryFieldEditRequest request)
+    public async Task<Validation> ValidateDataEntryFieldEditRequestAsync(
+        DataEntryFieldEditRequest request
+    )
     {
-        var dataTypeField = await _database.DataTypeFields
-            .Include(f => f.DataType)
-            .FirstOrDefaultAsync(f => f.Id == request.DataEntryFieldId);
-
-        if (dataTypeField == null)
-        {
-            return new Validation($"Field with id {request.DataEntryFieldId} not found.");
-        }
-
         var dataEntry = await _database.DataEntryFields
             .Include(def => def.DataTypeField)
+            .ThenInclude(dtf => dtf.DataType)
+            .ThenInclude(dt => dt.Fields)
             .FirstOrDefaultAsync(de => de.Id == request.DataEntryFieldId);
 
         if (dataEntry == null)
@@ -162,9 +180,14 @@ public class DataEntryValidator : IDataEntryValidator
             return new Validation("Data entry field not found.");
         }
 
-        if (dataTypeField.DataType.Id != dataEntry.DataTypeField.DataTypeId)
+        var dataTypeField = dataEntry.DataTypeField.DataType.Fields
+            .FirstOrDefault(f => f.Id == dataEntry.DataTypeFieldId);
+
+        if (dataTypeField == null)
         {
-            return new Validation($"Field with id {request.DataEntryFieldId} does not belong to the expected data type.");
+            return new Validation(
+                $"Field with id {request.DataEntryFieldId} does not belong to the expected data type."
+            );
         }
 
         return new Validation(

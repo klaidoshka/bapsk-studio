@@ -39,13 +39,13 @@ public class DataEntryService : IDataEntryService
 
         foreach (var field in dataType.Fields)
         {
-            if (requestFieldsById.TryGetValue(field.Id, out var value))
+            if (requestFieldsById.TryGetValue(field.Id, out var requestField))
             {
                 fields.Add(
                     new DataEntryField
                     {
                         DataTypeField = field,
-                        Value = _fieldTypeService.Serialize(field.Type, value)
+                        Value = _fieldTypeService.Serialize(field.Type, requestField.Value)
                     }
                 );
             }
@@ -108,9 +108,10 @@ public class DataEntryService : IDataEntryService
 
         foreach (var field in entry.Fields)
         {
-            if (requestFieldsById.TryGetValue(field.DataTypeFieldId, out var value))
+            if (requestFieldsById.TryGetValue(field.Id, out var requestField))
             {
-                field.Value = _fieldTypeService.Serialize(field.DataTypeField.Type, value);
+                field.Value =
+                    _fieldTypeService.Serialize(field.DataTypeField.Type, requestField.Value);
             }
             else
             {
@@ -128,18 +129,66 @@ public class DataEntryService : IDataEntryService
     {
         (await _dataEntryValidator.ValidateDataEntryGetRequestAsync(request)).AssertValid();
 
-        return await _database.DataEntries
+        var candidate = await _database.DataEntries
             .Include(de => de.Fields)
+            .ThenInclude(f => f.DataTypeField)
+            .Include(de => de.DataType)
+            .ThenInclude(dt => dt.Fields)
             .FirstAsync(de => de.Id == request.DataEntryId);
+
+        var fieldsById = candidate.Fields.ToDictionary(f => f.DataTypeFieldId);
+
+        foreach (var field in candidate.DataType.Fields)
+        {
+            if (!fieldsById.ContainsKey(field.Id))
+            {
+                candidate.Fields.Add(
+                    new DataEntryField
+                    {
+                        DataTypeField = field,
+                        Value = field.DefaultValue ?? String.Empty
+                    }
+                );
+            }
+        }
+
+        return candidate;
     }
 
-    public async Task<IEnumerable<DataEntry>> GetByDataTypeIdAsync(DataEntryGetByDataTypeRequest request)
+    public async Task<IEnumerable<DataEntry>> GetByDataTypeIdAsync(
+        DataEntryGetByDataTypeRequest request
+    )
     {
-        (await _dataEntryValidator.ValidateDataEntryGetByDataTypeRequestAsync(request)).AssertValid();
+        (await _dataEntryValidator.ValidateDataEntryGetByDataTypeRequestAsync(request))
+            .AssertValid();
 
-        return await _database.DataEntries
+        var candidates = await _database.DataEntries
             .Include(de => de.Fields)
+            .ThenInclude(f => f.DataTypeField)
+            .Include(de => de.DataType)
+            .ThenInclude(dt => dt.Fields)
             .Where(de => de.DataTypeId == request.DataTypeId && !de.IsDeleted)
             .ToListAsync();
+
+        foreach (var candidate in candidates)
+        {
+            var fieldsById = candidate.Fields.ToDictionary(f => f.DataTypeFieldId);
+
+            foreach (var field in candidate.DataType.Fields)
+            {
+                if (!fieldsById.ContainsKey(field.Id))
+                {
+                    candidate.Fields.Add(
+                        new DataEntryField
+                        {
+                            DataTypeField = field,
+                            Value = field.DefaultValue ?? String.Empty
+                        }
+                    );
+                }
+            }
+        }
+
+        return candidates;
     }
 }

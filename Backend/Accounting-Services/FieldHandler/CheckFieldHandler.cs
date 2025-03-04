@@ -20,7 +20,7 @@ public class CheckFieldHandler() : FieldHandler(FieldType.Check)
         return value switch
         {
             bool booleanValue => booleanValue,
-            string stringValue => bool.TryParse(stringValue, out var candidate)
+            string stringValue => Boolean.TryParse(stringValue, out var candidate)
                 ? candidate
                 : throw new InvalidOperationException("Value cannot be deserialized to a boolean."),
             _ => throw new InvalidOperationException("Value cannot be deserialized to a boolean.")

@@ -56,7 +56,8 @@ public class AuthService : IAuthService
         {
             AccessToken = _jwtService.GenerateAccessToken(user, sessionId),
             RefreshToken = _jwtService.GenerateRefreshToken(user, sessionId),
-            RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.RefreshTokenExpiryMinutes),
+            RefreshTokenExpiresAt =
+                DateTime.UtcNow.AddMinutes(_jwtSettings.RefreshTokenExpiryMinutes),
             User = user
         };
 
@@ -116,7 +117,8 @@ public class AuthService : IAuthService
         {
             AccessToken = _jwtService.GenerateAccessToken(session.User, session.Id),
             RefreshToken = _jwtService.GenerateRefreshToken(session.User, session.Id),
-            RefreshTokenExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.RefreshTokenExpiryMinutes),
+            RefreshTokenExpiresAt =
+                DateTime.UtcNow.AddMinutes(_jwtSettings.RefreshTokenExpiryMinutes),
             User = session.User
         };
 

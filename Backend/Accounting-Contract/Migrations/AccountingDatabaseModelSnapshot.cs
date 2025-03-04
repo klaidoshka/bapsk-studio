@@ -56,7 +56,7 @@ namespace Accounting.Contract.Migrations
 
                     b.HasIndex("ModifiedById");
 
-                    b.ToTable("DataEntries");
+                    b.ToTable("DataEntries", (string)null);
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.DataEntryField", b =>
@@ -84,7 +84,7 @@ namespace Accounting.Contract.Migrations
 
                     b.HasIndex("DataTypeFieldId");
 
-                    b.ToTable("DataEntryFields");
+                    b.ToTable("DataEntryFields", (string)null);
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.DataType", b =>
@@ -114,7 +114,7 @@ namespace Accounting.Contract.Migrations
 
                     b.HasIndex("InstanceId");
 
-                    b.ToTable("DataTypes");
+                    b.ToTable("DataTypes", (string)null);
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.DataTypeField", b =>
@@ -146,7 +146,7 @@ namespace Accounting.Contract.Migrations
 
                     b.HasIndex("DataTypeId");
 
-                    b.ToTable("DataTypeFields");
+                    b.ToTable("DataTypeFields", (string)null);
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.Instance", b =>
@@ -175,7 +175,7 @@ namespace Accounting.Contract.Migrations
 
                     b.HasIndex("CreatedById");
 
-                    b.ToTable("Instances");
+                    b.ToTable("Instances", (string)null);
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.InstanceUserMeta", b =>
@@ -198,7 +198,7 @@ namespace Accounting.Contract.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("InstanceUserMetas");
+                    b.ToTable("InstanceUserMetas", (string)null);
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.SaleTaxFreeDeclaration", b =>
@@ -212,7 +212,7 @@ namespace Accounting.Contract.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SaleTaxFreeDeclarations");
+                    b.ToTable("SaleTaxFreeDeclarations", (string)null);
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.Session", b =>
@@ -247,7 +247,7 @@ namespace Accounting.Contract.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Sessions");
+                    b.ToTable("Sessions", (string)null);
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.User", b =>
@@ -292,7 +292,7 @@ namespace Accounting.Contract.Migrations
                     b.HasIndex("EmailNormalized")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.DataEntry", b =>

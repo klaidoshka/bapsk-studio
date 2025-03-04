@@ -45,7 +45,10 @@ public static class ProgramExtensions
     /// <param name="section">To bind onto configuration</param>
     /// <typeparam name="TConfiguration">Configuration class type</typeparam>
     /// <returns>Configuration instance</returns>
-    public static TConfiguration AddConfiguration<TConfiguration>(this WebApplicationBuilder builder, string section)
+    public static TConfiguration AddConfiguration<TConfiguration>(
+        this WebApplicationBuilder builder,
+        string section
+    )
         where TConfiguration : class
     {
         var configuration = builder.Configuration.GetSection(section).Get<TConfiguration>();
@@ -66,7 +69,10 @@ public static class ProgramExtensions
     /// <param name="services">To add database context to</param>
     /// <param name="databaseOptions">Configuration of database</param>
     /// <exception cref="NotSupportedException">If unsupported database dialect is used</exception>
-    public static void AddDbContext(this IServiceCollection services, DatabaseOptions databaseOptions)
+    public static void AddDbContext(
+        this IServiceCollection services,
+        DatabaseOptions databaseOptions
+    )
     {
         services.AddDbContext<AccountingDatabase>(
             optionsBuilder =>
@@ -113,7 +119,7 @@ public static class ProgramExtensions
             .MapUserEndpoints();
 
         var accountingRouteGroup = apiRouteGroup.MapGroup("/accounting");
-        
+
         accountingRouteGroup
             .MapGroup("/data-entry")
             .MapDataEntryEndpoints();

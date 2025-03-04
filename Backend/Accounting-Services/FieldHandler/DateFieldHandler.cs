@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Response;
@@ -6,13 +7,40 @@ namespace Accounting.Services.FieldHandler;
 
 public class DateFieldHandler() : FieldHandler(FieldType.Date)
 {
+    private static readonly string[] DateFormats =
+    [
+        "yyyy-MM-dd",
+        "MM/dd/yyyy",
+        "dd-MM-yyyy",
+        "yyyy/MM/dd",
+        "dd/MM/yyyy",
+        "yyyy.MM.dd",
+        "dd.MM.yyyy",
+        "yyyy MM dd",
+        "dd MM yyyy",
+        "yyyy-MM-ddTHH:mm:ssZ",
+        "yyyy-MM-ddTHH:mm:ss.fffZ",
+        "yyyy-MM-ddTHH:mm:sszzz",
+        "yyyy-MM-ddTHH:mm:ss.fffzzz",
+        "yyyy-MM-ddTHH:mm:ss",
+        "yyyy-MM-dd HH:mm:ss",
+        "MM/dd/yyyy HH:mm:ss",
+        "dd-MM-yyyy HH:mm:ss",
+        "yyyy/MM/dd HH:mm:ss",
+        "dd/MM/yyyy HH:mm:ss",
+        "yyyy.MM.dd HH:mm:ss",
+        "dd.MM.yyyy HH:mm:ss",
+        "yyyy MM dd HH:mm:ss",
+        "dd MM yyyy HH:mm:ss"
+    ];
+
     public override object Deserialize(string value)
     {
         try
         {
-            return JsonSerializer.Deserialize<DateTime>(value);
+            return ToDateTime(value)!.Value;
         }
-        catch (JsonException e)
+        catch (Exception e)
         {
             throw new InvalidOperationException("Value cannot be deserialized to a date.", e);
         }
@@ -20,20 +48,30 @@ public class DateFieldHandler() : FieldHandler(FieldType.Date)
 
     public override string Serialize(object value)
     {
-        return JsonSerializer.Serialize(ToDateTime(value));
+        return ToDateTime(value)!.Value.ToString("u");
     }
 
     private static DateTime? ToDateTime(object value)
     {
-        return value switch
+        var dateTime = value switch
         {
-            DateTime dateTimeValue => dateTimeValue,
-            DateOnly dateOnlyValue => dateOnlyValue.ToDateTime(TimeOnly.MinValue),
-            string stringValue => DateTime.TryParse(stringValue, out var candidate)
+            JsonElement jsonElement => jsonElement.ValueKind == JsonValueKind.String
+                ? ToDateTime(jsonElement.GetString()!)
+                : null,
+            string stringValue => DateTime.TryParseExact(
+                stringValue,
+                DateFormats,
+                DateTimeFormatInfo.InvariantInfo,
+                DateTimeStyles.AdjustToUniversal,
+                out var candidate
+            )
                 ? candidate
-                : throw new InvalidOperationException("Value cannot be deserialized to a date."),
-            _ => throw new InvalidOperationException("Value cannot be deserialized to a date.")
+                : null,
+            _ => null
         };
+
+        return dateTime ??
+               throw new InvalidOperationException("Value cannot be converted to a date.");
     }
 
     public override Validation Validate(object value)

@@ -31,7 +31,7 @@ public class DataTypeValidator : IDataTypeValidator
             return new Validation("You are not allowed to create data types in this instance.");
         }
 
-        if (string.IsNullOrWhiteSpace(request.Name))
+        if (String.IsNullOrWhiteSpace(request.Name))
         {
             return new Validation("Data type name is required.");
         }
@@ -56,7 +56,7 @@ public class DataTypeValidator : IDataTypeValidator
 
         var failures = new List<string>();
 
-        if (request.Fields.Any(f => string.IsNullOrWhiteSpace(f.Name)))
+        if (request.Fields.Any(f => String.IsNullOrWhiteSpace(f.Name)))
         {
             failures.Add("Field must have a name.");
         }
@@ -69,7 +69,7 @@ public class DataTypeValidator : IDataTypeValidator
 
         if (duplicates.Count != 0)
         {
-            failures.Add($"Duplicate field names: {string.Join(", ", duplicates)}");
+            failures.Add($"Duplicate field names: {String.Join(", ", duplicates)}");
         }
 
         failures.AddRange(
@@ -115,7 +115,7 @@ public class DataTypeValidator : IDataTypeValidator
             return new Validation("You are not allowed to edit this data type.");
         }
 
-        if (string.IsNullOrWhiteSpace(request.Name))
+        if (String.IsNullOrWhiteSpace(request.Name))
         {
             return new Validation("Data type name is required.");
         }
@@ -136,7 +136,7 @@ public class DataTypeValidator : IDataTypeValidator
 
         var failures = new List<string>();
 
-        if (request.Fields.Any(f => string.IsNullOrWhiteSpace(f.Name)))
+        if (request.Fields.Any(f => String.IsNullOrWhiteSpace(f.Name)))
         {
             failures.Add("Field must have a name.");
         }
@@ -149,7 +149,7 @@ public class DataTypeValidator : IDataTypeValidator
 
         if (duplicates.Count != 0)
         {
-            failures.Add($"Duplicate field names: {string.Join(", ", duplicates)}");
+            failures.Add($"Duplicate field names: {String.Join(", ", duplicates)}");
         }
 
         failures.AddRange(
@@ -177,7 +177,9 @@ public class DataTypeValidator : IDataTypeValidator
             : new Validation();
     }
 
-    public async Task<Validation> ValidateDataTypeGetByInstanceRequestAsync(DataTypeGetByInstanceRequest request)
+    public async Task<Validation> ValidateDataTypeGetByInstanceRequestAsync(
+        DataTypeGetByInstanceRequest request
+    )
     {
         var instance = await _database.Instances.FindAsync(request.InstanceId);
 
@@ -196,7 +198,8 @@ public class DataTypeValidator : IDataTypeValidator
         if (request.DefaultValue is not null)
         {
             return new Validation(
-                _fieldTypeValidator.ValidateValue(request.Type, request.DefaultValue).FailureMessages
+                _fieldTypeValidator.ValidateValue(request.Type, request.DefaultValue)
+                    .FailureMessages
             );
         }
 
@@ -208,7 +211,8 @@ public class DataTypeValidator : IDataTypeValidator
         if (request.DefaultValue is not null)
         {
             return new Validation(
-                _fieldTypeValidator.ValidateValue(request.Type, request.DefaultValue).FailureMessages
+                _fieldTypeValidator.ValidateValue(request.Type, request.DefaultValue)
+                    .FailureMessages
             );
         }
 

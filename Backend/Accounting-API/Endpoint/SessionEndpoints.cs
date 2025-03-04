@@ -9,6 +9,27 @@ public static class SessionEndpoints
 {
     public static void MapSessionEndpoints(this RouteGroupBuilder builder)
     {
+        builder.MapDelete(
+            "{id:guid}",
+            async (
+                Guid id,
+                HttpRequest httpRequest,
+                IJwtService jwtService,
+                ISessionService sessionService
+            ) =>
+            {
+                await sessionService.DeleteAsync(
+                    new SessionDeleteRequest
+                    {
+                        RequesterId = await httpRequest.GetUserIdAsync(jwtService),
+                        SessionId = id
+                    }
+                );
+
+                return Results.Ok();
+            }
+        );
+
         builder.MapGet(
             "{id:guid}",
             async (
@@ -28,7 +49,7 @@ public static class SessionEndpoints
         );
 
         builder.MapGet(
-            string.Empty,
+            String.Empty,
             async (
                 HttpRequest httpRequest,
                 IJwtService jwtService,

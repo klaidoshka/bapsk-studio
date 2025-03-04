@@ -35,13 +35,34 @@ public class ExceptionHandlingMiddleware : IMiddleware
 
         var exceptionResponse = exception switch
         {
-            ApplicationException _ => new ExceptionResponse(HttpStatusCode.BadRequest, "Application exception occurred."),
-            ArgumentException _ => new ExceptionResponse(HttpStatusCode.NotFound, "The request had invalid arguments."),
-            BadHttpRequestException _ => new ExceptionResponse(HttpStatusCode.NotAcceptable, "The request was not acceptable."),
-            KeyNotFoundException _ => new ExceptionResponse(HttpStatusCode.NotFound, "The requested resource was not found."),
-            UnauthorizedAccessException _ => new ExceptionResponse(HttpStatusCode.Unauthorized, "Unauthorized."),
-            ValidationException it => new ExceptionResponse(HttpStatusCode.BadRequest, it.Validation.FailureMessages),
-            _ => new ExceptionResponse(HttpStatusCode.InternalServerError, "Internal server error, please try again later.")
+            ApplicationException _ => new ExceptionResponse(
+                HttpStatusCode.BadRequest,
+                "Application exception occurred."
+            ),
+            ArgumentException _ => new ExceptionResponse(
+                HttpStatusCode.NotFound,
+                "The request had invalid arguments."
+            ),
+            BadHttpRequestException _ => new ExceptionResponse(
+                HttpStatusCode.NotAcceptable,
+                "The request was not acceptable."
+            ),
+            KeyNotFoundException _ => new ExceptionResponse(
+                HttpStatusCode.NotFound,
+                "The requested resource was not found."
+            ),
+            UnauthorizedAccessException _ => new ExceptionResponse(
+                HttpStatusCode.Unauthorized,
+                "Unauthorized."
+            ),
+            ValidationException it => new ExceptionResponse(
+                HttpStatusCode.BadRequest,
+                it.Validation.FailureMessages
+            ),
+            _ => new ExceptionResponse(
+                HttpStatusCode.InternalServerError,
+                "Internal server error, please try again later."
+            )
         };
 
         context.Response.StatusCode = exceptionResponse.StatusCode;

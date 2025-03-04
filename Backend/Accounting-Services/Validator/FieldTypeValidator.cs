@@ -29,7 +29,10 @@ public class FieldTypeValidator : IFieldTypeValidator
             : handler.Validate(value);
     }
 
-    public Validation ValidateValues(ICollection<DataTypeField> fields, IDictionary<int, object> values)
+    public Validation ValidateValues(
+        ICollection<DataTypeField> fields,
+        IDictionary<int, object> values
+    )
     {
         var failures = new List<string>();
 
@@ -38,6 +41,7 @@ public class FieldTypeValidator : IFieldTypeValidator
             if (field.IsRequired && !values.ContainsKey(field.Id))
             {
                 failures.Add($"Field {field.Name} is required.");
+
                 continue;
             }
 

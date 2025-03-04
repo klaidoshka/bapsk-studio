@@ -18,6 +18,17 @@ public class SessionService : ISessionService
         _sessionValidator = sessionValidator;
     }
 
+    public async Task DeleteAsync(SessionDeleteRequest request)
+    {
+        (await _sessionValidator.ValidateSessionDeleteRequestAsync(request)).AssertValid();
+
+        var session = await _database.Sessions.FirstAsync(s => s.Id == request.SessionId);
+
+        _database.Sessions.Remove(session);
+
+        await _database.SaveChangesAsync();
+    }
+
     public async Task<Session> GetAsync(SessionGetRequest request)
     {
         (await _sessionValidator.ValidateSessionGetRequestAsync(request)).AssertValid();

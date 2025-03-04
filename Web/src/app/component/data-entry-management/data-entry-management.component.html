@@ -1,0 +1,68 @@
+<p-dialog
+  header="Data Type Management"
+  closeOnEscape="true"
+  modal="true"
+  closable="true"
+  [(visible)]="isShown"
+  (onHide)="hide()"
+  (close)="hide()"
+>
+  <div class="min-w-128">
+    <div class="my-2">
+      <app-messages-showcase [messages]="messages()"/>
+    </div>
+
+    <div
+      class="grid grid-cols-1 gap-4"
+      [formGroup]="form"
+    >
+      @for (field of $formFields; track $index) {
+        <div>
+          <label
+            [for]="field.field"
+            class="block text-sm font-medium text-gray-700"
+          >{{ field.field }}</label>
+
+          @switch (field.type) {
+            @case (FieldType.Check) {
+              <p-check-box
+                [formControlName]="field.field"
+                [id]="field.field"
+                binary="true"
+                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              ></p-check-box>
+            }
+            @case (FieldType.Date) {
+              <p-datePicker
+                [formControlName]="field.field"
+                [id]="field.field"
+                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              ></p-datePicker>
+            }
+            @default {
+              <input
+                [formControlName]="field.field"
+                pInputText
+                [type]="field.type"
+                [id]="field.field"
+                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              />
+            }
+          }
+
+          @if (getErrorMessage(field.field); as error) {
+            <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="flex justify-end mt-4">
+      <p-button
+        label="Save"
+        [disabled]="!form.valid || !form.dirty"
+        (onClick)="save()"
+      ></p-button>
+    </div>
+  </div>
+</p-dialog>

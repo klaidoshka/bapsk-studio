@@ -18,7 +18,9 @@ public static class SubmitDeclaration
         };
     }
 
-    private static TFDeclaration_Type ToExternalType(this Contract.Sti.SubmitDeclaration.SubmitDeclaration type)
+    private static TFDeclaration_Type ToExternalType(
+        this Contract.Sti.SubmitDeclaration.SubmitDeclaration type
+    )
     {
         return new TFDeclaration_Type
         {
@@ -37,7 +39,7 @@ public static class SubmitDeclaration
             BirthDate = customer.BirthDate,
             FirstName = customer.FirstName,
             IdentityDocument = customer.IdentityDocument.ToExternalType(),
-            Item = (customer.ResidentCountryCode?.ConvertToEnum<NonEuCountryCode_Type>() as object)
+            Item = customer.ResidentCountryCode?.ConvertToEnum<NonEuCountryCode_Type>() as object
                    ?? customer.ResidentTerritory?.ToExternalType(),
             LastName = customer.LastName,
             OtherDocument = customer.OtherDocument.ToExternalType(),
@@ -45,7 +47,9 @@ public static class SubmitDeclaration
         };
     }
 
-    private static IdentityDocument_Type ToExternalType(this SubmitDeclarationIdentityDocument document)
+    private static IdentityDocument_Type ToExternalType(
+        this SubmitDeclarationIdentityDocument document
+    )
     {
         return new IdentityDocument_Type
         {
@@ -58,7 +62,9 @@ public static class SubmitDeclaration
         };
     }
 
-    private static Customer_TypeResTerritory ToExternalType(this SubmitDeclarationCustomerResidenceTerritory territory)
+    private static Customer_TypeResTerritory ToExternalType(
+        this SubmitDeclarationCustomerResidenceTerritory territory
+    )
     {
         return new Customer_TypeResTerritory
         {
@@ -67,7 +73,9 @@ public static class SubmitDeclaration
         };
     }
 
-    private static OtherDocument_Type[] ToExternalType(this IReadOnlyList<SubmitDeclarationOtherDocument> documents)
+    private static OtherDocument_Type[] ToExternalType(
+        this IReadOnlyList<SubmitDeclarationOtherDocument> documents
+    )
     {
         return documents
             .Select(
@@ -75,7 +83,8 @@ public static class SubmitDeclaration
                 {
                     DocNo = new OtherDocNo_Type
                     {
-                        issuedBy = document.DocumentNo.IssuedBy.ConvertToEnum<IsoCountryCode_Type>(),
+                        issuedBy =
+                            document.DocumentNo.IssuedBy.ConvertToEnum<IsoCountryCode_Type>(),
                         Value = document.DocumentNo.Value
                     },
                     DocType = document.DocumentType
@@ -99,7 +108,7 @@ public static class SubmitDeclaration
         {
             Affirmation = header.Affirmation.ConvertToEnum<DocHeader_TypeAffirmation>(),
             CompletionDate = header.CompletionDate,
-            DocCorrNo = header.DocumentCorrectionNo,
+            DocCorrNo = header.DocumentCorrectionNo.ToString(),
             DocId = header.DocumentId
         };
     }
@@ -131,14 +140,16 @@ public static class SubmitDeclaration
         };
     }
 
-    private static SalesDocument_Type[] ToExternalType(this IReadOnlyList<SubmitDeclarationSalesDocument> documents)
+    private static SalesDocument_Type[] ToExternalType(
+        this IReadOnlyList<SubmitDeclarationSalesDocument> documents
+    )
     {
         return documents
             .Select(
                 document => new SalesDocument_Type
                 {
                     Goods = document.Goods.ToExternalType(),
-                    Item = (document.CashRegisterReceipt?.ToExternalType() as object) ??
+                    Item = document.CashRegisterReceipt?.ToExternalType() as object ??
                            document.InvoiceNo,
                     SalesDate = document.SalesDate
                 }
@@ -166,7 +177,9 @@ public static class SubmitDeclaration
             .ToArray();
     }
 
-    private static CashRegisterReceipt_Type ToExternalType(this SubmitDeclarationCashRegisterReceipt receipt)
+    private static CashRegisterReceipt_Type ToExternalType(
+        this SubmitDeclarationCashRegisterReceipt receipt
+    )
     {
         return new CashRegisterReceipt_Type
         {
@@ -185,7 +198,7 @@ public static class SubmitDeclaration
             ResultDate = response.submitDeclarationResponse.ResultDate,
             ResultStatus = response.submitDeclarationResponse.ResultStatus
                 .ConvertToEnum<ResultStatus>(),
-            TransmissionId = response.submitDeclarationResponse.TransmissionID,
+            TransmissionId = response.submitDeclarationResponse.TransmissionID
         };
     }
 }

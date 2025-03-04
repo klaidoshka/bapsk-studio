@@ -7,4 +7,5 @@ import {RouterModule} from "@angular/router";
   templateUrl: "./auth-page.component.html",
   styleUrl: "./auth-page.component.scss"
 })
-export class AuthPageComponent {}
+export class AuthPageComponent {
+}

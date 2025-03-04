@@ -52,7 +52,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
           return throwError(() => error);
         }),
         catchError((error) => {
-          // Redirect to the login page if the refresh token fails
+          // Redirect to the auth-login page if the refresh token fails
           return authService.logout().pipe(
             switchMap(() => {
               router.navigate(["/auth/login"]);

@@ -38,7 +38,9 @@ public interface IDataTypeValidator
     /// </summary>
     /// <param name="request">Request to process</param>
     /// <returns>Validation result</returns>
-    public Task<Validation> ValidateDataTypeGetByInstanceRequestAsync(DataTypeGetByInstanceRequest request);
+    public Task<Validation> ValidateDataTypeGetByInstanceRequestAsync(
+        DataTypeGetByInstanceRequest request
+    );
 
     /// <summary>
     /// Validates the data type field create request.

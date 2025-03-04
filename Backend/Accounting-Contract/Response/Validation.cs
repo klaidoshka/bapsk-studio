@@ -8,7 +8,9 @@ public class Validation(IEnumerable<string>? failures)
     public IEnumerable<string> FailureMessages { get; } = failures ?? [];
 
     public Validation() : this([]) { }
+
     public Validation(string message) : this([message]) { }
+
     public Validation(bool valid) : this(valid ? [] : ["Validation failed"]) { }
 
     /// <summary>

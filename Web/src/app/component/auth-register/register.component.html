@@ -1,11 +1,11 @@
 <h2 class="text-2xl font-bold mb-4 text-gray-700">Register</h2>
 
-<form [formGroup]="$registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
   <!-- Display messages if any -->
-  @if ($messages().length > 0) {
+  @if (messages().length > 0) {
     <div class="mb-4">
       <ul class="list-disc list-inside text-red-500">
-        @for (message of $messages(); track $index) {
+        @for (message of messages(); track $index) {
           <li>{{ message }}</li>
         }
       </ul>
@@ -56,7 +56,7 @@
         inputId="birthDate"
         formControlName="birthDate"
         [showIcon]="true"
-        [maxDate]="$maxDate()"
+        [maxDate]="maxDate()"
         variant="filled"
         inputStyleClass="p-2 rounded-md"
         class="bg-surface-50 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
@@ -114,9 +114,8 @@
         optionLabel="name"
         placeholder="Select a Country"
         [dropdown]="true"
-        [suggestions]="$filteredCountries"
+        [suggestions]="filteredCountries"
         (completeMethod)="filterCountries($event)"
-        inputStyleClass="p-2 rounded-md"
         class="bg-surface-50 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
         required
       ></p-autocomplete>
@@ -135,9 +134,8 @@
       label="Register"
       icon="pi pi-check"
       iconPos="right"
-      [loading]="$isSubmitting()"
-      [disabled]="$registerForm.invalid"
-      class="md:w-auto pt-2 pb-2 pl-4 pr-4 rounded w-full bg-primary-300 hover:bg-primary-400"
+      [loading]="isSubmitting()"
+      [disabled]="registerForm.invalid"
     ></p-button>
   </div>
 </form>

@@ -1,6 +1,6 @@
 import {HttpClient} from "@angular/common/http";
-import {inject, Injectable} from "@angular/core";
-import {BehaviorSubject, finalize, Observable, of} from "rxjs";
+import {Injectable, Signal, signal} from "@angular/core";
+import {finalize, Observable, of} from "rxjs";
 import {AuthResponse, LoginRequest, RegisterRequest, User} from "../model/auth.model";
 import {ApiRouter} from "./api-router.service";
 
@@ -8,28 +8,35 @@ import {ApiRouter} from "./api-router.service";
   providedIn: "root"
 })
 export class AuthService {
-  private apiRouter = inject(ApiRouter);
-  private httpClient = inject(HttpClient);
   private accessTokenKey = "__accounting_accessToken__";
-  private stateSubject = new BehaviorSubject<boolean>(this.getAccessToken() !== null);
-  private userSubject = new BehaviorSubject<User | null>(null);
-  private isRefreshing = false;
+  private user = signal<User | null>(null);
+  private userAuthenticated = signal<boolean>(this.getAccessToken() !== null);
+  private userRefreshing = signal<boolean>(false);
+
+  constructor(
+    private apiRouter: ApiRouter,
+    private httpClient: HttpClient
+  ) {
+    if (this.userAuthenticated() && this.user() === null) {
+      
+    }
+  }
 
   acceptAuthResponse(response: AuthResponse): void {
     localStorage.setItem(this.accessTokenKey, response.accessToken);
-    this.userSubject.next(response.user);
-    this.stateSubject.next(true);
+    this.user.set(response.user);
+    this.userAuthenticated.set(true);
   }
 
   cleanupCredentials(): void {
     localStorage.removeItem(this.accessTokenKey);
 
-    if (this.stateSubject.value) {
-      this.stateSubject.next(false);
+    if (this.userAuthenticated()) {
+      this.userAuthenticated.set(false);
     }
 
-    if (this.userSubject.value) {
-      this.userSubject.next(null);
+    if (this.user() !== null) {
+      this.user.set(null);
     }
   }
 
@@ -37,53 +44,47 @@ export class AuthService {
     return localStorage.getItem(this.accessTokenKey);
   }
 
-  getUser(): Observable<User | null> {
-    return this.userSubject.asObservable();
+  getUser(): Signal<User | null> {
+    return this.user.asReadonly();
   }
 
-  getUserValue(): User | null {
-    return this.userSubject.value;
+  isAuthenticated(): Signal<boolean> {
+    return this.userAuthenticated.asReadonly();
   }
 
-  isAuthenticated(): Observable<boolean> {
-    return this.stateSubject.asObservable();
-  }
-
-  isAuthenticatedValue(): boolean {
-    return this.stateSubject.value;
-  }
-
-  isRefreshingAccess(): boolean {
-    return this.isRefreshing;
+  isRefreshingAccess(): Signal<boolean> {
+    return this.userRefreshing.asReadonly();
   }
 
   login(request: LoginRequest): Observable<AuthResponse> {
     return this.httpClient.post<AuthResponse>(
-        this.apiRouter.authLogin(),
-        request
+      this.apiRouter.authLogin(),
+      request
     );
   }
 
   logout(): Observable<void> {
-    if (!this.isAuthenticatedValue()) {
+    if (!this.userAuthenticated()) {
       return of();
     }
 
     return this.httpClient.post<void>(this.apiRouter.authLogout(), {}).pipe(
-        finalize(() => {
-          this.cleanupCredentials();
-        })
+      finalize(() => {
+        this.cleanupCredentials();
+      })
     );
   }
 
   markAsRefreshingAccess(isRefreshing: boolean): void {
-    this.isRefreshing = isRefreshing;
+    if (this.userRefreshing() !== isRefreshing) {
+      this.userRefreshing.set(isRefreshing);
+    }
   }
 
   register(request: RegisterRequest): Observable<AuthResponse> {
     return this.httpClient.post<AuthResponse>(
-        this.apiRouter.authRegister(),
-        request
+      this.apiRouter.authRegister(),
+      request
     );
   }
 

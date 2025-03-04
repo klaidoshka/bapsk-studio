@@ -47,7 +47,7 @@ public static class AuthEndpoints
                 {
                     var refreshToken = httpContext.Request.ToRefreshToken();
 
-                    if (string.IsNullOrWhiteSpace(refreshToken))
+                    if (String.IsNullOrWhiteSpace(refreshToken))
                     {
                         return Results.Unauthorized();
                     }
@@ -72,7 +72,7 @@ public static class AuthEndpoints
             {
                 var refreshToken = httpContext.Request.ToRefreshToken();
 
-                if (string.IsNullOrWhiteSpace(refreshToken))
+                if (String.IsNullOrWhiteSpace(refreshToken))
                 {
                     return Results.Unauthorized();
                 }

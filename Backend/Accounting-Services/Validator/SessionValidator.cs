@@ -14,6 +14,20 @@ public class SessionValidator : ISessionValidator
         _database = database;
     }
 
+    public async Task<Validation> ValidateSessionDeleteRequestAsync(SessionDeleteRequest request)
+    {
+        var session = await _database.Sessions.FindAsync(request.SessionId);
+
+        if (session == null)
+        {
+            return new Validation("Session not found.");
+        }
+
+        return session.UserId != request.RequesterId
+            ? new Validation("Session does not belong to you.")
+            : new Validation();
+    }
+
     public async Task<Validation> ValidateSessionGetRequestAsync(SessionGetRequest request)
     {
         var session = await _database.Sessions.FindAsync(request.SessionId);

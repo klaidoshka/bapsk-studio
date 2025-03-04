@@ -12,7 +12,10 @@ public class InstanceUserMetaService : IInstanceUserMetaService
     private readonly AccountingDatabase _database;
     private readonly IInstanceUserMetaValidator _instanceUserMetaValidator;
 
-    public InstanceUserMetaService(AccountingDatabase database, IInstanceUserMetaValidator instanceUserMetaValidator)
+    public InstanceUserMetaService(
+        AccountingDatabase database,
+        IInstanceUserMetaValidator instanceUserMetaValidator
+    )
     {
         _database = database;
         _instanceUserMetaValidator = instanceUserMetaValidator;
@@ -20,7 +23,8 @@ public class InstanceUserMetaService : IInstanceUserMetaService
 
     public async Task<InstanceUserMeta> CreateAsync(InstanceUserMetaCreateRequest request)
     {
-        (await _instanceUserMetaValidator.ValidateInstanceUserMetaCreateRequestAsync(request)).AssertValid();
+        (await _instanceUserMetaValidator.ValidateInstanceUserMetaCreateRequestAsync(request))
+            .AssertValid();
 
         var instance = await _database.Instances
             .Include(i => i.UserMetas)
@@ -41,7 +45,8 @@ public class InstanceUserMetaService : IInstanceUserMetaService
 
     public async Task DeleteAsync(InstanceUserMetaDeleteRequest request)
     {
-        (await _instanceUserMetaValidator.ValidateInstanceUserMetaDeleteRequestAsync(request)).AssertValid();
+        (await _instanceUserMetaValidator.ValidateInstanceUserMetaDeleteRequestAsync(request))
+            .AssertValid();
 
         var instanceUserMeta = await _database.InstanceUserMetas
             .Include(ium => ium.Instance)
@@ -54,14 +59,18 @@ public class InstanceUserMetaService : IInstanceUserMetaService
 
     public async Task<InstanceUserMeta> GetAsync(InstanceUserMetaGetRequest request)
     {
-        (await _instanceUserMetaValidator.ValidateInstanceUserMetaGetRequestAsync(request)).AssertValid();
+        (await _instanceUserMetaValidator.ValidateInstanceUserMetaGetRequestAsync(request))
+            .AssertValid();
 
         return (await _database.InstanceUserMetas.FindAsync(request.InstanceUserMetaId))!;
     }
 
-    public async Task<IEnumerable<InstanceUserMeta>> GetByInstanceIdAsync(InstanceUserMetaGetByInstanceRequest request)
+    public async Task<IEnumerable<InstanceUserMeta>> GetByInstanceIdAsync(
+        InstanceUserMetaGetByInstanceRequest request
+    )
     {
-        (await _instanceUserMetaValidator.ValidateInstanceUserMetaGetByInstanceRequestAsync(request)).AssertValid();
+        (await _instanceUserMetaValidator
+            .ValidateInstanceUserMetaGetByInstanceRequestAsync(request)).AssertValid();
 
         return await _database.InstanceUserMetas
             .Where(ium => ium.InstanceId == request.InstanceId)

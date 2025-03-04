@@ -30,5 +30,7 @@ public interface IInstanceUserMetaService
     /// </summary>
     /// <param name="request">Request to process</param>
     /// <returns>Instance's user metas</returns>
-    public Task<IEnumerable<InstanceUserMeta>> GetByInstanceIdAsync(InstanceUserMetaGetByInstanceRequest request);
+    public Task<IEnumerable<InstanceUserMeta>> GetByInstanceIdAsync(
+        InstanceUserMetaGetByInstanceRequest request
+    );
 }

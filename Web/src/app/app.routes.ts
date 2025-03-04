@@ -1,6 +1,6 @@
 import {Routes} from "@angular/router";
-import {LoginComponent} from "./component/login/login.component";
-import {RegisterComponent} from "./component/register/register.component";
+import {LoginComponent} from "./component/auth-login/login.component";
+import {RegisterComponent} from "./component/auth-register/register.component";
 import {AnonymousOnlyChildGuard, AnonymousOnlyGuard} from "./guard/anonymous-only.guard";
 import {
   AuthenticatedOnlyChildGuard,

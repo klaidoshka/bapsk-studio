@@ -108,6 +108,7 @@ public class DataTypeService : IDataTypeService
             field.Matched.DefaultValue = field.New.DefaultValue == null
                 ? null
                 : _fieldTypeService.Serialize(field.New.Type, field.New.DefaultValue);
+
             field.Matched.IsRequired = field.New.IsRequired;
             field.Matched.Name = field.New.Name;
             field.Matched.Type = field.New.Type;
@@ -150,7 +151,9 @@ public class DataTypeService : IDataTypeService
             .FirstAsync(dt => dt.Id == request.DataTypeId);
     }
 
-    public async Task<IEnumerable<DataType>> GetByInstanceIdAsync(DataTypeGetByInstanceRequest request)
+    public async Task<IEnumerable<DataType>> GetByInstanceIdAsync(
+        DataTypeGetByInstanceRequest request
+    )
     {
         (await _dataTypeValidator.ValidateDataTypeGetByInstanceRequestAsync(request)).AssertValid();
 

@@ -1,0 +1,12 @@
+@if (isAuthenticated()) {
+  <p-toast key="logout"/>
+
+  <app-confirmation
+    [key]='"logout-confirmation"'
+    [header]='"Are you really leaving now?"'
+  />
+
+  <div class="mx-4">
+    <p-menubar [model]="entries()"/>
+  </div>
+}

@@ -10,18 +10,26 @@ public class AccountingDatabaseFactory : IDesignTimeDbContextFactory<AccountingD
     public AccountingDatabase CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<AccountingDatabase>();
-        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLowerInvariant();
+
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+            ?.ToLowerInvariant();
+
         var isDevelopmentEnvironment = environment is null or "development";
-        var configurationFileName = isDevelopmentEnvironment ? "appsettings.Development.json" : "appsettings.json";
+
+        var configurationFileName = isDevelopmentEnvironment
+            ? "appsettings.Development.json"
+            : "appsettings.json";
 
         var configuration = new ConfigurationBuilder()
-            .AddJsonFile(Directory.GetCurrentDirectory() + $@"\..\Accounting-API\{configurationFileName}")
+            .AddJsonFile(
+                Directory.GetCurrentDirectory() + $@"\..\Accounting-API\{configurationFileName}"
+            )
             .Build();
 
         var databaseOptions = configuration.GetSection(nameof(DatabaseOptions));
         var connectionString = databaseOptions[nameof(DatabaseOptions.ConnectionString)];
 
-        if (string.IsNullOrWhiteSpace(connectionString))
+        if (String.IsNullOrWhiteSpace(connectionString))
         {
             throw new InvalidDataException("Connection string is missing");
         }
@@ -32,8 +40,8 @@ public class AccountingDatabaseFactory : IDesignTimeDbContextFactory<AccountingD
         ServerVersion version = dialect?.ToLowerInvariant() switch
         {
             "mariadb" => new MariaDbServerVersion(serverVersion),
-            "mysql"   => new MySqlServerVersion(serverVersion),
-            _         => throw new NotSupportedException("Database dialect not supported.")
+            "mysql" => new MySqlServerVersion(serverVersion),
+            _ => throw new NotSupportedException("Database dialect not supported.")
         };
 
         optionsBuilder.UseMySql(

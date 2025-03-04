@@ -8,9 +8,9 @@ public static class HttpRequestExtensions
 {
     private class HttpLocationResponse
     {
-        public string? City { get; set; } = string.Empty;
-        public string? Country { get; set; } = string.Empty;
-        public string? Region { get; set; } = string.Empty;
+        public string? City { get; set; } = String.Empty;
+        public string? Country { get; set; } = String.Empty;
+        public string? Region { get; set; } = String.Empty;
     }
 
     public static string? GetUserAgent(this HttpRequest request)
@@ -20,14 +20,14 @@ public static class HttpRequestExtensions
 
     public static string? GetIpAddress(this HttpRequest request)
     {
-        return request.HttpContext.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
+        return request.HttpContext.Connection.RemoteIpAddress?.ToString() ?? String.Empty;
     }
 
     public static async Task<string> GetLocationAsync(this HttpRequest request)
     {
         var ip = request.GetIpAddress();
 
-        if (string.IsNullOrEmpty(ip))
+        if (String.IsNullOrEmpty(ip))
         {
             return "Unknown";
         }
@@ -36,10 +36,14 @@ public static class HttpRequestExtensions
         var response = await httpClient.GetStringAsync($"https://ipinfo.io/{ip}/json");
         var location = JsonSerializer.Deserialize<HttpLocationResponse>(response);
 
-        return location == null ? "Unknown" : $"{location.City} ({location.Country} - {location.Region})";
+        return location == null
+            ? "Unknown"
+            : $"{location.City} ({location.Country} - {location.Region})";
     }
 
-    public static async Task<AuthRequestUserMeta> GetAuthRequestUserMetaAsync(this HttpRequest request)
+    public static async Task<AuthRequestUserMeta> GetAuthRequestUserMetaAsync(
+        this HttpRequest request
+    )
     {
         var agent = request.GetUserAgent();
         var ipAddress = request.GetIpAddress();

@@ -1,12 +1,18 @@
 <p-toast key="root"></p-toast>
 
-<header
-  class="flex items-center justify-between p-4 bg-white shadow-md sticky top-0 z-10">
+<header class="flex px-4 py-1 bg-white shadow-md sticky top-0 z-10">
   <div class="flex items-center space-x-4">
-    <a class="text-xl font-bold">Accounting</a>
+    <p
+      class="text-xl font-bold cursor-pointer hover:opacity-70"
+      routerLink="/"
+    >Accounting</p>
   </div>
 
-  <app-profile-dropdown/>
+  <div class="flex items-center space-x-4 ml-auto">
+    <app-instance-selector/>
+
+    <app-profile-dropdown/>
+  </div>
 </header>
 
 <main class="container mx-auto mt-4">

@@ -27,5 +27,8 @@ public interface IFieldTypeValidator
     /// <param name="fields">Fields</param>
     /// <param name="values">Values to be validated against field type</param>
     /// <returns>Validation result for values</returns>
-    public Validation ValidateValues(ICollection<DataTypeField> fields, IDictionary<int, object> values);
+    public Validation ValidateValues(
+        ICollection<DataTypeField> fields,
+        IDictionary<int, object> values
+    );
 }

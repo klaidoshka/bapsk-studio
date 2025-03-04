@@ -50,7 +50,9 @@ public static class QueryDeclaration
         };
     }
 
-    private static IReadOnlyList<QueryDeclarationsDeclaration> ToInternalType(this DeclList_Type declList)
+    private static IReadOnlyList<QueryDeclarationsDeclaration> ToInternalType(
+        this DeclList_Type declList
+    )
     {
         return declList
             .DeclListItem

@@ -13,7 +13,11 @@ public class AuthValidator : IAuthValidator
     private readonly IHashService _hashService;
     private readonly IJwtService _jwtService;
 
-    public AuthValidator(AccountingDatabase database, IHashService hashService, IJwtService jwtService)
+    public AuthValidator(
+        AccountingDatabase database,
+        IHashService hashService,
+        IJwtService jwtService
+    )
     {
         _database = database;
         _jwtService = jwtService;
@@ -24,12 +28,12 @@ public class AuthValidator : IAuthValidator
     {
         var failures = new List<string>();
 
-        if (string.IsNullOrWhiteSpace(meta.Agent))
+        if (String.IsNullOrWhiteSpace(meta.Agent))
         {
             failures.Add("Agent is required in authentication meta.");
         }
 
-        if (string.IsNullOrWhiteSpace(meta.IpAddress))
+        if (String.IsNullOrWhiteSpace(meta.IpAddress))
         {
             failures.Add("IP address is required in authentication meta.");
         }
@@ -50,12 +54,12 @@ public class AuthValidator : IAuthValidator
             failures.AddRange(ValidateAuthMeta(request.Meta).FailureMessages);
         }
 
-        if (string.IsNullOrWhiteSpace(request.Password))
+        if (String.IsNullOrWhiteSpace(request.Password))
         {
             failures.Add("Password is required.");
         }
 
-        if (string.IsNullOrWhiteSpace(request.Email))
+        if (String.IsNullOrWhiteSpace(request.Email))
         {
             failures.Add("Email is required.");
         }
@@ -76,12 +80,12 @@ public class AuthValidator : IAuthValidator
             failures.AddRange(ValidateAuthMeta(request.Meta).FailureMessages);
         }
 
-        if (string.IsNullOrWhiteSpace(request.Password))
+        if (String.IsNullOrWhiteSpace(request.Password))
         {
             failures.Add("Password is required.");
         }
 
-        if (string.IsNullOrWhiteSpace(request.Email))
+        if (String.IsNullOrWhiteSpace(request.Email))
         {
             failures.Add("Email is required.");
         }
@@ -99,15 +103,17 @@ public class AuthValidator : IAuthValidator
         }
 
         if (
-            string.IsNullOrWhiteSpace(request.Password) ||
+            String.IsNullOrWhiteSpace(request.Password) ||
             request.Password.Length < 7 ||
             request.Password.All(ch => request.Password[0] == ch)
         )
         {
-            failures.Add("Password must have at least 7 characters and be not a sequence of the same character.");
+            failures.Add(
+                "Password must have at least 7 characters and be not a sequence of the same character."
+            );
         }
 
-        if (string.IsNullOrWhiteSpace(request.FirstName))
+        if (String.IsNullOrWhiteSpace(request.FirstName))
         {
             failures.Add("First name is required.");
         }

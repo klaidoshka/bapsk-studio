@@ -1,0 +1,15 @@
+@if (messages().success) {
+  @for (message of messages().success; track $index) {
+    <p-message
+      severity="success"
+      text="{{ message }}"
+    ></p-message>
+  }
+} @else if (messages().error) {
+  @for (message of messages().error; track $index) {
+    <p-message
+      severity="error"
+      text="{{ message }}"
+    ></p-message>
+  }
+}

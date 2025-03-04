@@ -31,4 +31,5 @@ export class ApiRouter {
   public readonly instanceGetByUser = () => `${this.accountingUrl}/instance`;
 
   public readonly sessionGetByUser = () => `${this.baseServerUrl}/session`;
+  public readonly sessionRevoke = (id: string) => `${this.baseServerUrl}/session/${id}`;
 }

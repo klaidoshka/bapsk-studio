@@ -16,11 +16,11 @@ const angularEngine = new AngularNodeAppEngine();
  */
 application.use("/**", (req, res, next) => {
   angularEngine
-    .handle(req)
-    .then((response) =>
-      response ? writeResponseToNodeResponse(response, res) : next()
-    )
-    .catch(next);
+  .handle(req)
+  .then((response) =>
+    response ? writeResponseToNodeResponse(response, res) : next()
+  )
+  .catch(next);
 });
 
 /**

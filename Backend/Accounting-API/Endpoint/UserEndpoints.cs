@@ -10,7 +10,7 @@ public static class UserEndpoints
     public static void MapUserEndpoints(this RouteGroupBuilder builder)
     {
         builder.MapPost(
-            string.Empty,
+            String.Empty,
             async (
                 [FromBody] UserCreateRequest request,
                 IUserService userService
@@ -55,7 +55,7 @@ public static class UserEndpoints
         );
 
         builder.MapGet(
-            string.Empty,
+            String.Empty,
             async (
                 string email,
                 IUserService userService

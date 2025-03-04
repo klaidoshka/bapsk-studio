@@ -12,14 +12,10 @@ public abstract class FieldHandler(FieldType type)
     {
         { FieldType.Check, new CheckFieldHandler() },
         { FieldType.Date, new DateFieldHandler() },
-        { FieldType.Decimal, new DecimalFieldHandler() },
-        { FieldType.DecimalArray, new DecimalArrayFieldHandler() },
-        { FieldType.Int, new IntFieldHandler() },
-        { FieldType.IntArray, new IntArrayFieldHandler() },
-        { FieldType.Text, new TextFieldHandler() },
-        { FieldType.TextArray, new TextArrayFieldHandler() }
+        { FieldType.Number, new NumberFieldHandler() },
+        { FieldType.Text, new TextFieldHandler() }
     };
-    
+
     /// <summary>
     /// Type of the field.
     /// </summary>

@@ -5,12 +5,12 @@ export default interface Instance {
   createdAt: Date;
 }
 
-export interface CreateRequest {
+export interface InstanceCreateRequest {
   name: string;
   description: string | null;
 }
 
-export interface EditRequest {
+export interface InstanceEditRequest {
   instanceId: number;
   name: string;
   description: string | null;

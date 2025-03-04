@@ -11,7 +11,7 @@ public interface IAuthValidator
     /// <param name="meta">User meta for authentication</param>
     /// <returns>Validation instance with possible failures</returns>
     Validation ValidateAuthMeta(AuthRequestUserMeta meta);
-    
+
     /// <summary>
     /// Checks if specified login request is valid.
     /// </summary>

@@ -10,35 +10,15 @@ export default interface DataTypeField {
 export enum FieldType {
   Check = 1,
   Date = 2,
-  Decimal = 3,
-  DecimalArray = 4,
-  Int = 5,
-  IntArray = 6,
-  Text = 7,
-  TextArray = 8
-}
-
-export function getFieldTypeLabel(type: FieldType): string {
-  const value = fieldTypes.find(
-    (fieldType) => fieldType.value === type
-  )?.label
-
-  if (!value) {
-    throw new Error("Invalid field type");
-  }
-
-  return value;
+  Number = 3,
+  Text = 4
 }
 
 export const fieldTypes = [
   {label: 'Check', value: FieldType.Check},
   {label: 'Date', value: FieldType.Date},
-  {label: 'Decimal', value: FieldType.Decimal},
-  {label: 'DecimalArray', value: FieldType.DecimalArray},
-  {label: 'Int', value: FieldType.Int},
-  {label: 'IntArray', value: FieldType.IntArray},
-  {label: 'Text', value: FieldType.Text},
-  {label: 'TextArray', value: FieldType.TextArray}
+  {label: 'Number', value: FieldType.Number},
+  {label: 'Text', value: FieldType.Text}
 ];
 
 export interface DataTypeFieldCreateRequest {

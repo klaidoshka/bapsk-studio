@@ -1,6 +1,8 @@
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
+using Accounting.Contract;
 using Accounting.Contract.Configuration;
+using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Accounting.Contract.Sti.CancelDeclaration;
 using Accounting.Contract.Sti.ExportedGoods;
@@ -9,47 +11,91 @@ using Accounting.Contract.Sti.SubmitDeclaration;
 using Accounting.Contract.Sti.SubmitPaymentInfo;
 using Accounting.Services.Sti;
 using Accounting.Services.Sti.Mapping;
+using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Services.Service;
 
 public class StiService : IStiService, IAsyncDisposable
 {
     private readonly VATRefundforForeignTravelerTRPortClient _client;
+    private readonly AccountingDatabase _database;
 
     public StiService(
         CertificateSerialNumbers certificateSerialNumbers,
+        AccountingDatabase database,
         Endpoints endpoints,
         Logging logging
     )
     {
+        _database = database;
         _client = CreateClient(certificateSerialNumbers, endpoints, logging);
     }
 
-    public async Task<CancelDeclarationResponse> CancelDeclarationAsync(CancelDeclarationRequest request)
+    public async Task<CancelDeclarationResponse> CancelDeclarationAsync(
+        CancelDeclarationRequest request
+    )
     {
         return (await _client.cancelDeclarationAsync(request.ToExternalType()))
             .ToInternalType();
     }
 
-    public async Task<ExportedGoodsResponse> GetInfoOnExportedGoodsAsync(ExportedGoodsRequest request)
+    public async Task<ExportedGoodsResponse> GetInfoOnExportedGoodsAsync(
+        ExportedGoodsRequest request
+    )
     {
         return (await _client.getInfoOnExportedGoodsAsync(request.ToExternalType()))
             .ToInternalType();
     }
 
-    public async Task<QueryDeclarationsResponse> QueryDeclarationsAsync(QueryDeclarationsRequest request)
+    public async Task<QueryDeclarationsResponse> QueryDeclarationsAsync(
+        QueryDeclarationsRequest request
+    )
     {
         return (await _client.queryDeclarationsAsync(request.ToExternalType()))
             .ToInternalType();
     }
 
-    public async Task<SubmitDeclarationResponse> SubmitDeclarationAsync(SubmitDeclarationRequest request)
+    public async Task<SubmitDeclarationResponse> SubmitDeclarationAsync(
+        SubmitDeclarationRequest request
+    )
     {
+        var declaration = await _database.SaleTaxFreeDeclarations.FirstOrDefaultAsync(
+            d =>
+                d.Id == request.Declaration.Header.DocumentId
+        );
+
+        if (declaration is not null)
+        {
+            if (request.Declaration.Header.DocumentCorrectionNo <= declaration.Correction)
+            {
+                declaration.Correction += 1;
+                request.Declaration.Header.DocumentCorrectionNo = declaration.Correction;
+            }
+            else
+            {
+                declaration.Correction = request.Declaration.Header.DocumentCorrectionNo;
+            }
+        }
+        else
+        {
+            await _database.SaleTaxFreeDeclarations.AddAsync(
+                new SaleTaxFreeDeclaration
+                {
+                    Id = request.Declaration.Header.DocumentId,
+                    Correction = request.Declaration.Header.DocumentCorrectionNo
+                }
+            );
+        }
+
+        await _database.SaveChangesAsync();
+
         return (await _client.submitDeclarationAsync(request.ToExternalType()))
             .ToInternalType();
     }
 
-    public async Task<SubmitPaymentInfoResponse> SubmitPaymentInfoAsync(SubmitPaymentInfoRequest request)
+    public async Task<SubmitPaymentInfoResponse> SubmitPaymentInfoAsync(
+        SubmitPaymentInfoRequest request
+    )
     {
         return (await _client.submitPaymentInfoAsync(request.ToExternalType()))
             .ToInternalType();

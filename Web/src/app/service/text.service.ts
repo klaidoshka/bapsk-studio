@@ -19,4 +19,8 @@ export class TextService {
 
     return result;
   }
+
+  joinToString(array: string[], separator: string = "\n"): string {
+    return array.join(separator);
+  }
 }

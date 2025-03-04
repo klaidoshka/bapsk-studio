@@ -12,7 +12,8 @@ public class TextFieldHandler() : FieldHandler(FieldType.Text)
 
     public override string Serialize(object value)
     {
-        return value?.ToString() ?? throw new InvalidOperationException("Value cannot be serialized to a string.");
+        return value?.ToString() ??
+               throw new InvalidOperationException("Value cannot be serialized to a string.");
     }
 
     public override Validation Validate(object value)
