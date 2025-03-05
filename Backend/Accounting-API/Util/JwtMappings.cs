@@ -27,7 +27,6 @@ public static class JwtMappings
             token.RefreshToken,
             new CookieOptions
             {
-                Expires = token.RefreshTokenExpiresAt,
                 HttpOnly = true,
                 SameSite = SameSiteMode.Lax,
                 Secure = false // TODO: Set to true when using HTTPS

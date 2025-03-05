@@ -56,8 +56,7 @@ public class AuthService : IAuthService
         {
             AccessToken = _jwtService.GenerateAccessToken(user, sessionId),
             RefreshToken = _jwtService.GenerateRefreshToken(user, sessionId),
-            RefreshTokenExpiresAt =
-                DateTime.UtcNow.AddMinutes(_jwtSettings.RefreshTokenExpiryMinutes),
+            SessionId = sessionId,
             User = user
         };
 
@@ -116,15 +115,10 @@ public class AuthService : IAuthService
         var token = new JwtTokenPair
         {
             AccessToken = _jwtService.GenerateAccessToken(session.User, session.Id),
-            RefreshToken = _jwtService.GenerateRefreshToken(session.User, session.Id),
-            RefreshTokenExpiresAt =
-                DateTime.UtcNow.AddMinutes(_jwtSettings.RefreshTokenExpiryMinutes),
+            RefreshToken = refreshToken,
+            SessionId = session.Id,
             User = session.User
         };
-
-        session.RefreshToken = token.RefreshToken;
-
-        await _database.SaveChangesAsync();
 
         return token;
     }

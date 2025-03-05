@@ -30,6 +30,7 @@ public static class AuthEndpoints
                     new AuthResponse
                     {
                         AccessToken = token.AccessToken,
+                        SessionId = token.SessionId,
                         User = token.User.ToDto()
                     }
                 );
@@ -85,6 +86,7 @@ public static class AuthEndpoints
                     new AuthResponse
                     {
                         AccessToken = token.AccessToken,
+                        SessionId = token.SessionId,
                         User = token.User.ToDto()
                     }
                 );
@@ -110,6 +112,7 @@ public static class AuthEndpoints
                     new AuthResponse
                     {
                         AccessToken = token.AccessToken,
+                        SessionId = token.SessionId,
                         User = token.User.ToDto()
                     }
                 );

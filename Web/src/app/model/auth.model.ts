@@ -9,6 +9,7 @@ export interface User {
 
 export interface AuthResponse {
   accessToken: string;
+  sessionId: string;
   user: User;
 }
 

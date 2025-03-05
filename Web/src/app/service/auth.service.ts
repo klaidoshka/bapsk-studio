@@ -1,5 +1,5 @@
 import {HttpClient} from "@angular/common/http";
-import {Injectable, Signal, signal} from "@angular/core";
+import {computed, Injectable, Signal, signal} from "@angular/core";
 import {finalize, Observable, of} from "rxjs";
 import {AuthResponse, LoginRequest, RegisterRequest, User} from "../model/auth.model";
 import {ApiRouter} from "./api-router.service";
@@ -8,10 +8,12 @@ import {ApiRouter} from "./api-router.service";
   providedIn: "root"
 })
 export class AuthService {
-  private accessTokenKey = "__accounting_accessToken__";
-  private user = signal<User | null>(null);
-  private userAuthenticated = signal<boolean>(this.getAccessToken() !== null);
+  private accessKey = "__accounting_access__";
+  private access = signal<AuthResponse | null>(this.getAccess());
+  private user = computed(() => this.access()?.user || null);
+  private userAuthenticated = computed(() => this.access() !== null);
   private userRefreshing = signal<boolean>(false);
+  private userSessionId = computed(() => this.access()?.sessionId || null);
 
   constructor(
     private apiRouter: ApiRouter,
@@ -20,33 +22,37 @@ export class AuthService {
   }
 
   acceptAuthResponse(response: AuthResponse): void {
-    localStorage.setItem(this.accessTokenKey, response.accessToken);
-    this.user.set(response.user);
-    this.userAuthenticated.set(true);
+    localStorage.setItem(this.accessKey, JSON.stringify(response));
+    this.access.set(response);
   }
 
   cleanupCredentials(): void {
-    localStorage.removeItem(this.accessTokenKey);
+    localStorage.removeItem(this.accessKey);
 
-    if (this.userAuthenticated()) {
-      this.userAuthenticated.set(false);
+    if (this.access() !== null) {
+      this.access.set(null);
     }
+  }
 
-    if (this.user() !== null) {
-      this.user.set(null);
-    }
+  private getAccess(): AuthResponse | null {
+    const access = localStorage.getItem(this.accessKey);
+    return access !== null ? JSON.parse(access) : null;
   }
 
   getAccessToken(): string | null {
-    return localStorage.getItem(this.accessTokenKey);
+    return this.access()?.accessToken || null;
+  }
+
+  getSessionId(): Signal<string | null> {
+    return this.userSessionId;
   }
 
   getUser(): Signal<User | null> {
-    return this.user.asReadonly();
+    return this.user;
   }
 
   isAuthenticated(): Signal<boolean> {
-    return this.userAuthenticated.asReadonly();
+    return this.userAuthenticated;
   }
 
   isRefreshingAccess(): Signal<boolean> {
