@@ -1,3 +1,7 @@
+<app-confirmation key="session-revokation" header="Are you sure about revoking this session?"/>
+
+<p-toast key="session-revokation"/>
+
 <p-table [value]="sessions()">
   <ng-template #header>
     <tr>
@@ -18,12 +22,15 @@
       <td>{{ session.createdAt | date: 'medium' }}</td>
       <td>{{ session.ipAddress }}</td>
       <td>{{ session.location }}</td>
-      <p-button
-        icon="pi pi-ban"
-        type="button"
-        variant="text"
-        (onClick)="revoke(session)"
-      ></p-button>
+      <td>
+        <p-button
+          [disabled]="session.id === currentSessionId()"
+          icon="pi pi-ban"
+          type="button"
+          variant="text"
+          (onClick)="revoke(session)"
+        ></p-button>
+      </td>
     </tr>
   </ng-template>
 </p-table>

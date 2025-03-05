@@ -1,34 +1,51 @@
-import {Component, signal} from '@angular/core';
+import {Component, Signal, viewChild} from '@angular/core';
 import {TableModule} from "primeng/table";
 import {SessionService} from '../../service/session.service';
 import Session from '../../model/session.model';
 import {Button} from 'primeng/button';
 import {DatePipe} from '@angular/common';
+import {AuthService} from '../../service/auth.service';
+import {ConfirmationComponent} from '../confirmation/confirmation.component';
+import {MessageService} from 'primeng/api';
+import {Toast} from 'primeng/toast';
 
 @Component({
   selector: 'app-session-showcase',
   imports: [
     TableModule,
     Button,
-    DatePipe
+    DatePipe,
+    ConfirmationComponent,
+    Toast
   ],
   templateUrl: './session-showcase.component.html',
+  providers: [MessageService],
   styles: ``
 })
 export class SessionShowcaseComponent {
-  sessions = signal<Session[]>([]);
+  currentSessionId: Signal<string | null>;
+  sessions: Signal<Session[]>;
+  confirmationComponent = viewChild.required(ConfirmationComponent);
 
   constructor(
+    authService: AuthService,
+    private messageService: MessageService,
     private sessionService: SessionService
   ) {
-    this.sessionService.getByUser().subscribe(sessions => {
-      this.sessions.set(sessions);
-    });
+    this.currentSessionId = authService.getSessionId();
+    this.sessions = sessionService.getByUserAsSignal();
   }
 
   revoke(session: Session) {
-    this.sessionService.revoke(session.id).subscribe(() => {
-      this.sessions.update(sessions => sessions.filter(s => s.id !== session.id));
-    });
+    this.confirmationComponent().request(() => {
+      this.sessionService.revoke(session.id).subscribe(() =>
+        this.messageService.add({
+          key: 'session-revokation',
+          severity: 'success',
+          summary: "Session",
+          detail: "Session has been successfully revoked"
+        })
+      );
+    })
   }
 }
