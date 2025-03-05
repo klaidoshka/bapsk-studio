@@ -1,4 +1,4 @@
-import {Component, effect, Signal, signal} from '@angular/core';
+import {Component, effect, Signal, signal, viewChild} from '@angular/core';
 import {DropdownModule} from "primeng/dropdown";
 import Instance from '../../model/instance.model';
 import {AuthService} from '../../service/auth.service';
@@ -6,6 +6,7 @@ import {InstanceService} from '../../service/instance.service';
 import {Button} from 'primeng/button';
 import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {InstanceManagementComponent} from '../instance-management/instance-management.component';
 
 @Component({
   selector: 'app-instance-selector',
@@ -14,7 +15,8 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
     Button,
     AutoComplete,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    InstanceManagementComponent
   ],
   templateUrl: './instance-selector.component.html',
   styles: ``
@@ -23,6 +25,7 @@ export class InstanceSelectorComponent {
   filteredInstances = signal<Instance[]>([]);
   instances!: Signal<Instance[]>;
   isAuthenticated!: Signal<boolean>;
+  managementMenu = viewChild.required(InstanceManagementComponent);
   selectedInstance!: Signal<Instance | null>;
 
   constructor(
@@ -40,17 +43,21 @@ export class InstanceSelectorComponent {
     });
   }
 
-  selectInstance(instance: Instance | null) {
-    if (this.selectedInstance() !== instance && instance !== null) {
-      this.instanceService.setActiveInstance(instance);
-    }
-  }
-
   filterInstances(event: AutoCompleteCompleteEvent) {
     const query = event.query.toLowerCase();
 
     this.filteredInstances.set(this.instances().filter((instance) => {
       return instance.name.toLowerCase().includes(query);
     }));
+  }
+
+  selectInstance(instance: Instance | null) {
+    if (this.selectedInstance() !== instance && instance !== null) {
+      this.instanceService.setActiveInstance(instance);
+    }
+  }
+
+  showManagementMenu() {
+    this.managementMenu().show(null);
   }
 }

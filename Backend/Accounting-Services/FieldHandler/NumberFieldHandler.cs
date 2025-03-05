@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Response;
 
@@ -10,23 +11,32 @@ public class NumberFieldHandler() : FieldHandler(FieldType.Number)
         return ToDouble(value);
     }
 
-    public override string Serialize(object value)
+    public override string Serialize(JsonElement value)
     {
         return ToDouble(value).ToString();
     }
 
     private static double ToDouble(object value)
     {
-        return value switch
+        double? result = value switch
         {
-            double doubleValue => doubleValue,
-            int intValue => intValue,
-            string stringValue => Double.Parse(stringValue),
-            _ => throw new InvalidOperationException("Value cannot be deserialized to a decimal.")
+            JsonElement jsonElement => jsonElement.ValueKind switch
+            {
+                JsonValueKind.String => Double.TryParse(jsonElement.GetString(), out var output)
+                    ? output
+                    : 0.0,
+                _ => jsonElement.TryGetDouble(out var output) ? output : null
+            },
+            string stringValue => Double.TryParse(stringValue, out var output) ? output : null,
+            _ => null
         };
+
+        return result ?? throw new InvalidOperationException(
+            $"Value {value} cannot be deserialized to a decimal."
+        );
     }
 
-    public override Validation Validate(object value)
+    public override Validation Validate(JsonElement value)
     {
         try
         {

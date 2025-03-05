@@ -26,7 +26,7 @@ public class DataEntryValidator : IDataEntryValidator
             .Include(dt => dt.Fields)
             .FirstOrDefaultAsync(dt => dt.Id == request.DataTypeId);
 
-        if (dataType == null)
+        if (dataType == null || dataType.IsDeleted)
         {
             return new Validation("Data type not found.");
         }
@@ -47,17 +47,17 @@ public class DataEntryValidator : IDataEntryValidator
 
         var requestFieldsById = request.Fields.ToDictionary(f => f.DataTypeFieldId);
 
-        var missingFields = dataType.Fields
-            .Where(
-                f =>
-                    !requestFieldsById.ContainsKey(f.Id) &&
-                    f.IsRequired &&
-                    f.DefaultValue == null
-            )
-            .Select(field => $"Field with id {field.Id} is required, but not provided.")
-            .ToList();
-
-        failures.AddRange(missingFields);
+        failures.AddRange(
+            dataType.Fields
+                .Where(
+                    f =>
+                        !requestFieldsById.ContainsKey(f.Id) &&
+                        f.IsRequired &&
+                        f.DefaultValue == null
+                )
+                .Select(field => $"Field '{field.Name}' is required, but not provided.")
+                .ToList()
+        );
 
         return new Validation(failures);
     }
@@ -71,7 +71,7 @@ public class DataEntryValidator : IDataEntryValidator
             .ThenInclude(dt => dt.Instance)
             .FirstOrDefaultAsync(de => de.Id == request.DataEntryId);
 
-        if (dataEntry == null)
+        if (dataEntry == null || dataEntry.IsDeleted)
         {
             return new Validation("Data entry not found.");
         }
@@ -88,7 +88,7 @@ public class DataEntryValidator : IDataEntryValidator
             .ThenInclude(dt => dt.Instance)
             .FirstOrDefaultAsync(de => de.Id == request.DataEntryId);
 
-        if (dataEntry == null)
+        if (dataEntry == null || dataEntry.IsDeleted)
         {
             return new Validation("Data entry not found.");
         }
@@ -118,7 +118,7 @@ public class DataEntryValidator : IDataEntryValidator
             .ThenInclude(i => i.UserMetas)
             .FirstOrDefaultAsync(de => de.Id == request.DataEntryId);
 
-        if (dataEntry == null)
+        if (dataEntry == null || dataEntry.IsDeleted)
         {
             return new Validation("Data entry not found.");
         }
@@ -137,7 +137,7 @@ public class DataEntryValidator : IDataEntryValidator
             .ThenInclude(i => i.UserMetas)
             .FirstOrDefaultAsync(dt => dt.Id == request.DataTypeId);
 
-        if (dataType == null)
+        if (dataType == null || dataType.IsDeleted)
         {
             return new Validation("Data type not found.");
         }
@@ -169,24 +169,26 @@ public class DataEntryValidator : IDataEntryValidator
         DataEntryFieldEditRequest request
     )
     {
-        var dataEntry = await _database.DataEntryFields
+        var dataEntryField = await _database.DataEntryFields
             .Include(def => def.DataTypeField)
             .ThenInclude(dtf => dtf.DataType)
             .ThenInclude(dt => dt.Fields)
             .FirstOrDefaultAsync(de => de.Id == request.DataEntryFieldId);
 
-        if (dataEntry == null)
+        if (dataEntryField == null)
         {
-            return new Validation("Data entry field not found.");
+            return new Validation(
+                $"Field with id {request.DataEntryFieldId} does not exist in data entry."
+            );
         }
 
-        var dataTypeField = dataEntry.DataTypeField.DataType.Fields
-            .FirstOrDefault(f => f.Id == dataEntry.DataTypeFieldId);
+        var dataTypeField = dataEntryField.DataTypeField.DataType.Fields
+            .FirstOrDefault(f => f.Id == dataEntryField.DataTypeFieldId);
 
         if (dataTypeField == null)
         {
             return new Validation(
-                $"Field with id {request.DataEntryFieldId} does not belong to the expected data type."
+                $"Field with id {request.DataEntryFieldId} does not belong to the data type of this data entry."
             );
         }
 

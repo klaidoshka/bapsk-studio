@@ -74,7 +74,7 @@ export class DataTypeManagementComponent implements OnInit {
   }
 
   get formFields() {
-    return this.form.get("fields") as FormArray;
+    return this.form.get("fields") as FormArray<FormGroup>;
   }
 
   private createForm() {
@@ -135,7 +135,7 @@ export class DataTypeManagementComponent implements OnInit {
         this.messages.set({success: ["DataType has been created successfully."]});
       },
       error: (response: ErrorResponse) => {
-        this.messages.set({error: response.error.messages});
+        this.messages.set({error: response.error.messages || ["Extremely rare error occurred, please try again later."]});
       },
       complete: () => {
         this.isProcessing.set(false);
@@ -151,7 +151,7 @@ export class DataTypeManagementComponent implements OnInit {
         this.messages.set({success: ["Instance has been edited successfully."]});
       },
       error: (response: ErrorResponse) => {
-        this.messages.set({error: response.error.messages});
+        this.messages.set({error: response.error.messages || ["Extremely rare error occurred, please try again later."]});
       },
       complete: () => {
         this.isProcessing.set(false);
@@ -171,6 +171,10 @@ export class DataTypeManagementComponent implements OnInit {
     }
 
     return null;
+  }
+
+  getFieldType(id: number): FieldType {
+    return this.formFields.controls.at(id)?.value?.type || FieldType.Text;
   }
 
   hide() {

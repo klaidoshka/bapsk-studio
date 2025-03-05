@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Response;
 
@@ -33,12 +34,12 @@ public abstract class FieldHandler(FieldType type)
     /// </summary>
     /// <param name="value">Value to serialize</param>
     /// <returns>String representing the value that can later be deserialized into value</returns>
-    public abstract string Serialize(object value);
+    public abstract string Serialize(JsonElement value);
 
     /// <summary>
     /// Validates the value against the field type.
     /// </summary>
     /// <param name="value">Value to validate</param>
     /// <returns>Validation result</returns>
-    public abstract Validation Validate(object value);
+    public abstract Validation Validate(JsonElement value);
 }

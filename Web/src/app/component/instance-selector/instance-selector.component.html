@@ -1,9 +1,12 @@
 @if (isAuthenticated()) {
   @switch (instances().length) {
     @case (0) {
+      <app-instance-management />
+
       <p-button
         label="Create Instance"
         icon="pi pi-plus"
+        (onClick)="showManagementMenu()"
       ></p-button>
     }
     @default {

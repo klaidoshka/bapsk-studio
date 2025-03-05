@@ -1,5 +1,5 @@
 import {Component, computed, input, OnInit, Signal, signal} from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {DataEntryService} from '../../service/data-entry.service';
 import {InstanceService} from '../../service/instance.service';
 import {TextService} from '../../service/text.service';
@@ -88,7 +88,7 @@ export class DataEntryManagementComponent implements OnInit {
         this.messages.set({success: ["DataEntry has been created successfully."]});
       },
       error: (response: ErrorResponse) => {
-        this.messages.set({error: response.error.messages});
+        this.messages.set({error: response.error.messages || ["Extremely rare error occurred, please try again later."]});
       },
       complete: () => {
         this.isProcessing.set(false);
@@ -104,7 +104,7 @@ export class DataEntryManagementComponent implements OnInit {
         this.messages.set({success: ["Instance has been edited successfully."]});
       },
       error: (response: ErrorResponse) => {
-        this.messages.set({error: response.error.messages});
+        this.messages.set({error: response.error.messages || ["Extremely rare error occurred, please try again later."]});
       },
       complete: () => {
         this.isProcessing.set(false);
@@ -112,12 +112,12 @@ export class DataEntryManagementComponent implements OnInit {
     });
   }
 
-  get $formFields() {
+  get formFields() {
     return Object.keys(this.form.controls).map(key => {
-        const control = this.form.get(key);
+        const control = this.form.get(key)!;
         const type = this.dataType()?.fields?.find(f => f.name === key)?.type;
         return {
-          control: control,
+          control: control as FormControl<any>,
           field: key,
           type: type || FieldType.Text
         };
@@ -150,7 +150,7 @@ export class DataEntryManagementComponent implements OnInit {
     }
 
     if (this.dataEntry() != null) {
-      const fields: DataEntryFieldEditRequest[] = this.$formFields.map(field => {
+      const fields: DataEntryFieldEditRequest[] = this.formFields.map(field => {
         const candidate = this.dataEntry()!!.fields?.find(f => f.name === field.field);
 
         return {
@@ -169,7 +169,7 @@ export class DataEntryManagementComponent implements OnInit {
       const fields: DataEntryFieldCreateRequest[] = this.dataType()!!.fields?.map((field, index) => {
         return {
           dataTypeFieldId: field.id,
-          value: this.$formFields.find(f => f.field === field.name)?.control?.value ||
+          value: this.formFields.find(f => f.field === field.name)?.control?.value ||
             field.defaultValue ||
             ''
         };

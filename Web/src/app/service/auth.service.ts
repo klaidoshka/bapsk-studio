@@ -17,9 +17,6 @@ export class AuthService {
     private apiRouter: ApiRouter,
     private httpClient: HttpClient
   ) {
-    if (this.userAuthenticated() && this.user() === null) {
-      
-    }
   }
 
   acceptAuthResponse(response: AuthResponse): void {

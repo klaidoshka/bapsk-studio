@@ -1,4 +1,13 @@
-import {Component, computed, effect, signal, Signal, untracked, viewChild} from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  signal,
+  Signal,
+  untracked,
+  viewChild,
+  ViewEncapsulation
+} from '@angular/core';
 import {ButtonModule} from 'primeng/button';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {AuthService} from '../../service/auth.service';
@@ -17,12 +26,14 @@ import {ConfirmationComponent} from '../confirmation/confirmation.component';
     Menubar,
     ConfirmationComponent
   ],
-  templateUrl: './profile-dropdown.component.html'
+  templateUrl: './profile-dropdown.component.html',
+  styleUrl: './profile-dropdown.component.scss',
+  encapsulation: ViewEncapsulation.None
 })
 export class ProfileDropdownComponent {
   confirmationComponent = viewChild.required(ConfirmationComponent);
   displayName!: Signal<string>;
-  entries = signal<MenuItem[]>([]);
+  entries = signal<MenuItem[]>(this.getEmptyEntries());
   isAuthenticated!: Signal<boolean>;
 
   constructor(
@@ -32,7 +43,7 @@ export class ProfileDropdownComponent {
   ) {
     this.displayName = computed(() => {
       const user = this.authService.getUser()();
-      return user !== null ? user.firstName + ' ' + user.lastName : '';
+      return user !== null ? user.firstName + ' ' + user.lastName : 'Profile';
     });
 
     this.isAuthenticated = this.authService.isAuthenticated();
@@ -42,13 +53,29 @@ export class ProfileDropdownComponent {
 
       untracked(() => {
           if (user === null && this.entries().length > 0) {
-            this.entries.set([]);
+            this.entries.set(this.getEmptyEntries());
           } else if (user !== null) {
             this.entries.set(this.getEntries());
           }
         }
       );
     });
+  }
+
+  private getEmptyEntries(): MenuItem[] {
+    return [
+      {
+        label: 'Profile',
+        icon: 'pi pi-user',
+        items: [
+          {
+            label: 'Logout',
+            icon: 'pi pi-sign-out',
+            command: () => this.logout()
+          }
+        ]
+      }
+    ]
   }
 
   private getEntries(): MenuItem[] {

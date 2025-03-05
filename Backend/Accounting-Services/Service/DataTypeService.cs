@@ -3,6 +3,7 @@ using Accounting.Contract.Entity;
 using Accounting.Contract.Request;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
+using Accounting.Services.Util;
 using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Services.Service;
@@ -46,11 +47,11 @@ public class DataTypeService : IDataTypeService
                 new DataTypeField
                 {
                     DataTypeId = dataType.Id,
-                    DefaultValue = field.DefaultValue == null
+                    DefaultValue = field.DefaultValue.IsNull()
                         ? null
                         : _fieldTypeService.Serialize(field.Type, field.DefaultValue),
                     IsRequired = field.IsRequired,
-                    Name = request.Name,
+                    Name = field.Name,
                     Type = field.Type
                 }
             );
@@ -105,7 +106,7 @@ public class DataTypeService : IDataTypeService
 
         foreach (var field in matchedFields.Values)
         {
-            field.Matched.DefaultValue = field.New.DefaultValue == null
+            field.Matched.DefaultValue = field.New.DefaultValue.IsNull()
                 ? null
                 : _fieldTypeService.Serialize(field.New.Type, field.New.DefaultValue);
 
@@ -124,7 +125,7 @@ public class DataTypeService : IDataTypeService
                 new DataTypeField
                 {
                     DataTypeId = dataType.Id,
-                    DefaultValue = field.DefaultValue == null
+                    DefaultValue = field.DefaultValue.IsNull()
                         ? null
                         : _fieldTypeService.Serialize(field.Type, field.DefaultValue),
                     IsRequired = field.IsRequired,

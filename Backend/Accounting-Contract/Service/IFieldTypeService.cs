@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Accounting.Contract.Entity;
 
 namespace Accounting.Contract.Service;
@@ -18,5 +19,5 @@ public interface IFieldTypeService
     /// <param name="type">Field type</param>
     /// <param name="value">Field value</param>
     /// <returns>Serialized value</returns>
-    public string Serialize(FieldType type, object value);
+    public string Serialize(FieldType type, JsonElement value);
 }

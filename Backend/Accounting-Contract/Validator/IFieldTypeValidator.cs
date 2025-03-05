@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Response;
 
@@ -11,7 +12,7 @@ public interface IFieldTypeValidator
     /// <param name="field">Field that will have value validated against</param>
     /// <param name="value">Field value</param>
     /// <returns>Validation result for value</returns>
-    public Validation ValidateValue(DataTypeField field, object value);
+    public Validation ValidateValue(DataTypeField field, JsonElement value);
 
     /// <summary>
     /// Validate a value against a field type. Value must be of certain syntax.
@@ -19,7 +20,7 @@ public interface IFieldTypeValidator
     /// <param name="type">Type of the field</param>
     /// <param name="value">Field value</param>
     /// <returns>Validation result for value</returns>
-    public Validation ValidateValue(FieldType type, object value);
+    public Validation ValidateValue(FieldType type, JsonElement value);
 
     /// <summary>
     /// Validate a set of values based on their fields.
@@ -29,6 +30,6 @@ public interface IFieldTypeValidator
     /// <returns>Validation result for values</returns>
     public Validation ValidateValues(
         ICollection<DataTypeField> fields,
-        IDictionary<int, object> values
+        IDictionary<int, JsonElement> values
     );
 }

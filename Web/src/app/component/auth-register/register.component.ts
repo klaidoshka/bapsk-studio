@@ -105,9 +105,7 @@ export class RegisterComponent {
         this.isSubmitting.set(false);
       },
       error: (response: ErrorResponse) => {
-        this.messages.set(response.error?.messages || [
-          "Failed to auth-register, please try again later..."
-        ]);
+        this.messages.set(response.error?.messages || ["Failed to register, please try again later."]);
         this.isSubmitting.set(false);
       }
     });

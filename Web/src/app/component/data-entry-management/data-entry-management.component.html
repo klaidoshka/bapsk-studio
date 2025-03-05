@@ -1,5 +1,5 @@
 <p-dialog
-  header="Data Type Management"
+  header="Data Entry Management"
   closeOnEscape="true"
   modal="true"
   closable="true"
@@ -16,7 +16,7 @@
       class="grid grid-cols-1 gap-4"
       [formGroup]="form"
     >
-      @for (field of $formFields; track $index) {
+      @for (field of formFields; track $index) {
         <div>
           <label
             [for]="field.field"
@@ -26,7 +26,7 @@
           @switch (field.type) {
             @case (FieldType.Check) {
               <p-check-box
-                [formControlName]="field.field"
+                [formControl]="field.control"
                 [id]="field.field"
                 binary="true"
                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
@@ -34,15 +34,17 @@
             }
             @case (FieldType.Date) {
               <p-datePicker
-                [formControlName]="field.field"
+                [formControl]="field.control"
                 [id]="field.field"
                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                appendTo="body"
               ></p-datePicker>
             }
             @default {
               <input
-                [formControlName]="field.field"
+                [formControl]="field.control"
                 pInputText
+                [defaultValue]="field.type === FieldType.Number ? 0 : ''"
                 [type]="field.type"
                 [id]="field.field"
                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"

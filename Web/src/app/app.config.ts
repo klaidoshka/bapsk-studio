@@ -18,16 +18,18 @@ function initAuthService(authService: AuthService, router: Router): Promise<void
     if (!authService.isAuthenticated()()) {
       return resolve();
     }
-    
+
     authService.renewAccess().subscribe({
       next: (response) => {
         authService.acceptAuthResponse(response);
         router.navigate(["/"]);
         resolve();
       },
-      error: () => {
-        authService.cleanupCredentials();
-        router.navigate(["/auth/login"]);
+      error: (response) => {
+        if (response.status === 401) {
+          authService.cleanupCredentials();
+          router.navigate(["/auth/login"]);
+        }
         resolve();
       }
     });

@@ -35,23 +35,23 @@ public class ExceptionHandlingMiddleware : IMiddleware
 
         var exceptionResponse = exception switch
         {
-            ApplicationException _ => new ExceptionResponse(
+            ApplicationException => new ExceptionResponse(
                 HttpStatusCode.BadRequest,
                 "Application exception occurred."
             ),
-            ArgumentException _ => new ExceptionResponse(
+            ArgumentException => new ExceptionResponse(
                 HttpStatusCode.NotFound,
                 "The request had invalid arguments."
             ),
-            BadHttpRequestException _ => new ExceptionResponse(
+            BadHttpRequestException or InvalidOperationException => new ExceptionResponse(
                 HttpStatusCode.NotAcceptable,
                 "The request was not acceptable."
             ),
-            KeyNotFoundException _ => new ExceptionResponse(
+            KeyNotFoundException => new ExceptionResponse(
                 HttpStatusCode.NotFound,
                 "The requested resource was not found."
             ),
-            UnauthorizedAccessException _ => new ExceptionResponse(
+            UnauthorizedAccessException => new ExceptionResponse(
                 HttpStatusCode.Unauthorized,
                 "Unauthorized."
             ),

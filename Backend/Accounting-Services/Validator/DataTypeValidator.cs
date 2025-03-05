@@ -2,6 +2,7 @@ using Accounting.Contract;
 using Accounting.Contract.Request;
 using Accounting.Contract.Response;
 using Accounting.Contract.Validator;
+using Accounting.Services.Util;
 using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Services.Validator;
@@ -51,14 +52,14 @@ public class DataTypeValidator : IDataTypeValidator
 
         if (!request.Fields.Any())
         {
-            return new Validation("At least one field is required.");
+            return new Validation("At least one field is required in data type.");
         }
 
         var failures = new List<string>();
 
         if (request.Fields.Any(f => String.IsNullOrWhiteSpace(f.Name)))
         {
-            failures.Add("Field must have a name.");
+            failures.Add("Fields must have their name set.");
         }
 
         var duplicates = request.Fields
@@ -88,7 +89,7 @@ public class DataTypeValidator : IDataTypeValidator
             .Include(dt => dt.Instance)
             .FirstOrDefaultAsync(dt => dt.Id == request.DataTypeId && !dt.IsDeleted);
 
-        if (dataType == null)
+        if (dataType == null || dataType.IsDeleted)
         {
             return new Validation("Data type not found.");
         }
@@ -101,11 +102,12 @@ public class DataTypeValidator : IDataTypeValidator
     public async Task<Validation> ValidateDataTypeEditRequestAsync(DataTypeEditRequest request)
     {
         var dataType = await _database.DataTypes
+            .Include(dt => dt.Entries)
             .Include(dt => dt.Fields)
             .Include(dt => dt.Instance)
             .FirstOrDefaultAsync(dt => dt.Id == request.DataTypeId && !dt.IsDeleted);
 
-        if (dataType == null)
+        if (dataType == null || dataType.IsDeleted)
         {
             return new Validation("Data type not found.");
         }
@@ -120,6 +122,7 @@ public class DataTypeValidator : IDataTypeValidator
             return new Validation("Data type name is required.");
         }
 
+        // Check for duplicate data type name
         if (
             await _database.DataTypes.AnyAsync(
                 dt => dt.InstanceId == dataType.InstanceId &&
@@ -136,11 +139,13 @@ public class DataTypeValidator : IDataTypeValidator
 
         var failures = new List<string>();
 
+        // Check for fields with no name
         if (request.Fields.Any(f => String.IsNullOrWhiteSpace(f.Name)))
         {
-            failures.Add("Field must have a name.");
+            failures.Add("Fields must have their name set.");
         }
 
+        // Look for duplicate field names
         var duplicates = request.Fields
             .GroupBy(f => f.Name.Trim())
             .Where(g => g.Count() > 1)
@@ -152,6 +157,25 @@ public class DataTypeValidator : IDataTypeValidator
             failures.Add($"Duplicate field names: {String.Join(", ", duplicates)}");
         }
 
+        // Check for new fields that have no default value and entries already exist
+        if (dataType.Entries.Count != 0)
+        {
+            var newFields = request.Fields
+                .Where(f => f.DataTypeFieldId is 0 or null && f.DefaultValue.IsNullOrEmpty())
+                .Select(
+                    f => $"New field '{f.Name}' has no default value to assign to existing entries."
+                )
+                .ToList();
+
+            if (newFields.Count != 0)
+            {
+                failures.AddRange(newFields);
+
+                return new Validation(failures);
+            }
+        }
+
+        // Validate field edits
         failures.AddRange(
             request.Fields.SelectMany(
                 f => ValidateDataTypeFieldEditRequest(f).FailureMessages
@@ -167,7 +191,7 @@ public class DataTypeValidator : IDataTypeValidator
             .Include(dt => dt.Instance)
             .FirstOrDefaultAsync(dt => dt.Id == request.DataTypeId && !dt.IsDeleted);
 
-        if (dataType == null)
+        if (dataType == null || dataType.IsDeleted)
         {
             return new Validation("Data type not found.");
         }
@@ -195,7 +219,7 @@ public class DataTypeValidator : IDataTypeValidator
 
     public Validation ValidateDataTypeFieldCreateRequest(DataTypeFieldCreateRequest request)
     {
-        if (request.DefaultValue is not null)
+        if (!request.DefaultValue.IsNullOrEmpty())
         {
             return new Validation(
                 _fieldTypeValidator.ValidateValue(request.Type, request.DefaultValue)
@@ -208,7 +232,7 @@ public class DataTypeValidator : IDataTypeValidator
 
     public Validation ValidateDataTypeFieldEditRequest(DataTypeFieldEditRequest request)
     {
-        if (request.DefaultValue is not null)
+        if (!request.DefaultValue.IsNullOrEmpty())
         {
             return new Validation(
                 _fieldTypeValidator.ValidateValue(request.Type, request.DefaultValue)

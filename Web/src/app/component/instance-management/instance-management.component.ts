@@ -57,7 +57,7 @@ export class InstanceManagementComponent implements OnInit {
         this.messages.set({success: ["Instance has been created successfully."]});
       },
       error: (response: ErrorResponse) => {
-        this.messages.set({error: response.error.messages});
+        this.messages.set({error: response.error.messages || ["Extremely rare error occurred, please try again later."]});
       },
       complete: () => {
         this.isProcessing.set(false);
@@ -73,7 +73,7 @@ export class InstanceManagementComponent implements OnInit {
         this.messages.set({success: ["Instance has been edited successfully."]});
       },
       error: (response: ErrorResponse) => {
-        this.messages.set({error: response.error.messages});
+        this.messages.set({error: response.error.messages || ["Extremely rare error occurred, please try again later."]});
       },
       complete: () => {
         this.isProcessing.set(false);

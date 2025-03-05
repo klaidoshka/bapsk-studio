@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Response;
 
@@ -10,13 +11,12 @@ public class TextFieldHandler() : FieldHandler(FieldType.Text)
         return value;
     }
 
-    public override string Serialize(object value)
+    public override string Serialize(JsonElement value)
     {
-        return value?.ToString() ??
-               throw new InvalidOperationException("Value cannot be serialized to a string.");
+        return value.GetString() ?? String.Empty;
     }
 
-    public override Validation Validate(object value)
+    public override Validation Validate(JsonElement value)
     {
         return new Validation();
     }

@@ -42,11 +42,14 @@ public class DateFieldHandler() : FieldHandler(FieldType.Date)
         }
         catch (Exception e)
         {
-            throw new InvalidOperationException("Value cannot be deserialized to a date.", e);
+            throw new InvalidOperationException(
+                $"Value {value} cannot be deserialized to a date.",
+                e
+            );
         }
     }
 
-    public override string Serialize(object value)
+    public override string Serialize(JsonElement value)
     {
         return ToDateTime(value)!.Value.ToString("u");
     }
@@ -70,11 +73,12 @@ public class DateFieldHandler() : FieldHandler(FieldType.Date)
             _ => null
         };
 
-        return dateTime ??
-               throw new InvalidOperationException("Value cannot be converted to a date.");
+        return dateTime ?? throw new InvalidOperationException(
+            $"Value {value} cannot be converted to a date."
+        );
     }
 
-    public override Validation Validate(object value)
+    public override Validation Validate(JsonElement value)
     {
         try
         {

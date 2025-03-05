@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Response;
 
@@ -10,24 +11,33 @@ public class CheckFieldHandler() : FieldHandler(FieldType.Check)
         return ToBoolean(value);
     }
 
-    public override string Serialize(object value)
+    public override string Serialize(JsonElement value)
     {
         return ToBoolean(value).ToString();
     }
 
     private static bool ToBoolean(object value)
     {
-        return value switch
+        bool? result = value switch
         {
-            bool booleanValue => booleanValue,
+            JsonElement jsonElement => jsonElement.ValueKind switch
+            {
+                JsonValueKind.True => true,
+                JsonValueKind.False => false,
+                _ => null
+            },
             string stringValue => Boolean.TryParse(stringValue, out var candidate)
                 ? candidate
-                : throw new InvalidOperationException("Value cannot be deserialized to a boolean."),
-            _ => throw new InvalidOperationException("Value cannot be deserialized to a boolean.")
+                : null,
+            _ => null
         };
+
+        return result ?? throw new InvalidOperationException(
+            $"Value {value} cannot be deserialized to a boolean."
+        );
     }
 
-    public override Validation Validate(object value)
+    public override Validation Validate(JsonElement value)
     {
         try
         {

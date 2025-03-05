@@ -71,8 +71,8 @@
           </thead>
 
           <tbody class="p-datatable-tbody">
-            @for (field of formFields.value; let i = $index; track i) {
-              <tr [formGroupName]=i>
+            @for (field of formFields.controls; let i = $index; track i) {
+              <tr [formGroup]="field">
                 <td>
                   <input
                     formControlName="name"
@@ -95,7 +95,7 @@
                 </td>
 
                 <td>
-                  @switch (formFields.controls.at(i)?.value.type) {
+                  @switch (getFieldType(i)) {
                     @case (FieldType.Check) {
                       <p-check-box
                         formControlName="defaultValue"
@@ -104,10 +104,20 @@
                       ></p-check-box>
                     }
                     @case (FieldType.Date) {
-                      <p-date-picker
+                      <p-datepicker
                         formControlName="defaultValue"
                         class="w-full"
-                      ></p-date-picker>
+                        appendTo="body"
+                      ></p-datepicker>
+                    }
+                    @case (FieldType.Number) {
+                      <input
+                        formControlName="defaultValue"
+                        [defaultValue]="0"
+                        pInputText
+                        type="number"
+                        class="w-full"
+                      />
                     }
                     @default {
                       <input

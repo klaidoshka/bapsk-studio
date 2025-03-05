@@ -72,7 +72,7 @@ export class LoginComponent {
       },
       error: (response: ErrorResponse) => {
         this.messages.set(response.error?.messages || [
-          "Failed to log you in, please try again..."
+          "Failed to log you in, please try again later."
         ]);
         this.isSubmitting.set(false);
       }
