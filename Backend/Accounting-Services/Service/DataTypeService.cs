@@ -1,5 +1,6 @@
 using Accounting.Contract;
 using Accounting.Contract.Dto.StiVatReturn;
+using Accounting.Contract.Enumeration;
 using Accounting.Contract.Request;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
@@ -59,7 +60,8 @@ public class DataTypeService : IDataTypeService
                 Description = request.Description,
                 InstanceId = request.InstanceId,
                 IsDeleted = false,
-                Name = request.Name
+                Name = request.Name,
+                Type = DataTypeType.UserMade
             }
         )).Entity;
 

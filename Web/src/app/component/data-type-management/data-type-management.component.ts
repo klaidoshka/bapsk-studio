@@ -10,11 +10,7 @@ import {
 } from '@angular/forms';
 import {DataTypeService} from '../../service/data-type.service';
 import {TextService} from '../../service/text.service';
-import DataType, {
-  DataTypeCreateRequest,
-  DataTypeEditRequest,
-  DataTypeType
-} from '../../model/data-type.model';
+import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../../model/data-type.model';
 import Messages from '../../model/messages.model';
 import {first} from 'rxjs';
 import ErrorResponse from '../../model/error-response.model';
@@ -193,22 +189,21 @@ export class DataTypeManagementComponent implements OnInit {
         name: this.form.value.name,
         description: this.form.value.description,
         dataTypeId: this.dataType()!!.id!!,
-        fields: updatedFields,
-        type: this.dataType()!!.type
+        fields: updatedFields
       });
     } else {
       this.create({
         instanceId: this.instanceId()!!,
         name: this.form.value.name,
         description: this.form.value.description,
-        fields: this.formFields.value,
-        type: DataTypeType.UserMade
+        fields: this.formFields.value
       });
     }
   }
 
   show(dataType: DataType | null) {
     this.form = this.createForm();
+    this.dataType.set(dataType);
 
     if (dataType) {
       this.form.patchValue({...dataType});
