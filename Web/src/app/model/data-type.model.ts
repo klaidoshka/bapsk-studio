@@ -17,6 +17,7 @@ export interface DataTypeCreateRequest {
   fields: DataTypeFieldCreateRequest[] | null;
   instanceId: number;
   name: string;
+  type: DataTypeType;
 }
 
 export interface DataTypeEditRequest {
@@ -24,6 +25,7 @@ export interface DataTypeEditRequest {
   dataTypeId: number;
   fields: DataTypeFieldEditRequest[] | null;
   name: string;
+  type: DataTypeType;
 }
 
 export enum DataTypeType {

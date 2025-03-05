@@ -34,7 +34,7 @@ public class DataTypeService : IDataTypeService
         var dataTypes = new List<DataType>
         {
             Customer.DataType,
-            Good.DataType,
+            SoldGood.DataType,
             Sale.DataType,
             Salesman.DataType
         };

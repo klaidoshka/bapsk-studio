@@ -10,7 +10,11 @@ import {
 } from '@angular/forms';
 import {DataTypeService} from '../../service/data-type.service';
 import {TextService} from '../../service/text.service';
-import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../../model/data-type.model';
+import DataType, {
+  DataTypeCreateRequest,
+  DataTypeEditRequest,
+  DataTypeType
+} from '../../model/data-type.model';
 import Messages from '../../model/messages.model';
 import {first} from 'rxjs';
 import ErrorResponse from '../../model/error-response.model';
@@ -189,14 +193,16 @@ export class DataTypeManagementComponent implements OnInit {
         name: this.form.value.name,
         description: this.form.value.description,
         dataTypeId: this.dataType()!!.id!!,
-        fields: updatedFields
+        fields: updatedFields,
+        type: this.dataType()!!.type
       });
     } else {
       this.create({
         instanceId: this.instanceId()!!,
         name: this.form.value.name,
         description: this.form.value.description,
-        fields: this.formFields.value
+        fields: this.formFields.value,
+        type: DataTypeType.UserMade
       });
     }
   }

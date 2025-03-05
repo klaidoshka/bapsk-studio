@@ -3,7 +3,7 @@ using Accounting.Contract.Enumeration;
 
 namespace Accounting.Contract.Dto.StiVatReturn;
 
-public class Good
+public class SoldGood
 {
     public string Description { get; set; }
 
@@ -30,7 +30,7 @@ public class Good
     public static Entity.DataType DataType =>
         new()
         {
-            Name = "Good",
+            Name = "Sold Good",
             Description = "Goods that were sold to the customer",
             Fields = new List<Entity.DataTypeField>(10)
             {
