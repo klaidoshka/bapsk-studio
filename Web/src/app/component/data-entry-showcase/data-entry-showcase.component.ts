@@ -3,7 +3,7 @@ import {Button} from "primeng/button";
 import {ConfirmationComponent} from "../confirmation/confirmation.component";
 import {MessagesShowcaseComponent} from "../messages-showcase/messages-showcase.component";
 import {TableModule} from "primeng/table";
-import Messages from '../../model/messages-model';
+import Messages from '../../model/messages.model';
 import {DataEntryPreviewComponent} from '../data-entry-preview/data-entry-preview.component';
 import DataEntry from '../../model/data-entry.model';
 import {DataEntryService} from '../../service/data-entry.service';

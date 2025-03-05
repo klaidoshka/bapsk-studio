@@ -5,5 +5,9 @@ public enum FieldType
     Check = 1,
     Date = 2,
     Number = 3,
-    Text = 4
+    Text = 4,
+    Reference = 5,
+    IsoCountryCode = 6,
+    IdentityDocumentType = 7,
+    UnitOfMeasureType = 8
 }

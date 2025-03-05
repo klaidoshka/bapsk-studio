@@ -6,11 +6,6 @@ namespace Accounting.Contract.Entity;
 public class DataType
 {
     /// <summary>
-    /// Navigation property for the fields that the data type has.
-    /// </summary>
-    public virtual ICollection<DataTypeField> Fields { get; set; } = new List<DataTypeField>();
-
-    /// <summary>
     /// Description of the data type, can be undefined.
     /// </summary>
     [StringLength(
@@ -23,6 +18,11 @@ public class DataType
     /// Navigation property for the entries that the data type has.
     /// </summary>
     public virtual ICollection<DataEntry> Entries { get; set; }
+
+    /// <summary>
+    /// Navigation property for the fields that the data type has.
+    /// </summary>
+    public virtual ICollection<DataTypeField> Fields { get; set; }
 
     /// <summary>
     /// Unique identifier of the data type.

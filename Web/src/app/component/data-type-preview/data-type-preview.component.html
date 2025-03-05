@@ -30,7 +30,7 @@
     >
       <tr>
         <td>{{ field.name }}</td>
-        <td>{{ field.type | uppercase }}</td>
+        <td>{{ getFieldTypeLabel(field.type) }}</td>
         <td>
           @if (field.isRequired) {
             <p class="text-green-500">Yes</p>

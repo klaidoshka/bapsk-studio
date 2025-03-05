@@ -6,6 +6,12 @@ namespace Accounting.Contract.Service;
 public interface IDataTypeService
 {
     /// <summary>
+    /// Adds the default data types to an instance.
+    /// </summary>
+    /// <param name="instance">Instance to add default data types to</param>
+    public Task AddDefaultDataTypes(Instance instance);
+    
+    /// <summary>
     /// Creates a new data type.
     /// </summary>
     /// <param name="request">Request to process</param>

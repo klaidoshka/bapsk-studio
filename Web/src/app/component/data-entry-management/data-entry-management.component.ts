@@ -7,7 +7,7 @@ import DataEntry, {
   DataEntryCreateRequest,
   DataEntryEditRequest
 } from '../../model/data-entry.model';
-import Messages from '../../model/messages-model';
+import Messages from '../../model/messages.model';
 import {first} from 'rxjs';
 import ErrorResponse from '../../model/error-response.model';
 import {Button} from 'primeng/button';

@@ -3,8 +3,10 @@ using System.Text.Json.Serialization;
 using Accounting.API.Middleware;
 using Accounting.API.Util;
 using Accounting.Contract.Configuration;
+using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
+using Accounting.Services.FieldHandler;
 using Accounting.Services.Service;
 using Accounting.Services.Validator;
 
@@ -22,6 +24,32 @@ builder.AddCertificate();
 
 // Services
 builder.Services.AddDbContext(databaseOptions);
+builder.Services.AddSingleton<ExceptionHandlingMiddleware>();
+builder.Services.AddSingleton<UserIdExtractorMiddleware>();
+builder.Services.AddScoped<CheckFieldHandler>();
+builder.Services.AddScoped<DateFieldHandler>();
+builder.Services.AddScoped<NumberFieldHandler>();
+builder.Services.AddScoped<TextFieldHandler>();
+builder.Services.AddScoped<ReferenceFieldHandler>();
+builder.Services.AddScoped<IsoCountryCodeFieldHandler>();
+builder.Services.AddScoped<IdentityDocumentTypeFieldHandler>();
+builder.Services.AddScoped<UnitOfMeasureTypeFieldHandler>();
+
+builder.Services.AddScoped<Dictionary<FieldType, FieldHandler>>(
+    provider => new Dictionary<FieldType, FieldHandler>
+    {
+        [FieldType.Check] = provider.GetRequiredService<CheckFieldHandler>(),
+        [FieldType.Date] = provider.GetRequiredService<DateFieldHandler>(),
+        [FieldType.Number] = provider.GetRequiredService<NumberFieldHandler>(),
+        [FieldType.Text] = provider.GetRequiredService<TextFieldHandler>(),
+        [FieldType.Reference] = provider.GetRequiredService<ReferenceFieldHandler>(),
+        [FieldType.IsoCountryCode] = provider.GetRequiredService<IsoCountryCodeFieldHandler>(),
+        [FieldType.IdentityDocumentType] = provider.GetRequiredService<
+            IdentityDocumentTypeFieldHandler>(),
+        [FieldType.UnitOfMeasureType] = provider.GetRequiredService<UnitOfMeasureTypeFieldHandler>()
+    }
+);
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthValidator, AuthValidator>();
 builder.Services.AddScoped<IDataEntryService, DataEntryService>();
@@ -38,11 +66,12 @@ builder.Services.AddScoped<IInstanceUserMetaValidator, InstanceUserMetaValidator
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<ISessionValidator, SessionValidator>();
-builder.Services.AddScoped<IStiService, StiService>();
+builder.Services.AddScoped<IStiVatReturnClientService, StiVatReturnClientService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserValidator, UserValidator>();
-builder.Services.AddSingleton<ExceptionHandlingMiddleware>();
-builder.Services.AddSingleton<UserIdExtractorMiddleware>();
+builder.Services.AddScoped<IVatReturnService, VatReturnService>();
+builder.Services.AddScoped<IVatReturnValidator, VatReturnValidator>();
+
 builder.AddJwtAuth();
 
 builder.Services.AddOpenApi();

@@ -3,7 +3,7 @@ import Instance, {InstanceCreateRequest, InstanceEditRequest} from '../../model/
 import {Dialog} from 'primeng/dialog';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {TextService} from '../../service/text.service';
-import Messages from '../../model/messages-model';
+import Messages from '../../model/messages.model';
 import {InstanceService} from '../../service/instance.service';
 import ErrorResponse from '../../model/error-response.model';
 import {first} from 'rxjs';

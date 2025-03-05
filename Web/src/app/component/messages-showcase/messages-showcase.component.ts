@@ -1,5 +1,5 @@
 import {Component, input} from '@angular/core';
-import Messages from '../../model/messages-model';
+import Messages from '../../model/messages.model';
 import {Message} from 'primeng/message';
 
 @Component({

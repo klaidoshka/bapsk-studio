@@ -1,5 +1,5 @@
-using Accounting.Contract.Sti;
-using Accounting.Contract.Sti.SubmitDeclaration;
+using Accounting.Contract.Dto.StiVatReturn;
+using Accounting.Contract.Dto.StiVatReturn.SubmitDeclaration;
 using Accounting.Services.Util;
 
 namespace Accounting.Services.Sti.Mapping;
@@ -19,7 +19,7 @@ public static class SubmitDeclaration
     }
 
     private static TFDeclaration_Type ToExternalType(
-        this Contract.Sti.SubmitDeclaration.SubmitDeclaration type
+        this Contract.Dto.StiVatReturn.SubmitDeclaration.SubmitDeclaration type
     )
     {
         return new TFDeclaration_Type
@@ -58,7 +58,7 @@ public static class SubmitDeclaration
                 issuedBy = document.DocumentNo.IssuedBy.ConvertToEnum<IsoCountryCode_Type>(),
                 Value = document.DocumentNo.Value
             },
-            DocType = document.DocumentType
+            DocType = (int)document.DocumentType
         };
     }
 

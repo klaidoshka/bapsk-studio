@@ -7,6 +7,13 @@ namespace Accounting.Services.Validator;
 
 public class FieldTypeValidator : IFieldTypeValidator
 {
+    private readonly Dictionary<FieldType, FieldHandler.FieldHandler> _fieldHandlers;
+
+    public FieldTypeValidator(Dictionary<FieldType, FieldHandler.FieldHandler> fieldHandlers)
+    {
+        _fieldHandlers = fieldHandlers;
+    }
+
     public Validation ValidateValue(DataTypeField field, JsonElement value)
     {
         var validation = ValidateValue(field.Type, value);
@@ -25,7 +32,7 @@ public class FieldTypeValidator : IFieldTypeValidator
 
     public Validation ValidateValue(FieldType type, JsonElement value)
     {
-        return !FieldHandler.FieldHandler.Handlers.TryGetValue(type, out var handler)
+        return !_fieldHandlers.TryGetValue(type, out var handler)
             ? new Validation($"Field type {type} is not supported.")
             : handler.Validate(value);
     }

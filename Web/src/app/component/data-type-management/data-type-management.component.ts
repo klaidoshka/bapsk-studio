@@ -11,7 +11,7 @@ import {
 import {DataTypeService} from '../../service/data-type.service';
 import {TextService} from '../../service/text.service';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../../model/data-type.model';
-import Messages from '../../model/messages-model';
+import Messages from '../../model/messages.model';
 import {first} from 'rxjs';
 import ErrorResponse from '../../model/error-response.model';
 import {Button} from 'primeng/button';

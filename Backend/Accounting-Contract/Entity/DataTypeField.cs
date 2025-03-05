@@ -8,7 +8,6 @@ public class DataTypeField
     /// <summary>
     /// Navigation property for the data type that the field belongs to.
     /// </summary>
-    [ForeignKey(nameof(DataTypeId))]
     public DataType DataType { get; set; }
 
     /// <summary>
@@ -42,6 +41,16 @@ public class DataTypeField
         MinimumLength = 1
     )]
     public string Name { get; set; } = "";
+
+    /// <summary>
+    /// Navigation property for the reference data type. This is only set when FieldType is Reference.
+    /// </summary>
+    public DataType? Reference { get; set; }
+
+    /// <summary>
+    /// Reference to another data type. This is only set when FieldType is Reference.
+    /// </summary>
+    public int? ReferenceId { get; set; }
 
     /// <summary>
     /// Type of the field value.

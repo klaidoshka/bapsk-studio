@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
-using Accounting.Contract.Sti;
-using Accounting.Contract.Sti.QueryDeclarations;
+using Accounting.Contract.Dto.StiVatReturn;
+using Accounting.Contract.Dto.StiVatReturn.QueryDeclarations;
 using Accounting.Services.Util;
 
 namespace Accounting.Services.Sti.Mapping;

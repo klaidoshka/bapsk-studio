@@ -1,4 +1,8 @@
+#region
+
 using Accounting.Contract.Enumeration;
+
+#endregion
 
 namespace Accounting.Contract.Dto;
 

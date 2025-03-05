@@ -4,7 +4,7 @@ import {ButtonModule} from 'primeng/button';
 import Instance from '../../model/instance.model';
 import {InstanceService} from '../../service/instance.service';
 import {TableModule} from 'primeng/table';
-import Messages from '../../model/messages-model';
+import Messages from '../../model/messages.model';
 import {first} from 'rxjs';
 import ErrorResponse from '../../model/error-response.model';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';

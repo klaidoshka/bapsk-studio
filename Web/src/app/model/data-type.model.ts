@@ -9,6 +9,7 @@ export default interface DataType {
   id: number;
   instanceId: number;
   name: string;
+  type: DataTypeType;
 }
 
 export interface DataTypeCreateRequest {
@@ -23,4 +24,12 @@ export interface DataTypeEditRequest {
   dataTypeId: number;
   fields: DataTypeFieldEditRequest[] | null;
   name: string;
+}
+
+export enum DataTypeType {
+  UserMade = 1,
+  Customer = 2,
+  Good = 3,
+  Sale = 4,
+  Salesman = 5
 }

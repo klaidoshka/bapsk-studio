@@ -1,5 +1,5 @@
-using Accounting.Contract.Sti;
-using Accounting.Contract.Sti.SubmitPaymentInfo;
+using Accounting.Contract.Dto.StiVatReturn;
+using Accounting.Contract.Dto.StiVatReturn.SubmitPaymentInfo;
 using Accounting.Services.Util;
 
 namespace Accounting.Services.Sti.Mapping;

@@ -10,12 +10,18 @@ namespace Accounting.Services.Service;
 public class InstanceService : IInstanceService
 {
     private readonly AccountingDatabase _database;
+    private readonly IDataTypeService _dataTypeService;
     private readonly IInstanceValidator _instanceValidator;
 
-    public InstanceService(AccountingDatabase database, IInstanceValidator instanceValidator)
+    public InstanceService(
+        AccountingDatabase database,
+        IDataTypeService dataTypeService,
+        IInstanceValidator instanceValidator
+    )
     {
         _database = database;
         _instanceValidator = instanceValidator;
+        _dataTypeService = dataTypeService;
     }
 
     public async Task<Instance> CreateAsync(InstanceCreateRequest request)
@@ -36,6 +42,8 @@ public class InstanceService : IInstanceService
         instance.UserMetas.Add(new InstanceUserMeta { User = user });
 
         instance = (await _database.Instances.AddAsync(instance)).Entity;
+
+        await _dataTypeService.AddDefaultDataTypes(instance);
 
         await _database.SaveChangesAsync();
 
