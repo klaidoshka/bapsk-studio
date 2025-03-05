@@ -1,0 +1,52 @@
+@User_API_IP = http://localhost:5125/api/v1/user
+
+POST {{User_API_IP}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "BirthDate": "2021-09-01T00:00:00",
+  "Country": "US",
+  "Email": "john.doe@gmail.com",
+  "FirstName": "John",
+  "LastName": "DoeLol",
+  "Password": "123456.ow"
+}
+
+###
+
+DELETE {{User_API_IP}}/2
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###
+
+PUT {{User_API_IP}}/2
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "BirthDate": "2007-09-01T00:00:00",
+  "Country": "US",
+  "Email": "john.doe@gmail.com",
+  "FirstName": "John",
+  "Id": 1,
+  "LastName": "DoeLol"
+}
+
+###
+
+GET {{User_API_IP}}/2
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###
+
+GET {{User_API_IP}}?email=john.doe@gmail.com
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}

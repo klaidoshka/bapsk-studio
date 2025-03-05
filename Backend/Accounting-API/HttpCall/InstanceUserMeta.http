@@ -1,0 +1,33 @@
+@InstanceUserMeta_API_IP = http://localhost:5125/api/v1/accounting/instance-user-meta
+
+POST {{InstanceUserMeta_API_IP}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "InstanceId": 1,
+  "UserId": "2",
+  "ManagerId": "1"
+}
+
+###
+
+DELETE {{InstanceUserMeta_API_IP}}/1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###
+
+GET {{InstanceUserMeta_API_IP}}/1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###
+
+GET {{InstanceUserMeta_API_IP}}?instanceId=1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}

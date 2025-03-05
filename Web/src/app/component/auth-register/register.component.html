@@ -1,0 +1,147 @@
+<h2 class="text-2xl font-bold mb-4 text-gray-700">Register</h2>
+
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
+  <!-- Display messages if any -->
+  @if (messages().length > 0) {
+    <div class="mb-4">
+      <ul class="list-disc list-inside text-red-500">
+        @for (message of messages(); track $index) {
+          <li>{{ message }}</li>
+        }
+      </ul>
+    </div>
+  }
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- First Name -->
+    <div class="form-field">
+      <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
+      <input
+        type="text"
+        id="firstName"
+        formControlName="firstName"
+        pInputText
+        class="bg-surface-50 mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        required
+      />
+      @if (getErrorMessage('firstName'); as firstNameInvalid) {
+        <div class="text-xs text-red-500 mt-1">
+          {{ firstNameInvalid }}
+        </div>
+      }
+    </div>
+
+    <!-- Last Name -->
+    <div class="form-field">
+      <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
+      <input
+        type="text"
+        id="lastName"
+        formControlName="lastName"
+        pInputText
+        class="bg-surface-50 mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        required
+      />
+      @if (getErrorMessage('lastName'); as lastNameInvalid) {
+        <div class="text-xs text-red-500 mt-1">
+          {{ lastNameInvalid }}
+        </div>
+      }
+    </div>
+
+    <!-- Birth Date -->
+    <div class="form-field">
+      <label for="birthDate" class="block text-sm font-medium text-gray-700">Birth Date</label>
+      <p-datepicker
+        inputId="birthDate"
+        formControlName="birthDate"
+        [showIcon]="true"
+        [maxDate]="maxDate()"
+        variant="filled"
+        inputStyleClass="p-2 rounded-md"
+        class="bg-surface-50 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        required
+      ></p-datepicker>
+      @if (getErrorMessage('birthDate'); as birthDateInvalid) {
+        <div class="text-xs text-red-500 mt-1">
+          {{ birthDateInvalid }}
+        </div>
+      }
+    </div>
+
+    <!-- Email -->
+    <div class="form-field">
+      <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+      <input
+        type="email"
+        id="email"
+        formControlName="email"
+        pInputText
+        class="bg-surface-50 mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        required
+      />
+      @if (getErrorMessage('email'); as emailInvalid) {
+        <div class="text-xs text-red-500 mt-1">
+          {{ emailInvalid }}
+        </div>
+      }
+    </div>
+
+    <!-- Password -->
+    <div class="form-field">
+      <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+      <input
+        type="password"
+        id="password"
+        formControlName="password"
+        pInputText
+        class="bg-surface-50 mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        required
+      />
+      @if (getErrorMessage('password'); as passwordInvalid) {
+        <div class="text-xs text-red-500 mt-1">
+          {{ passwordInvalid }}
+        </div>
+      }
+    </div>
+
+    <!-- Country Dropdown -->
+    <div class="form-field">
+      <label for="country" class="block text-sm font-medium text-gray-700">Country</label>
+      <p-autocomplete
+        id="country"
+        formControlName="country"
+        optionLabel="name"
+        placeholder="Select a Country"
+        [dropdown]="true"
+        [suggestions]="filteredCountries"
+        (completeMethod)="filterCountries($event)"
+        class="bg-surface-50 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        required
+      ></p-autocomplete>
+      @if (getErrorMessage('country'); as countryInvalid) {
+        <div class="text-xs text-red-500 mt-1">
+          {{ countryInvalid }}
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Submit Button -->
+  <div class="flex justify-center">
+    <p-button
+      type="submit"
+      label="Register"
+      icon="pi pi-check"
+      iconPos="right"
+      [loading]="isSubmitting()"
+      [disabled]="registerForm.invalid"
+    ></p-button>
+  </div>
+</form>
+
+<p class="mt-4 text-sm text-center text-gray-600">Already have an account?</p>
+
+<p class="text-center">
+  <a routerLink="/auth/login" class="text-indigo-600 hover:underline">Login here</a>
+</p>

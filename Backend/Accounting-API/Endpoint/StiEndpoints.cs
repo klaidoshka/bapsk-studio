@@ -10,15 +10,6 @@ namespace Accounting.API.Endpoint;
 
 public static class StiEndpoints
 {
-    /// <summary>
-    /// Maps STI endpoints under the specified route group.
-    /// POST: /cancel-declaration
-    /// GET: /exported-goods
-    /// GET: /query-declarations
-    /// POST: /submit-declaration
-    /// POST: /submit-payment-info
-    /// </summary>
-    /// <param name="endpoints">Endpoints group to map STI endpoints under</param>
     public static void MapStiEndpoints(this RouteGroupBuilder endpoints)
     {
         endpoints.MapPost(

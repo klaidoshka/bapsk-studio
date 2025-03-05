@@ -1,4 +1,7 @@
-using Accounting.Contract.Auth;
+using Accounting.API.Util;
+using Accounting.Contract.Dto;
+using Accounting.Contract.Request;
+using Accounting.Contract.Response;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,16 +13,24 @@ public static class AuthEndpoints
     {
         builder.MapPost(
             "/login",
-            async ([FromBody] LoginRequest request, HttpResponse response, IAuthService authService) =>
+            async (
+                [FromBody] LoginRequest request,
+                HttpRequest httpRequest,
+                HttpResponse response,
+                IAuthService authService
+            ) =>
             {
-                var validation = authService.ValidateLoginRequest(request);
+                request.Meta = await httpRequest.GetAuthRequestUserMetaAsync();
 
-                return await validation.ToResultAsync(
-                    async () =>
+                var token = await authService.LoginAsync(request);
+
+                response.PutJwt(token);
+
+                return Results.Ok(
+                    new AuthResponse
                     {
-                        var token = await authService.LoginAsync(request);
-
-                        PutTokensIntoResponse(token, response);
+                        AccessToken = token.AccessToken,
+                        User = token.User.ToDto()
                     }
                 );
             }
@@ -28,46 +39,53 @@ public static class AuthEndpoints
         builder
             .MapPost(
                 "/logout",
-                async (HttpContext httpContext, IAuthService authService, IJwtService jwtService) =>
+                async (
+                    HttpContext httpContext,
+                    IAuthService authService,
+                    IJwtService jwtService
+                ) =>
                 {
-                    var refreshToken = GetRefreshTokenFromRequest(httpContext.Request);
+                    var refreshToken = httpContext.Request.ToRefreshToken();
 
-                    var validation = await authService.ValidateRefreshTokenAsync(refreshToken);
+                    if (String.IsNullOrWhiteSpace(refreshToken))
+                    {
+                        return Results.Unauthorized();
+                    }
 
-                    return await validation.ToResultAsync(
-                        async () =>
-                        {
-                            var sessionId = jwtService.ExtractSessionId(refreshToken)!.Value;
+                    var sessionId = jwtService.ExtractSessionId(refreshToken)!.Value;
 
-                            await authService.LogoutAsync(sessionId);
+                    await authService.LogoutAsync(sessionId);
 
-                            httpContext.Response.Cookies.Delete("accessToken");
-                            httpContext.Response.Cookies.Delete("refreshToken");
-                        }
-                    );
+                    httpContext.Response.ClearJwt();
+
+                    return Results.Ok();
                 }
             )
             .RequireAuthorization();
 
         builder.MapPost(
             "/refresh",
-            async (HttpContext httpContext, IAuthService authService) =>
+            async (
+                HttpContext httpContext,
+                IAuthService authService
+            ) =>
             {
-                var refreshToken = GetRefreshTokenFromRequest(httpContext.Request);
+                var refreshToken = httpContext.Request.ToRefreshToken();
 
-                if (string.IsNullOrWhiteSpace(refreshToken))
+                if (String.IsNullOrWhiteSpace(refreshToken))
                 {
                     return Results.Unauthorized();
                 }
 
-                var validation = await authService.ValidateRefreshTokenAsync(refreshToken);
+                var token = await authService.RefreshTokenAsync(refreshToken);
 
-                return await validation.ToResultAsync(
-                    async () =>
+                httpContext.Response.PutJwt(token);
+
+                return Results.Ok(
+                    new AuthResponse
                     {
-                        var token = await authService.RefreshTokenAsync(refreshToken);
-
-                        PutTokensIntoResponse(token, httpContext.Response);
+                        AccessToken = token.AccessToken,
+                        User = token.User.ToDto()
                     }
                 );
             }
@@ -75,43 +93,26 @@ public static class AuthEndpoints
 
         builder.MapPost(
             "/register",
-            async ([FromBody] RegisterRequest request, IAuthService authService) =>
+            async (
+                [FromBody] RegisterRequest request,
+                HttpRequest httpRequest,
+                HttpResponse response,
+                IAuthService authService
+            ) =>
             {
-                var validation = await authService.ValidateRegisterRequestAsync(request);
+                request.Meta = await httpRequest.GetAuthRequestUserMetaAsync();
 
-                return await validation.ToResultAsync(
-                    () => authService.RegisterAsync(request)
+                var token = await authService.RegisterAsync(request);
+
+                response.PutJwt(token);
+
+                return Results.Ok(
+                    new AuthResponse
+                    {
+                        AccessToken = token.AccessToken,
+                        User = token.User.ToDto()
+                    }
                 );
-            }
-        );
-    }
-
-    private static string? GetRefreshTokenFromRequest(HttpRequest request)
-    {
-        return request.Cookies["refreshToken"];
-    }
-
-    private static void PutTokensIntoResponse(JwtTokenPair token, HttpResponse response)
-    {
-        response.Cookies.Append(
-            "accessToken",
-            token.AccessToken,
-            new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = false, // TODO: Set to true when using HTTPS
-                SameSite = SameSiteMode.Strict
-            }
-        );
-
-        response.Cookies.Append(
-            "refreshToken",
-            token.RefreshToken,
-            new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = false, // TODO: Set to true when using HTTPS
-                SameSite = SameSiteMode.Strict
             }
         );
     }

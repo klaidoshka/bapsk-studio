@@ -16,7 +16,7 @@ public class SubmitDeclarationDocumentHeader
     /// <summary>
     /// Declaration correction number. Starts from 1.
     /// </summary>
-    public required string DocumentCorrectionNo { get; set; }
+    public required int DocumentCorrectionNo { get; set; }
 
     /// <summary>
     /// Declaration unique identifier.

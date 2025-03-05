@@ -1,11 +1,13 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Accounting.API;
-using Accounting.API.Endpoint;
+using Accounting.API.Middleware;
+using Accounting.API.Util;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Service;
+using Accounting.Contract.Validator;
 using Accounting.Services.Service;
+using Accounting.Services.Validator;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -19,18 +21,31 @@ builder.AddConfiguration<Logging>("Logging");
 
 var databaseOptions = builder.AddConfiguration<DatabaseOptions>("DatabaseOptions");
 
+builder.AddCertificate();
+
 // Services
 builder.Services.AddDbContext(databaseOptions);
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuthValidator, AuthValidator>();
+builder.Services.AddScoped<IDataEntryService, DataEntryService>();
+builder.Services.AddScoped<IDataEntryValidator, DataEntryValidator>();
+builder.Services.AddScoped<IDataTypeService, DataTypeService>();
+builder.Services.AddScoped<IDataTypeValidator, DataTypeValidator>();
+builder.Services.AddScoped<IFieldTypeService, FieldTypeService>();
+builder.Services.AddScoped<IFieldTypeValidator, FieldTypeValidator>();
 builder.Services.AddScoped<IHashService, HashService>();
+builder.Services.AddScoped<IInstanceService, InstanceService>();
+builder.Services.AddScoped<IInstanceValidator, InstanceValidator>();
+builder.Services.AddScoped<IInstanceUserMetaService, InstanceUserMetaService>();
+builder.Services.AddScoped<IInstanceUserMetaValidator, InstanceUserMetaValidator>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<ISessionService, SessionService>();
+builder.Services.AddScoped<ISessionValidator, SessionValidator>();
 builder.Services.AddScoped<IStiService, StiService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddSingleton<ExceptionHandlingMiddleware>();
 
-// Misc
-builder.AddCertificate();
-
-builder
-    .Services
+builder.Services
     .AddAuthentication(
         options =>
         {
@@ -57,31 +72,25 @@ builder
     );
 
 builder.Services.AddAuthorization();
-
 builder.Services.AddOpenApi();
 
 builder.Services.ConfigureHttpJsonOptions(
     json =>
     {
         json.SerializerOptions.PropertyNameCaseInsensitive = true;
-        json.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+
+        json.SerializerOptions.Converters.Add(
+            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+        );
     }
 );
 
 var application = builder.Build();
 
 application.UseAuthentication();
-
 application.UseAuthorization();
-
-application
-    .MapGroup("/api/v1/auth")
-    .MapAuthEndpoints();
-
-application
-    .MapGroup("/api/v1/accounting/sti")
-    .RequireAuthorization()
-    .MapStiEndpoints();
+application.UseMiddleware<ExceptionHandlingMiddleware>();
+application.MapEndpoints();
 
 if (application.Environment.IsDevelopment())
 {
@@ -89,7 +98,5 @@ if (application.Environment.IsDevelopment())
 }
 
 application.UseHttpsRedirection();
-
 application.UseHsts();
-
 application.Run();

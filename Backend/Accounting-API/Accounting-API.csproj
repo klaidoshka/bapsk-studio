@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Accounting-Contract\Accounting-Contract.csproj" />
-    <ProjectReference Include="..\Accounting-Services\Accounting-Services.csproj" />
+    <ProjectReference Include="..\Accounting-Contract\Accounting-Contract.csproj"/>
+    <ProjectReference Include="..\Accounting-Services\Accounting-Services.csproj"/>
   </ItemGroup>
 
 </Project>

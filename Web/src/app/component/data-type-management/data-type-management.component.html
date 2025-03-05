@@ -1,0 +1,174 @@
+<p-dialog
+  header="Data Type Management"
+  closeOnEscape="true"
+  modal="true"
+  closable="true"
+  [(visible)]="isShown"
+  (onHide)="hide()"
+  (close)="hide()"
+>
+  <div class="min-w-128">
+    <div class="my-2">
+      <app-messages-showcase [messages]="messages()"/>
+    </div>
+
+    <div
+      class="grid grid-cols-1 gap-4"
+      [formGroup]="form"
+    >
+      <div>
+        <label
+          for="name"
+          class="block text-sm font-medium text-gray-700"
+        >Name</label>
+        <input
+          formControlName="name"
+          pInputText
+          type="text"
+          id="name"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        />
+        @if (getErrorMessage("name"); as error) {
+          <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+        }
+      </div>
+
+      <div>
+        <label
+          for="description"
+          class="block text-sm font-medium text-gray-700"
+        >Description</label>
+        <textarea
+          formControlName="description"
+          pTextarea
+          id="description"
+          class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        ></textarea>
+        @if (getErrorMessage("description"); as error) {
+          <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+        }
+      </div>
+
+      <div>
+        <label
+          for="fields"
+          class="block text-sm font-medium text-gray-700"
+        >Fields</label>
+
+        <table
+          class="p-datatable-table"
+          id="fields"
+          formArrayName="fields"
+        >
+          <thead class="p-datatable-thead">
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default Value</th>
+            <th>Required</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+
+          <tbody class="p-datatable-tbody">
+            @for (field of formFields.controls; let i = $index; track i) {
+              <tr [formGroup]="field">
+                <td>
+                  <input
+                    formControlName="name"
+                    pInputText
+                    type="text"
+                    class="w-full"
+                  />
+                </td>
+
+                <td>
+                  <p-select
+                    formControlName="type"
+                    [options]="fieldTypes"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Select a type"
+                    (onChange)="clearDefaultValue(i)"
+                    appendTo="body"
+                  ></p-select>
+                </td>
+
+                <td>
+                  @switch (getFieldType(i)) {
+                    @case (FieldType.Check) {
+                      <p-check-box
+                        formControlName="defaultValue"
+                        binary="true"
+                        class="w-full"
+                      ></p-check-box>
+                    }
+                    @case (FieldType.Date) {
+                      <p-datepicker
+                        formControlName="defaultValue"
+                        class="w-full"
+                        appendTo="body"
+                      ></p-datepicker>
+                    }
+                    @case (FieldType.Number) {
+                      <input
+                        formControlName="defaultValue"
+                        [defaultValue]="0"
+                        pInputText
+                        type="number"
+                        class="w-full"
+                      />
+                    }
+                    @default {
+                      <input
+                        formControlName="defaultValue"
+                        pInputText
+                        type="text"
+                        class="w-full"
+                      />
+                    }
+                  }
+                </td>
+
+                <td>
+                  <p-checkbox
+                    formControlName="isRequired"
+                    binary="true"
+                  ></p-checkbox>
+                </td>
+
+                <td>
+                  <p-button
+                    icon="pi pi-trash"
+                    type="button"
+                    variant="text"
+                    (onClick)="removeField(i)"
+                  ></p-button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        @if (getErrorMessage("fields"); as error) {
+          <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+        }
+
+        <div class="mt-2">
+          <p-button
+            label="Add Field"
+            (onClick)="addField(null)"
+          ></p-button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end mt-4">
+      <p-button
+        label="Save"
+        [disabled]="!form.valid || !form.dirty"
+        (onClick)="save()"
+      ></p-button>
+    </div>
+  </div>
+</p-dialog>

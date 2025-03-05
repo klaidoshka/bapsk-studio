@@ -1,0 +1,25 @@
+@if (isAuthenticated()) {
+  @switch (instances().length) {
+    @case (0) {
+      <app-instance-management />
+
+      <p-button
+        label="Create Instance"
+        icon="pi pi-plus"
+        (onClick)="showManagementMenu()"
+      ></p-button>
+    }
+    @default {
+      <p-autocomplete
+        [(ngModel)]="selectedInstance"
+        optionLabel="name"
+        placeholder="Select Instance"
+        [dropdown]="true"
+        [suggestions]="filteredInstances()"
+        (completeMethod)="filterInstances($event)"
+        (onSelect)="selectInstance($event.value)"
+        class="bg-surface-50 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+      ></p-autocomplete>
+    }
+  }
+}

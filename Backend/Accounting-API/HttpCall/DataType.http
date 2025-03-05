@@ -1,0 +1,47 @@
+@DataEntry_API_IP = http://localhost:5125/api/v1/accounting/data-type
+
+POST {{DataEntry_API_IP}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "Description": "Description of the data type",
+  "InstanceId": 2,
+  "Name": "Name"
+}
+
+###
+
+DELETE {{DataEntry_API_IP}}/3
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###
+
+PUT {{DataEntry_API_IP}}/3
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "Description": "Description Edited",
+  "Id": 1,
+  "ManagerId": 1,
+  "Name": "Name Edited"
+}
+
+###
+
+GET {{DataEntry_API_IP}}/3
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###
+
+GET {{DataEntry_API_IP}}?instanceId=2
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}

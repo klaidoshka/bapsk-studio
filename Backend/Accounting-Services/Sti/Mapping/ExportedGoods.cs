@@ -18,7 +18,9 @@ public static class ExportedGoods
         };
     }
 
-    public static ExportedGoodsResponse ToInternalType(this getInfoOnExportedGoodsResponse1 response)
+    public static ExportedGoodsResponse ToInternalType(
+        this getInfoOnExportedGoodsResponse1 response
+    )
     {
         return new ExportedGoodsResponse
         {
@@ -41,11 +43,13 @@ public static class ExportedGoods
         {
             CustomsVerificationResult = goods.CustomsVerificationResults
                 .ToInternalType(),
-            StiAssessmentResult = goods.STIAssessmentResults.ToInternalType(),
+            StiAssessmentResult = goods.STIAssessmentResults.ToInternalType()
         };
     }
 
-    private static ExportedGoodsCustomsVerificationResult ToInternalType(this CustomsVerificationResults_Type results)
+    private static ExportedGoodsCustomsVerificationResult ToInternalType(
+        this CustomsVerificationResults_Type results
+    )
     {
         return new ExportedGoodsCustomsVerificationResult
         {
@@ -60,7 +64,9 @@ public static class ExportedGoods
         };
     }
 
-    private static IReadOnlyList<ExportedGoodsVerifiedGoods> ToInternalType(this VerifiedGoods_Type[] goods)
+    private static IReadOnlyList<ExportedGoodsVerifiedGoods> ToInternalType(
+        this VerifiedGoods_Type[] goods
+    )
     {
         return goods
             .Select(
@@ -78,7 +84,9 @@ public static class ExportedGoods
             .ToImmutableList();
     }
 
-    private static ExportedGoodsStiAssessmentResult ToInternalType(this STIAssessmentResults_Type results)
+    private static ExportedGoodsStiAssessmentResult ToInternalType(
+        this STIAssessmentResults_Type results
+    )
     {
         return new ExportedGoodsStiAssessmentResult
         {
@@ -87,7 +95,9 @@ public static class ExportedGoods
         };
     }
 
-    private static IReadOnlyList<ExportedGoodsStiAssessmentResultCondition> ToInternalType(this STIAssessmentResults_TypeCondition[] conditions)
+    private static IReadOnlyList<ExportedGoodsStiAssessmentResultCondition> ToInternalType(
+        this STIAssessmentResults_TypeCondition[] conditions
+    )
     {
         return conditions
             .Select(

@@ -12,9 +12,17 @@ public class MessageLoggingBehavior : IEndpointBehavior
         clientRuntime.ClientMessageInspectors.Add(new CustomMessageInspector());
     }
 
-    public void ApplyDispatchBehavior(ServiceEndpoint endpoint, EndpointDispatcher endpointDispatcher) { }
+    public void ApplyDispatchBehavior(
+        ServiceEndpoint endpoint,
+        EndpointDispatcher endpointDispatcher
+    ) { }
+
     public void Validate(ServiceEndpoint endpoint) { }
-    public void AddBindingParameters(ServiceEndpoint endpoint, BindingParameterCollection bindingParameters) { }
+
+    public void AddBindingParameters(
+        ServiceEndpoint endpoint,
+        BindingParameterCollection bindingParameters
+    ) { }
 
     private class CustomMessageInspector : IClientMessageInspector
     {
@@ -26,6 +34,7 @@ public class MessageLoggingBehavior : IEndpointBehavior
         public object BeforeSendRequest(ref Message request, IClientChannel channel)
         {
             Console.WriteLine("-------- Request  --------\n" + request);
+
             return null;
         }
     }

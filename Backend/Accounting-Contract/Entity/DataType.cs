@@ -6,15 +6,9 @@ namespace Accounting.Contract.Entity;
 public class DataType
 {
     /// <summary>
-    /// Navigation property for the user who created the data type.
+    /// Navigation property for the fields that the data type has.
     /// </summary>
-    [ForeignKey(nameof(CreatedById))]
-    public User CreatedBy { get; set; }
-
-    /// <summary>
-    /// Unique identifier of the user who created the data type.
-    /// </summary>
-    public int CreatedById { get; set; }
+    public virtual ICollection<DataTypeField> Fields { get; set; }
 
     /// <summary>
     /// Description of the data type, can be undefined.
@@ -26,6 +20,11 @@ public class DataType
     public string? Description { get; set; }
 
     /// <summary>
+    /// Navigation property for the entries that the data type has.
+    /// </summary>
+    public virtual ICollection<DataEntry> Entries { get; set; }
+
+    /// <summary>
     /// Unique identifier of the data type.
     /// </summary>
     [Key]
@@ -35,7 +34,7 @@ public class DataType
     /// <summary>
     /// Marks the data type as soft-deleted, but does not remove it from the database.
     /// </summary>
-    public bool? IsDeleted { get; set; }
+    public bool IsDeleted { get; set; }
 
     /// <summary>
     /// Navigation property for the instance that the data type belongs to.

@@ -1,59 +1,74 @@
 using Accounting.Contract;
-using Accounting.Contract.Auth;
-using Accounting.Contract.Entity;
-using Accounting.Contract.Result;
+using Accounting.Contract.Configuration;
+using Accounting.Contract.Dto;
+using Accounting.Contract.Request;
+using Accounting.Contract.Response;
 using Accounting.Contract.Service;
+using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;
+using Session = Accounting.Contract.Entity.Session;
+using User = Accounting.Contract.Entity.User;
 
 namespace Accounting.Services.Service;
 
 public class AuthService : IAuthService
 {
+    private readonly IAuthValidator _authValidator;
     private readonly AccountingDatabase _database;
     private readonly IHashService _hashService;
     private readonly IJwtService _jwtService;
+    private readonly JwtSettings _jwtSettings;
 
     public AuthService(
+        IAuthValidator authValidator,
         AccountingDatabase database,
         IHashService hashService,
-        IJwtService jwtService
+        IJwtService jwtService,
+        JwtSettings jwtSettings
     )
     {
+        _authValidator = authValidator;
         _database = database;
         _hashService = hashService;
         _jwtService = jwtService;
+        _jwtSettings = jwtSettings;
     }
 
     public async Task<JwtTokenPair> LoginAsync(LoginRequest request)
     {
-        var user = await _database.Users.FirstOrDefaultAsync(
+        _authValidator
+            .ValidateLoginRequest(request)
+            .AssertValid();
+
+        (await _authValidator.ValidateUserCredentialsAsync(request.Email, request.Password))
+            .AssertValid();
+
+        var user = await _database.Users.FirstAsync(
             u => u.EmailNormalized.Equals(
                 request.Email,
                 StringComparison.InvariantCultureIgnoreCase
             )
         );
 
-        if (user == null || !(await ValidateUserCredentialsAsync(request.Email, request.Password)).IsValid)
-        {
-            throw new UnauthorizedAccessException("Invalid credentials or user does not exist");
-        }
-
         var sessionId = Guid.NewGuid();
 
         var token = new JwtTokenPair
         {
             AccessToken = _jwtService.GenerateAccessToken(user, sessionId),
-            RefreshToken = _jwtService.GenerateRefreshToken(user, sessionId)
+            RefreshToken = _jwtService.GenerateRefreshToken(user, sessionId),
+            RefreshTokenExpiresAt =
+                DateTime.UtcNow.AddMinutes(_jwtSettings.RefreshTokenExpiryMinutes),
+            User = user
         };
 
         await _database.Sessions.AddAsync(
             new Session
             {
-                Agent = request.Agent,
+                Agent = request.Meta!.Agent!,
                 CreatedAt = DateTime.UtcNow,
                 Id = sessionId,
-                IpAddress = request.IpAddress,
-                Location = request.Location,
+                IpAddress = request.Meta!.IpAddress!,
+                Location = request.Meta!.Location ?? "Unknown location",
                 RefreshToken = token.RefreshToken,
                 UserId = user.Id
             }
@@ -66,41 +81,45 @@ public class AuthService : IAuthService
 
     public async Task LogoutAsync(Guid sessionId)
     {
-        var session = await _database.Sessions.FirstOrDefaultAsync(s => s.Id == sessionId);
+        var session = await _database.Sessions.FindAsync(sessionId);
 
-        if (session != null)
+        if (session == null)
         {
-            _database.Sessions.Remove(session);
-
-            await _database.SaveChangesAsync();
+            throw new ValidationException("Session not found.");
         }
+
+        _database.Sessions.Remove(session);
+
+        await _database.SaveChangesAsync();
     }
 
     public async Task<JwtTokenPair> RefreshTokenAsync(string refreshToken)
     {
-        var validation = await ValidateRefreshTokenAsync(refreshToken);
+        var validation = await _authValidator.ValidateRefreshTokenAsync(refreshToken);
 
         if (!validation.IsValid)
         {
-            throw new UnauthorizedAccessException("Invalid refresh token");
+            throw new ValidationException("Invalid refresh token.");
         }
 
         var sessionId = _jwtService.ExtractSessionId(refreshToken);
 
-        var session = await _database
-            .Sessions
+        var session = await _database.Sessions
             .Include(s => s.User)
             .FirstOrDefaultAsync(s => s.Id == sessionId);
 
         if (session == null)
         {
-            throw new UnauthorizedAccessException("Session not found");
+            throw new ValidationException("Session not found.");
         }
 
         var token = new JwtTokenPair
         {
             AccessToken = _jwtService.GenerateAccessToken(session.User, session.Id),
-            RefreshToken = _jwtService.GenerateRefreshToken(session.User, session.Id)
+            RefreshToken = _jwtService.GenerateRefreshToken(session.User, session.Id),
+            RefreshTokenExpiresAt =
+                DateTime.UtcNow.AddMinutes(_jwtSettings.RefreshTokenExpiryMinutes),
+            User = session.User
         };
 
         session.RefreshToken = token.RefreshToken;
@@ -112,6 +131,8 @@ public class AuthService : IAuthService
 
     public async Task<JwtTokenPair> RegisterAsync(RegisterRequest request)
     {
+        (await _authValidator.ValidateRegisterRequestAsync(request)).AssertValid();
+
         var user = new User
         {
             BirthDate = request.BirthDate,
@@ -119,6 +140,7 @@ public class AuthService : IAuthService
             Email = request.Email,
             EmailNormalized = request.Email.ToLowerInvariant(),
             FirstName = request.FirstName,
+            IsDeleted = false,
             LastName = request.LastName,
             PasswordHash = _hashService.Hash(request.Password)
         };
@@ -130,96 +152,10 @@ public class AuthService : IAuthService
         return await LoginAsync(
             new LoginRequest
             {
-                Agent = request.Agent,
                 Email = request.Email,
-                IpAddress = request.IpAddress,
-                Location = request.Location,
+                Meta = request.Meta,
                 Password = request.Password
             }
         );
-    }
-
-    public Validation ValidateLoginRequest(LoginRequest request)
-    {
-        var failures = new List<string>();
-
-        if (string.IsNullOrWhiteSpace(request.Password))
-        {
-            failures.Add("Password is required");
-        }
-
-        if (string.IsNullOrWhiteSpace(request.Email))
-        {
-            failures.Add("Email is required");
-        }
-
-        return new Validation(failures);
-    }
-
-    public async Task<Validation> ValidateRegisterRequestAsync(RegisterRequest request)
-    {
-        var failures = new List<string>();
-
-        if (string.IsNullOrWhiteSpace(request.Password))
-        {
-            failures.Add("Password is required");
-        }
-
-        if (string.IsNullOrWhiteSpace(request.Email))
-        {
-            failures.Add("Email is required");
-        }
-
-        if (
-            await _database.Users.AnyAsync(
-                u => u.EmailNormalized.Equals(
-                    request.Email,
-                    StringComparison.InvariantCultureIgnoreCase
-                )
-            )
-        )
-        {
-            failures.Add("Specified email cannot be used to register an user");
-        }
-
-        if (
-            string.IsNullOrWhiteSpace(request.Password) ||
-            request.Password.Length < 7 ||
-            request.Password.All(ch => request.Password[0] == ch)
-        )
-        {
-            failures.Add("Password must have at least 7 characters and be not a sequence of the same character");
-        }
-
-        if (string.IsNullOrWhiteSpace(request.FirstName))
-        {
-            failures.Add("First name is required");
-        }
-
-        return new Validation(failures);
-    }
-
-    public async Task<Validation> ValidateRefreshTokenAsync(string refreshToken)
-    {
-        var sessionId = _jwtService.ExtractSessionId(refreshToken);
-        var session = await _database.Sessions.FirstOrDefaultAsync(s => s.Id == sessionId);
-
-        return session?.RefreshToken == refreshToken
-            ? new Validation()
-            : new Validation("Session was not found");
-    }
-
-    public async Task<Validation> ValidateUserCredentialsAsync(string email, string password)
-    {
-        var user = await _database.Users.FirstOrDefaultAsync(
-            u => u.EmailNormalized.Equals(
-                email,
-                StringComparison.InvariantCultureIgnoreCase
-            )
-        );
-
-        return user != null && _hashService.Verify(password, user.PasswordHash)
-            ? new Validation()
-            : new Validation("Invalid credentials or user does not exist");
     }
 }

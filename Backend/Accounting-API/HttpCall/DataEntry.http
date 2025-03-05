@@ -1,0 +1,50 @@
+@DataEntry_API_IP = http://localhost:5125/api/v1/accounting/data-entry
+
+POST {{DataEntry_API_IP}}
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "CreatorId": 1,
+  "DataTypeId": 3,
+  "Values": {
+    "1": "Text value within DataTypeField of id 1"
+  }
+}
+
+###
+
+DELETE {{DataEntry_API_IP}}/1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###
+
+PUT {{DataEntry_API_IP}}/1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "ManagerId": 1,
+  "Id": 1,
+  "Values": {
+    "1": "Value 1 Edited"
+  }
+}
+
+###
+
+GET {{DataEntry_API_IP}}/1
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+###
+
+GET {{DataEntry_API_IP}}?dataTypeId=3
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}

@@ -1,0 +1,23 @@
+<p-dialog
+  header="Instance Preview"
+  closable="true"
+  closeOnEscape="true"
+  modal="true"
+  (close)="hide()"
+  (onHide)="hide()"
+  [(visible)]="isShown"
+>
+  <p class="font-bold">Name</p>
+  <p>{{ instance()?.name }}</p>
+
+  <p class="font-bold mt-4">Description</p>
+  <p>{{ instance()?.description }}</p>
+
+  <div class="flex justify-end mt-4">
+    <p-button
+      label="Close"
+      class="p-button-secondary"
+      (onClick)="hide()"
+    ></p-button>
+  </div>
+</p-dialog>

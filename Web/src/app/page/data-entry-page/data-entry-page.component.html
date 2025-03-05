@@ -1,0 +1,37 @@
+<div class="flex h-screen">
+  <!-- Sidebar -->
+  <div class="w-1/5 bg-gray-800 text-white p-4 space-y-4 min-w-fit">
+    <h1 class="text-2xl font-bold">Data Types</h1>
+
+    @for (dataType of $dataTypes(); track dataType.id) {
+      <div class="my-2 p-1 bg-primary-500 rounded rounded-2">
+        <div
+          (click)="select(dataType)"
+          [class]="{
+          'cursor-pointer': true,
+          'underline': dataType.id === $dataType()?.id
+          }"
+        >
+          <h2 class="text-lg font-bold">{{ dataType.name }}</h2>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-grow p-4">
+    <div class="p-4">
+      <h1 class="text-2xl font-bold mb-4">Data Entries</h1>
+
+      @if ($dataType()) {
+        <app-data-entry-showcase [dataType]="$dataType()!!"/>
+      } @else {
+        <p-message
+          class="my-4"
+          severity="warn"
+        >Please select a data type to manage data entries.
+        </p-message>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,61 @@
+<p-dialog
+  header="Instance Management"
+  closeOnEscape="true"
+  modal="true"
+  closable="true"
+  [(visible)]="isShown"
+  (onHide)="hide()"
+  (close)="hide()"
+>
+  <div class="min-w-128">
+    <div class="my-2">
+      <app-messages-showcase [messages]="messages()"/>
+    </div>
+
+    <div
+      class="grid grid-cols-1 gap-4"
+      [formGroup]="form"
+    >
+      <div>
+        <label
+          for="name"
+          class="block text-sm font-medium text-gray-700"
+        >Name</label>
+        <input
+          formControlName="name"
+          pInputText
+          type="text"
+          id="name"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        />
+        @if (getErrorMessage("name"); as error) {
+          <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+        }
+      </div>
+
+      <div>
+        <label
+          for="description"
+          class="block text-sm font-medium text-gray-700"
+        >Description</label>
+        <textarea
+          formControlName="description"
+          pTextarea
+          id="description"
+          class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        ></textarea>
+        @if (getErrorMessage("description"); as error) {
+          <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+        }
+      </div>
+    </div>
+
+    <div class="flex justify-end mt-4">
+      <p-button
+        label="Save"
+        [disabled]="!form.valid || !form.dirty"
+        (onClick)="save()"
+      ></p-button>
+    </div>
+  </div>
+</p-dialog>

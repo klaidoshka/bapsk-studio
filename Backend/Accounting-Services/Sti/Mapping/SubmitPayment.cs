@@ -18,7 +18,9 @@ public static class SubmitPayment
         };
     }
 
-    private static PaymentInfo_TypePayment[] ToExternalType(this IReadOnlyList<SubmitPaymentInfo> payments)
+    private static PaymentInfo_TypePayment[] ToExternalType(
+        this IReadOnlyList<SubmitPaymentInfo> payments
+    )
     {
         return payments
             .Select(
