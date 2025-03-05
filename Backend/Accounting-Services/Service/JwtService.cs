@@ -83,7 +83,6 @@ public class JwtService : IJwtService
             _jwtSettings.Issuer,
             _jwtSettings.Audience,
             claims,
-            expires: DateTime.UtcNow.AddMinutes(_jwtSettings.RefreshTokenExpiryMinutes),
             signingCredentials: credentials
         );
 

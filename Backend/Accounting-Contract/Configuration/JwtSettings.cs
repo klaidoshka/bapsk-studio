@@ -21,11 +21,6 @@ public class JwtSettings
     public string Issuer { get; set; }
 
     /// <summary>
-    /// When the refresh token expires.
-    /// </summary>
-    public int RefreshTokenExpiryMinutes { get; set; }
-
-    /// <summary>
     /// Secret key for JWT token.
     /// </summary>
     public string Secret { get; set; }

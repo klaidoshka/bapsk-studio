@@ -13,9 +13,9 @@ public class JwtTokenPair
     public required string RefreshToken { get; set; }
 
     /// <summary>
-    /// When the refresh token expires.
+    /// Session id associated with the token.
     /// </summary>
-    public required DateTime RefreshTokenExpiresAt { get; set; }
+    public required Guid SessionId { get; set; }
 
     /// <summary>
     /// User associated with the token.
