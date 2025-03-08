@@ -28,9 +28,14 @@ public class ReferenceFieldHandler() : FieldHandler(FieldType.Reference)
     {
         int? result = value switch
         {
-            JsonElement jsonElement => jsonElement.TryGetInt32(out var candidate)
-                ? candidate
-                : null,
+            JsonElement jsonElement => jsonElement.ValueKind switch
+            {
+                JsonValueKind.String => Int32.TryParse(jsonElement.GetString(), out var candidate)
+                    ? candidate
+                    : null,
+                JsonValueKind.Number => jsonElement.GetInt32(),
+                _ => null
+            },
             string stringValue => Int32.TryParse(stringValue, out var candidate)
                 ? candidate
                 : null,
