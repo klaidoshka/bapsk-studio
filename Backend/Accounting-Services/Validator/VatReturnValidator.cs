@@ -44,38 +44,7 @@ public class VatReturnValidator : IVatReturnValidator
 
         var validation = await ValidateSubmitRequestSaleAsync(request.Sale);
 
-        if (!validation.IsValid)
-        {
-            return validation;
-        }
-
-        validation = await ValidateSubmitRequestSalesmanAsync(request.Sale.Salesman);
-
-        if (!validation.IsValid)
-        {
-            return validation;
-        }
-
-        validation = await ValidateSubmitRequestCustomerAsync(request.Sale.Customer);
-
-        if (!validation.IsValid)
-        {
-            return validation;
-        }
-
-        var failures = new List<string>();
-
-        foreach (var soldGood in request.Sale.SoldGoods)
-        {
-            validation = await ValidateSubmitRequestSoldGoodAsync(soldGood);
-
-            if (!validation.IsValid)
-            {
-                failures.AddRange(validation.FailureMessages);
-            }
-        }
-
-        return new Validation(failures);
+        return !validation.IsValid ? validation : new Validation();
     }
 
     public async Task<Validation> ValidateSubmitRequestCustomerAsync(
@@ -118,7 +87,24 @@ public class VatReturnValidator : IVatReturnValidator
             );
         }
 
-        return new Validation();
+        var failures = new List<string>();
+
+        failures.AddRange(
+            (await ValidateSubmitRequestSalesmanAsync(sale.Salesman)).FailureMessages
+        );
+
+        failures.AddRange(
+            (await ValidateSubmitRequestCustomerAsync(sale.Customer)).FailureMessages
+        );
+
+        foreach (var soldGood in sale.SoldGoods)
+        {
+            failures.AddRange(
+                (await ValidateSubmitRequestSoldGoodAsync(soldGood)).FailureMessages
+            );
+        }
+
+        return new Validation(failures);
     }
 
     public async Task<Validation> ValidateSubmitRequestSalesmanAsync(
@@ -157,7 +143,6 @@ public class VatReturnValidator : IVatReturnValidator
         StiVatReturnDeclarationSubmitRequest request
     )
     {
-        // If sale/customer/salesman/soldGoods are provided by IDs, check if they exist and are associated with the correct instance.
         var sale = request.Sale.Id is not null
             ? await _database.Sales.FirstOrDefaultAsync(it => it.Id == request.Sale.Id)
             : null;
@@ -183,6 +168,11 @@ public class VatReturnValidator : IVatReturnValidator
         if (salesman is not null && salesman.InstanceId != request.InstanceId)
         {
             return new Validation("Salesman is not associated with the provided instance.");
+        }
+
+        if (request.InstanceId is null)
+        {
+            return new Validation();
         }
 
         var soldGoodIds = request.Sale.SoldGoods
