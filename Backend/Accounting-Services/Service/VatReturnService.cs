@@ -1,12 +1,11 @@
 using Accounting.Contract;
-using Accounting.Contract.Dto.StiVatReturn;
 using Accounting.Contract.Dto.StiVatReturn.SubmitDeclaration;
-using Accounting.Contract.Enumeration;
 using Accounting.Contract.Request;
 using Accounting.Contract.Response;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;
+using StiVatReturnDeclaration = Accounting.Contract.Dto.StiVatReturn.StiVatReturnDeclaration;
 
 namespace Accounting.Services.Service;
 
@@ -27,6 +26,9 @@ public class VatReturnService : IVatReturnService
         _validator = validator;
     }
 
+    // If IDS are missing, means sent a whole instance, otherwise get the specific data.
+    // Upon submission create data that was missing and return ids together with the declaration response.
+    // For easier management, if id is set, resolve instance, apply its data onto the request body.
     public async Task<StiVatReturnDeclaration> SubmitAsync(
         StiVatReturnDeclarationSubmitRequest request
     )
@@ -44,7 +46,7 @@ public class VatReturnService : IVatReturnService
 
         var clientRequest = await ToClientRequest(
             request.Sale,
-            request.InstanceId,
+            request.InstanceId ?? -1, // TODO: Handle correctly
             declaration?.Correction ?? 1
         );
 
@@ -70,7 +72,6 @@ public class VatReturnService : IVatReturnService
                     DeclaredById = request.RequesterId,
                     Id = clientRequest.Declaration.Header.DocumentId,
                     InstanceId = request.InstanceId,
-                    SaleId = request.Sale.Id,
                     State = response.DeclarationState,
                     SubmitDate = response.ResultDate
                 }
@@ -86,15 +87,15 @@ public class VatReturnService : IVatReturnService
 
         return new StiVatReturnDeclaration
         {
-            DeclarationState = response.DeclarationState!.Value,
+            State = response.DeclarationState!.Value,
             DocumentId = clientRequest.Declaration.Header.DocumentId,
-            ResultDate = response.ResultDate,
-            Sale = request.Sale
+            Date = response.ResultDate,
+            SaleId = request.Sale.Id ?? -1 // TODO: Get from database
         };
     }
 
     private async Task<SubmitDeclarationRequest> ToClientRequest(
-        Sale sale,
+        StiVatReturnDeclarationSubmitRequestSale sale,
         int instanceId,
         int correctionNo
     )
@@ -108,7 +109,7 @@ public class VatReturnService : IVatReturnService
             .Include(de => de.DataType)
             .Where(
                 de => de.DataType.InstanceId == instanceId &&
-                      de.DataType.Type == DataTypeType.Good &&
+                      // de.DataType.Type == DataTypeType.Good &&
                       de.DataType.Fields.Any(f => f.ReferenceId == sale.Id)
             )
             .ToListAsync();
@@ -121,16 +122,16 @@ public class VatReturnService : IVatReturnService
             {
                 Customer = new SubmitDeclarationCustomer
                 {
-                    BirthDate = sale.Customer.BirthDate,
+                    BirthDate = sale.Customer.Birthdate,
                     FirstName = sale.Customer.FirstName,
                     IdentityDocument = new SubmitDeclarationIdentityDocument
                     {
                         DocumentNo = new SubmitDeclarationIdDocumentNo
                         {
-                            IssuedBy = sale.Customer.IdentityDocumentIssuedBy,
-                            Value = sale.Customer.IdentityDocument
+                            IssuedBy = sale.Customer.IdentityDocument.IssuedBy,
+                            Value = sale.Customer.IdentityDocument.Value
                         },
-                        DocumentType = sale.Customer.IdentityDocumentType
+                        DocumentType = sale.Customer.IdentityDocument.Type
                     },
                     LastName = sale.Customer.LastName
                 },
@@ -151,8 +152,8 @@ public class VatReturnService : IVatReturnService
                     Name = sale.Salesman.Name,
                     VatPayerCode = new SubmitDeclarationLtVatPayerCode
                     {
-                        IssuedBy = sale.Salesman.VatPayerCodeIssuedBy,
-                        Value = sale.Salesman.VatPayerCode
+                        IssuedBy = sale.Salesman.VatPayerCode.IssuedBy,
+                        Value = sale.Salesman.VatPayerCode.Value
                     }
                 },
                 SalesDocuments = [] // TODO: Map sales documents
@@ -162,19 +163,5 @@ public class VatReturnService : IVatReturnService
             Situation = 1,
             TimeStamp = now
         };
-    }
-
-    public Task<IEnumerable<StiVatReturnDeclaration>> GetByCustomerAsync(
-        StiVatReturnDeclarationGetByCustomerRequest request
-    )
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<StiVatReturnDeclaration>> GetAsync(
-        StiVatReturnDeclarationGetRequest request
-    )
-    {
-        throw new NotImplementedException();
     }
 }

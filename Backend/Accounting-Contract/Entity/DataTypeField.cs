@@ -40,7 +40,7 @@ public class DataTypeField
         ErrorMessage = "Field name must be between 1 and 100 characters.",
         MinimumLength = 1
     )]
-    public string Name { get; set; } = "";
+    public string Name { get; set; } = String.Empty;
 
     /// <summary>
     /// Navigation property for the reference data type. This is only set when FieldType is Reference.

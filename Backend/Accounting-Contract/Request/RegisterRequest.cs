@@ -1,4 +1,4 @@
-using Accounting.Contract.Enumeration;
+using Accounting.Contract.Entity;
 
 namespace Accounting.Contract.Request;
 

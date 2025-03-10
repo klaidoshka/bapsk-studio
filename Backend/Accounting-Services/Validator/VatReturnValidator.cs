@@ -1,6 +1,5 @@
 using Accounting.Contract;
 using Accounting.Contract.Dto.StiVatReturn.SubmitDeclaration;
-using Accounting.Contract.Enumeration;
 using Accounting.Contract.Request;
 using Accounting.Contract.Response;
 using Accounting.Contract.Validator;
@@ -23,135 +22,183 @@ public class VatReturnValidator : IVatReturnValidator
     {
         if (!request.Affirmation)
         {
-            return new Validation(
-                "You must affirm that the customer can be refunded before submitting."
-            );
+            return new Validation("You must affirm that the customer can be returned VAT.");
         }
 
-        var instance = await _database.Instances
-            .Include(i => i.UserMetas)
-            .FirstOrDefaultAsync(i => i.Id == request.InstanceId);
+        if (!request.Sale.SoldGoods.Any())
+        {
+            return new Validation("At least one sold good must be provided.");
+        }
 
-        if (instance == null)
+        var instance = request.InstanceId is not null
+            ? await _database.Instances
+                .Include(i => i.UserMetas)
+                .FirstOrDefaultAsync(i => i.Id == request.InstanceId)
+            : null;
+
+        // Check if instance to use was provided, but not found.
+        if (instance is null && request.InstanceId is not null)
         {
             return new Validation("Instance not found.");
         }
 
-        if (instance.UserMetas.All(um => um.UserId != request.RequesterId))
+        var validation = await ValidateSubmitRequestSaleAsync(request.Sale);
+
+        if (!validation.IsValid)
         {
-            return new Validation(
-                "You are not authorized to submit declaration for this instance."
-            );
+            return validation;
         }
 
-        var declaration = await _database.StiVatReturnDeclarations.FirstOrDefaultAsync(
-            d => d.SaleId == request.Sale.Id
-        );
+        validation = await ValidateSubmitRequestSalesmanAsync(request.Sale.Salesman);
 
-        if (declaration != null && declaration.State == SubmitDeclarationState.ACCEPTED_CORRECT)
+        if (!validation.IsValid)
         {
-            return new Validation("Declaration is already submitted and accepted.");
+            return validation;
         }
 
-        var customer = await _database.DataEntries
-            .Include(de => de.DataType)
-            .Where(
-                de => de.DataType.InstanceId == instance.Id &&
-                      de.DataType.Type == DataTypeType.Customer
-            )
-            .FirstOrDefaultAsync(customer => customer.Id == request.Sale.Customer.Id);
+        validation = await ValidateSubmitRequestCustomerAsync(request.Sale.Customer);
 
-        if (customer == null)
+        if (!validation.IsValid)
+        {
+            return validation;
+        }
+
+        var failures = new List<string>();
+
+        foreach (var soldGood in request.Sale.SoldGoods)
+        {
+            validation = await ValidateSubmitRequestSoldGoodAsync(soldGood);
+
+            if (!validation.IsValid)
+            {
+                failures.AddRange(validation.FailureMessages);
+            }
+        }
+
+        return new Validation(failures);
+    }
+
+    public async Task<Validation> ValidateSubmitRequestCustomerAsync(
+        StiVatReturnDeclarationSubmitRequestCustomer customer
+    )
+    {
+        var customerEntity = customer.Id is not null
+            ? await _database.Customers.FirstOrDefaultAsync(it => it.Id == customer.Id)
+            : null;
+
+        if (customerEntity is null && customer.Id is not null)
         {
             return new Validation("Customer not found.");
         }
 
-        var sale = await _database.DataEntries
-            .Include(de => de.DataType)
-            .Where(
-                de => de.DataType.InstanceId == instance.Id && de.DataType.Type == DataTypeType.Sale
-            )
-            .FirstOrDefaultAsync(sale => sale.Id == request.Sale.Id);
+        return new Validation();
+    }
 
-        if (sale == null)
+    public async Task<Validation> ValidateSubmitRequestSaleAsync(
+        StiVatReturnDeclarationSubmitRequestSale sale
+    )
+    {
+        var saleEntity = sale.Id is not null
+            ? await _database.Sales.FirstOrDefaultAsync(it => it.Id == sale.Id)
+            : null;
+
+        if (saleEntity is null && sale.Id is not null)
         {
             return new Validation("Sale not found.");
         }
 
-        var salesman = await _database.DataEntries
-            .Include(de => de.DataType)
-            .Where(
-                de => de.DataType.InstanceId == instance.Id &&
-                      de.DataType.Type == DataTypeType.Salesman
-            )
-            .FirstOrDefaultAsync(salesman => salesman.Id == request.Sale.Salesman.Id);
+        var declaration = await _database.StiVatReturnDeclarations.FirstOrDefaultAsync(
+            it => it.SaleId == sale.Id
+        );
 
-        if (salesman == null)
-        {
-            return new Validation("Salesman not found.");
-        }
-
-        var goods = await _database.DataEntries
-            .Include(de => de.DataType)
-            .Where(
-                de => de.DataType.InstanceId == instance.Id &&
-                      de.DataType.Type == DataTypeType.Good &&
-                      de.DataType.Fields.Any(f => f.ReferenceId == sale.DataTypeId)
-            )
-            .ToListAsync();
-
-        return goods.Count == 0 ? new Validation("No goods to declare.") : new Validation();
-    }
-
-    public async Task<Validation> ValidateGetByCustomerRequestAsync(
-        StiVatReturnDeclarationGetByCustomerRequest request
-    )
-    {
-        var instance = await _database.Instances
-            .Include(i => i.UserMetas)
-            .FirstOrDefaultAsync(i => i.Id == request.InstanceId);
-
-        if (instance == null)
-        {
-            return new Validation("Instance not found.");
-        }
-
-        if (instance.UserMetas.All(um => um.UserId != request.RequesterId))
+        if (declaration != null && declaration.State == SubmitDeclarationState.ACCEPTED_CORRECT)
         {
             return new Validation(
-                "You are not authorized to get declarations for this instance."
-            );
-        }
-
-        var customer = await _database.DataEntries
-            .Include(de => de.DataType)
-            .Where(
-                de => de.DataType.InstanceId == instance.Id &&
-                      de.DataType.Type == DataTypeType.Customer
-            )
-            .FirstOrDefaultAsync(customer => customer.Id == request.CustomerId);
-
-        return customer == null ? new Validation("Customer not found.") : new Validation();
-    }
-
-    public async Task<Validation> ValidateGetRequestAsync(StiVatReturnDeclarationGetRequest request)
-    {
-        var instance = await _database.Instances
-            .Include(i => i.UserMetas)
-            .FirstOrDefaultAsync(i => i.Id == request.InstanceId);
-
-        if (instance == null)
-        {
-            return new Validation("Instance not found.");
-        }
-
-        if (instance.UserMetas.All(um => um.UserId != request.RequesterId))
-        {
-            return new Validation(
-                "You are not authorized to get declarations for this instance."
+                "Sale declaration for VAT return is already submitted and accepted."
             );
         }
 
         return new Validation();
+    }
+
+    public async Task<Validation> ValidateSubmitRequestSalesmanAsync(
+        StiVatReturnDeclarationSubmitRequestSalesman salesman
+    )
+    {
+        var salesmanEntity = salesman.Id is not null
+            ? await _database.Salesmen.FirstOrDefaultAsync(it => it.Id == salesman.Id)
+            : null;
+
+        if (salesmanEntity is null && salesman.Id is not null)
+        {
+            return new Validation("Salesman not found.");
+        }
+
+        return new Validation();
+    }
+
+    public async Task<Validation> ValidateSubmitRequestSoldGoodAsync(
+        StiVatReturnDeclarationSubmitRequestSoldGood soldGood
+    )
+    {
+        var soldGoodEntity = soldGood.Id is not null
+            ? await _database.SoldGoods.FirstOrDefaultAsync(it => it.Id == soldGood.Id)
+            : null;
+
+        if (soldGoodEntity is null && soldGood.Id is not null)
+        {
+            return new Validation("Sold good not found.");
+        }
+
+        return new Validation();
+    }
+
+    public async Task<Validation> ValidateSubmitRequestAuthorizationAsync(
+        StiVatReturnDeclarationSubmitRequest request
+    )
+    {
+        // If sale/customer/salesman/soldGoods are provided by IDs, check if they exist and are associated with the correct instance.
+        var sale = request.Sale.Id is not null
+            ? await _database.Sales.FirstOrDefaultAsync(it => it.Id == request.Sale.Id)
+            : null;
+
+        if (sale is not null && sale.InstanceId != request.InstanceId)
+        {
+            return new Validation("Sale is not associated with the provided instance.");
+        }
+
+        var customer = request.Sale.Customer.Id is not null
+            ? await _database.Customers.FirstOrDefaultAsync(it => it.Id == request.Sale.Customer.Id)
+            : null;
+
+        if (customer is not null && customer.InstanceId != request.InstanceId)
+        {
+            return new Validation("Customer is not associated with the provided instance.");
+        }
+
+        var salesman = request.Sale.Salesman.Id is not null
+            ? await _database.Salesmen.FirstOrDefaultAsync(it => it.Id == request.Sale.Salesman.Id)
+            : null;
+
+        if (salesman is not null && salesman.InstanceId != request.InstanceId)
+        {
+            return new Validation("Salesman is not associated with the provided instance.");
+        }
+
+        var soldGoodIds = request.Sale.SoldGoods
+            .Select(it => it.Id)
+            .Where(it => it is not null)
+            .ToHashSet();
+
+        var soldGoods = await _database.SoldGoods
+            .Where(it => soldGoodIds.Contains(it.Id))
+            .ToListAsync();
+
+        return new Validation(
+            soldGoods
+                .Where(it => it.SaleId != request.Sale.Id)
+                .Select(it => $"Sold good '{it.Id}' is not associated with the provided sale.")
+                .ToList()
+        );
     }
 }

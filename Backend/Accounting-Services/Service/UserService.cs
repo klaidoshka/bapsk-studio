@@ -1,6 +1,5 @@
 using Accounting.Contract;
 using Accounting.Contract.Entity;
-using Accounting.Contract.Enumeration;
 using Accounting.Contract.Request;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;

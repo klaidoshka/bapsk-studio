@@ -1,6 +1,6 @@
 #region
 
-using Accounting.Contract.Enumeration;
+using Accounting.Contract.Entity;
 
 #endregion
 

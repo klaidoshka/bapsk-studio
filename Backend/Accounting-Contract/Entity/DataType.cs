@@ -15,6 +15,12 @@ public class DataType
     public string? Description { get; set; }
 
     /// <summary>
+    /// Data type field id which is used to display this data type.
+    /// Used for display in the UI.
+    /// </summary>
+    public int? DisplayFieldId { get; set; }
+
+    /// <summary>
     /// Navigation property for the entries that the data type has.
     /// </summary>
     public virtual ICollection<DataEntry> Entries { get; set; }
@@ -55,5 +61,5 @@ public class DataType
         ErrorMessage = "Data name must be between 1 and 100 characters.",
         MinimumLength = 1
     )]
-    public string Name { get; set; } = "";
+    public string Name { get; set; } = String.Empty;
 }

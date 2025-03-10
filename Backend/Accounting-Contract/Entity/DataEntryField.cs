@@ -42,5 +42,5 @@ public class DataEntryField
         ErrorMessage = "Field value must be at least 1 character long.",
         MinimumLength = 1
     )]
-    public string Value { get; set; } = "";
+    public string Value { get; set; } = String.Empty;
 }

@@ -55,12 +55,10 @@ public class StiVatReturnDeclaration
     /// Navigation property for the sale of the declaration.
     /// </summary>
     [ForeignKey(nameof(SaleId))]
-    public DataEntry? Sale { get; set; }
+    public Sale? Sale { get; set; }
 
     /// <summary>
     /// Sale identifier of the declaration. Only null if declared by the system from external requests.
-    /// Sale is the data entry that the declaration is created for. It is expected that the data
-    /// entry this id points to is of DataTypeType.Sale, otherwise, the declaration is invalid.
     /// </summary>
     public int? SaleId { get; set; }
 

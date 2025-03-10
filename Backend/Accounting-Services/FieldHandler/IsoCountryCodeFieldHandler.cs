@@ -1,6 +1,5 @@
 using System.Text.Json;
 using Accounting.Contract.Entity;
-using Accounting.Contract.Enumeration;
 using Accounting.Contract.Response;
 
 namespace Accounting.Services.FieldHandler;

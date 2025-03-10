@@ -5,13 +5,17 @@ namespace Accounting.Contract;
 
 public class AccountingDatabase : DbContext
 {
+    public DbSet<Customer> Customers { get; set; }
     public DbSet<DataEntry> DataEntries { get; set; }
     public DbSet<DataEntryField> DataEntryFields { get; set; }
     public DbSet<DataType> DataTypes { get; set; }
     public DbSet<DataTypeField> DataTypeFields { get; set; }
     public DbSet<Instance> Instances { get; set; }
     public DbSet<InstanceUserMeta> InstanceUserMetas { get; set; }
+    public DbSet<Sale> Sales { get; set; }
+    public DbSet<Salesman> Salesmen { get; set; }
     public DbSet<Session> Sessions { get; set; }
+    public DbSet<SoldGood> SoldGoods { get; set; }
     public DbSet<StiVatReturnDeclaration> StiVatReturnDeclarations { get; set; }
     public DbSet<User> Users { get; set; }
 

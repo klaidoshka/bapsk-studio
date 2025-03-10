@@ -1,6 +1,4 @@
 using Accounting.Contract;
-using Accounting.Contract.Dto.StiVatReturn;
-using Accounting.Contract.Enumeration;
 using Accounting.Contract.Request;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
@@ -9,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using DataEntryField = Accounting.Contract.Entity.DataEntryField;
 using DataType = Accounting.Contract.Entity.DataType;
 using DataTypeField = Accounting.Contract.Entity.DataTypeField;
-using Instance = Accounting.Contract.Entity.Instance;
 
 namespace Accounting.Services.Service;
 
@@ -30,26 +27,6 @@ public class DataTypeService : IDataTypeService
         _fieldTypeService = fieldTypeService;
     }
 
-    public async Task AddDefaultDataTypes(Instance instance)
-    {
-        var dataTypes = new List<DataType>
-        {
-            Customer.DataType,
-            SoldGood.DataType,
-            Sale.DataType,
-            Salesman.DataType
-        };
-
-        foreach (var dataType in dataTypes)
-        {
-            dataType.Instance = instance;
-        }
-
-        await _database.DataTypes.AddRangeAsync(dataTypes);
-
-        await _database.SaveChangesAsync();
-    }
-
     public async Task<DataType> CreateAsync(DataTypeCreateRequest request)
     {
         (await _dataTypeValidator.ValidateDataTypeCreateRequestAsync(request)).AssertValid();
@@ -60,8 +37,7 @@ public class DataTypeService : IDataTypeService
                 Description = request.Description,
                 InstanceId = request.InstanceId,
                 IsDeleted = false,
-                Name = request.Name,
-                Type = DataTypeType.UserMade
+                Name = request.Name
             }
         )).Entity;
 

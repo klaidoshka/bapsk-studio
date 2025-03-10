@@ -4,7 +4,6 @@ using System.Text;
 using Accounting.Contract;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Entity;
-using Accounting.Contract.Enumeration;
 using Accounting.Contract.Service;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -78,7 +77,7 @@ public class JwtService : IJwtService
         {
             Role.Admin => Roles.Admin,
             Role.User => Roles.User,
-            _ => throw new ArgumentOutOfRangeException("Unsupported user role")
+            _ => throw new ArgumentOutOfRangeException()
         };
         
         claims.Add(new Claim(ClaimTypes.Role, role));

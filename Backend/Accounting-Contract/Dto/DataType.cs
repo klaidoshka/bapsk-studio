@@ -1,9 +1,3 @@
-#region
-
-using Accounting.Contract.Enumeration;
-
-#endregion
-
 namespace Accounting.Contract.Dto;
 
 public class DataType
@@ -13,7 +7,6 @@ public class DataType
     public int Id { get; set; }
     public int InstanceId { get; set; }
     public string Name { get; set; }
-    public DataTypeType Type { get; set; }
 }
 
 public static class DataTypeExtensions
@@ -28,8 +21,7 @@ public static class DataTypeExtensions
                 .ToList(),
             Id = entity.Id,
             InstanceId = entity.InstanceId,
-            Name = entity.Name,
-            Type = entity.Type
+            Name = entity.Name
         };
     }
 }

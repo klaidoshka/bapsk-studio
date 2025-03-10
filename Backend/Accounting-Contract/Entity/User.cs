@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Accounting.Contract.Enumeration;
 using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Contract.Entity;
@@ -21,12 +20,12 @@ public class User
     /// <summary>
     /// Email address of the user.
     /// </summary>
-    public string Email { get; set; } = "";
+    public string Email { get; set; } = String.Empty;
 
     /// <summary>
     /// Normalized (LOWERED) email address of the user.
     /// </summary>
-    public string EmailNormalized { get; set; } = "";
+    public string EmailNormalized { get; set; } = String.Empty;
 
     /// <summary>
     /// Unique identifier of the user.
@@ -48,7 +47,7 @@ public class User
     /// <summary>
     /// First name of the user.
     /// </summary>
-    public string FirstName { get; set; } = "";
+    public string FirstName { get; set; } = String.Empty;
 
     /// <summary>
     /// Navigational property to instances that the user has created for accounting.
@@ -64,12 +63,12 @@ public class User
     /// <summary>
     /// Last name of the user.
     /// </summary>
-    public string LastName { get; set; } = "";
+    public string LastName { get; set; } = String.Empty;
 
     /// <summary>
     /// Password hash of the user.
     /// </summary>
-    public string PasswordHash { get; set; } = "";
+    public string PasswordHash { get; set; } = String.Empty;
 
     /// <summary>
     /// Navigation property for the sessions created by the user.

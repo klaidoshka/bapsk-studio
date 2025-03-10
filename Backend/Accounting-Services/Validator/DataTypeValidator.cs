@@ -1,5 +1,4 @@
 using Accounting.Contract;
-using Accounting.Contract.Enumeration;
 using Accounting.Contract.Request;
 using Accounting.Contract.Response;
 using Accounting.Contract.Validator;
@@ -95,10 +94,10 @@ public class DataTypeValidator : IDataTypeValidator
             return new Validation("Data type not found.");
         }
 
-        if (dataType.Type != DataTypeType.UserMade)
-        {
-            return new Validation("Default data types cannot be deleted.");
-        }
+        // if (dataType.Type != DataTypeType.UserMade)
+        // {
+        //     return new Validation("Default data types cannot be deleted.");
+        // }
 
         return dataType.Instance.CreatedById != request.RequesterId
             ? new Validation("You are not allowed to delete this data type.")
@@ -182,24 +181,24 @@ public class DataTypeValidator : IDataTypeValidator
             return new Validation(failures);
         }
 
-        if (dataType.Type != DataTypeType.UserMade)
-        {
-            // Check for new fields in default data types
-            if (newFields.Count != 0)
-            {
-                return new Validation("Default data types cannot have new fields added.");
-            }
-
-            // Check for missing fields in default data types
-            var missingFields = dataType.Fields
-                .Where(f => request.Fields.All(rf => rf.DataTypeFieldId != f.Id))
-                .ToList();
-
-            if (missingFields.Count != 0)
-            {
-                return new Validation("Cannot remove fields from default data types.");
-            }
-        }
+        // if (dataType.Type != DataTypeType.UserMade)
+        // {
+        //     // Check for new fields in default data types
+        //     if (newFields.Count != 0)
+        //     {
+        //         return new Validation("Default data types cannot have new fields added.");
+        //     }
+        //
+        //     // Check for missing fields in default data types
+        //     var missingFields = dataType.Fields
+        //         .Where(f => request.Fields.All(rf => rf.DataTypeFieldId != f.Id))
+        //         .ToList();
+        //
+        //     if (missingFields.Count != 0)
+        //     {
+        //         return new Validation("Cannot remove fields from default data types.");
+        //     }
+        // }
 
         // Validate field edits
         failures.AddRange(
