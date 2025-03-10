@@ -31,7 +31,6 @@ export class DataTypeShowcaseComponent {
   dataTypes!: Signal<DataType[]>;
   confirmationComponent = viewChild.required(ConfirmationComponent);
   instanceId!: Signal<number | null>;
-  isProcessing = signal<boolean>(false);
   managementMenu = viewChild.required(DataTypeManagementComponent);
   messages = signal<Messages>({});
   previewMenu = viewChild.required(DataTypePreviewComponent);
@@ -54,17 +53,11 @@ export class DataTypeShowcaseComponent {
 
   delete(dataType: DataType) {
     this.confirmationComponent().request(() => {
-      this.isProcessing.set(true);
       this.dataTypeService.delete(dataType.id!!).pipe(first()).subscribe({
-        next: () => {
-          this.messages.set({success: ['Instance deleted successfully']});
-        },
-        error: (response: ErrorResponse) => {
-          this.messages.set({error: response.error.messages});
-        },
-        complete: () => {
-          this.isProcessing.set(false);
-        }
+        next: () => this.messages.set({success: ['Instance deleted successfully']}),
+        error: (response: ErrorResponse) => this.messages.set({
+          error: response.error?.messages || ["Extremely rare error occurred, please try again later."]
+        })
       });
     });
   }

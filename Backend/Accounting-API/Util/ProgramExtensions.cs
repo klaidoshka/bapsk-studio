@@ -1,8 +1,14 @@
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using Accounting.API.AuthorizationHandler;
 using Accounting.API.Endpoint;
 using Accounting.Contract;
 using Accounting.Contract.Configuration;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Protocols.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Accounting.API.Util;
 
@@ -93,6 +99,52 @@ public static class ProgramExtensions
                 );
             }
         );
+    }
+
+    /// <summary>
+    /// Adds JWT authentication and authorization to the application.
+    /// </summary>
+    /// <param name="builder">Builder to use for setting up authentication, authorization</param>
+    /// <exception cref="InvalidConfigurationException">Thrown if JwtSettings:Secret configuration is not set</exception>
+    public static void AddJwtAuth(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddScoped<IAuthorizationHandler, UserAuthorizationHandler>();
+        builder.Services.AddHttpContextAccessor();
+
+        builder.Services
+            .AddAuthentication(
+                options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                }
+            )
+            .AddJwtBearer(
+                options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+                        ValidAudience = builder.Configuration["JwtSettings:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(
+                                builder.Configuration["JwtSettings:Secret"] ??
+                                throw new InvalidConfigurationException(
+                                    "JwtSettings:Secret is not set."
+                                )
+                            )
+                        )
+                    };
+                }
+            );
+
+        builder.Services
+            .AddAuthorizationBuilder()
+            .AddPolicy(Policies.AdminOnly, policy => policy.RequireRole(Roles.Admin));
     }
 
     /// <summary>

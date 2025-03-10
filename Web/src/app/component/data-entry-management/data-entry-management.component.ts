@@ -43,7 +43,6 @@ export class DataEntryManagementComponent implements OnInit {
   FieldType = FieldType;
   form!: FormGroup;
   instanceId!: Signal<number | null>;
-  isProcessing = signal<boolean>(false);
   isShown = signal<boolean>(false);
   isShownInitially = input<boolean>(false);
   messages = signal<Messages>({});
@@ -81,34 +80,20 @@ export class DataEntryManagementComponent implements OnInit {
   }
 
   private create(request: DataEntryCreateRequest) {
-    this.isProcessing.set(true);
-
     this.dataEntryService.create(request).pipe(first()).subscribe({
-      next: () => {
-        this.messages.set({success: ["DataEntry has been created successfully."]});
-      },
-      error: (response: ErrorResponse) => {
-        this.messages.set({error: response.error.messages || ["Extremely rare error occurred, please try again later."]});
-      },
-      complete: () => {
-        this.isProcessing.set(false);
-      }
+      next: () => this.messages.set({success: ["DataEntry has been created successfully."]}),
+      error: (response: ErrorResponse) => this.messages.set({
+        error: response.error?.messages || ["Extremely rare error occurred, please try again later."]
+      })
     });
   }
 
   private edit(request: DataEntryEditRequest) {
-    this.isProcessing.set(true);
-
     this.dataEntryService.edit(request).pipe(first()).subscribe({
-      next: () => {
-        this.messages.set({success: ["Instance has been edited successfully."]});
-      },
-      error: (response: ErrorResponse) => {
-        this.messages.set({error: response.error.messages || ["Extremely rare error occurred, please try again later."]});
-      },
-      complete: () => {
-        this.isProcessing.set(false);
-      }
+      next: () => this.messages.set({success: ["Instance has been edited successfully."]}),
+      error: (response: ErrorResponse) => this.messages.set({
+        error: response.error?.messages || ["Extremely rare error occurred, please try again later."]
+      })
     });
   }
 
@@ -166,7 +151,7 @@ export class DataEntryManagementComponent implements OnInit {
         fields: fields
       });
     } else {
-      const fields: DataEntryFieldCreateRequest[] = this.dataType()!!.fields?.map((field, index) => {
+      const fields: DataEntryFieldCreateRequest[] = this.dataType()!!.fields?.map((field, _) => {
         return {
           dataTypeFieldId: field.id,
           value: this.formFields.find(f => f.field === field.name)?.control?.value ||

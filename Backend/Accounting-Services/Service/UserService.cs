@@ -1,8 +1,9 @@
 using Accounting.Contract;
 using Accounting.Contract.Entity;
+using Accounting.Contract.Enumeration;
 using Accounting.Contract.Request;
-using Accounting.Contract.Response;
 using Accounting.Contract.Service;
+using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Services.Service;
@@ -11,11 +12,17 @@ public class UserService : IUserService
 {
     private readonly AccountingDatabase _database;
     private readonly IHashService _hashService;
+    private readonly IUserValidator _userValidator;
 
-    public UserService(AccountingDatabase database, IHashService hashService)
+    public UserService(
+        AccountingDatabase database,
+        IHashService hashService,
+        IUserValidator userValidator
+    )
     {
         _database = database;
         _hashService = hashService;
+        _userValidator = userValidator;
     }
 
     public async Task<User> CreateAsync(UserCreateRequest request)
@@ -27,7 +34,6 @@ public class UserService : IUserService
             Email = request.Email,
             EmailNormalized = request.Email.ToLowerInvariant(),
             FirstName = request.FirstName,
-            IsDeleted = false,
             LastName = request.LastName,
             PasswordHash = _hashService.Hash(request.Password)
         };
@@ -39,15 +45,11 @@ public class UserService : IUserService
         return user;
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(int userId)
     {
-        var user = await _database.Users.FindAsync(id)
-                   ?? throw new ValidationException("User not found.");
+        (await _userValidator.ValidateUserDeleteAsync(userId)).AssertValid();
 
-        if (user.IsDeleted)
-        {
-            return;
-        }
+        var user = (await _database.Users.FindAsync(userId))!;
 
         user.IsDeleted = true;
 
@@ -56,12 +58,9 @@ public class UserService : IUserService
 
     public async Task EditAsync(UserEditRequest request)
     {
-        var user = await _database.Users.FindAsync(request.Id);
+        (await _userValidator.ValidateUserEditAsync(request)).AssertValid();
 
-        if (user == null || user.IsDeleted)
-        {
-            throw new ValidationException("User not found.");
-        }
+        var user = (await _database.Users.FindAsync(request.UserId))!;
 
         user.BirthDate = request.BirthDate;
         user.Country = request.Country;
@@ -73,32 +72,33 @@ public class UserService : IUserService
         await _database.SaveChangesAsync();
     }
 
-    public async Task<User> GetAsync(int id)
+    public async Task<IEnumerable<User>> GetAsync(UserGetRequest request)
     {
-        var user = await _database.Users.FindAsync(id);
+        var requester =
+            (await _database.Users.FirstOrDefaultAsync(u => u.Id == request.RequesterId))!;
 
-        if (user == null || user.IsDeleted)
+        if (request.ReturnIdentityOnly || requester.Role == Role.Admin)
         {
-            throw new ValidationException("User not found.");
+            return await _database.Users
+                .Where(u => u.IsDeleted == false)
+                .ToListAsync();
         }
-
-        return user;
+        
+        return await _database.InstanceUserMetas
+            .Include(u => u.Instance)
+            .ThenInclude(u => u.UserMetas)
+            .ThenInclude(u => u.User)
+            .Where(u => u.UserId == requester.Id)
+            .SelectMany(u => u.Instance.UserMetas)
+            .Select(u => u.User)
+            .Where(u => u.IsDeleted == false)
+            .ToListAsync();
     }
 
-    public async Task<User> GetByEmailAsync(string email)
+    public async Task<User> GetByIdAsync(int userId)
     {
-        var user = await _database.Users.FirstOrDefaultAsync(
-            u => u.EmailNormalized.Equals(
-                email,
-                StringComparison.InvariantCultureIgnoreCase
-            )
-        );
+        (await _userValidator.ValidateUserGetByIdAsync(userId)).AssertValid();
 
-        if (user == null || user.IsDeleted)
-        {
-            throw new ValidationException("User not found.");
-        }
-
-        return user;
+        return (await _database.Users.FindAsync(userId))!;
     }
 }

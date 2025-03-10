@@ -1,4 +1,5 @@
 import {Injectable} from '@angular/core';
+import {HttpParams} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -6,6 +7,16 @@ import {Injectable} from '@angular/core';
 export class ApiRouter {
   private readonly baseServerUrl = 'http://localhost:5125/api/v1';
   private readonly accountingUrl = this.baseServerUrl + '/accounting';
+
+  public readonly toParameters = (parameters: { [key: string]: string | number | boolean }) => {
+    let params = new HttpParams();
+
+    Object.keys(parameters).forEach(key => {
+      params = params.set(key, parameters[key]);
+    });
+
+    return params.toString();
+  }
 
   public readonly authLogin = () => `${this.baseServerUrl}/auth/login`;
   public readonly authLogout = () => `${this.baseServerUrl}/auth/logout`;
@@ -16,13 +27,18 @@ export class ApiRouter {
   public readonly dataEntryDelete = (id: number) => `${this.accountingUrl}/data-entry/${id}`;
   public readonly dataEntryEdit = (id: number) => `${this.accountingUrl}/data-entry/${id}`;
   public readonly dataEntryGet = (id: number) => `${this.accountingUrl}/data-entry/${id}`;
-  public readonly dataEntryGetByDataTypeId = (dataTypeId: number) => `${this.accountingUrl}/data-entry?dataTypeId=${dataTypeId}`;
+  public readonly dataEntryGetByDataTypeId = (dataTypeId: number) => `${this.accountingUrl}/data-entry?${this.toParameters({
+    dataTypeId: dataTypeId
+  })}`;
 
   public readonly dataTypeCreate = () => `${this.accountingUrl}/data-type`;
   public readonly dataTypeDelete = (id: number) => `${this.accountingUrl}/data-type/${id}`;
   public readonly dataTypeEdit = (id: number) => `${this.accountingUrl}/data-type/${id}`;
   public readonly dataTypeGet = (id: number) => `${this.accountingUrl}/data-type/${id}`;
-  public readonly dataTypeGetByInstanceId = (instanceId: number) => `${this.accountingUrl}/data-type?instanceId=${instanceId}`;
+  public readonly dataTypeGetByInstanceId = (instanceId: number) =>
+    `${this.accountingUrl}/data-type?${this.toParameters({
+      instanceId: instanceId
+    })}`;
 
   public readonly instanceCreate = () => `${this.accountingUrl}/instance`;
   public readonly instanceDelete = (id: number) => `${this.accountingUrl}/instance/${id}`;
@@ -32,4 +48,16 @@ export class ApiRouter {
 
   public readonly sessionGetByUser = () => `${this.baseServerUrl}/session`;
   public readonly sessionRevoke = (id: string) => `${this.baseServerUrl}/session/${id}`;
+
+  public readonly userCreate = () => `${this.baseServerUrl}/user`;
+  public readonly userDelete = (id: number) => `${this.baseServerUrl}/user/${id}`;
+  public readonly userEdit = (id: number) => `${this.baseServerUrl}/user/${id}`;
+  public readonly userGet = (returnIdentityOnly: boolean = false) =>
+    `${this.baseServerUrl}/user?${this.toParameters({
+      returnIdentityOnly: returnIdentityOnly
+    })}`
+  public readonly userGetById = (id: number, returnIdentityOnly: boolean = false) =>
+    `${this.baseServerUrl}/user/${id}?${this.toParameters({
+      returnIdentityOnly: returnIdentityOnly
+    })}`
 }

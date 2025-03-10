@@ -7,18 +7,21 @@ import {
   AuthenticatedOnlyGuard
 } from "./guard/authenticated-only.guard.";
 import {AuthPageComponent} from "./page/auth-page/auth-page.component";
-import {HomePageComponent} from "./page/home-page/home-page.component";
+import {
+  AuthenticatedLayoutComponent
+} from "./page/authenticated-layout/authenticated-layout.component";
 import {NotFoundPageComponent} from "./page/not-found-page/not-found-page.component";
 import {ProfilePageComponent} from './page/profile-page/profile-page.component';
 import {SessionPageComponent} from './page/session-page/session-page.component';
 import {DataEntryPageComponent} from './page/data-entry-page/data-entry-page.component';
 import {DataTypePageComponent} from './page/data-type-page/data-type-page.component';
 import {InstancePageComponent} from './page/instance-page/instance-page.component';
+import {UserPageComponent} from './page/user-page/user-page.component';
 
 export const routes: Routes = [
   {
     path: "",
-    component: HomePageComponent,
+    loadComponent: () => AuthenticatedLayoutComponent,
     canActivate: [AuthenticatedOnlyGuard],
     canActivateChild: [AuthenticatedOnlyChildGuard],
     children: [
@@ -27,48 +30,52 @@ export const routes: Routes = [
         children: [
           {
             path: "types",
-            component: DataTypePageComponent
+            loadComponent: () => DataTypePageComponent
           },
           {
             path: "entries",
-            component: DataEntryPageComponent
+            loadComponent: () => DataEntryPageComponent
           }
         ]
       },
       {
         path: "instances",
-        component: InstancePageComponent
+        loadComponent: () => InstancePageComponent
       },
       {
         path: "profile",
         children: [
           {
             path: "sessions",
-            component: SessionPageComponent
+            loadComponent: () => SessionPageComponent
           }
         ],
-        component: ProfilePageComponent,
+        loadComponent: () => ProfilePageComponent,
       },
+      {
+        path: "users",
+        loadComponent: () => UserPageComponent
+      }
     ]
   },
   {
     path: "auth",
-    component: AuthPageComponent,
+    loadComponent: () => AuthPageComponent,
     canActivate: [AnonymousOnlyGuard],
     canActivateChild: [AnonymousOnlyChildGuard],
     children: [
       {
         path: "login",
-        component: LoginComponent
+        loadComponent: () => LoginComponent
       },
       {
         path: "register",
-        component: RegisterComponent
+        loadComponent: () => RegisterComponent
       }
     ]
   },
   {
     path: "**",
-    component: NotFoundPageComponent
+    loadComponent: () => NotFoundPageComponent
   }
 ];

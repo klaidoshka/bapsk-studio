@@ -29,7 +29,6 @@ import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.
 export class InstanceManagementComponent implements OnInit {
   form!: FormGroup;
   instance = signal<Instance | null>(null);
-  isProcessing = signal<boolean>(false);
   isShownInitially = input<boolean>(false);
   isShown = signal<boolean>(false);
   messages = signal<Messages>({});
@@ -50,34 +49,20 @@ export class InstanceManagementComponent implements OnInit {
   }
 
   private create(request: InstanceCreateRequest) {
-    this.isProcessing.set(true);
-
     this.instanceService.create(request).pipe(first()).subscribe({
-      next: () => {
-        this.messages.set({success: ["Instance has been created successfully."]});
-      },
-      error: (response: ErrorResponse) => {
-        this.messages.set({error: response.error.messages || ["Extremely rare error occurred, please try again later."]});
-      },
-      complete: () => {
-        this.isProcessing.set(false);
-      }
+      next: () => this.messages.set({success: ["Instance has been created successfully."]}),
+      error: (response: ErrorResponse) => this.messages.set({
+        error: response.error?.messages || ["Extremely rare error occurred, please try again later."]
+      })
     });
   }
 
   private edit(request: InstanceEditRequest) {
-    this.isProcessing.set(true);
-
     this.instanceService.edit(request).pipe(first()).subscribe({
-      next: () => {
-        this.messages.set({success: ["Instance has been edited successfully."]});
-      },
-      error: (response: ErrorResponse) => {
-        this.messages.set({error: response.error.messages || ["Extremely rare error occurred, please try again later."]});
-      },
-      complete: () => {
-        this.isProcessing.set(false);
-      }
+      next: () => this.messages.set({success: ["Instance has been edited successfully."]}),
+      error: (response: ErrorResponse) => this.messages.set({
+        error: response.error?.messages || ["Extremely rare error occurred, please try again later."]
+      })
     });
   }
 
@@ -123,10 +108,10 @@ export class InstanceManagementComponent implements OnInit {
     this.form.reset({description: "No description set."});
 
     if (instance) {
-      this.instance.set(instance);
       this.form.patchValue({...instance});
     }
 
+    this.instance.set(instance);
     this.isShown.set(true);
   }
 }

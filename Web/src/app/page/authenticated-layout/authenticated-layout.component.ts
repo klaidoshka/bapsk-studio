@@ -2,10 +2,10 @@ import {Component} from "@angular/core";
 import {RouterModule} from "@angular/router";
 
 @Component({
-  selector: "app-home-page",
+  selector: "app-authenticated-layout",
   imports: [RouterModule],
-  templateUrl: "./home-page.component.html",
+  templateUrl: "./authenticated-layout.component.html",
   providers: []
 })
-export class HomePageComponent {
+export class AuthenticatedLayoutComponent {
 }

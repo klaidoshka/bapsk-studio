@@ -6,10 +6,11 @@ import {ButtonModule} from "primeng/button";
 import {DatePicker} from "primeng/datepicker";
 import {DropdownModule} from "primeng/dropdown";
 import {InputText} from "primeng/inputtext";
-import {IsoCountries, IsoCountry, RegisterRequest} from "../../model/auth.model";
+import {RegisterRequest} from "../../model/auth.model";
 import ErrorResponse from "../../model/error-response.model";
 import {AuthService} from "../../service/auth.service";
 import {TextService} from "../../service/text.service";
+import {IsoCountries, IsoCountry} from '../../model/iso-country.model';
 
 @Component({
   selector: "app-auth-register",
@@ -27,7 +28,7 @@ import {TextService} from "../../service/text.service";
 export class RegisterComponent {
   filteredCountries: IsoCountry[] = [];
   isSubmitting = signal<boolean>(false);
-  maxDate = signal(this.getDateMinusYears(13)).asReadonly();
+  maxDate = new Date();
   messages = signal<string[]>([]);
   registerForm!: FormGroup;
 
@@ -38,21 +39,13 @@ export class RegisterComponent {
     private textService: TextService
   ) {
     this.registerForm = this.formBuilder.group({
-      birthDate: [this.maxDate(), Validators.required],
+      birthDate: [this.maxDate, Validators.required],
       country: [IsoCountries[129], Validators.required],
       email: ["", [Validators.required, Validators.email]],
       firstName: ["", Validators.required],
       lastName: ["", Validators.required],
       password: ["", [Validators.required, Validators.minLength(8)]]
     });
-  }
-
-  private getDateMinusYears(years: number): Date {
-    const date = new Date();
-
-    date.setFullYear(date.getFullYear() - years);
-
-    return date;
   }
 
   getErrorMessage(field: string): string | null {

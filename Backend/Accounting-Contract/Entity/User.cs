@@ -11,22 +11,22 @@ public class User
     /// <summary>
     /// Birthdate of the user.
     /// </summary>
-    public DateTime BirthDate { get; set; }
+    public DateTime BirthDate { get; set; } = DateTime.MinValue;
 
     /// <summary>
     /// Country of the user.
     /// </summary>
-    public IsoCountryCode Country { get; set; }
+    public IsoCountryCode Country { get; set; } = IsoCountryCode.LT;
 
     /// <summary>
     /// Email address of the user.
     /// </summary>
-    public string Email { get; set; }
+    public string Email { get; set; } = "";
 
     /// <summary>
     /// Normalized (LOWERED) email address of the user.
     /// </summary>
-    public string EmailNormalized { get; set; }
+    public string EmailNormalized { get; set; } = "";
 
     /// <summary>
     /// Unique identifier of the user.
@@ -34,6 +34,11 @@ public class User
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
+    
+    /// <summary>
+    /// Role of the user.
+    /// </summary>
+    public Role Role { get; set; } = Role.User;
 
     /// <summary>
     /// Marks the user as deleted.
@@ -43,31 +48,31 @@ public class User
     /// <summary>
     /// First name of the user.
     /// </summary>
-    public string FirstName { get; set; }
+    public string FirstName { get; set; } = "";
 
     /// <summary>
     /// Navigational property to instances that the user has created for accounting.
     /// </summary>
-    public virtual ICollection<Instance> InstancesCreated { get; set; }
+    public virtual ICollection<Instance> InstancesCreated { get; set; } = new List<Instance>();
 
     /// <summary>
     /// Navigational property to instances user metas associated with the user.
     /// These metas define which instances the user has access to.
     /// </summary>
-    public virtual ICollection<InstanceUserMeta> InstanceUserMetas { get; set; }
+    public virtual ICollection<InstanceUserMeta> InstanceUserMetas { get; set; } = new List<InstanceUserMeta>();
 
     /// <summary>
     /// Last name of the user.
     /// </summary>
-    public string LastName { get; set; }
+    public string LastName { get; set; } = "";
 
     /// <summary>
     /// Password hash of the user.
     /// </summary>
-    public string PasswordHash { get; set; }
+    public string PasswordHash { get; set; } = "";
 
     /// <summary>
     /// Navigation property for the sessions created by the user.
     /// </summary>
-    public virtual ICollection<Session> Sessions { get; set; }
+    public virtual ICollection<Session> Sessions { get; set; } = new List<Session>();
 }

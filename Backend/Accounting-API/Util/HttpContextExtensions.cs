@@ -1,10 +1,11 @@
 using System.Text.Json;
+using Accounting.API.Middleware;
 using Accounting.Contract.Request;
 using Accounting.Contract.Service;
 
 namespace Accounting.API.Util;
 
-public static class HttpRequestExtensions
+public static class HttpContextExtensions
 {
     private class HttpLocationResponse
     {
@@ -57,6 +58,24 @@ public static class HttpRequestExtensions
         };
     }
 
+    /// <summary>
+    /// Tries to resolve the requested id from the HTTP request. I.e. `/users/1` would return 1.
+    /// </summary>
+    /// <returns>Requested id or null if not found</returns>
+    public static int? GetRequestedId(this HttpContext context)
+    {
+        return context.GetRouteData().Values.TryGetValue("id", out var idValue)
+            ? Int32.TryParse(idValue?.ToString(), out var userId)
+                ? userId
+                : null
+            : null;
+    }
+
+    /// <summary>
+    /// Resolves user ID from the HTTP request.
+    /// </summary>
+    /// <returns>User id</returns>
+    /// <exception cref="UnauthorizedAccessException">Thrown if resolved id is null</exception>
     public static async Task<int> GetUserIdAsync(this HttpRequest request, IJwtService jwtService)
     {
         var accessToken = request.ToAccessToken()!;
@@ -64,9 +83,30 @@ public static class HttpRequestExtensions
 
         if (session == null)
         {
-            throw new UnauthorizedAccessException("Invalid access token.");
+            throw new UnauthorizedAccessException();
         }
 
         return session.UserId;
+    }
+
+    /// <summary>
+    /// Resolves user ID from the HTTP context.
+    /// </summary>
+    /// <returns>User id or null if it was not possible to resolve</returns>
+    public static int? GetUserId(this HttpContext httpContext)
+    {
+        return httpContext.Items.TryGetValue(UserIdExtractorMiddleware.UserIdKey, out var userId)
+            ? (int?)userId
+            : null;
+    }
+
+    /// <summary>
+    /// Resolves user ID from the HTTP context.
+    /// </summary>
+    /// <returns>User id</returns>
+    /// <exception cref="UnauthorizedAccessException">Thrown if user cannot be resolved</exception>
+    public static int GetUserIdOrThrow(this HttpContext httpContext)
+    {
+        return httpContext.GetUserId() ?? throw new UnauthorizedAccessException();
     }
 }

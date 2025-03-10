@@ -31,7 +31,7 @@ public class DataTypeField
     /// <summary>
     /// Marks the field as required or not.
     /// </summary>
-    public bool IsRequired { get; set; }
+    public bool IsRequired { get; set; } = true;
 
     /// <summary>
     /// Name of the field.
@@ -41,10 +41,10 @@ public class DataTypeField
         ErrorMessage = "Field name must be between 1 and 100 characters.",
         MinimumLength = 1
     )]
-    public string Name { get; set; }
+    public string Name { get; set; } = "";
 
     /// <summary>
     /// Type of the field value.
     /// </summary>
-    public FieldType Type { get; set; }
+    public FieldType Type { get; set; } = FieldType.Text;
 }
