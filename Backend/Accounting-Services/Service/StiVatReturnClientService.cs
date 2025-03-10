@@ -21,14 +21,13 @@ public class StiVatReturnClientService : IStiVatReturnClientService, IAsyncDispo
     private readonly AccountingDatabase _database;
 
     public StiVatReturnClientService(
-        CertificateSerialNumbers certificateSerialNumbers,
+        StiVatReturn stiVatReturn,
         AccountingDatabase database,
-        Endpoints endpoints,
         Logging logging
     )
     {
         _database = database;
-        _client = CreateClient(certificateSerialNumbers, endpoints, logging);
+        _client = CreateClient(stiVatReturn, logging);
     }
 
     public async Task<CancelDeclarationResponse> CancelDeclarationAsync(
@@ -102,12 +101,11 @@ public class StiVatReturnClientService : IStiVatReturnClientService, IAsyncDispo
     }
 
     private static VATRefundforForeignTravelerTRPortClient CreateClient(
-        CertificateSerialNumbers certificateSerialNumbers,
-        Endpoints endpoints,
+        StiVatReturn stiVatReturn,
         Logging logging
     )
     {
-        if (certificateSerialNumbers.StiVatRefund is null || endpoints.StiVatRefund is null)
+        if (stiVatReturn.CertificateSerialNumber is null || stiVatReturn.Endpoint is null)
         {
             throw new InvalidOperationException(
                 "STI VAT Refund certificate serial number or endpoint is not configured"
@@ -125,7 +123,7 @@ public class StiVatReturnClientService : IStiVatReturnClientService, IAsyncDispo
                     }
                 }
             },
-            new EndpointAddress(endpoints.StiVatRefund)
+            new EndpointAddress(stiVatReturn.Endpoint)
         );
 
         if (logging.LogSoap == true)
@@ -137,7 +135,7 @@ public class StiVatReturnClientService : IStiVatReturnClientService, IAsyncDispo
             StoreLocation.LocalMachine,
             StoreName.My,
             X509FindType.FindBySerialNumber,
-            certificateSerialNumbers.StiVatRefund
+            stiVatReturn.CertificateSerialNumber
         );
 
         return client;

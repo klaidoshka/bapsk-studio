@@ -7,4 +7,5 @@ public class ValidationException(Validation validation) : Exception(
     public Validation Validation { get; } = validation;
 
     public ValidationException(string message) : this(new Validation(message)) { }
+    public ValidationException(IEnumerable<string> messages) : this(new Validation(messages)) { }
 }

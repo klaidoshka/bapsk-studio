@@ -1,120 +1,233 @@
 using Accounting.Contract;
+using Accounting.Contract.Configuration;
 using Accounting.Contract.Dto.StiVatReturn.SubmitDeclaration;
+using Accounting.Contract.Entity;
 using Accounting.Contract.Request.StiVatReturn;
 using Accounting.Contract.Response;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
+using Accounting.Services.Util;
 using Microsoft.EntityFrameworkCore;
-using StiVatReturnDeclaration = Accounting.Contract.Dto.StiVatReturn.StiVatReturnDeclaration;
 
 namespace Accounting.Services.Service;
 
 public class VatReturnService : IVatReturnService
 {
     private readonly AccountingDatabase _database;
+    private readonly StiVatReturn _stiVatReturn;
     private readonly IStiVatReturnClientService _stiVatReturnClientService;
     private readonly IVatReturnValidator _validator;
 
     public VatReturnService(
         AccountingDatabase database,
+        StiVatReturn stiVatReturn,
         IStiVatReturnClientService stiVatReturnClientService,
         IVatReturnValidator validator
     )
     {
         _database = database;
+        _stiVatReturn = stiVatReturn;
         _stiVatReturnClientService = stiVatReturnClientService;
         _validator = validator;
     }
 
-    // If IDS are missing, means sent a whole instance, otherwise get the specific data.
-    // Upon submission create data that was missing and return ids together with the declaration response.
-    // For easier management, if id is set, resolve instance, apply its data onto the request body.
+    private static void AddMissingGoods(
+        IEnumerable<StiVatReturnDeclarationSubmitRequestSoldGood> missingGoods,
+        Sale sale
+    )
+    {
+        foreach (var missingGood in missingGoods)
+        {
+            sale.SoldGoods.Add(
+                new SoldGood
+                {
+                    Description = missingGood.Description,
+                    Quantity = missingGood.Quantity,
+                    SequenceNo = missingGood.SequenceNo,
+                    TaxableAmount = missingGood.TaxableAmount,
+                    TotalAmount = missingGood.TotalAmount,
+                    UnitOfMeasure = missingGood.UnitOfMeasure,
+                    UnitOfMeasureType = missingGood.UnitOfMeasureType,
+                    VatAmount = missingGood.VatAmount,
+                    VatRate = missingGood.VatRate
+                }
+            );
+        }
+    }
+
     public async Task<StiVatReturnDeclaration> SubmitAsync(
         StiVatReturnDeclarationSubmitRequest request
     )
     {
         (await _validator.ValidateSubmitRequestAsync(request)).AssertValid();
 
-        var declaration = await _database.StiVatReturnDeclarations.FirstOrDefaultAsync(
-            d => d.SaleId == request.Sale.Id
+        var declaration = await ResolveDeclarationAsync(request);
+
+        var clientRequest = ResolveStiClientRequest(
+            request,
+            declaration
         );
 
-        if (declaration != null)
-        {
-            declaration.Correction += 1;
-        }
+        var clientResponse = await _stiVatReturnClientService.SubmitDeclarationAsync(clientRequest);
 
-        var clientRequest = await ToClientRequest(
-            request.Sale,
-            request.InstanceId ?? -1, // TODO: Handle correctly
-            declaration?.Correction ?? 1
-        );
-
-        var response = await _stiVatReturnClientService.SubmitDeclarationAsync(clientRequest);
-
-        if (response.DeclarationState == null)
+        if (clientResponse.DeclarationState == null)
         {
             throw new ValidationException(
-                new Validation(
-                    response.Errors
-                        .Select(e => e.Details)
-                        .ToList()
-                )
+                clientResponse.Errors
+                    .Select(e => e.Details)
+                    .ToList()
             );
         }
 
-        if (declaration == null)
+        declaration.State = clientResponse.DeclarationState;
+        declaration.SubmitDate = clientResponse.ResultDate;
+
+        if (String.IsNullOrWhiteSpace(declaration.Id))
         {
-            await _database.StiVatReturnDeclarations.AddAsync(
-                new Contract.Entity.StiVatReturnDeclaration
-                {
-                    Correction = 1,
-                    DeclaredById = request.RequesterId,
-                    Id = clientRequest.Declaration.Header.DocumentId,
-                    InstanceId = request.InstanceId,
-                    State = response.DeclarationState,
-                    SubmitDate = response.ResultDate
-                }
-            );
-        }
-        else
-        {
-            declaration.State = response.DeclarationState;
-            declaration.SubmitDate = response.ResultDate;
+            declaration.Id = clientRequest.Declaration.Header.DocumentId;
+            declaration = (await _database.StiVatReturnDeclarations.AddAsync(declaration)).Entity;
         }
 
         await _database.SaveChangesAsync();
 
-        return new StiVatReturnDeclaration
+        // Upon submission create data that was missing and return ids together with the declaration response.
+        return declaration;
+    }
+
+    private async Task<StiVatReturnDeclaration> ResolveDeclarationAsync(
+        StiVatReturnDeclarationSubmitRequest request
+    )
+    {
+        var declaration = request.Sale.Id is not null
+            ? await _database.StiVatReturnDeclarations.FirstAsync(d => d.SaleId == request.Sale.Id)
+            : new StiVatReturnDeclaration();
+
+        if (String.IsNullOrWhiteSpace(declaration.Id))
         {
-            State = response.DeclarationState!.Value,
-            DocumentId = clientRequest.Declaration.Header.DocumentId,
-            Date = response.ResultDate,
-            SaleId = request.Sale.Id ?? -1 // TODO: Get from database
+            declaration.Id = $"{Guid.NewGuid():N}";
+            declaration.DeclaredById = request.RequesterId;
+            declaration.InstanceId = request.InstanceId;
+        }
+
+        declaration.Correction += 1;
+        declaration.Sale = await ResolveSaleAsync(request.Sale, request.InstanceId);
+
+        return declaration;
+    }
+
+    private async Task<Sale> ResolveSaleAsync(
+        StiVatReturnDeclarationSubmitRequestSale sale,
+        int? instanceId
+    )
+    {
+        if (sale.Id is not null)
+        {
+            var saleEntity = await _database.Sales
+                .Include(it => it.Customer)
+                .Include(it => it.Salesman)
+                .Include(it => it.SoldGoods)
+                .FirstAsync(s => s.Id == sale.Id);
+
+            var missingGoods = sale.SoldGoods
+                .Where(it => it.Id is null)
+                .ToList();
+
+            // Ids will be missing for now until the outer transaction is committed.
+            AddMissingGoods(missingGoods, saleEntity);
+
+            return saleEntity;
+        }
+
+        var saleNew = new Sale
+        {
+            CashRegisterNo = sale.CashRegister?.CashRegisterNo,
+            CashRegisterReceiptNo = sale.CashRegister?.ReceiptNo,
+            Customer = (await ResolveCustomerAsync(sale.Customer))
+                .Also(it => it.InstanceId = instanceId),
+            Date = sale.Date,
+            InstanceId = instanceId,
+            InvoiceNo = sale.InvoiceNo,
+            Salesman = (await ResolveSalesmanAsync(sale.Salesman))
+                .Also(it => it.InstanceId = instanceId)
+        };
+
+        return saleNew;
+    }
+
+    private async Task<Customer> ResolveCustomerAsync(
+        StiVatReturnDeclarationSubmitRequestCustomer customer
+    )
+    {
+        if (customer.Id is not null)
+        {
+            return await _database.Customers.FirstAsync(c => c.Id == customer.Id);
+        }
+
+        return new Customer
+        {
+            Birthdate = customer.Birthdate,
+            FirstName = customer.FirstName,
+            IdentityDocument = customer.IdentityDocument.Value,
+            IdentityDocumentIssuedBy = customer.IdentityDocument.IssuedBy,
+            IdentityDocumentType = customer.IdentityDocument.Type,
+            LastName = customer.LastName
         };
     }
 
-    private async Task<SubmitDeclarationRequest> ToClientRequest(
-        StiVatReturnDeclarationSubmitRequestSale sale,
-        int instanceId,
-        int correctionNo
+    private async Task<Salesman> ResolveSalesmanAsync(
+        StiVatReturnDeclarationSubmitRequestSalesman salesman
+    )
+    {
+        if (salesman.Id is not null)
+        {
+            return await _database.Salesmen.FirstAsync(s => s.Id == salesman.Id);
+        }
+
+        return new Salesman
+        {
+            Name = salesman.Name,
+            VatPayerCode = salesman.VatPayerCode.Value,
+            VatPayerCodeIssuedBy = salesman.VatPayerCode.IssuedBy
+        };
+    }
+
+    private SubmitDeclarationRequest ResolveStiClientRequest(
+        StiVatReturnDeclarationSubmitRequest request,
+        StiVatReturnDeclaration declaration
     )
     {
         var requestId = $"{Guid.NewGuid():N}";
-        var documentId = $"{Guid.NewGuid():N}";
         var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Vilnius");
         var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
 
-        var goods = await _database.DataEntries
-            .Include(de => de.DataType)
-            .Where(
-                de => de.DataType.InstanceId == instanceId &&
-                      // de.DataType.Type == DataTypeType.Good &&
-                      de.DataType.Fields.Any(f => f.ReferenceId == sale.Id)
-            )
-            .ToListAsync();
-
-        // TODO: Map goods to sales document
+        var document = new SubmitDeclarationSalesDocument
+        {
+            CashRegisterReceipt = declaration.Sale.InvoiceNo is null
+                ? new SubmitDeclarationCashRegisterReceipt
+                {
+                    CashRegisterNo = declaration.Sale.CashRegisterNo,
+                    ReceiptNo = declaration.Sale.CashRegisterReceiptNo,
+                }
+                : null,
+            Goods = declaration.Sale.SoldGoods
+                .Select(
+                    it => new SubmitDeclarationGoods
+                    {
+                        Description = it.Description,
+                        Quantity = it.Quantity,
+                        SequenceNo = it.SequenceNo,
+                        TaxableAmount = it.TaxableAmount,
+                        TotalAmount = it.TotalAmount,
+                        UnitOfMeasure = it.UnitOfMeasure,
+                        UnitOfMeasureType = it.UnitOfMeasureType,
+                        VatAmount = it.VatAmount,
+                        VatRate = it.VatRate
+                    }
+                )
+                .ToList(),
+            InvoiceNo = declaration.Sale.InvoiceNo,
+            SalesDate = declaration.Sale.Date
+        };
 
         return new SubmitDeclarationRequest
         {
@@ -122,44 +235,44 @@ public class VatReturnService : IVatReturnService
             {
                 Customer = new SubmitDeclarationCustomer
                 {
-                    BirthDate = sale.Customer.Birthdate,
-                    FirstName = sale.Customer.FirstName,
+                    BirthDate = request.Sale.Customer.Birthdate,
+                    FirstName = request.Sale.Customer.FirstName,
                     IdentityDocument = new SubmitDeclarationIdentityDocument
                     {
                         DocumentNo = new SubmitDeclarationIdDocumentNo
                         {
-                            IssuedBy = sale.Customer.IdentityDocument.IssuedBy,
-                            Value = sale.Customer.IdentityDocument.Value
+                            IssuedBy = request.Sale.Customer.IdentityDocument.IssuedBy,
+                            Value = request.Sale.Customer.IdentityDocument.Value
                         },
-                        DocumentType = sale.Customer.IdentityDocument.Type
+                        DocumentType = request.Sale.Customer.IdentityDocument.Type
                     },
-                    LastName = sale.Customer.LastName
+                    LastName = request.Sale.Customer.LastName
                 },
                 Header = new SubmitDeclarationDocumentHeader
                 {
                     Affirmation = SubmitDeclarationDocumentHeaderAffirmation.Y,
                     CompletionDate = now,
-                    DocumentCorrectionNo = 1,
-                    DocumentId = documentId
+                    DocumentCorrectionNo = declaration.Correction,
+                    DocumentId = declaration.Id
                 },
                 Intermediary = new SubmitDeclarationIntermediary
                 {
-                    IntermediaryId = "123456789", // TODO: Get from configuration
-                    Name = "Accounting Services Tool" // TODO: Get from configuration
+                    Id = _stiVatReturn.Intermediary.Id,
+                    Name = _stiVatReturn.Intermediary.Name
                 },
                 Salesman = new SubmitDeclarationSalesman
                 {
-                    Name = sale.Salesman.Name,
+                    Name = request.Sale.Salesman.Name,
                     VatPayerCode = new SubmitDeclarationLtVatPayerCode
                     {
-                        IssuedBy = sale.Salesman.VatPayerCode.IssuedBy,
-                        Value = sale.Salesman.VatPayerCode.Value
+                        IssuedBy = request.Sale.Salesman.VatPayerCode.IssuedBy,
+                        Value = request.Sale.Salesman.VatPayerCode.Value
                     }
                 },
-                SalesDocuments = [] // TODO: Map sales documents
+                SalesDocuments = [document]
             },
             RequestId = requestId,
-            SenderId = "123456789", // TODO: Get from configuration
+            SenderId = _stiVatReturn.Intermediary.Id,
             Situation = 1,
             TimeStamp = now
         };

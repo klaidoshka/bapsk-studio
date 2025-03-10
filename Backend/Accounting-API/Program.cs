@@ -13,10 +13,9 @@ using Accounting.Services.Validator;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configuration
-builder.AddConfiguration<CertificateSerialNumbers>("CertificateSerialNumbers");
-builder.AddConfiguration<Endpoints>("Endpoints");
 builder.AddConfiguration<JwtSettings>("JwtSettings");
 builder.AddConfiguration<Logging>("Logging");
+builder.AddConfiguration<StiVatReturn>("StiVatReturn");
 
 var databaseOptions = builder.AddConfiguration<DatabaseOptions>("DatabaseOptions");
 

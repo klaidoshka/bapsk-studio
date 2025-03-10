@@ -9,7 +9,7 @@ public class SubmitDeclarationIntermediary
     ///     10 characters for foreigner identification number,
     ///     6-8 characters for individuals of individual activity identification number
     /// </summary>
-    public required string IntermediaryId { get; set; }
+    public required string Id { get; set; }
 
     /// <summary>
     ///     Intermediary name, 300 characters.

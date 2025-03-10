@@ -117,7 +117,7 @@ public static class SubmitDeclaration
     {
         return new Intermediary_Type
         {
-            IntermediaryIn = intermediary.IntermediaryId,
+            IntermediaryIn = intermediary.Id,
             Name = intermediary.Name
         };
     }

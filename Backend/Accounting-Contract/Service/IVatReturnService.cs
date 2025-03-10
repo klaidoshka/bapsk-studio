@@ -1,4 +1,4 @@
-using Accounting.Contract.Dto.StiVatReturn;
+using Accounting.Contract.Entity;
 using Accounting.Contract.Request.StiVatReturn;
 
 namespace Accounting.Contract.Service;
@@ -6,7 +6,7 @@ namespace Accounting.Contract.Service;
 public interface IVatReturnService
 {
     /// <summary>
-    /// Submits VTA refund declaration to STI API.
+    /// Submits VTA refund declaration to STI API. Authorization validation must be executed beforehand.
     /// </summary>
     /// <param name="request">Request to handle for response</param>
     /// <returns>Declaration submit response</returns>
