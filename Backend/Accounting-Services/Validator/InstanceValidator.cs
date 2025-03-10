@@ -1,5 +1,5 @@
 using Accounting.Contract;
-using Accounting.Contract.Request;
+using Accounting.Contract.Request.Instance;
 using Accounting.Contract.Response;
 using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;

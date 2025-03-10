@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Accounting.Contract.Entity;
 
-namespace Accounting.Contract.Request;
+namespace Accounting.Contract.Request.DataType;
 
 public class DataTypeFieldCreateRequest
 {

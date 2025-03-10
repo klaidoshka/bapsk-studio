@@ -1,5 +1,5 @@
 using Accounting.Contract.Entity;
-using Accounting.Contract.Request;
+using Accounting.Contract.Request.DataType;
 
 namespace Accounting.Contract.Service;
 

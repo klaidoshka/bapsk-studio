@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Accounting.Contract.Request;
+namespace Accounting.Contract.Request.DataEntry;
 
 public class DataEntryFieldCreateRequest
 {

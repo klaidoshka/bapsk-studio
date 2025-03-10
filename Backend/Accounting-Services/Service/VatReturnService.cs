@@ -1,6 +1,6 @@
 using Accounting.Contract;
 using Accounting.Contract.Dto.StiVatReturn.SubmitDeclaration;
-using Accounting.Contract.Request;
+using Accounting.Contract.Request.StiVatReturn;
 using Accounting.Contract.Response;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;

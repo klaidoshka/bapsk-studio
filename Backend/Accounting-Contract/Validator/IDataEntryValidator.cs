@@ -1,4 +1,4 @@
-using Accounting.Contract.Request;
+using Accounting.Contract.Request.DataEntry;
 using Accounting.Contract.Response;
 
 namespace Accounting.Contract.Validator;

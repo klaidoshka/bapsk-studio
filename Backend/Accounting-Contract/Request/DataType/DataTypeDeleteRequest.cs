@@ -1,6 +1,6 @@
-namespace Accounting.Contract.Request;
+namespace Accounting.Contract.Request.DataType;
 
-public class DataTypeGetRequest
+public class DataTypeDeleteRequest
 {
     public int DataTypeId { get; set; }
     public int? RequesterId { get; set; }

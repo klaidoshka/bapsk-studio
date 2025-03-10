@@ -1,4 +1,4 @@
-namespace Accounting.Contract.Request;
+namespace Accounting.Contract.Request.DataType;
 
 public class DataTypeEditRequest
 {
