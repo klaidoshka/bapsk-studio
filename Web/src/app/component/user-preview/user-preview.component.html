@@ -1,0 +1,29 @@
+<p-dialog
+  header="User Preview"
+  closable="true"
+  closeOnEscape="true"
+  modal="true"
+  (close)="hide()"
+  (onHide)="hide()"
+  [(visible)]="isShown"
+>
+  <p class="font-bold">Name</p>
+  <p>{{ user()?.firstName + ' ' + user()?.lastName }}</p>
+
+  <p class="font-bold mt-4">Email</p>
+  <p>{{ user()?.email }}</p>
+
+  <p class="font-bold mt-4">Birthdate</p>
+  <p>{{ user()?.birthDate }}</p>
+
+  <p class="font-bold mt-4">Country</p>
+  <p>{{ user()?.country?.name }}</p>
+
+  <div class="flex justify-end mt-4">
+    <p-button
+      label="Close"
+      class="p-button-secondary"
+      (onClick)="hide()"
+    ></p-button>
+  </div>
+</p-dialog>

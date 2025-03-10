@@ -10,6 +10,14 @@ public class User
     public int Id { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
+    public Role Role { get; set; }
+}
+
+public class UserIdentity
+{
+    public int Id { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
 }
 
 public static class UserMappings
@@ -21,6 +29,17 @@ public static class UserMappings
             BirthDate = entity.BirthDate,
             Country = entity.Country,
             Email = entity.Email,
+            Id = entity.Id,
+            FirstName = entity.FirstName,
+            LastName = entity.LastName,
+            Role = entity.Role
+        };
+    }
+    
+    public static UserIdentity ToIdentityDto(this Entity.User entity)
+    {
+        return new UserIdentity
+        {
             Id = entity.Id,
             FirstName = entity.FirstName,
             LastName = entity.LastName

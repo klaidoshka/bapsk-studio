@@ -8,7 +8,7 @@ public class Instance
     /// <summary>
     /// Date and time when the instance was created.
     /// </summary>
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>
     /// Navigation property for the user who created the instance.
@@ -41,11 +41,11 @@ public class Instance
         ErrorMessage = "Instance name must be between 1 and 255 characters.",
         MinimumLength = 1
     )]
-    public string Name { get; set; }
+    public string Name { get; set; } = "";
 
     /// <summary>
     /// Navigation property for the user metas of the instance.
     /// Metas hold users and their data who can access the instance.
     /// </summary>
-    public virtual ICollection<InstanceUserMeta> UserMetas { get; set; }
+    public virtual ICollection<InstanceUserMeta> UserMetas { get; set; } = new List<InstanceUserMeta>();
 }

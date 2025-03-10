@@ -8,12 +8,12 @@ public class Session
     /// <summary>
     /// Agent of the user who created the session. Browser, OS, etc.
     /// </summary>
-    public string Agent { get; set; }
+    public string Agent { get; set; } = "";
 
     /// <summary>
     /// When the session was created.
     /// </summary>
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>
     /// Unique identifier of the session.
@@ -24,17 +24,17 @@ public class Session
     /// <summary>
     /// IP address of the user who created the session.
     /// </summary>
-    public string IpAddress { get; set; }
+    public string IpAddress { get; set; } = "";
 
     /// <summary>
     /// Location of the user who created the session.
     /// </summary>
-    public string Location { get; set; }
+    public string Location { get; set; } = "";
 
     /// <summary>
     /// Refresh token used to refresh the session's access token.
     /// </summary>
-    public string RefreshToken { get; set; }
+    public string RefreshToken { get; set; } = "";
 
     /// <summary>
     /// Navigation property for the user who created the session.

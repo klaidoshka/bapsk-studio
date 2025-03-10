@@ -35,7 +35,6 @@ export class DataEntryShowcaseComponent implements OnInit {
   confirmationComponent = viewChild.required(ConfirmationComponent);
   dataEntries!: Signal<DataEntry[]>;
   dataType = input.required<DataType>();
-  isProcessing = signal<boolean>(false);
   managementMenu = viewChild.required(DataEntryManagementComponent);
   messages = signal<Messages>({});
   previewMenu = viewChild.required(DataEntryPreviewComponent);
@@ -62,17 +61,11 @@ export class DataEntryShowcaseComponent implements OnInit {
 
   delete(dataType: DataEntry) {
     this.confirmationComponent().request(() => {
-      this.isProcessing.set(true);
       this.dataEntryService.delete(dataType.id!!).pipe(first()).subscribe({
-        next: () => {
-          this.messages.set({success: ['Instance deleted successfully']});
-        },
-        error: (response: ErrorResponse) => {
-          this.messages.set({error: response.error.messages});
-        },
-        complete: () => {
-          this.isProcessing.set(false);
-        }
+        next: () => this.messages.set({success: ['Instance deleted successfully']}),
+        error: (response: ErrorResponse) => this.messages.set({
+          error: response.error?.messages || ["Extremely rare error occurred, please try again later."]
+        })
       });
     });
   }

@@ -8,7 +8,7 @@ public class DataEntry
     /// <summary>
     /// The date and time the data entry was created.
     /// </summary>
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>
     /// Navigation property for the user who created the data entry.
@@ -35,7 +35,7 @@ public class DataEntry
     /// <summary>
     /// Navigation property for the fields of the data entry.
     /// </summary>
-    public virtual ICollection<DataEntryField> Fields { get; set; }
+    public virtual ICollection<DataEntryField> Fields { get; set; } = new List<DataEntryField>();
 
     /// <summary>
     /// Unique identifier of the data entry.
@@ -52,7 +52,7 @@ public class DataEntry
     /// <summary>
     /// Last date and time the data entry was modified.
     /// </summary>
-    public DateTime? ModifiedAt { get; set; }
+    public DateTime? ModifiedAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>
     /// Navigation property for the user who last modified the data entry.

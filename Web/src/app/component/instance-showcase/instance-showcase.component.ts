@@ -27,7 +27,6 @@ import {ConfirmationComponent} from '../confirmation/confirmation.component';
 export class InstanceShowcaseComponent {
   confirmationComponent = viewChild.required(ConfirmationComponent);
   instances!: Signal<Instance[]>
-  isProcessing = signal<boolean>(false);
   managementMenu = viewChild.required(InstanceManagementComponent);
   messages = signal<Messages>({});
   previewMenu = viewChild.required(InstancePreviewComponent);
@@ -48,17 +47,9 @@ export class InstanceShowcaseComponent {
 
   delete(instance: Instance) {
     this.confirmationComponent().request(() => {
-      this.isProcessing.set(true);
       this.instanceService.delete(instance.id!!).pipe(first()).subscribe({
-        next: () => {
-          this.messages.set({success: ['Instance deleted successfully']});
-        },
-        error: (response: ErrorResponse) => {
-          this.messages.set({error: response.error.messages});
-        },
-        complete: () => {
-          this.isProcessing.set(false);
-        }
+        next: () => this.messages.set({success: ['Instance deleted successfully']}),
+        error: (response: ErrorResponse) => this.messages.set({error: response.error.messages})
       });
     });
   }

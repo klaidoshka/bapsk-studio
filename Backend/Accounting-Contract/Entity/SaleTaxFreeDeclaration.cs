@@ -12,7 +12,7 @@ public class SaleTaxFreeDeclaration
         99,
         ErrorMessage = "Correction number must be between 1 and 99."
     )]
-    public int Correction { get; set; }
+    public int Correction { get; set; } = 1;
 
     /// <summary>
     /// Unique identifier of the declaration.

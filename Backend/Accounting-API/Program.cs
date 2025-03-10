@@ -1,4 +1,3 @@
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Accounting.API.Middleware;
@@ -8,8 +7,6 @@ using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Accounting.Services.Service;
 using Accounting.Services.Validator;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,35 +40,11 @@ builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<ISessionValidator, SessionValidator>();
 builder.Services.AddScoped<IStiService, StiService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserValidator, UserValidator>();
 builder.Services.AddSingleton<ExceptionHandlingMiddleware>();
+builder.Services.AddSingleton<UserIdExtractorMiddleware>();
+builder.AddJwtAuth();
 
-builder.Services
-    .AddAuthentication(
-        options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        }
-    )
-    .AddJwtBearer(
-        options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-                ValidAudience = builder.Configuration["JwtSettings:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Secret"])
-                )
-            };
-        }
-    );
-
-builder.Services.AddAuthorization();
 builder.Services.AddOpenApi();
 
 builder.Services.ConfigureHttpJsonOptions(
@@ -87,6 +60,7 @@ builder.Services.ConfigureHttpJsonOptions(
 
 var application = builder.Build();
 
+application.UseMiddleware<UserIdExtractorMiddleware>();
 application.UseAuthentication();
 application.UseAuthorization();
 application.UseMiddleware<ExceptionHandlingMiddleware>();

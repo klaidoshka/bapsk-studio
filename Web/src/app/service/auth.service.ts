@@ -1,8 +1,12 @@
 import {HttpClient} from "@angular/common/http";
 import {computed, Injectable, Signal, signal} from "@angular/core";
 import {finalize, Observable, of} from "rxjs";
-import {AuthResponse, LoginRequest, RegisterRequest, User} from "../model/auth.model";
+import {AuthResponse, LoginRequest, RegisterRequest} from "../model/auth.model";
+import {User} from "../model/user.model";
 import {ApiRouter} from "./api-router.service";
+import {toEnumOrThrow} from '../util/enum.util';
+import {Role} from '../model/role.model';
+import {getIsoCountryByCode} from '../model/iso-country.model';
 
 @Injectable({
   providedIn: "root"
@@ -22,6 +26,15 @@ export class AuthService {
   }
 
   acceptAuthResponse(response: AuthResponse): void {
+    response = {
+      ...response,
+      user: {
+        ...response.user,
+        country: getIsoCountryByCode(response.user.country as unknown as string),
+        role: toEnumOrThrow(response.user.role, Role)
+      }
+    };
+
     localStorage.setItem(this.accessKey, JSON.stringify(response));
     this.access.set(response);
   }

@@ -8,7 +8,7 @@ public class DataType
     /// <summary>
     /// Navigation property for the fields that the data type has.
     /// </summary>
-    public virtual ICollection<DataTypeField> Fields { get; set; }
+    public virtual ICollection<DataTypeField> Fields { get; set; } = new List<DataTypeField>();
 
     /// <summary>
     /// Description of the data type, can be undefined.
@@ -55,5 +55,5 @@ public class DataType
         ErrorMessage = "Data name must be between 1 and 100 characters.",
         MinimumLength = 1
     )]
-    public string Name { get; set; }
+    public string Name { get; set; } = "";
 }

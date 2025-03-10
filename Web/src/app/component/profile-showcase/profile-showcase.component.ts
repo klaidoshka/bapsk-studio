@@ -1,6 +1,6 @@
 import {Component, Signal} from '@angular/core';
 import {AuthService} from '../../service/auth.service';
-import {User} from '../../model/auth.model';
+import {User} from '../../model/user.model';
 import {TableModule} from 'primeng/table';
 
 @Component({

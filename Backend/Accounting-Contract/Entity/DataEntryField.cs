@@ -39,9 +39,8 @@ public class DataEntryField
     /// </summary>
     [StringLength(
         Int32.MaxValue,
-        ErrorMessage =
-            "Field value must have at least 1 character or do not create a database entry.",
+        ErrorMessage = "Field value must be at least 1 character long.",
         MinimumLength = 1
     )]
-    public string Value { get; set; }
+    public string Value { get; set; } = "";
 }

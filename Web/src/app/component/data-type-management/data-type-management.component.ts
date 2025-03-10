@@ -54,7 +54,6 @@ export class DataTypeManagementComponent implements OnInit {
   fieldTypes = fieldTypes;
   form!: FormGroup;
   instanceId!: Signal<number | null>;
-  isProcessing = signal<boolean>(false);
   isShown = signal<boolean>(false);
   isShownInitially = input<boolean>(false);
   messages = signal<Messages>({});
@@ -128,34 +127,20 @@ export class DataTypeManagementComponent implements OnInit {
   }
 
   private create(request: DataTypeCreateRequest) {
-    this.isProcessing.set(true);
-
     this.dataTypeService.create(request).pipe(first()).subscribe({
-      next: () => {
-        this.messages.set({success: ["DataType has been created successfully."]});
-      },
-      error: (response: ErrorResponse) => {
-        this.messages.set({error: response.error.messages || ["Extremely rare error occurred, please try again later."]});
-      },
-      complete: () => {
-        this.isProcessing.set(false);
-      }
+      next: () => this.messages.set({success: ["DataType has been created successfully."]}),
+      error: (response: ErrorResponse) => this.messages.set({
+        error: response.error?.messages || ["Extremely rare error occurred, please try again later."]
+      })
     });
   }
 
   private edit(request: DataTypeEditRequest) {
-    this.isProcessing.set(true);
-
     this.dataTypeService.edit(request).pipe(first()).subscribe({
-      next: () => {
-        this.messages.set({success: ["Instance has been edited successfully."]});
-      },
-      error: (response: ErrorResponse) => {
-        this.messages.set({error: response.error.messages || ["Extremely rare error occurred, please try again later."]});
-      },
-      complete: () => {
-        this.isProcessing.set(false);
-      }
+      next: () => this.messages.set({success: ["Instance has been edited successfully."]}),
+      error: (response: ErrorResponse) => this.messages.set({
+        error: response.error?.messages || ["Extremely rare error occurred, please try again later."]
+      })
     });
   }
 
@@ -220,13 +205,13 @@ export class DataTypeManagementComponent implements OnInit {
     this.form = this.createForm();
 
     if (dataType) {
-      this.dataType.set(dataType);
       this.form.patchValue({...dataType});
       dataType.fields?.forEach(field => {
         this.addField(field);
       });
     }
 
+    this.dataType.set(dataType);
     this.isShown.set(true);
   }
 }

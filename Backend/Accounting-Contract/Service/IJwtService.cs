@@ -9,7 +9,7 @@ public interface IJwtService
     /// </summary>
     /// <param name="token">Token to extract session from</param>
     /// <returns>Session within the token or null if not found</returns>
-    public Task<Session> ExtractSessionAsync(string token);
+    public Task<Session?> ExtractSessionAsync(string token);
 
     /// <summary>
     /// Extracts the session id from the specified token.
@@ -33,4 +33,11 @@ public interface IJwtService
     /// <param name="sessionId">Session id to generate token for</param>
     /// <returns>Refresh token</returns>
     public string GenerateRefreshToken(User user, Guid sessionId);
+
+    /// <summary>
+    /// Checks if the specified token is valid.
+    /// </summary>
+    /// <param name="token">Token to check</param>
+    /// <returns>True if token is valid</returns>
+    public bool IsTokenValid(string token);
 }

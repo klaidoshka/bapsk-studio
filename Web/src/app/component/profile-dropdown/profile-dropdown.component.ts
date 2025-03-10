@@ -16,6 +16,7 @@ import {Router} from '@angular/router';
 import {ToastModule} from 'primeng/toast';
 import {Menubar} from 'primeng/menubar';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
+import {Role} from '../../model/role.model';
 
 @Component({
   selector: 'app-profile-dropdown',
@@ -108,6 +109,12 @@ export class ProfileDropdownComponent {
             label: 'Data Entries',
             icon: 'pi pi-table',
             routerLink: "/data/entries",
+          },
+          {
+            visible: this.authService.getUser()()?.role == Role.Admin,
+            label: 'Users',
+            icon: 'pi pi-users',
+            routerLink: "/users",
           },
           {
             label: 'Logout',

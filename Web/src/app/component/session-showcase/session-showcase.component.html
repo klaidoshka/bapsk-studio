@@ -2,7 +2,10 @@
 
 <p-toast key="session-revokation"/>
 
-<p-table [value]="sessions()">
+<p-table
+  styleClass="w-fit min-w-fit max-w-fit"
+  [value]="sessions()"
+>
   <ng-template #header>
     <tr>
       <th>Agent</th>

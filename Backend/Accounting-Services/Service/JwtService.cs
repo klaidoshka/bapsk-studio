@@ -4,7 +4,7 @@ using System.Text;
 using Accounting.Contract;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Entity;
-using Accounting.Contract.Response;
+using Accounting.Contract.Enumeration;
 using Accounting.Contract.Service;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -22,24 +22,29 @@ public class JwtService : IJwtService
         _jwtSettings = jwtSettings;
     }
 
-    public async Task<Session> ExtractSessionAsync(string token)
+    public async Task<Session?> ExtractSessionAsync(string token)
     {
         var sessionId = ExtractSessionId(token);
 
         if (sessionId is null)
         {
-            throw new ValidationException("Session id not found in token");
+            return null;
         }
 
-        return await _database.Sessions.FirstOrDefaultAsync(s => s.Id == sessionId)
-               ?? throw new ValidationException("Session not found");
+        var session = await _database.Sessions
+            .Include(s => s.User)
+            .FirstOrDefaultAsync(s => s.Id == sessionId);
+
+        return session is null || session.User.IsDeleted
+            ? null
+            : session;
     }
 
     public Guid? ExtractSessionId(string token)
     {
         var handler = new JwtSecurityTokenHandler();
         var jwtToken = handler.ReadJwtToken(token);
-        var idClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "sessionId")?.Value;
+        var idClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == Claims.SessionId)?.Value;
 
         return Guid.TryParse(idClaim, out var sessionId) ? sessionId : null;
     }
@@ -48,13 +53,7 @@ public class JwtService : IJwtService
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-        var claims = new[]
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim("sessionId", sessionId.ToString())
-        };
+        var claims = ToClaims(user, sessionId);
 
         var token = new JwtSecurityToken(
             _jwtSettings.Issuer,
@@ -67,6 +66,26 @@ public class JwtService : IJwtService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+    private IEnumerable<Claim> ToClaims(User user, Guid sessionId)
+    {
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(Claims.SessionId, sessionId.ToString())
+        };
+
+        var role = user.Role switch
+        {
+            Role.Admin => Roles.Admin,
+            Role.User => Roles.User,
+            _ => throw new ArgumentOutOfRangeException("Unsupported user role")
+        };
+        
+        claims.Add(new Claim(ClaimTypes.Role, role));
+        
+        return claims;
+    }
+
     public string GenerateRefreshToken(User user, Guid sessionId)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret));
@@ -74,9 +93,7 @@ public class JwtService : IJwtService
 
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim("sessionId", sessionId.ToString())
+            new Claim(Claims.SessionId, sessionId.ToString())
         };
 
         var token = new JwtSecurityToken(
@@ -87,5 +104,34 @@ public class JwtService : IJwtService
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public bool IsTokenValid(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.UTF8.GetBytes(_jwtSettings.Secret);
+
+        try
+        {
+            tokenHandler.ValidateToken(
+                token,
+                new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidIssuer = _jwtSettings.Issuer,
+                    ValidAudience = _jwtSettings.Audience
+                },
+                out _
+            );
+
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }
