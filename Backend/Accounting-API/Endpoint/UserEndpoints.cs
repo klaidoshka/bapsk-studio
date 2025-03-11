@@ -1,8 +1,7 @@
 using Accounting.API.AuthorizationHandler.Requirement;
 using Accounting.API.Util;
 using Accounting.Contract.Configuration;
-using Accounting.Contract.Dto;
-using Accounting.Contract.Request;
+using Accounting.Contract.Dto.User;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,6 +1,5 @@
 using Accounting.API.Util;
-using Accounting.Contract.Dto;
-using Accounting.Contract.Request;
+using Accounting.Contract.Dto.Session;
 using Accounting.Contract.Service;
 
 namespace Accounting.API.Endpoint;

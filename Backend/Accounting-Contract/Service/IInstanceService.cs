@@ -1,5 +1,5 @@
-using Accounting.Contract.Entity;
-using Accounting.Contract.Request.Instance;
+using Accounting.Contract.Dto.Instance;
+using Instance = Accounting.Contract.Entity.Instance;
 
 namespace Accounting.Contract.Service;
 

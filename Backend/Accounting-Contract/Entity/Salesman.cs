@@ -22,6 +22,11 @@ public class Salesman
     /// Instance id that the salesman belongs to
     /// </summary>
     public int? InstanceId { get; set; }
+    
+    /// <summary>
+    /// Marks if the salesman is deleted
+    /// </summary>
+    public bool IsDeleted { get; set; }
 
     /// <summary>
     /// Name of the salesman

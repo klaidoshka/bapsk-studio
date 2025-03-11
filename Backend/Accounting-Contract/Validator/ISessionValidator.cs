@@ -1,5 +1,5 @@
-using Accounting.Contract.Request;
-using Accounting.Contract.Response;
+using Accounting.Contract.Dto;
+using Accounting.Contract.Dto.Session;
 
 namespace Accounting.Contract.Validator;
 

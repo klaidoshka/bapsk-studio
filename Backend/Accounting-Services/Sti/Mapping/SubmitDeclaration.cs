@@ -1,5 +1,5 @@
-using Accounting.Contract.Dto.StiVatReturn;
-using Accounting.Contract.Dto.StiVatReturn.SubmitDeclaration;
+using Accounting.Contract.Dto.Sti;
+using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
 using Accounting.Services.Util;
 
 namespace Accounting.Services.Sti.Mapping;
@@ -19,7 +19,7 @@ public static class SubmitDeclaration
     }
 
     private static TFDeclaration_Type ToExternalType(
-        this Contract.Dto.StiVatReturn.SubmitDeclaration.SubmitDeclaration type
+        this Contract.Dto.Sti.VatReturn.SubmitDeclaration.SubmitDeclaration type
     )
     {
         return new TFDeclaration_Type

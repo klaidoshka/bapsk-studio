@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Accounting.API.Middleware;
-using Accounting.Contract.Request;
+using Accounting.Contract.Dto.Auth;
 using Accounting.Contract.Service;
 
 namespace Accounting.API.Util;
@@ -42,7 +42,7 @@ public static class HttpContextExtensions
             : $"{location.City} ({location.Country} - {location.Region})";
     }
 
-    public static async Task<AuthRequestUserMeta> GetAuthRequestUserMetaAsync(
+    public static async Task<AuthUserMeta> GetAuthRequestUserMetaAsync(
         this HttpRequest request
     )
     {
@@ -50,7 +50,7 @@ public static class HttpContextExtensions
         var ipAddress = request.GetIpAddress();
         var location = await request.GetLocationAsync();
 
-        return new AuthRequestUserMeta
+        return new AuthUserMeta
         {
             Agent = agent,
             IpAddress = ipAddress,

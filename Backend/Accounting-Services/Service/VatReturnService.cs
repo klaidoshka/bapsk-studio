@@ -1,13 +1,20 @@
 using Accounting.Contract;
 using Accounting.Contract.Configuration;
-using Accounting.Contract.Dto.StiVatReturn.SubmitDeclaration;
+using Accounting.Contract.Dto;
+using Accounting.Contract.Dto.Customer;
+using Accounting.Contract.Dto.Sale;
+using Accounting.Contract.Dto.Salesman;
+using Accounting.Contract.Dto.Sti.VatReturn;
+using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
 using Accounting.Contract.Entity;
-using Accounting.Contract.Request.StiVatReturn;
-using Accounting.Contract.Response;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Accounting.Services.Util;
 using Microsoft.EntityFrameworkCore;
+using Customer = Accounting.Contract.Dto.Customer.Customer;
+using Sale = Accounting.Contract.Dto.Sale.Sale;
+using Salesman = Accounting.Contract.Dto.Salesman.Salesman;
+using SoldGood = Accounting.Contract.Dto.Sale.SoldGood;
 
 namespace Accounting.Services.Service;
 
@@ -29,30 +36,6 @@ public class VatReturnService : IVatReturnService
         _stiVatReturn = stiVatReturn;
         _stiVatReturnClientService = stiVatReturnClientService;
         _validator = validator;
-    }
-
-    private static void AddMissingGoods(
-        IEnumerable<StiVatReturnDeclarationSubmitRequestSoldGood> missingGoods,
-        Sale sale
-    )
-    {
-        foreach (var missingGood in missingGoods)
-        {
-            sale.SoldGoods.Add(
-                new SoldGood
-                {
-                    Description = missingGood.Description,
-                    Quantity = missingGood.Quantity,
-                    SequenceNo = missingGood.SequenceNo,
-                    TaxableAmount = missingGood.TaxableAmount,
-                    TotalAmount = missingGood.TotalAmount,
-                    UnitOfMeasure = missingGood.UnitOfMeasure,
-                    UnitOfMeasureType = missingGood.UnitOfMeasureType,
-                    VatAmount = missingGood.VatAmount,
-                    VatRate = missingGood.VatRate
-                }
-            );
-        }
     }
 
     public async Task<StiVatReturnDeclaration> SubmitAsync(
@@ -109,53 +92,67 @@ public class VatReturnService : IVatReturnService
             declaration.InstanceId = request.InstanceId;
         }
 
+        // TODO: In the future it may be useful to track who modified the declaration and when
+        //      initially declaration was submitted.
         declaration.Correction += 1;
         declaration.Sale = await ResolveSaleAsync(request.Sale, request.InstanceId);
 
         return declaration;
     }
 
-    private async Task<Sale> ResolveSaleAsync(
-        StiVatReturnDeclarationSubmitRequestSale sale,
+    private async Task<Contract.Entity.Sale> ResolveSaleAsync(
+        Sale sale,
         int? instanceId
     )
     {
-        if (sale.Id is not null)
+        if (sale.Id is null)
         {
-            var saleEntity = await _database.Sales
-                .Include(it => it.Customer)
-                .Include(it => it.Salesman)
-                .Include(it => it.SoldGoods)
-                .FirstAsync(s => s.Id == sale.Id);
-
-            var missingGoods = sale.SoldGoods
-                .Where(it => it.Id is null)
-                .ToList();
-
-            // Ids will be missing for now until the outer transaction is committed.
-            AddMissingGoods(missingGoods, saleEntity);
-
-            return saleEntity;
+            // Sale id will be missing until the outer transaction is committed.
+            return new Contract.Entity.Sale
+            {
+                CashRegisterNo = sale.CashRegister?.CashRegisterNo,
+                CashRegisterReceiptNo = sale.CashRegister?.ReceiptNo,
+                Customer = (await ResolveCustomerAsync(sale.Customer))
+                    .Also(it => it.InstanceId = instanceId),
+                Date = sale.Date,
+                InstanceId = instanceId,
+                InvoiceNo = sale.InvoiceNo,
+                Salesman = (await ResolveSalesmanAsync(sale.Salesman))
+                    .Also(it => it.InstanceId = instanceId),
+                SoldGoods = await ResolveSoldGoodsAsync(sale.SoldGoods)
+            };
         }
 
-        var saleNew = new Sale
-        {
-            CashRegisterNo = sale.CashRegister?.CashRegisterNo,
-            CashRegisterReceiptNo = sale.CashRegister?.ReceiptNo,
-            Customer = (await ResolveCustomerAsync(sale.Customer))
-                .Also(it => it.InstanceId = instanceId),
-            Date = sale.Date,
-            InstanceId = instanceId,
-            InvoiceNo = sale.InvoiceNo,
-            Salesman = (await ResolveSalesmanAsync(sale.Salesman))
-                .Also(it => it.InstanceId = instanceId)
-        };
+        var saleEntity = await _database.Sales
+            .Include(it => it.Customer)
+            .Include(it => it.Salesman)
+            .Include(it => it.SoldGoods)
+            .FirstAsync(s => s.Id == sale.Id);
 
-        return saleNew;
+        var missingGoods = sale.SoldGoods
+            .Where(it => it.Id is null)
+            .ToList();
+
+        // Ids will be missing for now until the outer transaction is committed.
+        foreach (var missingGood in missingGoods)
+        {
+            saleEntity.SoldGoods.Add(missingGood.ToEntity());
+        }
+
+        var removedGoods = saleEntity.SoldGoods
+            .Where(it => sale.SoldGoods.All(sg => sg.Id != it.Id))
+            .ToList();
+        
+        foreach (var removedGood in removedGoods)
+        {
+            saleEntity.SoldGoods.Remove(removedGood);
+        }
+
+        return saleEntity;
     }
 
-    private async Task<Customer> ResolveCustomerAsync(
-        StiVatReturnDeclarationSubmitRequestCustomer customer
+    private async Task<Contract.Entity.Customer> ResolveCustomerAsync(
+        Customer customer
     )
     {
         if (customer.Id is not null)
@@ -163,19 +160,12 @@ public class VatReturnService : IVatReturnService
             return await _database.Customers.FirstAsync(c => c.Id == customer.Id);
         }
 
-        return new Customer
-        {
-            Birthdate = customer.Birthdate,
-            FirstName = customer.FirstName,
-            IdentityDocument = customer.IdentityDocument.Value,
-            IdentityDocumentIssuedBy = customer.IdentityDocument.IssuedBy,
-            IdentityDocumentType = customer.IdentityDocument.Type,
-            LastName = customer.LastName
-        };
+        // Customer id will be missing until the outer transaction is committed.
+        return customer.ToEntity();
     }
 
-    private async Task<Salesman> ResolveSalesmanAsync(
-        StiVatReturnDeclarationSubmitRequestSalesman salesman
+    private async Task<Contract.Entity.Salesman> ResolveSalesmanAsync(
+        Salesman salesman
     )
     {
         if (salesman.Id is not null)
@@ -183,12 +173,40 @@ public class VatReturnService : IVatReturnService
             return await _database.Salesmen.FirstAsync(s => s.Id == salesman.Id);
         }
 
-        return new Salesman
+        // Salesman id will be missing until the outer transaction is committed.
+        return salesman.ToEntity();
+    }
+
+    /// <summary>
+    /// Resolves sold goods for new sale. This is not to be used for updating existing sales.
+    /// </summary>
+    /// <param name="soldGoods">Provided sold goods in the declaration request</param>
+    /// <returns>
+    /// Resolved sold goods, stored in database. Ids will be missing until outer transaction is
+    /// commited.
+    /// </returns>
+    private async Task<ICollection<Contract.Entity.SoldGood>> ResolveSoldGoodsAsync(
+        IEnumerable<SoldGood> soldGoods
+    )
+    {
+        var soldGoodsResolved = new List<Contract.Entity.SoldGood>();
+
+        foreach (var soldGood in soldGoods)
         {
-            Name = salesman.Name,
-            VatPayerCode = salesman.VatPayerCode.Value,
-            VatPayerCodeIssuedBy = salesman.VatPayerCode.IssuedBy
-        };
+            if (soldGood.Id is not null)
+            {
+                soldGoodsResolved.Add(
+                    await _database.SoldGoods.FirstAsync(sg => sg.Id == soldGood.Id)
+                );
+
+                continue;
+            }
+
+            // Sold good id will be missing until the outer transaction is committed.
+            soldGoodsResolved.Add(soldGood.ToEntity());
+        }
+
+        return soldGoodsResolved;
     }
 
     private SubmitDeclarationRequest ResolveStiClientRequest(

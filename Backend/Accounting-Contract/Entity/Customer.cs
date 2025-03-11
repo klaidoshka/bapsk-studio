@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Accounting.Contract.Dto.StiVatReturn;
 
 namespace Accounting.Contract.Entity;
 
@@ -13,11 +12,8 @@ public class Customer
 
     /// <summary>
     /// First name of the customer.
-    ///
-    /// If customer has single name, this field contains "-" symbol and customer's actual name is
-    /// stored in the LastName field.
     /// </summary>
-    public string FirstName { get; set; } = "-";
+    public string FirstName { get; set; } = String.Empty;
 
     /// <summary>
     /// Id of the customer
@@ -51,6 +47,11 @@ public class Customer
     /// Instance id that the customer belongs to
     /// </summary>
     public int? InstanceId { get; set; }
+    
+    /// <summary>
+    /// Marks if the customer is deleted
+    /// </summary>
+    public bool IsDeleted { get; set; }
 
     /// <summary>
     /// Last name of the customer

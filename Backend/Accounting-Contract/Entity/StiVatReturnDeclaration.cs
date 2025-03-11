@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Accounting.Contract.Dto.StiVatReturn.SubmitDeclaration;
+using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
 
 namespace Accounting.Contract.Entity;
 

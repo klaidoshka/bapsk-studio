@@ -1,6 +1,6 @@
 using Accounting.Contract;
-using Accounting.Contract.Request.DataType;
-using Accounting.Contract.Response;
+using Accounting.Contract.Dto;
+using Accounting.Contract.Dto.DataType;
 using Accounting.Contract.Validator;
 using Accounting.Services.Util;
 using Microsoft.EntityFrameworkCore;

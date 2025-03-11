@@ -1,5 +1,5 @@
-using Accounting.Contract.Entity;
-using Accounting.Contract.Request;
+using Accounting.Contract.Dto.Session;
+using Session = Accounting.Contract.Entity.Session;
 
 namespace Accounting.Contract.Service;
 

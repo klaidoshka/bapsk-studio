@@ -1,9 +1,10 @@
 using Accounting.Contract;
+using Accounting.Contract.Dto.User;
 using Accounting.Contract.Entity;
-using Accounting.Contract.Request;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;
+using User = Accounting.Contract.Entity.User;
 
 namespace Accounting.Services.Service;
 

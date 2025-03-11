@@ -1,5 +1,5 @@
-using Accounting.Contract.Request.DataType;
-using Accounting.Contract.Response;
+using Accounting.Contract.Dto;
+using Accounting.Contract.Dto.DataType;
 
 namespace Accounting.Contract.Validator;
 

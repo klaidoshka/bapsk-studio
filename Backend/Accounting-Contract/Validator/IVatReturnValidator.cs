@@ -1,5 +1,8 @@
-using Accounting.Contract.Request.StiVatReturn;
-using Accounting.Contract.Response;
+using Accounting.Contract.Dto;
+using Accounting.Contract.Dto.Customer;
+using Accounting.Contract.Dto.Sale;
+using Accounting.Contract.Dto.Salesman;
+using Accounting.Contract.Dto.Sti.VatReturn;
 
 namespace Accounting.Contract.Validator;
 
@@ -21,7 +24,7 @@ public interface IVatReturnValidator
     /// <param name="customer">Customer to validate</param>
     /// <returns>Validation result</returns>
     public Task<Validation> ValidateSubmitRequestCustomerAsync(
-        StiVatReturnDeclarationSubmitRequestCustomer customer
+        Customer customer
     );
 
     /// <summary>
@@ -30,7 +33,7 @@ public interface IVatReturnValidator
     /// <param name="sale">Sale to validate</param>
     /// <returns>Validation result</returns>
     public Task<Validation> ValidateSubmitRequestSaleAsync(
-        StiVatReturnDeclarationSubmitRequestSale sale
+        Sale sale
     );
 
     /// <summary>
@@ -39,7 +42,7 @@ public interface IVatReturnValidator
     /// <param name="salesman">Salesman to validate</param>
     /// <returns>Validation result</returns>
     public Task<Validation> ValidateSubmitRequestSalesmanAsync(
-        StiVatReturnDeclarationSubmitRequestSalesman salesman
+        Salesman salesman
     );
 
     /// <summary>
@@ -48,7 +51,7 @@ public interface IVatReturnValidator
     /// <param name="soldGood">Sold good to validate</param>
     /// <returns>Validation result</returns>
     public Task<Validation> ValidateSubmitRequestSoldGoodAsync(
-        StiVatReturnDeclarationSubmitRequestSoldGood soldGood
+        SoldGood soldGood
     );
 
     /// <summary>

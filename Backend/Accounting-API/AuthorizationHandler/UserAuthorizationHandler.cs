@@ -1,6 +1,6 @@
 using Accounting.API.AuthorizationHandler.Requirement;
 using Accounting.API.Util;
-using Accounting.Contract.Response;
+using Accounting.Contract.Dto;
 using Accounting.Contract.Validator;
 using Microsoft.AspNetCore.Authorization;
 

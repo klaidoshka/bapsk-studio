@@ -1,5 +1,5 @@
-using Accounting.Contract.Dto.StiVatReturn;
-using Accounting.Contract.Dto.StiVatReturn.CancelDeclaration;
+using Accounting.Contract.Dto.Sti;
+using Accounting.Contract.Dto.Sti.VatReturn.CancelDeclaration;
 using Accounting.Services.Util;
 
 namespace Accounting.Services.Sti.Mapping;

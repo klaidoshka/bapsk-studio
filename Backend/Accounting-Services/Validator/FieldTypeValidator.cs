@@ -1,6 +1,6 @@
 using System.Text.Json;
+using Accounting.Contract.Dto;
 using Accounting.Contract.Entity;
-using Accounting.Contract.Response;
 using Accounting.Contract.Validator;
 
 namespace Accounting.Services.Validator;

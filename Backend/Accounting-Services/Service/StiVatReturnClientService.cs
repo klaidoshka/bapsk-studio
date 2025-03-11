@@ -2,11 +2,9 @@ using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using Accounting.Contract;
 using Accounting.Contract.Configuration;
-using Accounting.Contract.Dto.StiVatReturn.CancelDeclaration;
-using Accounting.Contract.Dto.StiVatReturn.ExportedGoods;
-using Accounting.Contract.Dto.StiVatReturn.QueryDeclarations;
-using Accounting.Contract.Dto.StiVatReturn.SubmitDeclaration;
-using Accounting.Contract.Dto.StiVatReturn.SubmitPaymentInfo;
+using Accounting.Contract.Dto.Sti.VatReturn.CancelDeclaration;
+using Accounting.Contract.Dto.Sti.VatReturn.ExportedGoods;
+using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Accounting.Services.Sti;
@@ -46,14 +44,6 @@ public class StiVatReturnClientService : IStiVatReturnClientService, IAsyncDispo
             .ToInternalType();
     }
 
-    public async Task<QueryDeclarationsResponse> QueryDeclarationsAsync(
-        QueryDeclarationsRequest request
-    )
-    {
-        return (await _client.queryDeclarationsAsync(request.ToExternalType()))
-            .ToInternalType();
-    }
-
     public async Task<SubmitDeclarationResponse> SubmitDeclarationAsync(
         SubmitDeclarationRequest request
     )
@@ -89,14 +79,6 @@ public class StiVatReturnClientService : IStiVatReturnClientService, IAsyncDispo
         await _database.SaveChangesAsync();
 
         return (await _client.submitDeclarationAsync(request.ToExternalType()))
-            .ToInternalType();
-    }
-
-    public async Task<SubmitPaymentInfoResponse> SubmitPaymentInfoAsync(
-        SubmitPaymentInfoRequest request
-    )
-    {
-        return (await _client.submitPaymentInfoAsync(request.ToExternalType()))
             .ToInternalType();
     }
 

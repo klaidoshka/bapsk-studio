@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Accounting.Contract.Dto.StiVatReturn;
 
 namespace Accounting.Contract.Entity;
 
@@ -17,6 +16,11 @@ public class SoldGood
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
+    
+    /// <summary>
+    /// Marks if this sold good is deleted
+    /// </summary>
+    public bool IsDeleted { get; set; }
 
     /// <summary>
     /// Quantity of the sold good.

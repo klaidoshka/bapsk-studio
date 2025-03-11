@@ -1,5 +1,5 @@
 using System.Net;
-using Accounting.Contract.Response;
+using Accounting.Contract.Dto;
 
 namespace Accounting.API.Middleware;
 

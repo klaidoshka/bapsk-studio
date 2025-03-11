@@ -1,8 +1,6 @@
-using Accounting.Contract.Dto.StiVatReturn.CancelDeclaration;
-using Accounting.Contract.Dto.StiVatReturn.ExportedGoods;
-using Accounting.Contract.Dto.StiVatReturn.QueryDeclarations;
-using Accounting.Contract.Dto.StiVatReturn.SubmitDeclaration;
-using Accounting.Contract.Dto.StiVatReturn.SubmitPaymentInfo;
+using Accounting.Contract.Dto.Sti.VatReturn.CancelDeclaration;
+using Accounting.Contract.Dto.Sti.VatReturn.ExportedGoods;
+using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +16,7 @@ public static class StiEndpoints
                     [FromBody] CancelDeclarationRequest request,
                     IStiVatReturnClientService stiService
                 ) =>
-            Results.Json(await stiService.CancelDeclarationAsync(request))
+                Results.Json(await stiService.CancelDeclarationAsync(request))
         );
 
         endpoints.MapGet(
@@ -27,16 +25,7 @@ public static class StiEndpoints
                     [FromBody] ExportedGoodsRequest request,
                     IStiVatReturnClientService stiService
                 ) =>
-            Results.Json(await stiService.GetInfoOnExportedGoodsAsync(request))
-        );
-
-        endpoints.MapGet(
-            "/query-declarations",
-            async (
-                    [FromBody] QueryDeclarationsRequest request,
-                    IStiVatReturnClientService stiService
-                ) =>
-            Results.Json(await stiService.QueryDeclarationsAsync(request))
+                Results.Json(await stiService.GetInfoOnExportedGoodsAsync(request))
         );
 
         endpoints.MapPost(
@@ -45,16 +34,7 @@ public static class StiEndpoints
                     [FromBody] SubmitDeclarationRequest request,
                     IStiVatReturnClientService stiService
                 ) =>
-            Results.Json(await stiService.SubmitDeclarationAsync(request))
-        );
-
-        endpoints.MapPost(
-            "/submit-payment-info",
-            async (
-                    [FromBody] SubmitPaymentInfoRequest request,
-                    IStiVatReturnClientService stiService
-                ) =>
-            Results.Json(await stiService.SubmitPaymentInfoAsync(request))
+                Results.Json(await stiService.SubmitDeclarationAsync(request))
         );
     }
 }

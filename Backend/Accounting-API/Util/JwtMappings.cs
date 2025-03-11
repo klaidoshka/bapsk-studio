@@ -1,4 +1,4 @@
-using Accounting.Contract.Dto;
+using Accounting.Contract.Dto.Auth;
 
 namespace Accounting.API.Util;
 

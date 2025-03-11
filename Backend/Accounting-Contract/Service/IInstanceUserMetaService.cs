@@ -1,5 +1,5 @@
-using Accounting.Contract.Entity;
-using Accounting.Contract.Request.Instance;
+using Accounting.Contract.Dto.Instance;
+using InstanceUserMeta = Accounting.Contract.Entity.InstanceUserMeta;
 
 namespace Accounting.Contract.Service;
 

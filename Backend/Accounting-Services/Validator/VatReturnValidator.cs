@@ -1,7 +1,10 @@
 using Accounting.Contract;
-using Accounting.Contract.Dto.StiVatReturn.SubmitDeclaration;
-using Accounting.Contract.Request.StiVatReturn;
-using Accounting.Contract.Response;
+using Accounting.Contract.Dto;
+using Accounting.Contract.Dto.Customer;
+using Accounting.Contract.Dto.Sale;
+using Accounting.Contract.Dto.Salesman;
+using Accounting.Contract.Dto.Sti.VatReturn;
+using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
 using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +19,7 @@ public class VatReturnValidator : IVatReturnValidator
         _database = database;
     }
 
+    // TODO: Add all validations for VAT return declaration submit request.
     public async Task<Validation> ValidateSubmitRequestAsync(
         StiVatReturnDeclarationSubmitRequest request
     )
@@ -48,7 +52,7 @@ public class VatReturnValidator : IVatReturnValidator
     }
 
     public async Task<Validation> ValidateSubmitRequestCustomerAsync(
-        StiVatReturnDeclarationSubmitRequestCustomer customer
+        Customer customer
     )
     {
         var customerEntity = customer.Id is not null
@@ -59,12 +63,15 @@ public class VatReturnValidator : IVatReturnValidator
         {
             return new Validation("Customer not found.");
         }
+        
+        // If customer has single name, FirstName contains "-" symbol and customer's actual name is
+        // stored in the LastName field.
 
         return new Validation();
     }
 
     public async Task<Validation> ValidateSubmitRequestSaleAsync(
-        StiVatReturnDeclarationSubmitRequestSale sale
+        Sale sale
     )
     {
         var saleEntity = sale.Id is not null
@@ -108,7 +115,7 @@ public class VatReturnValidator : IVatReturnValidator
     }
 
     public async Task<Validation> ValidateSubmitRequestSalesmanAsync(
-        StiVatReturnDeclarationSubmitRequestSalesman salesman
+        Salesman salesman
     )
     {
         var salesmanEntity = salesman.Id is not null
@@ -124,7 +131,7 @@ public class VatReturnValidator : IVatReturnValidator
     }
 
     public async Task<Validation> ValidateSubmitRequestSoldGoodAsync(
-        StiVatReturnDeclarationSubmitRequestSoldGood soldGood
+        SoldGood soldGood
     )
     {
         var soldGoodEntity = soldGood.Id is not null
@@ -149,7 +156,7 @@ public class VatReturnValidator : IVatReturnValidator
 
         if (sale is not null && sale.InstanceId != request.InstanceId)
         {
-            return new Validation("Sale is not associated with the provided instance.");
+            return new Validation("Specified sale is not accessible.");
         }
 
         var customer = request.Sale.Customer.Id is not null
@@ -158,7 +165,7 @@ public class VatReturnValidator : IVatReturnValidator
 
         if (customer is not null && customer.InstanceId != request.InstanceId)
         {
-            return new Validation("Customer is not associated with the provided instance.");
+            return new Validation("Specified customer is not accessible.");
         }
 
         var salesman = request.Sale.Salesman.Id is not null
@@ -167,10 +174,10 @@ public class VatReturnValidator : IVatReturnValidator
 
         if (salesman is not null && salesman.InstanceId != request.InstanceId)
         {
-            return new Validation("Salesman is not associated with the provided instance.");
+            return new Validation("Specified salesman is not accessible.");
         }
 
-        if (request.InstanceId is null)
+        if (request.Sale.Id is null)
         {
             return new Validation();
         }

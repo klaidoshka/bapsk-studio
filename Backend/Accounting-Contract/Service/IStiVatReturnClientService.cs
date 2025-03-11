@@ -1,8 +1,6 @@
-using Accounting.Contract.Dto.StiVatReturn.CancelDeclaration;
-using Accounting.Contract.Dto.StiVatReturn.ExportedGoods;
-using Accounting.Contract.Dto.StiVatReturn.QueryDeclarations;
-using Accounting.Contract.Dto.StiVatReturn.SubmitDeclaration;
-using Accounting.Contract.Dto.StiVatReturn.SubmitPaymentInfo;
+using Accounting.Contract.Dto.Sti.VatReturn.CancelDeclaration;
+using Accounting.Contract.Dto.Sti.VatReturn.ExportedGoods;
+using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
 
 namespace Accounting.Contract.Service;
 
@@ -26,23 +24,9 @@ public interface IStiVatReturnClientService
     public Task<ExportedGoodsResponse> GetInfoOnExportedGoodsAsync(ExportedGoodsRequest request);
 
     /// <summary>
-    /// Queries declarations with specified request via STI API.
-    /// </summary>
-    /// <param name="request">Request to handle for response</param>
-    /// <returns>In-progress task that resolves into operation's response</returns>
-    public Task<QueryDeclarationsResponse> QueryDeclarationsAsync(QueryDeclarationsRequest request);
-
-    /// <summary>
     /// Submits VTA refund declaration to STI API.
     /// </summary>
     /// <param name="request">Request to handle for response</param>
     /// <returns>In-progress task that resolves into operation's response</returns>
     public Task<SubmitDeclarationResponse> SubmitDeclarationAsync(SubmitDeclarationRequest request);
-
-    /// <summary>
-    /// Submits payment information to STI API.
-    /// </summary>
-    /// <param name="request">Request to handle for response</param>
-    /// <returns>In-progress task that resolves into operation's response</returns>
-    public Task<SubmitPaymentInfoResponse> SubmitPaymentInfoAsync(SubmitPaymentInfoRequest request);
 }

@@ -55,6 +55,11 @@ public class Sale
     /// must be provided.
     /// </summary>
     public string? InvoiceNo { get; set; }
+    
+    /// <summary>
+    /// Marks if this sale is deleted
+    /// </summary>
+    public bool IsDeleted { get; set; }
 
     /// <summary>
     /// Navigation property to the salesman that is associated with this sale

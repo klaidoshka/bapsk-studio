@@ -1,5 +1,5 @@
+using Accounting.Contract.Dto.Sti.VatReturn;
 using Accounting.Contract.Entity;
-using Accounting.Contract.Request.StiVatReturn;
 
 namespace Accounting.Contract.Service;
 
