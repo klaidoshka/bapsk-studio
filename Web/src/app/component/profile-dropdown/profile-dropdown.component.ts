@@ -106,9 +106,9 @@ export class ProfileDropdownComponent {
             routerLink: "/data/types",
           },
           {
-            label: 'Data Entries',
-            icon: 'pi pi-table',
-            routerLink: "/data/entries",
+            label: 'Workspace',
+            icon: 'pi pi-desktop',
+            routerLink: "/workspace",
           },
           {
             visible: this.authService.getUser()()?.role == Role.Admin,

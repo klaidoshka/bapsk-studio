@@ -8,12 +8,12 @@ import DataType from '../../model/data-type.model';
 import {Message} from 'primeng/message';
 
 @Component({
-  selector: 'app-data-entry-page',
-  templateUrl: './data-entry-page.component.html',
+  selector: 'app-workspace-page',
+  templateUrl: './workspace-page.component.html',
   imports: [DataEntryShowcaseComponent, Message],
   providers: []
 })
-export class DataEntryPageComponent {
+export class WorkspacePageComponent {
   private dataTypeService = inject(DataTypeService);
   private instanceService = inject(InstanceService);
 
