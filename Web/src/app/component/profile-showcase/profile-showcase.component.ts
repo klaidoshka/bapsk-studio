@@ -2,6 +2,7 @@ import {Component, Signal} from '@angular/core';
 import {AuthService} from '../../service/auth.service';
 import {User} from '../../model/user.model';
 import {TableModule} from 'primeng/table';
+import {Role} from '../../model/role.model';
 
 @Component({
   selector: 'app-profile-showcase',
@@ -16,5 +17,9 @@ export class ProfileShowcaseComponent {
     private authService: AuthService
   ) {
     this.user = this.authService.getUser();
+  }
+
+  toRoleString(role: Role): string {
+    return Role[role];
   }
 }
