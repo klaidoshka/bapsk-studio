@@ -22,4 +22,5 @@ export interface CustomerCreateRequest {
 
 export interface CustomerEditRequest {
   customer: Customer;
+  instanceId: number;
 }

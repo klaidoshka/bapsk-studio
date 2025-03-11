@@ -1,4 +1,4 @@
-import {Component, effect, Signal, signal, viewChild} from '@angular/core';
+import {Component, effect, Signal, signal, viewChild, WritableSignal} from '@angular/core';
 import {DropdownModule} from "primeng/dropdown";
 import Instance from '../../model/instance.model';
 import {AuthService} from '../../service/auth.service';
@@ -26,14 +26,14 @@ export class InstanceSelectorComponent {
   instances!: Signal<Instance[]>;
   isAuthenticated!: Signal<boolean>;
   managementMenu = viewChild.required(InstanceManagementComponent);
-  selectedInstance!: Signal<Instance | null>;
+  selectedInstance!: WritableSignal<Instance | null>;
 
   constructor(
     private authService: AuthService,
     private instanceService: InstanceService
   ) {
     this.isAuthenticated = this.authService.isAuthenticated();
-    this.instances = this.instanceService.getAllAsSignal();
+    this.instances = this.instanceService.getAsSignal();
     this.selectedInstance = this.instanceService.getActiveInstance();
 
     effect(() => {

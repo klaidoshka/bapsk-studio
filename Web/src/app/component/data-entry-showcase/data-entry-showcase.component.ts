@@ -43,12 +43,12 @@ export class DataEntryShowcaseComponent implements OnInit {
     private dataEntryService: DataEntryService
   ) {
     effect(() => {
-      this.dataEntries = this.dataEntryService.getAllAsSignal(this.dataType()!!.id);
+      this.dataEntries = this.dataEntryService.getAsSignal(this.dataType()!!.id);
     });
   }
 
   ngOnInit() {
-    this.dataEntries = this.dataEntryService.getAllAsSignal(this.dataType()!!.id);
+    this.dataEntries = this.dataEntryService.getAsSignal(this.dataType()!!.id);
   }
 
   showManagement(dataEntry: DataEntry | null) {

@@ -34,7 +34,7 @@ export class InstanceShowcaseComponent {
   constructor(
     private instanceService: InstanceService
   ) {
-    this.instances = this.instanceService.getAllAsSignal();
+    this.instances = this.instanceService.getAsSignal();
   }
 
   showManagement(instance: Instance | null) {

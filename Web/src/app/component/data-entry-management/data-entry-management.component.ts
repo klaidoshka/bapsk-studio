@@ -148,6 +148,7 @@ export class DataEntryManagementComponent implements OnInit {
 
       this.edit({
         dataEntryId: this.dataEntry()!!.id,
+        dataTypeId: this.dataType()!!.id,
         fields: fields
       });
     } else {

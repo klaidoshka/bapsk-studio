@@ -11,11 +11,11 @@ export class ErrorResolverService {
   constructor() {
   }
 
-  resolveHttpResponseTo(response: any, messages: WritableSignal<Messages>) {
+  readonly resolveHttpResponseTo = (response: any, messages: WritableSignal<Messages>) => {
     messages.set({error: this.resolve(response)});
   }
 
-  resolve(error: any): string[] {
+  readonly resolve = (error: any): string[] => {
     if (error instanceof Error) {
       return [error.message];
     } else if (typeof error === 'string') {

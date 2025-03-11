@@ -12,6 +12,7 @@ export interface SalesmanCreateRequest {
 }
 
 export interface SalesmanEditRequest {
+  instanceId: number;
   salesman: Salesman;
 }
 

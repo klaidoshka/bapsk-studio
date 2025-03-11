@@ -7,7 +7,7 @@ import {
   UserEditRequest,
   UserIdentity
 } from '../model/user.model';
-import {first, Observable, of, tap} from 'rxjs';
+import {first, Observable, tap} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {toEnumOrThrow} from '../util/enum.util';
 import {Role} from '../model/role.model';
@@ -17,9 +17,10 @@ import {IsoCountryCode} from '../model/iso-country.model';
   providedIn: 'root'
 })
 export class UserService {
-  private users = signal(new Map<number, WritableSignal<User | null>>());
-  private userIdentities = signal(new Map<number, WritableSignal<UserIdentity | null>>());
-  private usersSignal = signal<User[]>([]);
+  // TODO: Just make two instead of three signals. Use arrays.
+  private storeUsers = signal(new Map<number, WritableSignal<User | null>>());
+  private storeIdentities = signal(new Map<number, WritableSignal<UserIdentity | null>>());
+  private store = signal<User[]>([]);
 
   constructor(
     private apiRouter: ApiRouter,
@@ -30,7 +31,7 @@ export class UserService {
   }
 
   private readonly updateCachedUser = (user: User): Signal<User | null> => {
-    let candidate = this.users().get(user.id);
+    let candidate = this.storeUsers().get(user.id);
 
     if (candidate != null) {
       candidate.update(_ => ({
@@ -39,7 +40,7 @@ export class UserService {
         role: toEnumOrThrow(user.role, Role)
       }));
     } else {
-      this.users().set(user.id, signal({
+      this.storeUsers().set(user.id, signal({
         ...user,
         country: toEnumOrThrow(user.country, IsoCountryCode),
         role: toEnumOrThrow(user.role, Role)
@@ -49,24 +50,24 @@ export class UserService {
     this.updateUsersSignal();
     this.updateCachedUserIdentity(toUserIdentity(user));
 
-    return this.users().get(user.id)!;
+    return this.storeUsers().get(user.id)!;
   }
 
   private readonly updateCachedUserIdentity = (userIdentity: UserIdentity): Signal<UserIdentity | null> => {
-    let candidateIdentity = this.userIdentities().get(userIdentity.id);
+    let candidateIdentity = this.storeIdentities().get(userIdentity.id);
 
     if (candidateIdentity != null) {
       candidateIdentity.update(_ => userIdentity);
     } else {
-      this.userIdentities().set(userIdentity.id, signal(userIdentity));
+      this.storeIdentities().set(userIdentity.id, signal(userIdentity));
     }
 
-    return this.userIdentities().get(userIdentity.id)!;
+    return this.storeIdentities().get(userIdentity.id)!;
   }
 
   private readonly updateUsersSignal = () => {
-    this.usersSignal.update(() =>
-      Array.from(this.users().values())
+    this.store.update(() =>
+      Array.from(this.storeUsers().values())
       .map(user => user())
       .filter(user => user !== null) as User[]
     );
@@ -84,19 +85,19 @@ export class UserService {
     .pipe(
       tap(() => {
         // Updating both signals to null to notify subscribers that the user is deleted.
-        const user = this.users().get(id);
+        const user = this.storeUsers().get(id);
 
         if (user != null) {
           user.update(_ => null);
-          this.users().delete(id);
+          this.storeUsers().delete(id);
           this.updateUsersSignal();
         }
 
-        const userIdentity = this.userIdentities().get(id);
+        const userIdentity = this.storeIdentities().get(id);
 
         if (userIdentity != null) {
           userIdentity.update(_ => null);
-          this.userIdentities().delete(id);
+          this.storeIdentities().delete(id);
         }
       })
     );
@@ -107,7 +108,7 @@ export class UserService {
     .put<void>(this.apiRouter.userEdit(request.userId), request)
     .pipe(
       tap(() => {
-          const user = this.users().get(request.userId)?.();
+        const user = this.storeUsers().get(request.userId)?.();
 
           // Must exist, if edit is called.
           if (user != null) {
@@ -132,60 +133,48 @@ export class UserService {
   }
 
   readonly getAsSignal = (): Signal<User[]> => {
-    return this.usersSignal.asReadonly();
+    return this.store.asReadonly();
   }
 
   readonly getById = (id: number): Observable<User> => {
-    let candidate = this.users().get(id)?.();
-
-    if (candidate != null) {
-      return of(candidate);
-    }
-
     return this.httpClient
     .get<User>(this.apiRouter.userGetById(id))
     .pipe(tap((user: User) => this.updateCachedUser(user)));
   }
 
   readonly getByIdAsSignal = (id: number): Signal<User | null> => {
-    const candidate = this.users().get(id);
+    const candidate = this.storeUsers().get(id);
 
     if (candidate != null) {
       return candidate;
     }
 
-    this.users().set(id, signal(null));
+    this.storeUsers().set(id, signal(null));
 
     // Fetch the user identity from the server. It is cached in the signal by underlying call.
     new Promise((resolve) => this.getById(id).pipe(first()).subscribe(resolve));
 
-    return this.users().get(id)!;
+    return this.storeUsers().get(id)!.asReadonly();
   }
 
   readonly getIdentityById = (id: number): Observable<UserIdentity> => {
-    let candidate = this.userIdentities().get(id)?.();
-
-    if (candidate != null) {
-      return of(candidate);
-    }
-
     return this.httpClient
     .get<UserIdentity>(this.apiRouter.userGetById(id, true))
     .pipe(tap((user: UserIdentity) => this.updateCachedUserIdentity(user)));
   }
 
   readonly getIdentityByIdAsSignal = (id: number): Signal<UserIdentity | null> => {
-    const candidate = this.userIdentities().get(id);
+    const candidate = this.storeIdentities().get(id);
 
     if (candidate != null) {
       return candidate;
     }
 
-    this.userIdentities().set(id, signal(null));
+    this.storeIdentities().set(id, signal(null));
 
     // Fetch the user identity from the server. It is cached in the signal by underlying call.
     new Promise((resolve) => this.getIdentityById(id).pipe(first()).subscribe(resolve));
 
-    return this.userIdentities().get(id)!;
+    return this.storeIdentities().get(id)!.asReadonly();
   }
 }

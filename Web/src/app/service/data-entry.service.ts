@@ -1,13 +1,14 @@
 import {Injectable, Signal, signal, WritableSignal} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
-import {first, Observable, of, tap} from 'rxjs';
+import {first, Observable, tap} from 'rxjs';
 import DataEntry, {DataEntryCreateRequest, DataEntryEditRequest} from '../model/data-entry.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataEntryService {
+  // Key: DataTypeId
   private store = new Map<number, WritableSignal<DataEntry[]>>();
 
   constructor(
@@ -22,7 +23,7 @@ export class DataEntryService {
    *
    * @param id The data entry id
    */
-  private findDataTypeId(id: number): number | null {
+  private readonly toDataTypeId = (id: number): number | null => {
     let dataTypeId: number | null = null;
 
     for (const [key, values] of this.store.entries()) {
@@ -35,11 +36,13 @@ export class DataEntryService {
     return dataTypeId;
   }
 
-  create(request: DataEntryCreateRequest): Observable<DataEntry> {
+  readonly create = (request: DataEntryCreateRequest): Observable<DataEntry> => {
     return this.httpClient.post<DataEntry>(this.apiRouter.dataEntryCreate(), request).pipe(
       tap(dataEntry => {
-        if (this.store.has(dataEntry.dataTypeId)) {
-          this.store.get(request.dataTypeId)!!.update(old => [...old, dataEntry]);
+        const existingSignal = this.store.get(request.dataTypeId);
+
+        if (existingSignal != null) {
+          existingSignal.update(old => [...old, dataEntry]);
         } else {
           this.store.set(request.dataTypeId, signal([dataEntry]));
         }
@@ -47,54 +50,41 @@ export class DataEntryService {
     );
   }
 
-  delete(id: number): Observable<void> {
+  readonly delete = (id: number): Observable<void> => {
     return this.httpClient.delete<void>(this.apiRouter.dataEntryDelete(id)).pipe(
       tap(() => {
-        const dataTypeId = this.findDataTypeId(id);
+        const dataTypeId = this.toDataTypeId(id);
 
-        if (dataTypeId) {
-          this.store.get(dataTypeId)!!.update(old => old.filter(dataEntry => dataEntry.id !== id));
+        if (dataTypeId != null) {
+          this.store.get(dataTypeId)?.update(old => old.filter(dataEntry => dataEntry.id !== id));
         }
       })
     );
   }
 
-  edit(request: DataEntryEditRequest): Observable<void> {
+  readonly edit = (request: DataEntryEditRequest): Observable<void> => {
     return this.httpClient.put<void>(this.apiRouter.dataEntryEdit(request.dataEntryId), request).pipe(
-      tap(() => {
-        const dataTypeId = this.findDataTypeId(request.dataEntryId);
-
-        if (dataTypeId) {
-          this.getFromBackend(request.dataEntryId).pipe(first()).subscribe(updatedDataEntry => {
-            this.store.get(dataTypeId)?.update(old => old.map(dataEntry => {
-              if (dataEntry.id === updatedDataEntry.id) {
-                return updatedDataEntry;
-              } else {
-                return dataEntry;
-              }
-            }));
-          })
-        }
-      })
+      tap(() => this.get(request.dataEntryId).pipe(first()).subscribe())
     );
   }
 
-  private getFromBackend(id: number): Observable<DataEntry> {
-    return this.httpClient.get<DataEntry>(this.apiRouter.dataEntryGet(id));
-  }
+  readonly get = (id: number): Observable<DataEntry> => {
+    return this.httpClient.get<DataEntry>(this.apiRouter.dataEntryGetById(id)).pipe(
+      tap(dataEntry => {
+        const existingSignal = this.store.get(dataEntry.dataTypeId);
 
-  get(id: number): Observable<DataEntry> {
-    const candidate = Array.from(this.store.values())
-    .flatMap(dataEntries => dataEntries())
-    .find(dataEntry => dataEntry.id === id);
+        if (existingSignal != null) {
+          existingSignal.update(old => {
+            const index = old.findIndex(de => de.id === id);
 
-    if (candidate) {
-      return of(candidate);
-    }
+            if (index !== -1) {
+              old[index] = dataEntry;
+            } else {
+              old.push(dataEntry);
+            }
 
-    return this.getFromBackend(id).pipe(tap(dataEntry => {
-        if (this.store.has(dataEntry.dataTypeId)) {
-          this.store.get(dataEntry.dataTypeId)!!.update(old => [...old, dataEntry]);
+            return old;
+          });
         } else {
           this.store.set(dataEntry.dataTypeId, signal([dataEntry]));
         }
@@ -102,28 +92,33 @@ export class DataEntryService {
     );
   }
 
-  getAll(dataTypeId: number): Observable<DataEntry[]> {
-    if (this.store.has(dataTypeId)) {
-      return of(this.store.get(dataTypeId)!!());
-    }
-
+  readonly getAll = (dataTypeId: number): Observable<DataEntry[]> => {
     return this.httpClient.get<DataEntry[]>(this.apiRouter.dataEntryGetByDataTypeId(dataTypeId)).pipe(
-      tap(dataEntries => this.store.set(dataTypeId, signal(dataEntries)))
+      tap(dataEntries => {
+        const existingSignal = this.store.get(dataTypeId);
+
+        if (existingSignal != null) {
+          existingSignal.set(dataEntries);
+        } else {
+          this.store.set(dataTypeId, signal(dataEntries))
+        }
+      })
     );
   }
 
-  getAllAsSignal(dataTypeId: number): Signal<DataEntry[]> {
+
+  /**
+   * Get the data entries as a readonly signal. Data entries are cached and updated whenever
+   * HTTP requests are made via this service.
+   *
+   * @returns Readonly signal of data entries
+   */
+  getAsSignal(dataTypeId: number): Signal<DataEntry[]> {
     if (!this.store.has(dataTypeId)) {
       this.store.set(dataTypeId, signal([]));
-      this.refresh(dataTypeId);
+      this.getAll(dataTypeId).subscribe();
     }
 
     return this.store.get(dataTypeId)!!;
-  }
-
-  refresh(dataTypeId: number) {
-    this.httpClient.get<DataEntry[]>(this.apiRouter.dataEntryGetByDataTypeId(dataTypeId)).pipe(
-      tap(dataEntries => this.store.get(dataTypeId)!!.set(dataEntries))
-    ).subscribe();
   }
 }

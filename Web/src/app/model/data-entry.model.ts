@@ -20,5 +20,6 @@ export interface DataEntryCreateRequest {
 
 export interface DataEntryEditRequest {
   dataEntryId: number;
+  dataTypeId: number;
   fields: DataEntryFieldEditRequest[];
 }

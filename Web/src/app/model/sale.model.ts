@@ -37,6 +37,7 @@ export interface SaleCreateRequest {
 }
 
 export interface SaleEditRequest {
+  instanceId: number;
   sale: SaleCreateEdit;
 }
 

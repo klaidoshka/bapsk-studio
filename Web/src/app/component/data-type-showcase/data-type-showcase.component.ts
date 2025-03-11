@@ -39,8 +39,12 @@ export class DataTypeShowcaseComponent {
     private dataTypeService: DataTypeService,
     private instanceService: InstanceService
   ) {
-    this.dataTypes = this.dataTypeService.getAllAsSignal();
-    this.instanceId = computed(() => this.instanceService.getActiveInstance()()?.id || null);
+    this.instanceId = this.instanceService.getActiveInstanceId();
+
+    this.dataTypes = computed(() => {
+      const instanceId = this.instanceId();
+      return instanceId != null ? this.dataTypeService.getAsSignal(instanceId)() : [];
+    })
   }
 
   showManagement(dataType: DataType | null) {

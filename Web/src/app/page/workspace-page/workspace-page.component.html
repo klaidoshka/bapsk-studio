@@ -1,35 +1,65 @@
-<div class="flex w-full">
+<div class="flex">
   <!-- Sidebar -->
-  <div class="p-4 bg-gray-800 text-white w-fit h-fit min-w-fit max-w-fit min-h-fit max-h-fit">
-    <h1 class="text-2xl font-bold">Data Types</h1>
+  <div class="fixed top-0 left-0 h-full w-60 bg-gray-800 text-white p-4">
+    <h1 class="text-2xl font-bold mb-4">Workspaces</h1>
+    <button
+      class="block w-full p-2 my-1 bg-primary-500 rounded"
+      *ngFor="let type of workspaces"
+      (click)="selectWorkspace(type)"
+    >
+      {{ getWorkspaceName(type) }}
+    </button>
 
-    @for (dataType of $dataTypes(); track dataType.id) {
-      <div class="my-2 p-1 bg-primary-500 rounded rounded-2">
-        <div
-          (click)="select(dataType)"
-          [class]="{
-          'cursor-pointer': true,
-          'underline': dataType.id === $dataType()?.id
-          }"
-        >
-          <h2 class="text-lg font-bold">{{ dataType.name }}</h2>
-        </div>
-      </div>
-    }
+    <!-- Show DataType selector inside sidebar when DataType workspace is selected -->
+    <div
+      *ngIf="workspace() === WorkspaceType.DataType"
+      class="mt-4"
+    >
+      <p-autocomplete
+        [(ngModel)]="selectedDataType"
+        optionLabel="name"
+        placeholder="Select Data Type"
+        [dropdown]="true"
+        [suggestions]="filteredDataTypes()"
+        (completeMethod)="filterDataTypes($event)"
+        (onSelect)="selectDataType($event.value)"
+        class="bg-surface-50 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+      ></p-autocomplete>
+    </div>
   </div>
 
   <!-- Main Content -->
-  <div class="m-2">
-    <h1 class="text-2xl font-bold mb-4">Data Entries</h1>
+  <div class="ml-64 p-4 w-full">
+    <ng-container *ngIf="workspace() === WorkspaceType.DataType">
+      <h1 class="text-xl font-bold">Data Types</h1>
+      <h2 class="text-xl font-bold">{{ selectedDataType()?.name }}</h2>
 
-    @if ($dataType()) {
-      <app-data-entry-showcase [dataType]="$dataType()!!"/>
-    } @else {
+      <app-data-entry-showcase
+        *ngIf="selectedDataType()"
+        [dataType]="selectedDataType()!!"
+      />
+
       <p-message
-        class="my-4"
+        *ngIf="!selectedDataType()"
         severity="warn"
-      >Please select a data type to manage data entries.
+      >
+        Please select a data type.
       </p-message>
-    }
+    </ng-container>
+
+    <ng-container *ngIf="workspace() === WorkspaceType.Customer">
+      <h1 class="text-xl font-bold">Customers</h1>
+      <app-customer-showcase/>
+    </ng-container>
+
+    <ng-container *ngIf="workspace() === WorkspaceType.Sale">
+      <h1 class="text-xl font-bold">Sales</h1>
+      <app-sale-showcase/>
+    </ng-container>
+
+    <ng-container *ngIf="workspace() === WorkspaceType.Salesman">
+      <h1 class="text-xl font-bold">Salesmen</h1>
+      <app-salesman-showcase/>
+    </ng-container>
   </div>
 </div>
