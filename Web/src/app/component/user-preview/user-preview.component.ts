@@ -18,17 +18,17 @@ export class UserPreviewComponent implements OnInit {
   isShown = signal<boolean>(false);
   isShownInitially = input<boolean>(false);
 
-  ngOnInit() {
+  readonly ngOnInit = () => {
     this.isShown.set(this.isShownInitially());
   }
 
-  hide() {
+  readonly hide = () => {
     this.isShown.set(false);
     this.user.set(null);
   }
 
-  show(instance: User | null) {
-    this.user.set(instance);
+  readonly show = (user: User | null) => {
+    this.user.set(user);
     this.isShown.set(true);
   }
 

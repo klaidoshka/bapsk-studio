@@ -34,7 +34,7 @@ import {Role} from '../../model/role.model';
 export class ProfileDropdownComponent {
   confirmationComponent = viewChild.required(ConfirmationComponent);
   displayName!: Signal<string>;
-  entries = signal<MenuItem[]>(this.getEmptyEntries());
+  entries = signal<MenuItem[]>([]);
   isAuthenticated!: Signal<boolean>;
 
   constructor(
@@ -47,6 +47,7 @@ export class ProfileDropdownComponent {
       return user !== null ? user.firstName + ' ' + user.lastName : 'Profile';
     });
 
+    this.entries.set(this.getEmptyEntries());
     this.isAuthenticated = this.authService.isAuthenticated();
 
     effect(() => {
@@ -63,7 +64,7 @@ export class ProfileDropdownComponent {
     });
   }
 
-  private getEmptyEntries(): MenuItem[] {
+  private readonly getEmptyEntries = (): MenuItem[] => {
     return [
       {
         label: 'Profile',
@@ -79,7 +80,7 @@ export class ProfileDropdownComponent {
     ]
   }
 
-  private getEntries(): MenuItem[] {
+  private readonly getEntries = (): MenuItem[] => {
     return [
       {
         label: this.displayName(),
@@ -126,7 +127,7 @@ export class ProfileDropdownComponent {
     ]
   }
 
-  logout() {
+  readonly logout = () => {
     this.confirmationComponent().request(() => {
       this.authService.logout().subscribe({
         next: () => {

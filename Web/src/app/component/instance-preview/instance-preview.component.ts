@@ -17,16 +17,16 @@ export class InstancePreviewComponent implements OnInit {
   isShown = signal<boolean>(false);
   isShownInitially = input<boolean>(false);
 
-  ngOnInit() {
+  readonly ngOnInit = () => {
     this.isShown.set(this.isShownInitially());
   }
 
-  hide() {
+  readonly hide = () => {
     this.isShown.set(false);
     this.instance.set(null);
   }
 
-  show(instance: Instance | null) {
+  readonly show = (instance: Instance | null) => {
     this.instance.set(instance);
     this.isShown.set(true);
   }

@@ -11,10 +11,10 @@ import {
   DataEntryManagementComponent
 } from '../data-entry-management/data-entry-management.component';
 import {first} from 'rxjs';
-import ErrorResponse from '../../model/error-response.model';
 import {MessageModule} from 'primeng/message';
 import DataType from '../../model/data-type.model';
 import {DatePipe} from '@angular/common';
+import {ErrorResolverService} from '../../service/error-resolver.service';
 
 @Component({
   selector: 'app-data-entry-showcase',
@@ -40,32 +40,31 @@ export class DataEntryShowcaseComponent implements OnInit {
   previewMenu = viewChild.required(DataEntryPreviewComponent);
 
   constructor(
-    private dataEntryService: DataEntryService
+    private dataEntryService: DataEntryService,
+    private errorResolverService: ErrorResolverService
   ) {
     effect(() => {
       this.dataEntries = this.dataEntryService.getAsSignal(this.dataType()!!.id);
     });
   }
 
-  ngOnInit() {
+  readonly ngOnInit = () => {
     this.dataEntries = this.dataEntryService.getAsSignal(this.dataType()!!.id);
   }
 
-  showManagement(dataEntry: DataEntry | null) {
+  readonly showManagement = (dataEntry: DataEntry | null) => {
     this.managementMenu().show(dataEntry);
   }
 
-  showPreview(dataType: DataEntry) {
-    this.previewMenu().show(dataType);
+  readonly showPreview = (dataEntry: DataEntry) => {
+    this.previewMenu().show(dataEntry);
   }
 
-  delete(dataType: DataEntry) {
+  readonly delete = (dataEntry: DataEntry) => {
     this.confirmationComponent().request(() => {
-      this.dataEntryService.delete(dataType.id!!).pipe(first()).subscribe({
-        next: () => this.messages.set({success: ['Instance deleted successfully']}),
-        error: (response: ErrorResponse) => this.messages.set({
-          error: response.error?.messages || ["Extremely rare error occurred, please try again later."]
-        })
+      this.dataEntryService.delete(dataEntry.id!!).pipe(first()).subscribe({
+        next: () => this.messages.set({success: ['Data entry deleted successfully']}),
+        error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
       });
     });
   }

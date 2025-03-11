@@ -9,8 +9,8 @@ import {UserService} from '../../service/user.service';
 import Messages from '../../model/messages.model';
 import {User} from '../../model/user.model';
 import {first} from 'rxjs';
-import ErrorResponse from '../../model/error-response.model';
 import {getCountryName} from '../../model/iso-country.model';
+import {ErrorResolverService} from '../../service/error-resolver.service';
 
 @Component({
   selector: 'app-user-showcase',
@@ -33,27 +33,26 @@ export class UserShowcaseComponent {
   users!: Signal<User[]>;
 
   constructor(
+    private errorResolverService: ErrorResolverService,
     private userService: UserService
   ) {
     this.users = this.userService.getAsSignal();
   }
 
-  delete(user: User) {
+  readonly delete = (user: User) => {
     this.confirmationComponent().request(() => {
       this.userService.delete(user.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['User deleted successfully']}),
-        error: (response: ErrorResponse) => this.messages.set({
-          error: response.error?.messages || ['Extremely rare error occurred, please try again later.']
-        })
+        error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
       });
     });
   }
 
-  showManagement(user: User | null) {
+  readonly showManagement = (user: User | null) => {
     this.managementMenu().show(user);
   }
 
-  showPreview(user: User) {
+  readonly showPreview = (user: User) => {
     this.previewMenu().show(user);
   }
 

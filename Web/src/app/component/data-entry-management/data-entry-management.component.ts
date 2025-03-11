@@ -9,7 +9,6 @@ import DataEntry, {
 } from '../../model/data-entry.model';
 import Messages from '../../model/messages.model';
 import {first} from 'rxjs';
-import ErrorResponse from '../../model/error-response.model';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {InputText} from 'primeng/inputtext';
@@ -22,6 +21,7 @@ import {
   DataEntryFieldEditRequest
 } from '../../model/data-entry-field.model';
 import {DatePicker} from 'primeng/datepicker';
+import {ErrorResolverService} from '../../service/error-resolver.service';
 
 @Component({
   selector: 'app-data-entry-management',
@@ -48,20 +48,21 @@ export class DataEntryManagementComponent implements OnInit {
   messages = signal<Messages>({});
 
   constructor(
-    private formBuilder: FormBuilder,
     private dataEntryService: DataEntryService,
+    private errorResolverService: ErrorResolverService,
+    private formBuilder: FormBuilder,
     private instanceService: InstanceService,
     private textService: TextService
   ) {
     this.instanceId = computed(() => this.instanceService.getActiveInstance()()?.id || null);
   }
 
-  ngOnInit() {
+  readonly ngOnInit = () => {
     this.isShown.set(this.isShownInitially());
     this.form = this.createForm(this.dataType());
   }
 
-  private createForm(dataType: DataType, dataEntry: DataEntry | null = null): FormGroup {
+  private readonly createForm = (dataType: DataType, dataEntry: DataEntry | null = null): FormGroup => {
     const formGroup = this.formBuilder.group({});
 
     dataType.fields?.forEach(field => {
@@ -79,21 +80,17 @@ export class DataEntryManagementComponent implements OnInit {
     return formGroup;
   }
 
-  private create(request: DataEntryCreateRequest) {
+  private readonly create = (request: DataEntryCreateRequest) => {
     this.dataEntryService.create(request).pipe(first()).subscribe({
       next: () => this.messages.set({success: ["DataEntry has been created successfully."]}),
-      error: (response: ErrorResponse) => this.messages.set({
-        error: response.error?.messages || ["Extremely rare error occurred, please try again later."]
-      })
+      error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
     });
   }
 
-  private edit(request: DataEntryEditRequest) {
+  private readonly edit = (request: DataEntryEditRequest) => {
     this.dataEntryService.edit(request).pipe(first()).subscribe({
       next: () => this.messages.set({success: ["Instance has been edited successfully."]}),
-      error: (response: ErrorResponse) => this.messages.set({
-        error: response.error?.messages || ["Extremely rare error occurred, please try again later."]
-      })
+      error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
     });
   }
 
@@ -110,7 +107,7 @@ export class DataEntryManagementComponent implements OnInit {
     );
   }
 
-  getErrorMessage(field: string): string | null {
+  readonly getErrorMessage = (field: string): string | null => {
     const control = this.form.get(field);
 
     if (!control || !control.touched || !control.invalid) return "";
@@ -122,13 +119,13 @@ export class DataEntryManagementComponent implements OnInit {
     return null;
   }
 
-  hide() {
+  readonly hide = () => {
     this.messages.set({});
     this.isShown.set(false);
     this.form.reset();
   }
 
-  save() {
+  readonly save = () => {
     if (!this.form.valid) {
       this.messages.set({error: ["Please fill out the form."]});
       return;
@@ -168,7 +165,7 @@ export class DataEntryManagementComponent implements OnInit {
     }
   }
 
-  show(dataEntry: DataEntry | null) {
+  readonly show = (dataEntry: DataEntry | null) => {
     this.dataEntry.set(dataEntry);
     this.form.reset();
     this.form = this.createForm(this.dataType(), dataEntry);

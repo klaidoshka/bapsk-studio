@@ -36,7 +36,7 @@ export class SessionShowcaseComponent {
     this.sessions = sessionService.getByUserAsSignal();
   }
 
-  revoke(session: Session) {
+  readonly revoke = (session: Session) => {
     this.confirmationComponent().request(() => {
       this.sessionService.revoke(session.id).subscribe(() =>
         this.messageService.add({

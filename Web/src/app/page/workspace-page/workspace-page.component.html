@@ -34,6 +34,7 @@
       <h1 class="text-xl font-bold">Data Types</h1>
       <h2 class="text-xl font-bold">{{ selectedDataType()?.name }}</h2>
 
+      <!-- TODO: Should actually accept data-entries only? -->
       <app-data-entry-showcase
         *ngIf="selectedDataType()"
         [dataType]="selectedDataType()!!"
@@ -49,7 +50,7 @@
 
     <ng-container *ngIf="workspace() === WorkspaceType.Customer">
       <h1 class="text-xl font-bold">Customers</h1>
-      <app-customer-showcase/>
+      <app-customer-showcase [customers]="customers()"/>
     </ng-container>
 
     <ng-container *ngIf="workspace() === WorkspaceType.Sale">

@@ -6,10 +6,10 @@ import {InstanceService} from '../../service/instance.service';
 import {TableModule} from 'primeng/table';
 import Messages from '../../model/messages.model';
 import {first} from 'rxjs';
-import ErrorResponse from '../../model/error-response.model';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {InstancePreviewComponent} from '../instance-preview/instance-preview.component';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
+import {ErrorResolverService} from '../../service/error-resolver.service';
 
 @Component({
   selector: 'app-instance-showcase',
@@ -32,25 +32,26 @@ export class InstanceShowcaseComponent {
   previewMenu = viewChild.required(InstancePreviewComponent);
 
   constructor(
+    private errorResolverService: ErrorResolverService,
     private instanceService: InstanceService
   ) {
     this.instances = this.instanceService.getAsSignal();
   }
 
-  showManagement(instance: Instance | null) {
-    this.managementMenu().show(instance);
-  }
-
-  showPreview(instance: Instance) {
-    this.previewMenu().show(instance);
-  }
-
-  delete(instance: Instance) {
+  readonly delete = (instance: Instance) => {
     this.confirmationComponent().request(() => {
       this.instanceService.delete(instance.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['Instance deleted successfully']}),
-        error: (response: ErrorResponse) => this.messages.set({error: response.error.messages})
+        error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
       });
     });
+  }
+
+  readonly showManagement = (instance: Instance | null) => {
+    this.managementMenu().show(instance);
+  }
+
+  readonly showPreview = (instance: Instance) => {
+    this.previewMenu().show(instance);
   }
 }

@@ -13,7 +13,6 @@ import {TextService} from '../../service/text.service';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../../model/data-type.model';
 import Messages from '../../model/messages.model';
 import {first} from 'rxjs';
-import ErrorResponse from '../../model/error-response.model';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {InputText} from 'primeng/inputtext';
@@ -29,6 +28,7 @@ import DataTypeField, {
 import {Checkbox} from 'primeng/checkbox';
 import {Select} from 'primeng/select';
 import {DatePicker} from 'primeng/datepicker';
+import {ErrorResolverService} from '../../service/error-resolver.service';
 
 @Component({
   selector: 'app-data-type-management',
@@ -59,8 +59,9 @@ export class DataTypeManagementComponent implements OnInit {
   messages = signal<Messages>({});
 
   constructor(
-    private formBuilder: FormBuilder,
     private dataTypeService: DataTypeService,
+    private errorResolverService: ErrorResolverService,
+    private formBuilder: FormBuilder,
     private instanceService: InstanceService,
     private textService: TextService
   ) {
@@ -68,7 +69,7 @@ export class DataTypeManagementComponent implements OnInit {
     this.form = this.createForm();
   }
 
-  ngOnInit() {
+  readonly ngOnInit = () => {
     this.isShown.set(this.isShownInitially());
   }
 
@@ -76,7 +77,7 @@ export class DataTypeManagementComponent implements OnInit {
     return this.form.get("fields") as FormArray<FormGroup>;
   }
 
-  private createForm() {
+  private readonly createForm = () => {
     return this.formBuilder.group({
       name: ["", Validators.required],
       description: ["No description set."],
@@ -94,7 +95,7 @@ export class DataTypeManagementComponent implements OnInit {
     });
   }
 
-  addField(field: DataTypeField | null) {
+  readonly addField = (field: DataTypeField | null) => {
     if (field) {
       this.formFields.push(this.formBuilder.group({
         name: [field.name, Validators.required],
@@ -116,35 +117,31 @@ export class DataTypeManagementComponent implements OnInit {
     this.formFields.markAsDirty();
   }
 
-  clearDefaultValue(index: number) {
+  readonly clearDefaultValue = (index: number) => {
     this.formFields.at(index).patchValue({defaultValue: ""});
   }
 
-  removeField(index: number) {
+  readonly removeField = (index: number) => {
     this.formFields.removeAt(index);
     this.formFields.markAsTouched();
     this.formFields.markAsDirty();
   }
 
-  private create(request: DataTypeCreateRequest) {
+  private readonly create = (request: DataTypeCreateRequest) => {
     this.dataTypeService.create(request).pipe(first()).subscribe({
       next: () => this.messages.set({success: ["DataType has been created successfully."]}),
-      error: (response: ErrorResponse) => this.messages.set({
-        error: response.error?.messages || ["Extremely rare error occurred, please try again later."]
-      })
+      error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
     });
   }
 
-  private edit(request: DataTypeEditRequest) {
+  private readonly edit = (request: DataTypeEditRequest) => {
     this.dataTypeService.edit(request).pipe(first()).subscribe({
       next: () => this.messages.set({success: ["Instance has been edited successfully."]}),
-      error: (response: ErrorResponse) => this.messages.set({
-        error: response.error?.messages || ["Extremely rare error occurred, please try again later."]
-      })
+      error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
     });
   }
 
-  getErrorMessage(field: string): string | null {
+  readonly getErrorMessage = (field: string): string | null => {
     const control = this.form.get(field);
 
     if (!control || !control.touched || !control.invalid) return "";
@@ -158,17 +155,17 @@ export class DataTypeManagementComponent implements OnInit {
     return null;
   }
 
-  getFieldType(id: number): FieldType {
+  readonly getFieldType = (id: number): FieldType => {
     return this.formFields.controls.at(id)?.value?.type || FieldType.Text;
   }
 
-  hide() {
+  readonly hide = () => {
     this.messages.set({});
     this.isShown.set(false);
     this.form.reset();
   }
 
-  save() {
+  readonly save = () => {
     if (!this.form.valid) {
       this.messages.set({error: ["Please fill out the form."]});
       return;
@@ -201,7 +198,7 @@ export class DataTypeManagementComponent implements OnInit {
     }
   }
 
-  show(dataType: DataType | null) {
+  readonly show = (dataType: DataType | null) => {
     this.form = this.createForm();
     this.dataType.set(dataType);
 

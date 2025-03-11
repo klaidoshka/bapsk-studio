@@ -20,11 +20,11 @@ export class DataTypePreviewComponent implements OnInit {
   isShown = signal<boolean>(false);
   isShownInitially = input<boolean>(false);
 
-  ngOnInit() {
+  readonly ngOnInit = () => {
     this.isShown.set(this.isShownInitially());
   }
 
-  getFieldTypeLabel(type: FieldType) {
+  readonly getFieldTypeLabel = (type: FieldType) => {
     const enumKey = Object
     .keys(FieldType)
     .find(t => t.toString().toLowerCase() === type.toString().toLowerCase());
@@ -34,12 +34,12 @@ export class DataTypePreviewComponent implements OnInit {
     return fieldTypes.find(t => t.value === enumValue)?.label;
   }
 
-  hide() {
+  readonly hide = () => {
     this.isShown.set(false);
     this.dataType.set(null);
   }
 
-  show(dataType: DataType | null) {
+  readonly show = (dataType: DataType | null) => {
     this.dataType.set(dataType);
     this.isShown.set(true);
   }

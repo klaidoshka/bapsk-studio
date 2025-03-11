@@ -52,11 +52,11 @@ export class UserManagementComponent implements OnInit {
   ) {
   }
 
-  ngOnInit() {
+  readonly ngOnInit = () => {
     this.isShown.set(this.isShownInitially());
   }
 
-  private createForm(user: User | null): FormGroup {
+  private readonly createForm = (user: User | null): FormGroup => {
     return this.formBuilder.group({
       birthDate: [this.maxDate, Validators.required],
       country: [getDefaultIsoCountry(), Validators.required],
@@ -67,27 +67,27 @@ export class UserManagementComponent implements OnInit {
     });
   }
 
-  private onSuccess(message: string) {
+  private readonly onSuccess = (message: string) => {
     this.messages.set({success: [message]});
     this.form.markAsUntouched();
     this.form.markAsPristine();
   }
 
-  private create(request: UserCreateRequest) {
+  private readonly create = (request: UserCreateRequest) => {
     this.userService.create(request).pipe(first()).subscribe({
       next: () => this.onSuccess("User has been created successfully."),
       error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
     });
   }
 
-  private edit(request: UserEditRequest) {
+  private readonly edit = (request: UserEditRequest) => {
     this.userService.edit(request).pipe(first()).subscribe({
       next: () => this.onSuccess("User has been edited successfully."),
       error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
     });
   }
 
-  filterCountries(event: AutoCompleteCompleteEvent) {
+  readonly filterCountries = (event: AutoCompleteCompleteEvent) => {
     const query = event.query.toLowerCase();
 
     this.filteredCountries = IsoCountries.filter((country) =>
@@ -95,7 +95,7 @@ export class UserManagementComponent implements OnInit {
     );
   }
 
-  getErrorMessage(field: string): string | null {
+  readonly getErrorMessage = (field: string): string | null => {
     const control = this.form.get(field);
 
     if (!control || !control.touched || !control.invalid) return "";
@@ -108,14 +108,14 @@ export class UserManagementComponent implements OnInit {
     return null;
   }
 
-  hide() {
+  readonly hide = () => {
     this.messages.set({});
     this.isShown.set(false);
     this.isFormSet.set(false);
     this.form.reset();
   }
 
-  save() {
+  readonly save = () => {
     if (!this.form.valid) {
       this.messages.set({error: ["Please fill out the form."]});
       return;
@@ -142,7 +142,7 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-  show(user: User | null) {
+  readonly show = (user: User | null) => {
     if (user) {
       this.form = this.createForm(user);
       this.form.patchValue({

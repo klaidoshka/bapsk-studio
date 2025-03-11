@@ -20,7 +20,7 @@ export class ProfileShowcaseComponent {
     this.user = this.authService.getUser();
   }
 
-  toRoleString(role: Role): string {
+  readonly toRoleString = (role: Role): string => {
     return Role[role];
   }
 

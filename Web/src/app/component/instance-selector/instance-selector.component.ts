@@ -43,7 +43,7 @@ export class InstanceSelectorComponent {
     });
   }
 
-  filterInstances(event: AutoCompleteCompleteEvent) {
+  readonly filterInstances = (event: AutoCompleteCompleteEvent) => {
     const query = event.query.toLowerCase();
 
     this.filteredInstances.set(this.instances().filter((instance) => {
@@ -51,13 +51,13 @@ export class InstanceSelectorComponent {
     }));
   }
 
-  selectInstance(instance: Instance | null) {
+  readonly selectInstance = (instance: Instance | null) => {
     if (this.selectedInstance() !== instance && instance !== null) {
       this.instanceService.setActiveInstance(instance);
     }
   }
 
-  showManagementMenu() {
+  readonly showManagementMenu = () => {
     this.managementMenu().show(null);
   }
 }

@@ -21,16 +21,16 @@ export class DataEntryPreviewComponent implements OnInit {
   isShown = signal<boolean>(false);
   isShownInitially = input<boolean>(false);
 
-  ngOnInit() {
+  readonly ngOnInit = () => {
     this.isShown.set(this.isShownInitially());
   }
 
-  hide() {
+  readonly hide = () => {
     this.isShown.set(false);
     this.dataEntry.set(null);
   }
 
-  show(dataEntry: DataEntry | null) {
+  readonly show = (dataEntry: DataEntry | null) => {
     this.dataEntry.set(dataEntry);
     this.isShown.set(true);
   }

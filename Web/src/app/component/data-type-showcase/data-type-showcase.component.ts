@@ -9,9 +9,9 @@ import DataType from '../../model/data-type.model';
 import {DataTypeService} from '../../service/data-type.service';
 import {DataTypeManagementComponent} from '../data-type-management/data-type-management.component';
 import {first} from 'rxjs';
-import ErrorResponse from '../../model/error-response.model';
 import {InstanceService} from '../../service/instance.service';
 import {MessageModule} from 'primeng/message';
+import {ErrorResolverService} from '../../service/error-resolver.service';
 
 @Component({
   selector: 'app-data-type-showcase',
@@ -37,6 +37,7 @@ export class DataTypeShowcaseComponent {
 
   constructor(
     private dataTypeService: DataTypeService,
+    private errorResolverService: ErrorResolverService,
     private instanceService: InstanceService
   ) {
     this.instanceId = this.instanceService.getActiveInstanceId();
@@ -47,22 +48,20 @@ export class DataTypeShowcaseComponent {
     })
   }
 
-  showManagement(dataType: DataType | null) {
+  readonly delete = (dataType: DataType) => {
+    this.confirmationComponent().request(() => {
+      this.dataTypeService.delete(dataType.id!!).pipe(first()).subscribe({
+        next: () => this.messages.set({success: ['Data type deleted successfully']}),
+        error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
+      });
+    });
+  }
+
+  readonly showManagement = (dataType: DataType | null) => {
     this.managementMenu().show(dataType);
   }
 
-  showPreview(dataType: DataType) {
+  readonly showPreview = (dataType: DataType) => {
     this.previewMenu().show(dataType);
-  }
-
-  delete(dataType: DataType) {
-    this.confirmationComponent().request(() => {
-      this.dataTypeService.delete(dataType.id!!).pipe(first()).subscribe({
-        next: () => this.messages.set({success: ['Instance deleted successfully']}),
-        error: (response: ErrorResponse) => this.messages.set({
-          error: response.error?.messages || ["Extremely rare error occurred, please try again later."]
-        })
-      });
-    });
   }
 }
