@@ -61,7 +61,7 @@
 
     <div class="flex justify-end mt-4">
       <p-button
-        label="Save"
+        [label]="dataEntry() == null ? 'Create' : 'Save'"
         [disabled]="!form.valid || !form.dirty"
         (onClick)="save()"
       ></p-button>
