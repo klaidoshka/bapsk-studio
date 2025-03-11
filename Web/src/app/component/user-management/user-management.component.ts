@@ -9,7 +9,12 @@ import {TextService} from '../../service/text.service';
 import {first} from 'rxjs';
 import {User, UserCreateRequest, UserEditRequest} from '../../model/user.model';
 import {UserService} from '../../service/user.service';
-import {IsoCountries, IsoCountry} from '../../model/iso-country.model';
+import {
+  getDefaultIsoCountry,
+  getIsoCountryByCode,
+  IsoCountries,
+  IsoCountry
+} from '../../model/iso-country.model';
 import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
 import {DatePicker} from 'primeng/datepicker';
 import {ErrorResolverService} from '../../service/error-resolver.service';
@@ -54,7 +59,7 @@ export class UserManagementComponent implements OnInit {
   private createForm(user: User | null): FormGroup {
     return this.formBuilder.group({
       birthDate: [this.maxDate, Validators.required],
-      country: [IsoCountries[129], Validators.required],
+      country: [getDefaultIsoCountry(), Validators.required],
       email: ["", [Validators.required, Validators.email]],
       firstName: ["", Validators.required],
       lastName: ["", Validators.required],
@@ -140,7 +145,10 @@ export class UserManagementComponent implements OnInit {
   show(user: User | null) {
     if (user) {
       this.form = this.createForm(user);
-      this.form.patchValue({...user});
+      this.form.patchValue({
+        ...user,
+        country: getIsoCountryByCode(user.country).name
+      });
     } else {
       this.form = this.createForm(null);
     }

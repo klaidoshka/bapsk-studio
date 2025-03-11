@@ -11,7 +11,7 @@ import {first, Observable, of, tap} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {toEnumOrThrow} from '../util/enum.util';
 import {Role} from '../model/role.model';
-import {getIsoCountryByCode} from '../model/iso-country.model';
+import {IsoCountryCode} from '../model/iso-country.model';
 
 @Injectable({
   providedIn: 'root'
@@ -35,13 +35,13 @@ export class UserService {
     if (candidate != null) {
       candidate.update(_ => ({
         ...user,
-        country: getIsoCountryByCode(user.country as unknown as string),
+        country: toEnumOrThrow(user.country, IsoCountryCode),
         role: toEnumOrThrow(user.role, Role)
       }));
     } else {
       this.users().set(user.id, signal({
         ...user,
-        country: getIsoCountryByCode(user.country as unknown as string),
+        country: toEnumOrThrow(user.country, IsoCountryCode),
         role: toEnumOrThrow(user.role, Role)
       }));
     }
@@ -114,8 +114,7 @@ export class UserService {
             this.updateCachedUser({
               ...user,
               birthDate: request.birthDate,
-              // Will be updated to correct enum within #updateCachedUser.
-              country: request.country as any,
+              country: request.country,
               email: request.email,
               firstName: request.firstName,
               lastName: request.lastName

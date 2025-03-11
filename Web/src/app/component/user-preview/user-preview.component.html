@@ -17,7 +17,7 @@
   <p>{{ user()?.birthDate }}</p>
 
   <p class="font-bold mt-4">Country</p>
-  <p>{{ user()?.country?.name }}</p>
+  <p>{{ getCountryName(user()) }}</p>
 
   <div class="flex justify-end mt-4">
     <p-button

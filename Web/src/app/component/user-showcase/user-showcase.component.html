@@ -43,7 +43,7 @@
         <td>{{ user.firstName + ' ' + user.lastName }}</td>
         <td>{{ user.email }}</td>
         <td>{{ user.birthdate }}</td>
-        <td>{{ user.country.name }}</td>
+        <td>{{ getCountryName(user) }}</td>
         <td class="flex flex-nowrap items-center">
           <p-button
             icon="pi pi-eye"

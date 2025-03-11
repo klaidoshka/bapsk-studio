@@ -19,7 +19,7 @@
     <tr>
       <td>{{ user.firstName }} {{ user.lastName }}</td>
       <td>{{ user.email }}</td>
-      <td>{{ user.country.name }}</td>
+      <td>{{ getCountryName(user) }}</td>
       <td>{{ toRoleString(user.role) }}</td>
       <td>{{ user.birthDate }}</td>
     </tr>

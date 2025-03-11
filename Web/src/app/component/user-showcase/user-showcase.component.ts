@@ -10,6 +10,7 @@ import Messages from '../../model/messages.model';
 import {User} from '../../model/user.model';
 import {first} from 'rxjs';
 import ErrorResponse from '../../model/error-response.model';
+import {getCountryName} from '../../model/iso-country.model';
 
 @Component({
   selector: 'app-user-showcase',
@@ -55,4 +56,6 @@ export class UserShowcaseComponent {
   showPreview(user: User) {
     this.previewMenu().show(user);
   }
+
+  protected readonly getCountryName = getCountryName;
 }

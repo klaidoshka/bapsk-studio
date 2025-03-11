@@ -6,7 +6,7 @@ import {User} from "../model/user.model";
 import {ApiRouter} from "./api-router.service";
 import {toEnumOrThrow} from '../util/enum.util';
 import {Role} from '../model/role.model';
-import {getIsoCountryByCode} from '../model/iso-country.model';
+import {IsoCountryCode} from '../model/iso-country.model';
 
 @Injectable({
   providedIn: "root"
@@ -30,7 +30,7 @@ export class AuthService {
       ...response,
       user: {
         ...response.user,
-        country: getIsoCountryByCode(response.user.country as unknown as string),
+        country: toEnumOrThrow(response.user.country, IsoCountryCode),
         role: toEnumOrThrow(response.user.role, Role)
       }
     };

@@ -1,9 +1,9 @@
 import {Role} from './role.model';
-import {IsoCountry} from './iso-country.model';
+import {IsoCountryCode} from './iso-country.model';
 
 export interface User {
   birthDate: Date;
-  country: IsoCountry;
+  country: IsoCountryCode;
   email: string;
   id: number;
   firstName: string;
@@ -19,7 +19,7 @@ export interface UserIdentity {
 
 export interface UserCreateRequest {
   birthDate: Date;
-  country: string;
+  country: IsoCountryCode;
   email: string;
   firstName: string;
   lastName: string;
@@ -28,7 +28,7 @@ export interface UserCreateRequest {
 
 export interface UserEditRequest {
   birthDate: Date;
-  country: string;
+  country: IsoCountryCode;
   email: string;
   firstName: string;
   lastName: string;
