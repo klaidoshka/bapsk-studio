@@ -4,7 +4,7 @@ import {Dialog} from 'primeng/dialog';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
-import Messages from '../../model/messages-model';
+import Messages from '../../model/messages.model';
 import {TextService} from '../../service/text.service';
 import {first} from 'rxjs';
 import {User, UserCreateRequest, UserEditRequest} from '../../model/user.model';
