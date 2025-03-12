@@ -17,15 +17,17 @@
           class="text-center text-sm gap-y-0"
         >Current Instance</label>
 
-        <p-select
-          inputId="instance"
-          [(ngModel)]="selectedInstance"
-          [options]="instances()"
-          optionLabel="name"
-          styleClass="border-none"
-          placeholder="Select Instance"
-          class="bg-surface-50 mt-1 block w-full rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-        ></p-select>
+        @if (selectedInstance() != null) {
+          <p-select
+            inputId="instance"
+            [(ngModel)]="selectedInstance"
+            [options]="instances()"
+            optionLabel="name"
+            styleClass="border-none"
+            placeholder="Select Instance"
+            class="bg-surface-50 mt-1 block w-full rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          ></p-select>
+        }
       </div>
     }
   }

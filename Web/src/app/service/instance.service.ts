@@ -67,6 +67,10 @@ export class InstanceService {
 
         if (index !== -1) {
           old[index] = instance;
+
+          if (this.activeInstance() !== null && this.activeInstance()?.id === instance.id) {
+            this.activeInstance.set(instance);
+          }
         } else {
           old.push(instance);
         }
