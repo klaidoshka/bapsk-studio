@@ -42,8 +42,8 @@ public static class SubmitDeclaration
             Item = customer.ResidentCountryCode?.ConvertToEnum<NonEuCountryCode_Type>() as object
                    ?? customer.ResidentTerritory?.ToExternalType(),
             LastName = customer.LastName,
-            OtherDocument = customer.OtherDocument.ToExternalType(),
-            PersonIn = customer.PersonId.ToExternalType()
+            OtherDocument = customer.OtherDocuments.ToExternalType(),
+            PersonIn = customer.PersonId?.ToExternalType()
         };
     }
 

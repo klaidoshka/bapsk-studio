@@ -70,7 +70,7 @@ export class SaleService {
   }
 
   readonly get = (instanceId: number) => {
-    return this.httpClient.get<Sale[]>(this.apiRouter.saleGet()).pipe(
+    return this.httpClient.get<Sale[]>(this.apiRouter.saleGet(instanceId)).pipe(
       tap(sales => {
         const existingSignal = this.store.get(instanceId);
 

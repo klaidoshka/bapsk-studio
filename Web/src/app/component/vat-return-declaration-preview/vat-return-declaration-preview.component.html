@@ -1,0 +1,59 @@
+<p-dialog
+  header="Sale Preview"
+  closable="true"
+  closeOnEscape="true"
+  modal="true"
+  (close)="hide()"
+  (onHide)="hide()"
+  [(visible)]="isShown"
+>
+  <ng-container *ngIf="declaration() != null">
+    <div class="flex flex-col">
+      <div class="flex flex-col md:flex-row">
+        <div class="flex-1">
+          <p>
+            <strong>Sale ID:</strong>
+            {{ declaration()!.saleId }}
+          </p>
+        </div>
+
+        <div class="flex-1">
+          <p>
+            <strong>Declared By:</strong>
+            {{ declaration()!.declaredById }}
+          </p>
+        </div>
+
+        <div class="flex-1">
+          <p>
+            <strong>Correction:</strong>
+            {{ declaration()!.correction }}
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-col md:flex-row">
+        <div class="flex-1">
+          <p>
+            <strong>Submit Date:</strong>
+            {{ declaration()!.submitDate | date:'short' }}
+          </p>
+        </div>
+        <div class="flex-1">
+          <p>
+            <strong>State:</strong>
+            {{ getSubmitDeclarationStateLabel(declaration()!.state) }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end mt-4">
+      <p-button
+        label="Close"
+        class="p-button-secondary"
+        (onClick)="hide()"
+      ></p-button>
+    </div>
+  </ng-container>
+</p-dialog>

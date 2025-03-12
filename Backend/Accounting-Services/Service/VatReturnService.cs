@@ -5,8 +5,8 @@ using Accounting.Contract.Dto.Customer;
 using Accounting.Contract.Dto.Sale;
 using Accounting.Contract.Dto.Salesman;
 using Accounting.Contract.Dto.Sti.VatReturn;
+using Accounting.Contract.Dto.Sti.VatReturn.CancelDeclaration;
 using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
-using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Accounting.Services.Util;
@@ -15,6 +15,7 @@ using Customer = Accounting.Contract.Dto.Customer.Customer;
 using Sale = Accounting.Contract.Dto.Sale.Sale;
 using Salesman = Accounting.Contract.Dto.Salesman.Salesman;
 using SoldGood = Accounting.Contract.Dto.Sale.SoldGood;
+using StiVatReturnDeclaration = Accounting.Contract.Entity.StiVatReturnDeclaration;
 
 namespace Accounting.Services.Service;
 
@@ -36,6 +37,31 @@ public class VatReturnService : IVatReturnService
         _stiVatReturn = stiVatReturn;
         _stiVatReturnClientService = stiVatReturnClientService;
         _validator = validator;
+    }
+
+    public async Task<IEnumerable<StiVatReturnDeclaration>> GetAsync(int? instanceId)
+    {
+        return await _database.StiVatReturnDeclarations
+            .Include(it => it.Sale)
+            .ThenInclude(it => it.Customer)
+            .Include(it => it.Sale)
+            .ThenInclude(it => it.Salesman)
+            .Include(it => it.Sale)
+            .ThenInclude(it => it.SoldGoods)
+            .Where(s => s.InstanceId == instanceId)
+            .ToListAsync();
+    }
+
+    public async Task<StiVatReturnDeclaration?> GetBySaleIdAsync(int saleId)
+    {
+        return await _database.StiVatReturnDeclarations
+            .Include(it => it.Sale)
+            .ThenInclude(it => it.Customer)
+            .Include(it => it.Sale)
+            .ThenInclude(it => it.Salesman)
+            .Include(it => it.Sale)
+            .ThenInclude(it => it.SoldGoods)
+            .FirstOrDefaultAsync(d => d.SaleId == saleId);
     }
 
     public async Task<StiVatReturnDeclaration> SubmitAsync(
@@ -70,7 +96,7 @@ public class VatReturnService : IVatReturnService
             declaration.Id = clientRequest.Declaration.Header.DocumentId;
             declaration = (await _database.StiVatReturnDeclarations.AddAsync(declaration)).Entity;
         }
-
+        
         await _database.SaveChangesAsync();
 
         // Upon submission create data that was missing and return ids together with the declaration response.
@@ -82,8 +108,8 @@ public class VatReturnService : IVatReturnService
     )
     {
         var declaration = request.Sale.Id is not null
-            ? await _database.StiVatReturnDeclarations.FirstAsync(d => d.SaleId == request.Sale.Id)
-            : new StiVatReturnDeclaration();
+            ? (await _database.StiVatReturnDeclarations.FirstOrDefaultAsync(d => d.SaleId == request.Sale.Id)) ?? new()
+            : new();
 
         if (String.IsNullOrWhiteSpace(declaration.Id))
         {
@@ -142,7 +168,7 @@ public class VatReturnService : IVatReturnService
         var removedGoods = saleEntity.SoldGoods
             .Where(it => sale.SoldGoods.All(sg => sg.Id != it.Id))
             .ToList();
-        
+
         foreach (var removedGood in removedGoods)
         {
             saleEntity.SoldGoods.Remove(removedGood);

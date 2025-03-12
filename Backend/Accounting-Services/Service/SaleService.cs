@@ -126,6 +126,9 @@ public class SaleService : ISaleService
         if (request.InstanceId is not null)
         {
             return await _database.Sales
+                .Include(it => it.Customer)
+                .Include(it => it.Salesman)
+                .Include(it => it.SoldGoods)
                 .Where(it => !it.IsDeleted && it.InstanceId == request.InstanceId)
                 .ToListAsync();
         }

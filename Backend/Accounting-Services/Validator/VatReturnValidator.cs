@@ -29,7 +29,7 @@ public class VatReturnValidator : IVatReturnValidator
             return new Validation("You must affirm that the customer can be returned VAT.");
         }
 
-        if (!request.Sale.SoldGoods.Any())
+        if (request.Sale.Id is null && !request.Sale.SoldGoods.Any())
         {
             return new Validation("At least one sold good must be provided.");
         }

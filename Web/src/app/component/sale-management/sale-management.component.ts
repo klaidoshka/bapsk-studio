@@ -44,6 +44,7 @@ import {UnitOfMeasureType} from '../../model/unit-of-measure-type.model';
   styles: ``
 })
 export class SaleManagementComponent implements OnInit {
+  protected readonly SaleReceiptType = SaleReceiptType;
   customers = input.required<Customer[]>();
   customersLabeled = computed(() => this.customers().map((customer) => ({
     label: `${customer.firstName} ${customer.lastName} (${customer.identityDocument.value})`,
@@ -235,7 +236,14 @@ export class SaleManagementComponent implements OnInit {
     this.form.reset();
     this.soldGoods().clear();
 
+
     if (sale != null) {
+      this.selectedSaleReceiptType.set(
+        sale.invoiceNo?.trim()?.length
+          ? SaleReceiptType.Invoice
+          : SaleReceiptType.CashRegister
+      );
+
       this.form.patchValue({
         ...sale,
         customerId: sale.customer.id,
@@ -247,7 +255,8 @@ export class SaleManagementComponent implements OnInit {
       });
 
       this.soldGoods().markAsPristine();
+    } else {
+      this.selectedSaleReceiptType.set(SaleReceiptType.Invoice);
     }
   }
-  protected readonly SaleReceiptType = SaleReceiptType;
 }

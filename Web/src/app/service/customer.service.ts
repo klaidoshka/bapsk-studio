@@ -67,7 +67,7 @@ export class CustomerService {
   }
 
   readonly get = (instanceId: number) => {
-    return this.httpClient.get<Customer[]>(this.apiRouter.customerGetByInstanceId(instanceId)).pipe(
+    return this.httpClient.get<Customer[]>(this.apiRouter.customerGet(instanceId)).pipe(
       tap(customers => {
         const existingSignal = this.customers.get(instanceId);
 

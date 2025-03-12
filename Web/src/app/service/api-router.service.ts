@@ -26,7 +26,7 @@ export class ApiRouter {
   public readonly customerCreate = () => `${this.accountingUrl}/customer`;
   public readonly customerDelete = (id: number) => `${this.accountingUrl}/customer/${id}`;
   public readonly customerEdit = (id: number) => `${this.accountingUrl}/customer/${id}`;
-  public readonly customerGetByInstanceId = (instanceId: number) => `${this.accountingUrl}/customer?${this.toParameters({
+  public readonly customerGet = (instanceId: number) => `${this.accountingUrl}/customer?${this.toParameters({
     instanceId: instanceId
   })}`;
   public readonly customerGetById = (id: number) => `${this.accountingUrl}/customer/${id}`;
@@ -57,13 +57,17 @@ export class ApiRouter {
   public readonly saleCreate = () => `${this.accountingUrl}/sale`;
   public readonly saleDelete = (id: number) => `${this.accountingUrl}/sale/${id}`;
   public readonly saleEdit = (id: number) => `${this.accountingUrl}/sale/${id}`;
-  public readonly saleGet = () => `${this.accountingUrl}/sale`;
+  public readonly saleGet = (instanceId: number) => `${this.accountingUrl}/sale?${this.toParameters({
+    instanceId: instanceId
+  })}`;
   public readonly saleGetById = (id: number) => `${this.accountingUrl}/sale/${id}`;
 
   public readonly salesmanCreate = () => `${this.accountingUrl}/salesman`;
   public readonly salesmanDelete = (id: number) => `${this.accountingUrl}/salesman/${id}`;
   public readonly salesmanEdit = (id: number) => `${this.accountingUrl}/salesman/${id}`;
-  public readonly salesmanGet = () => `${this.accountingUrl}/salesman`;
+  public readonly salesmanGet = (instanceId: number) => `${this.accountingUrl}/salesman?${this.toParameters({
+    instanceId: instanceId
+  })}`;
   public readonly salesmanGetById = (id: number) => `${this.accountingUrl}/salesman/${id}`;
 
   public readonly sessionGetByUser = () => `${this.baseServerUrl}/session`;
@@ -80,4 +84,10 @@ export class ApiRouter {
     `${this.baseServerUrl}/user/${id}?${this.toParameters({
       returnIdentityOnly: returnIdentityOnly
     })}`
+
+  public readonly vatReturnSubmit = () => `${this.accountingUrl}/sti/vat-return`;
+  public readonly vatReturnGet = (instanceId: number) => `${this.accountingUrl}/sti/vat-return?${this.toParameters({
+    instanceId: instanceId
+  })}`;
+  public readonly vatReturnGetBySaleId = (saleId: number) => `${this.accountingUrl}/sti/vat-return/by-sale/${saleId}`;
 }

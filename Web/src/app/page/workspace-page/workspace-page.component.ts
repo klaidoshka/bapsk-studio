@@ -22,13 +22,18 @@ import {
 import {NgForOf, NgIf} from '@angular/common';
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
-import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
 import {SaleShowcaseComponent} from '../../component/sale-showcase/sale-showcase.component';
+import {Select} from 'primeng/select';
+import VatReturnDeclaration from '../../model/vat-return.model';
+import {VatReturnService} from '../../service/vat-return.service';
+import {
+  VatReturnDeclarationShowcaseComponent
+} from '../../component/vat-return-declaration-showcase/vat-return-declaration-showcase.component';
 
 @Component({
   selector: 'app-workspace-page',
   templateUrl: './workspace-page.component.html',
-  imports: [DataEntryShowcaseComponent, Message, CustomerShowcaseComponent, SalesmanShowcaseComponent, NgIf, NgForOf, DropdownModule, FormsModule, AutoComplete, SaleShowcaseComponent],
+  imports: [DataEntryShowcaseComponent, Message, CustomerShowcaseComponent, SalesmanShowcaseComponent, NgIf, NgForOf, DropdownModule, FormsModule, SaleShowcaseComponent, Select, VatReturnDeclarationShowcaseComponent],
   providers: []
 })
 export class WorkspacePageComponent {
@@ -36,20 +41,25 @@ export class WorkspacePageComponent {
 
   customers!: Signal<Customer[]>;
   dataTypes!: Signal<DataType[]>;
-  filteredDataTypes = signal<DataType[]>([]);
+  declarations!: Signal<VatReturnDeclaration[]>;
   instanceId!: Signal<number | null>;
   sales!: Signal<Sale[]>;
   salesmen!: Signal<Salesman[]>;
   selectedDataType = signal<DataType | null>(null);
-  workspace = signal<WorkspaceType>(WorkspaceType.DataType);
-  workspaces = [WorkspaceType.Customer, WorkspaceType.Sale, WorkspaceType.Salesman, WorkspaceType.DataType];
+  selectedWorkspace = signal<WorkspaceType>(WorkspaceType.DataType);
+
+  workspaces = [
+    WorkspaceType.Customer, WorkspaceType.Sale, WorkspaceType.Salesman,
+    WorkspaceType.VatReturnDeclarations, WorkspaceType.DataType
+  ];
 
   constructor(
-    private customerService: CustomerService,
+    customerService: CustomerService,
     dataTypeService: DataTypeService,
     instanceService: InstanceService,
-    private saleService: SaleService,
-    private salesmanService: SalesmanService
+    saleService: SaleService,
+    salesmanService: SalesmanService,
+    vatReturnService: VatReturnService
   ) {
     this.instanceId = instanceService.getActiveInstanceId();
 
@@ -66,7 +76,7 @@ export class WorkspacePageComponent {
     effect(() => {
       const dataTypes = this.dataTypes();
       const selectedDataTypeId = untracked(() => this.selectedDataType()?.id);
-      const workspace = untracked(() => this.workspace());
+      const workspace = untracked(() => this.selectedWorkspace());
 
       if (workspace !== WorkspaceType.DataType) {
         return;
@@ -74,7 +84,7 @@ export class WorkspacePageComponent {
 
       untracked(() => {
         if (dataTypes.length === 0) {
-          this.workspace.set(WorkspaceType.Customer);
+          this.selectedWorkspace.set(WorkspaceType.Customer);
         } else if (dataTypes.findIndex(it => it.id === selectedDataTypeId) === -1) {
           this.selectedDataType.set(dataTypes[0]);
         }
@@ -90,18 +100,26 @@ export class WorkspacePageComponent {
       const instanceId = this.instanceId();
       return instanceId != null ? salesmanService.getAsSignal(instanceId)() : [];
     });
-  }
 
-  filterDataTypes(event: AutoCompleteCompleteEvent) {
-    const query = event.query.toLowerCase();
-
-    this.filteredDataTypes.set(
-      this.dataTypes().filter(it => it.name.toLowerCase().includes(query))
-    );
+    this.declarations = computed(() => {
+      const instanceId = this.instanceId();
+      return instanceId != null ? vatReturnService.getAsSignal(instanceId)() : [];
+    });
   }
 
   getWorkspaceName(type: WorkspaceType): string {
-    return WorkspaceType[type];
+    switch (type) {
+      case WorkspaceType.Customer:
+        return 'Customers';
+      case WorkspaceType.Sale:
+        return 'Sales';
+      case WorkspaceType.Salesman:
+        return 'Salesmen';
+      case WorkspaceType.DataType:
+        return 'Data Types (Your data)';
+      case WorkspaceType.VatReturnDeclarations:
+        return 'VAT Return Declarations';
+    }
   }
 
   selectDataType(dataType?: DataType) {
@@ -111,11 +129,11 @@ export class WorkspacePageComponent {
   }
 
   selectWorkspace(workspace: WorkspaceType) {
-    if (this.workspace() === workspace) {
+    if (this.selectedWorkspace() === workspace) {
       return;
     }
 
     this.selectedDataType.set(null);
-    this.workspace.set(workspace);
+    this.selectedWorkspace.set(workspace);
   }
 }

@@ -26,14 +26,14 @@ public class SubmitDeclarationCustomer
     ///     Other documents that can prove that the buyer is a resident of a non-EU country
     ///     to be able to apply 0% VAT rate.
     /// </summary>
-    public IReadOnlyList<SubmitDeclarationOtherDocument> OtherDocument { get; set; }
+    public IReadOnlyList<SubmitDeclarationOtherDocument> OtherDocuments { get; set; } = new List<SubmitDeclarationOtherDocument>();
 
     /// <summary>
     ///     Buyer's personal identification number from their country.
     ///     If it cannot be provided (since country isn't using such system),
     ///     then it shouldn't be filled.
     /// </summary>
-    public SubmitDeclarationPersonId PersonId { get; set; }
+    public SubmitDeclarationPersonId? PersonId { get; set; }
 
     /// <summary>
     ///     If buyer is a resident of a non-EU country, then this field should be filled.

@@ -58,9 +58,9 @@ public class StiVatReturnDeclaration
     public Sale? Sale { get; set; }
 
     /// <summary>
-    /// Sale identifier of the declaration. Only null if declared by the system from external requests.
+    /// Sale identifier of the declaration.
     /// </summary>
-    public int? SaleId { get; set; }
+    public int SaleId { get; set; }
 
     /// <summary>
     /// Status of the declaration.
