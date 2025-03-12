@@ -11,6 +11,7 @@ import {Button} from 'primeng/button';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {TableModule} from 'primeng/table';
 import {DatePipe} from '@angular/common';
+import {getIdentityDocumentTypeLabel} from '../../model/identity-document-type.model';
 
 @Component({
   selector: 'app-customer-showcase',
@@ -56,4 +57,5 @@ export class CustomerShowcaseComponent {
   readonly showPreview = (customer: Customer) => {
     this.previewMenu().show(customer);
   }
+  protected readonly getIdentityDocumentTypeLabel = getIdentityDocumentTypeLabel;
 }

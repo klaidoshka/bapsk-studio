@@ -1,12 +1,6 @@
 import {Component, input, OnInit, signal} from '@angular/core';
 import Salesman, {SalesmanCreateRequest, SalesmanEditRequest} from '../../model/salesman.model';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
+import {AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import Messages from '../../model/messages.model';
 import {SalesmanService} from '../../service/salesman.service';
 import {LocalizationService} from '../../service/localization.service';
@@ -59,16 +53,22 @@ export class SalesmanManagementComponent implements OnInit {
     this.isShown.set(this.isShownInitially());
   }
 
+  private readonly onSuccess = (message: string) => {
+    this.messages.set({success: [message]});
+    this.form.markAsUntouched();
+    this.form.markAsPristine();
+  }
+
   private readonly create = (request: SalesmanCreateRequest) => {
     this.salesmanService.create(request).pipe(first()).subscribe({
-      next: () => this.messages.set({success: ["Salesman has been created successfully."]}),
+      next: () => this.onSuccess("Salesman has been created successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   private readonly edit = (request: SalesmanEditRequest) => {
     this.salesmanService.edit(request).pipe(first()).subscribe({
-      next: () => this.messages.set({success: ["Salesman has been edited successfully."]}),
+      next: () => this.onSuccess("Salesman has been edited successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }

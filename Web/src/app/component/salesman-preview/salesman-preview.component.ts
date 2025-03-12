@@ -2,6 +2,7 @@ import {Component, input, OnInit, signal} from '@angular/core';
 import Salesman from '../../model/salesman.model';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
+import {getIsoCountryLabel} from '../../model/iso-country.model';
 
 @Component({
   selector: 'app-salesman-preview',
@@ -30,4 +31,5 @@ export class SalesmanPreviewComponent implements OnInit {
     this.salesman.set(salesman);
     this.isShown.set(true);
   }
+  protected readonly getIsoCountryLabel = getIsoCountryLabel;
 }

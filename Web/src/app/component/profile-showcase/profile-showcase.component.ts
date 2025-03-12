@@ -3,7 +3,7 @@ import {AuthService} from '../../service/auth.service';
 import {User} from '../../model/user.model';
 import {TableModule} from 'primeng/table';
 import {Role} from '../../model/role.model';
-import {getUserCountryName} from "../../model/iso-country.model";
+import {getUserIsoCountryLabel} from "../../model/iso-country.model";
 
 @Component({
   selector: 'app-profile-showcase',
@@ -24,5 +24,5 @@ export class ProfileShowcaseComponent {
     return Role[role];
   }
 
-  protected readonly getCountryName = getUserCountryName;
+  protected readonly getCountryName = getUserIsoCountryLabel;
 }

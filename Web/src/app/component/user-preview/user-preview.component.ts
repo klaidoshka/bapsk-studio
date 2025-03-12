@@ -2,7 +2,7 @@ import {Component, input, OnInit, signal} from '@angular/core';
 import {User} from '../../model/user.model';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
-import {getUserCountryName} from "../../model/iso-country.model";
+import {getUserIsoCountryLabel} from "../../model/iso-country.model";
 
 @Component({
   selector: 'app-user-preview',
@@ -32,5 +32,5 @@ export class UserPreviewComponent implements OnInit {
     this.isShown.set(true);
   }
 
-  protected readonly getCountryName = getUserCountryName;
+  protected readonly getCountryName = getUserIsoCountryLabel;
 }

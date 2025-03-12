@@ -3,6 +3,9 @@ import {HttpClient} from '@angular/common/http';
 import {ApiRouter} from './api-router.service';
 import Customer, {CustomerCreateRequest, CustomerEditRequest} from '../model/customer.model';
 import {first, tap} from 'rxjs';
+import {toEnumOrThrow} from '../util/enum.util';
+import {IsoCountryCode} from '../model/iso-country.model';
+import {IdentityDocumentType} from '../model/identity-document-type.model';
 
 @Injectable({
   providedIn: 'root'
@@ -39,13 +42,7 @@ export class CustomerService {
 
   readonly create = (request: CustomerCreateRequest) => {
     return this.httpClient.post<Customer>(this.apiRouter.customerCreate(), request).pipe(
-      tap(customer => this.updateSingleInStore(request.instanceId, customer))
-    );
-  }
-
-  readonly edit = (request: CustomerEditRequest) => {
-    return this.httpClient.put<void>(this.apiRouter.customerEdit(request.customer.id!), request).pipe(
-      tap(() => this.getById(request.instanceId, request.customer.id!).pipe(first()).subscribe())
+      tap(customer => this.updateSingleInStore(request.instanceId, this.updateProperties(customer)))
     );
   }
 
@@ -63,15 +60,21 @@ export class CustomerService {
     );
   }
 
+  readonly edit = (request: CustomerEditRequest) => {
+    return this.httpClient.put<void>(this.apiRouter.customerEdit(request.customer.id!), request).pipe(
+      tap(() => this.getById(request.instanceId, request.customer.id!).pipe(first()).subscribe())
+    );
+  }
+
   readonly get = (instanceId: number) => {
     return this.httpClient.get<Customer[]>(this.apiRouter.customerGetByInstanceId(instanceId)).pipe(
       tap(customers => {
         const existingSignal = this.customers.get(instanceId);
 
         if (existingSignal != null) {
-          existingSignal.update(() => customers);
+          existingSignal.update(() => customers.map(this.updateProperties));
         } else {
-          this.customers.set(instanceId, signal(customers));
+          this.customers.set(instanceId, signal(customers.map(this.updateProperties)));
         }
       })
     );
@@ -79,7 +82,7 @@ export class CustomerService {
 
   readonly getById = (instanceId: number, id: number) => {
     return this.httpClient.get<Customer>(this.apiRouter.customerGetById(id)).pipe(
-      tap(customer => this.updateSingleInStore(instanceId, customer))
+      tap(customer => this.updateSingleInStore(instanceId, this.updateProperties(customer)))
     );
   }
 
@@ -99,5 +102,16 @@ export class CustomerService {
     }
 
     return this.customers.get(instanceId)!.asReadonly();
+  }
+
+  readonly updateProperties = (customer: Customer): Customer => {
+    return {
+      ...customer,
+      identityDocument: {
+        ...customer.identityDocument,
+        issuedBy: toEnumOrThrow(customer.identityDocument.issuedBy, IsoCountryCode),
+        type: toEnumOrThrow(customer.identityDocument.type, IdentityDocumentType)
+      }
+    };
   }
 }

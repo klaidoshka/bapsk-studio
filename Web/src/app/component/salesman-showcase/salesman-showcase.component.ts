@@ -10,6 +10,7 @@ import {first} from 'rxjs';
 import {Button} from 'primeng/button';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {TableModule} from 'primeng/table';
+import {getIsoCountryLabel} from '../../model/iso-country.model';
 
 @Component({
   selector: 'app-salesman-showcase',
@@ -54,4 +55,5 @@ export class SalesmanShowcaseComponent {
   readonly showPreview = (salesman: Salesman) => {
     this.previewMenu().show(salesman);
   }
+  protected readonly getCountryLabel = getIsoCountryLabel;
 }

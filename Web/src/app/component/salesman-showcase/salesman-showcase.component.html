@@ -42,7 +42,7 @@
         <tr>
           <td>{{ salesman.name }}</td>
           <td>{{ salesman.vatPayerCode.value }}</td>
-          <td>{{ salesman.vatPayerCode.issuedBy }}</td>
+          <td>{{ getCountryLabel(salesman.vatPayerCode.issuedBy) }}</td>
           <td class="flex flex-nowrap items-center">
             <p-button
               icon="pi pi-eye"

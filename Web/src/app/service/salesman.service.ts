@@ -3,6 +3,8 @@ import Salesman, {SalesmanCreateRequest, SalesmanEditRequest} from '../model/sal
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
 import {first, tap} from 'rxjs';
+import {toEnumOrThrow} from '../util/enum.util';
+import {IsoCountryCode} from '../model/iso-country.model';
 
 @Injectable({
   providedIn: 'root'
@@ -39,13 +41,7 @@ export class SalesmanService {
 
   readonly create = (request: SalesmanCreateRequest) => {
     return this.httpClient.post<Salesman>(this.apiRouter.salesmanCreate(), request).pipe(
-      tap(salesman => this.updateSingleInStore(request.instanceId, salesman))
-    );
-  }
-
-  readonly edit = (request: SalesmanEditRequest) => {
-    return this.httpClient.put<void>(this.apiRouter.salesmanEdit(request.salesman.id!), request).pipe(
-      tap(() => this.getById(request.instanceId, request.salesman.id!).pipe(first()).subscribe())
+      tap(salesman => this.updateSingleInStore(request.instanceId, this.updateProperties(salesman)))
     );
   }
 
@@ -63,15 +59,21 @@ export class SalesmanService {
     );
   }
 
+  readonly edit = (request: SalesmanEditRequest) => {
+    return this.httpClient.put<void>(this.apiRouter.salesmanEdit(request.salesman.id!), request).pipe(
+      tap(() => this.getById(request.instanceId, request.salesman.id!).pipe(first()).subscribe())
+    );
+  }
+
   readonly get = (instanceId: number) => {
     return this.httpClient.get<Salesman[]>(this.apiRouter.salesmanGet()).pipe(
       tap(salesmen => {
         const existingSignal = this.store.get(instanceId);
 
         if (existingSignal != null) {
-          existingSignal.update(() => salesmen);
+          existingSignal.update(() => salesmen.map(this.updateProperties));
         } else {
-          this.store.set(instanceId, signal(salesmen));
+          this.store.set(instanceId, signal(salesmen.map(this.updateProperties)));
         }
       })
     );
@@ -79,7 +81,7 @@ export class SalesmanService {
 
   readonly getById = (instanceId: number, id: number) => {
     return this.httpClient.get<Salesman>(this.apiRouter.salesmanGetById(id)).pipe(
-      tap(salesman => this.updateSingleInStore(instanceId, salesman))
+      tap(salesman => this.updateSingleInStore(instanceId, this.updateProperties(salesman)))
     );
   }
 
@@ -99,5 +101,15 @@ export class SalesmanService {
     }
 
     return this.store.get(instanceId)!.asReadonly();
+  }
+
+  readonly updateProperties = (salesman: Salesman): Salesman => {
+    return {
+      ...salesman,
+      vatPayerCode: {
+        ...salesman.vatPayerCode,
+        issuedBy: toEnumOrThrow(salesman.vatPayerCode.issuedBy, IsoCountryCode)
+      }
+    };
   }
 }

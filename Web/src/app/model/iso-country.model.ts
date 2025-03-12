@@ -5,7 +5,7 @@ export interface IsoCountry {
   name: string;
 }
 
-export const getUserCountryName = (user?: User | null): string => {
+export const getUserIsoCountryLabel = (user?: User | null): string => {
   if (user == null) {
     return getDefaultIsoCountry().name;
   }
@@ -13,7 +13,7 @@ export const getUserCountryName = (user?: User | null): string => {
   return getIsoCountryByCode(user.country)?.name || getDefaultIsoCountry().name;
 }
 
-export const getCountryName = (code?: IsoCountryCode | null): string => {
+export const getIsoCountryLabel = (code?: IsoCountryCode | null): string => {
   if (code == null) {
     return getDefaultIsoCountry().name;
   }

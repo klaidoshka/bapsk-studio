@@ -1,11 +1,5 @@
 import {Component, input, OnInit, signal} from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
+import {AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import Customer, {CustomerCreateRequest, CustomerEditRequest} from '../../model/customer.model';
 import Messages from '../../model/messages.model';
 import {CustomerService} from '../../service/customer.service';
@@ -69,16 +63,22 @@ export class CustomerManagementComponent implements OnInit {
     this.isShown.set(this.isShownInitially());
   }
 
+  private readonly onSuccess = (message: string) => {
+    this.messages.set({success: [message]});
+    this.form.markAsUntouched();
+    this.form.markAsPristine();
+  }
+
   private readonly create = (request: CustomerCreateRequest) => {
     this.customerService.create(request).pipe(first()).subscribe({
-      next: () => this.messages.set({success: ["Customer has been created successfully."]}),
+      next: () => this.onSuccess("Customer has been created successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   private readonly edit = (request: CustomerEditRequest) => {
     this.customerService.edit(request).pipe(first()).subscribe({
-      next: () => this.messages.set({success: ["Customer has been edited successfully."]}),
+      next: () => this.onSuccess("Customer has been edited successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }

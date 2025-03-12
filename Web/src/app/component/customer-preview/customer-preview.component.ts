@@ -3,7 +3,8 @@ import Customer from '../../model/customer.model';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {DatePipe} from '@angular/common';
-import {getCountryName} from '../../model/iso-country.model';
+import {getIsoCountryLabel} from '../../model/iso-country.model';
+import {getIdentityDocumentTypeLabel} from '../../model/identity-document-type.model';
 
 @Component({
   selector: 'app-customer-preview',
@@ -34,5 +35,6 @@ export class CustomerPreviewComponent implements OnInit {
     this.isShown.set(true);
   }
 
-  protected readonly getCountryName = getCountryName;
+  protected readonly getCountryName = getIsoCountryLabel;
+  protected readonly getIdentityDocumentTypeLabel = getIdentityDocumentTypeLabel;
 }

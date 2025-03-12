@@ -9,7 +9,7 @@ import {UserService} from '../../service/user.service';
 import Messages from '../../model/messages.model';
 import {User} from '../../model/user.model';
 import {first} from 'rxjs';
-import {getUserCountryName} from '../../model/iso-country.model';
+import {getUserIsoCountryLabel} from '../../model/iso-country.model';
 import {LocalizationService} from '../../service/localization.service';
 
 @Component({
@@ -56,5 +56,5 @@ export class UserShowcaseComponent {
     this.previewMenu().show(user);
   }
 
-  protected readonly getCountryName = getUserCountryName;
+  protected readonly getCountryName = getUserIsoCountryLabel;
 }
