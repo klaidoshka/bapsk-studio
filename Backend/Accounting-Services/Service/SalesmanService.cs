@@ -83,13 +83,14 @@ public class SalesmanService : ISalesmanService
             .Select(it => it.InstanceId)
             .ToHashSetAsync();
 
-        return await _database.Salesmen
-            .Where(
-                it => !it.IsDeleted &&
-                      it.InstanceId != null &&
-                      instanceIds.Contains(it.InstanceId!.Value)
-            )
-            .ToListAsync();
+        return (await _database.Salesmen
+                .Where(
+                    it => !it.IsDeleted &&
+                          it.InstanceId != null
+                )
+                .ToListAsync())
+            .Where(it => instanceIds.Contains(it.InstanceId!.Value))
+            .ToList();
     }
 
     public async Task<Salesman> GetByIdAsync(int id)
