@@ -1,4 +1,3 @@
-using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using Accounting.Contract.Configuration;
@@ -58,8 +57,6 @@ public class StiVatReturnClientService : IStiVatReturnClientService, IAsyncDispo
                 "STI VAT Refund certificate serial number or endpoint is not configured"
             );
         }
-
-        ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
 
         var client = new VATRefundforForeignTravelerTRPortClient(
             new BasicHttpsBinding(BasicHttpsSecurityMode.Transport)
