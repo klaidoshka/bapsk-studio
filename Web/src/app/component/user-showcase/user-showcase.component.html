@@ -42,7 +42,7 @@
       <tr>
         <td>{{ user.firstName + ' ' + user.lastName }}</td>
         <td>{{ user.email }}</td>
-        <td>{{ user.birthdate }}</td>
+        <td>{{ user.birthDate | date:'short' }}</td>
         <td>{{ getCountryName(user) }}</td>
         <td class="flex flex-nowrap items-center">
           <p-button

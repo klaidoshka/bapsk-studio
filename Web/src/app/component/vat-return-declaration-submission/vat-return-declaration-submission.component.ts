@@ -36,7 +36,7 @@ export class VatReturnDeclarationSubmissionComponent implements OnInit {
   messages = signal<Messages>({});
   sales = input.required<Sale[]>();
   salesLabeled = computed(() => this.sales().map(sale => ({
-    label: `${sale.date} (ID: ${sale.id}) | ${sale.customer.firstName} ${sale.customer.lastName} - ${sale.salesman.name} | ${sale.soldGoods.length} goods`,
+    label: `${sale.date.toLocaleDateString()} (ID: ${sale.id}) | ${sale.customer.firstName} ${sale.customer.lastName} - ${sale.salesman.name} | ${sale.soldGoods.length} goods`,
     value: sale
   })));
 

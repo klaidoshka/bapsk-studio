@@ -110,6 +110,7 @@ export class SaleService {
   readonly updateProperties = (sale: Sale): Sale => {
     return {
       ...sale,
+      date: new Date(sale.date),
       customer: this.customerService.updateProperties(sale.customer),
       salesman: this.salesmanService.updateProperties(sale.salesman),
       soldGoods: sale.soldGoods.map(soldGood => ({

@@ -14,7 +14,7 @@
   <p>{{ user()?.email }}</p>
 
   <p class="font-bold mt-4">Birthdate</p>
-  <p>{{ user()?.birthDate }}</p>
+  <p>{{ user()?.birthDate | date:'short' }}</p>
 
   <p class="font-bold mt-4">Country</p>
   <p>{{ getCountryName(user()) }}</p>

@@ -43,7 +43,7 @@
         <tr>
           <td>{{ customer.firstName }}</td>
           <td>{{ customer.lastName }}</td>
-          <td>{{ customer.birthDate | date:'short' }}</td>
+          <td>{{ customer.birthdate | date:'short' }}</td>
           <td>{{ getIdentityDocumentTypeLabel(customer.identityDocument.type) }}</td>
           <td class="flex flex-nowrap items-center">
             <p-button

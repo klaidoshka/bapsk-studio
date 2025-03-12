@@ -11,6 +11,7 @@ import {User} from '../../model/user.model';
 import {first} from 'rxjs';
 import {getUserIsoCountryLabel} from '../../model/iso-country.model';
 import {LocalizationService} from '../../service/localization.service';
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-user-showcase',
@@ -20,7 +21,8 @@ import {LocalizationService} from '../../service/localization.service';
     TableModule,
     ConfirmationComponent,
     MessagesShowcaseComponent,
-    Button
+    Button,
+    DatePipe
   ],
   templateUrl: './user-showcase.component.html',
   styles: ``

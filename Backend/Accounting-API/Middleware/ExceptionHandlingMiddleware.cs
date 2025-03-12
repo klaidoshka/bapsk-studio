@@ -1,4 +1,5 @@
 using System.Net;
+using System.ServiceModel;
 using Accounting.Contract.Dto;
 
 namespace Accounting.API.Middleware;
@@ -43,7 +44,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
                 HttpStatusCode.NotFound,
                 "The request had invalid arguments."
             ),
-            BadHttpRequestException or InvalidOperationException => new ExceptionResponse(
+            BadHttpRequestException or InvalidOperationException or FaultException => new ExceptionResponse(
                 HttpStatusCode.NotAcceptable,
                 "The request was not acceptable."
             ),

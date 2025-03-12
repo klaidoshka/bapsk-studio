@@ -1,12 +1,6 @@
 import {Injectable, Signal, signal, WritableSignal} from '@angular/core';
 import {ApiRouter} from './api-router.service';
-import {
-  toUserIdentity,
-  User,
-  UserCreateRequest,
-  UserEditRequest,
-  UserIdentity
-} from '../model/user.model';
+import {toUserIdentity, User, UserCreateRequest, UserEditRequest, UserIdentity} from '../model/user.model';
 import {first, Observable, tap} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {toEnumOrThrow} from '../util/enum.util';
@@ -34,17 +28,9 @@ export class UserService {
     let candidate = this.storeUsers().get(user.id);
 
     if (candidate != null) {
-      candidate.update(_ => ({
-        ...user,
-        country: toEnumOrThrow(user.country, IsoCountryCode),
-        role: toEnumOrThrow(user.role, Role)
-      }));
+      candidate.update(_ => this.updateProperties(user));
     } else {
-      this.storeUsers().set(user.id, signal({
-        ...user,
-        country: toEnumOrThrow(user.country, IsoCountryCode),
-        role: toEnumOrThrow(user.role, Role)
-      }));
+      this.storeUsers().set(user.id, signal(this.updateProperties(user)));
     }
 
     this.updateUsersSignal();
@@ -176,5 +162,14 @@ export class UserService {
     new Promise((resolve) => this.getIdentityById(id).pipe(first()).subscribe(resolve));
 
     return this.storeIdentities().get(id)!.asReadonly();
+  }
+
+  readonly updateProperties = (user: User): User => {
+    return {
+      ...user,
+      birthDate: new Date(user.birthDate),
+      country: toEnumOrThrow(user.country, IsoCountryCode),
+      role: toEnumOrThrow(user.role, Role)
+    }
   }
 }

@@ -107,6 +107,7 @@ export class CustomerService {
   readonly updateProperties = (customer: Customer): Customer => {
     return {
       ...customer,
+      birthdate: new Date(customer.birthdate),
       identityDocument: {
         ...customer.identityDocument,
         issuedBy: toEnumOrThrow(customer.identityDocument.issuedBy, IsoCountryCode),

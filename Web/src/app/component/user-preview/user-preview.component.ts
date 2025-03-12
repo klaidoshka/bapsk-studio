@@ -3,12 +3,14 @@ import {User} from '../../model/user.model';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {getUserIsoCountryLabel} from "../../model/iso-country.model";
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-user-preview',
   imports: [
     Button,
-    Dialog
+    Dialog,
+    DatePipe
   ],
   templateUrl: './user-preview.component.html',
   styles: ``
