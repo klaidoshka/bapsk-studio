@@ -23,11 +23,12 @@ import {NgForOf, NgIf} from '@angular/common';
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
 import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
+import {SaleShowcaseComponent} from '../../component/sale-showcase/sale-showcase.component';
 
 @Component({
   selector: 'app-workspace-page',
   templateUrl: './workspace-page.component.html',
-  imports: [DataEntryShowcaseComponent, Message, CustomerShowcaseComponent, SalesmanShowcaseComponent, NgIf, NgForOf, DropdownModule, FormsModule, AutoComplete],
+  imports: [DataEntryShowcaseComponent, Message, CustomerShowcaseComponent, SalesmanShowcaseComponent, NgIf, NgForOf, DropdownModule, FormsModule, AutoComplete, SaleShowcaseComponent],
   providers: []
 })
 export class WorkspacePageComponent {

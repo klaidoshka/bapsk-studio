@@ -28,7 +28,7 @@ export interface SaleCreateEdit {
   id?: number;
   invoiceNo?: string;
   salesmanId: number;
-  soldGoods: SoldGood[];
+  soldGoods: SoldGoodCreateEdit[];
 }
 
 export interface SaleCreateRequest {
@@ -56,5 +56,16 @@ export interface SoldGood {
   unitOfMeasure: string;
   unitOfMeasureType: UnitOfMeasureType;
   vatAmount: number;
+  vatRate: number;
+}
+
+export interface SoldGoodCreateEdit {
+  description: string;
+  id?: number;
+  quantity: number;
+  sequenceNo: string;
+  unitOfMeasure: string;
+  unitOfMeasureType: UnitOfMeasureType;
+  unitPrice: number;
   vatRate: number;
 }

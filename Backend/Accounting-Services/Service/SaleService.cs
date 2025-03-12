@@ -2,6 +2,7 @@ using Accounting.Contract;
 using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.Sale;
 using Accounting.Contract.Service;
+using Accounting.Services.Util;
 using Microsoft.EntityFrameworkCore;
 using Sale = Accounting.Contract.Entity.Sale;
 
@@ -66,7 +67,9 @@ public class SaleService : ISaleService
         // Validate if sale exists
         // Validate properties
 
-        var sale = await _database.Sales.FirstAsync(it => it.Id == request.Sale.Id);
+        var sale = await _database.Sales
+            .Include(it => it.SoldGoods)
+            .FirstAsync(it => it.Id == request.Sale.Id);
 
         sale.CashRegisterNo = request.Sale.CashRegister?.CashRegisterNo;
         sale.CashRegisterReceiptNo = request.Sale.CashRegister?.ReceiptNo;
@@ -74,6 +77,43 @@ public class SaleService : ISaleService
         sale.Date = request.Sale.Date;
         sale.InvoiceNo = request.Sale.InvoiceNo;
         sale.SalesmanId = request.Sale.SalesmanId;
+
+        var existingSoldGoods = sale.SoldGoods.ToDictionary(it => it.Id);
+
+        foreach (var soldGood in request.Sale.SoldGoods)
+        {
+            if (soldGood.Id is null)
+            {
+                sale.SoldGoods.Add(soldGood.ToEntity());
+
+                continue;
+            }
+
+            existingSoldGoods[soldGood.Id.Value]
+                .Also(
+                    it =>
+                    {
+                        it.Description = soldGood.Description;
+                        it.Quantity = soldGood.Quantity;
+                        it.SequenceNo = soldGood.SequenceNo;
+                        it.UnitOfMeasure = soldGood.UnitOfMeasure;
+                        it.UnitOfMeasureType = soldGood.UnitOfMeasureType;
+                        it.VatRate = soldGood.VatRate;
+                        it.TaxableAmount = soldGood.Quantity * soldGood.UnitPrice;
+                        it.VatAmount = it.TaxableAmount * soldGood.VatRate;
+                        it.TotalAmount = it.TaxableAmount + it.VatAmount;
+                    }
+                );
+        }
+
+        var requestSoldGoodIds = request.Sale.SoldGoods
+            .Select(it => it.Id)
+            .ToHashSet();
+
+        existingSoldGoods.Values
+            .Where(soldGood => !requestSoldGoodIds.Contains(soldGood.Id))
+            .ToList()
+            .ForEach(soldGood => sale.SoldGoods.Remove(soldGood));
 
         await _database.SaveChangesAsync();
     }
@@ -95,15 +135,17 @@ public class SaleService : ISaleService
             .Select(it => it.InstanceId)
             .ToHashSetAsync();
 
-        return await _database.Sales
-            .Include(it => it.Customer)
-            .Include(it => it.Salesman)
-            .Where(
-                it => !it.IsDeleted &&
-                      it.InstanceId != null &&
-                      instanceIds.Contains(it.InstanceId!.Value)
-            )
-            .ToListAsync();
+        return (await _database.Sales
+                .Include(it => it.Customer)
+                .Include(it => it.Salesman)
+                .Include(it => it.SoldGoods)
+                .Where(
+                    it => !it.IsDeleted &&
+                          it.InstanceId != null
+                )
+                .ToListAsync())
+            .Where(it => instanceIds.Contains(it.InstanceId!.Value))
+            .ToList();
     }
 
     public async Task<Sale> GetByIdAsync(int id)
@@ -111,6 +153,7 @@ public class SaleService : ISaleService
         return await _database.Sales
                    .Include(it => it.Customer)
                    .Include(it => it.Salesman)
+                   .Include(it => it.SoldGoods)
                    .FirstOrDefaultAsync(it => it.Id == id && !it.IsDeleted)
                ?? throw new ValidationException("Sale not found");
     }

@@ -20,7 +20,7 @@ public static class SaleExtensions
     {
         return new Sale
         {
-            CashRegister = sale.InvoiceNo == null
+            CashRegister = String.IsNullOrWhiteSpace(sale.InvoiceNo)
                 ? new CashRegister
                 {
                     CashRegisterNo = sale.CashRegisterNo ?? "",

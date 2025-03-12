@@ -57,5 +57,6 @@ export class CustomerShowcaseComponent {
   readonly showPreview = (customer: Customer) => {
     this.previewMenu().show(customer);
   }
+
   protected readonly getIdentityDocumentTypeLabel = getIdentityDocumentTypeLabel;
 }

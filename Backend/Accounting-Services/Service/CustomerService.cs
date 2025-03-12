@@ -89,13 +89,14 @@ public class CustomerService : ICustomerService
             .Select(it => it.InstanceId)
             .ToHashSetAsync();
 
-        return await _database.Customers
+        return (await _database.Customers
             .Where(
                 it => !it.IsDeleted &&
-                      it.InstanceId != null &&
-                      instanceIds.Contains(it.InstanceId!.Value)
+                      it.InstanceId != null
             )
-            .ToListAsync();
+            .ToListAsync())
+            .Where(it => instanceIds.Contains(it.InstanceId!.Value))
+            .ToList();
     }
 
     public async Task<Customer> GetByIdAsync(int id)

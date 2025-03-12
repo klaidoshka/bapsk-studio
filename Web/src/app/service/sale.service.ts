@@ -5,6 +5,8 @@ import {HttpClient} from '@angular/common/http';
 import {first, tap} from 'rxjs';
 import {CustomerService} from './customer.service';
 import {SalesmanService} from './salesman.service';
+import {toEnumOrThrow} from '../util/enum.util';
+import {UnitOfMeasureType} from '../model/unit-of-measure-type.model';
 
 @Injectable({
   providedIn: 'root'
@@ -109,7 +111,11 @@ export class SaleService {
     return {
       ...sale,
       customer: this.customerService.updateProperties(sale.customer),
-      salesman: this.salesmanService.updateProperties(sale.salesman)
+      salesman: this.salesmanService.updateProperties(sale.salesman),
+      soldGoods: sale.soldGoods.map(soldGood => ({
+        ...soldGood,
+        unitOfMeasureType: toEnumOrThrow(soldGood.unitOfMeasureType, UnitOfMeasureType)
+      }))
     }
   }
 }

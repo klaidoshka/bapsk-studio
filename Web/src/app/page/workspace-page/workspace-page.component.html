@@ -57,13 +57,15 @@
         />
       </ng-container>
 
-      <!--      <ng-container *ngIf="workspace() === WorkspaceType.Sale">-->
-      <!--        <h1 class="text-xl font-bold">Sales</h1>-->
-      <!--        <app-sale-showcase-->
-      <!--          [instanceId]="instanceId()!"-->
-      <!--          [sales]="sales()"-->
-      <!--        />-->
-      <!--      </ng-container>-->
+      <ng-container *ngIf="workspace() === WorkspaceType.Sale">
+        <h1 class="text-xl font-bold">Sales</h1>
+        <app-sale-showcase
+          [customers]="customers()"
+          [instanceId]="instanceId()!"
+          [sales]="sales()"
+          [salesmen]="salesmen()"
+        />
+      </ng-container>
 
       <ng-container *ngIf="workspace() === WorkspaceType.Salesman">
         <h1 class="text-xl font-bold">Salesmen</h1>
