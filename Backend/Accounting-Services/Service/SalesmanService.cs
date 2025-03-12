@@ -1,4 +1,5 @@
 using Accounting.Contract;
+using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.Salesman;
 using Accounting.Contract.Service;
 using Microsoft.EntityFrameworkCore;
@@ -89,5 +90,11 @@ public class SalesmanService : ISalesmanService
                       instanceIds.Contains(it.InstanceId!.Value)
             )
             .ToListAsync();
+    }
+
+    public async Task<Salesman> GetByIdAsync(int id)
+    {
+        return await _database.Salesmen.FirstOrDefaultAsync(it => it.Id == id && !it.IsDeleted)
+               ?? throw new ValidationException("Salesman not found");
     }
 }

@@ -1,4 +1,5 @@
 using Accounting.Contract;
+using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.Sale;
 using Accounting.Contract.Service;
 using Microsoft.EntityFrameworkCore;
@@ -95,11 +96,22 @@ public class SaleService : ISaleService
             .ToHashSetAsync();
 
         return await _database.Sales
+            .Include(it => it.Customer)
+            .Include(it => it.Salesman)
             .Where(
                 it => !it.IsDeleted &&
                       it.InstanceId != null &&
                       instanceIds.Contains(it.InstanceId!.Value)
             )
             .ToListAsync();
+    }
+
+    public async Task<Sale> GetByIdAsync(int id)
+    {
+        return await _database.Sales
+                   .Include(it => it.Customer)
+                   .Include(it => it.Salesman)
+                   .FirstOrDefaultAsync(it => it.Id == id && !it.IsDeleted)
+               ?? throw new ValidationException("Sale not found");
     }
 }

@@ -59,16 +59,25 @@ public static class HttpContextExtensions
     }
 
     /// <summary>
-    /// Tries to resolve the requested id from the HTTP request. I.e. `/users/1` would return 1.
+    /// Finds a property from the route data.
     /// </summary>
-    /// <returns>Requested id or null if not found</returns>
-    public static int? GetRequestedId(this HttpContext context)
+    /// <param name="context">Context of HTTP call</param>
+    /// <param name="key">Key to look property with</param>
+    /// <typeparam name="T">Result type</typeparam>
+    /// <returns>Value mapped into requested type T or null if we couldn't find or map into the type. Very generic types are supported only.</returns>
+    public static T? FindProperty<T>(this HttpContext context, string key)
     {
-        return context.GetRouteData().Values.TryGetValue("id", out var idValue)
-            ? Int32.TryParse(idValue?.ToString(), out var userId)
-                ? userId
-                : null
-            : null;
+        if (context.GetRouteData().Values.TryGetValue(key, out var routeValue))
+        {
+            return (T?)Convert.ChangeType(routeValue, typeof(T));
+        }
+
+        if (context.Request.Query.TryGetValue(key, out var queryValue))
+        {
+            return (T?)Convert.ChangeType(queryValue.ToString(), typeof(T));
+        }
+
+        return default;
     }
 
     /// <summary>

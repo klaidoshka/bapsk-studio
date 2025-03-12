@@ -26,7 +26,9 @@ export class ApiRouter {
   public readonly customerCreate = () => `${this.accountingUrl}/customer`;
   public readonly customerDelete = (id: number) => `${this.accountingUrl}/customer/${id}`;
   public readonly customerEdit = (id: number) => `${this.accountingUrl}/customer/${id}`;
-  public readonly customerGet = () => `${this.accountingUrl}/customer`;
+  public readonly customerGetByInstanceId = (instanceId: number) => `${this.accountingUrl}/customer?${this.toParameters({
+    instanceId: instanceId
+  })}`;
   public readonly customerGetById = (id: number) => `${this.accountingUrl}/customer/${id}`;
 
   public readonly dataEntryCreate = () => `${this.accountingUrl}/data-entry`;

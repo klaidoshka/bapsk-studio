@@ -27,7 +27,7 @@ public class UserAuthorizationHandler : AuthorizationHandler<UserRequirement>
     {
         var httpContext = _httpContextAccessor.HttpContext;
         var requesterId = httpContext?.GetUserId();
-        var requestedId = httpContext?.GetRequestedId();
+        var requestedId = httpContext?.FindProperty<int>("id");
 
         if (httpContext is null || !requesterId.HasValue || !requestedId.HasValue)
         {
@@ -36,7 +36,7 @@ public class UserAuthorizationHandler : AuthorizationHandler<UserRequirement>
             return;
         }
 
-        Validation? result;
+        Validation result;
 
         switch (requirement.Operation)
         {
@@ -73,13 +73,13 @@ public class UserAuthorizationHandler : AuthorizationHandler<UserRequirement>
                 throw new ArgumentOutOfRangeException();
         }
 
-        if (result?.IsValid == true)
+        if (result.IsValid)
         {
             context.Succeed(requirement);
         }
         else
         {
-            context.Fail();
+            context.Fail(new AuthorizationFailureReason(this, result.FailureMessages.First()));
         }
     }
 }

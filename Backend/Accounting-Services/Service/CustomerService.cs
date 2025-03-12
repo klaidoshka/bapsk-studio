@@ -1,4 +1,5 @@
 using Accounting.Contract;
+using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.Customer;
 using Accounting.Contract.Service;
 using Microsoft.EntityFrameworkCore;
@@ -95,5 +96,11 @@ public class CustomerService : ICustomerService
                       instanceIds.Contains(it.InstanceId!.Value)
             )
             .ToListAsync();
+    }
+
+    public async Task<Customer> GetByIdAsync(int id)
+    {
+        return await _database.Customers.FirstOrDefaultAsync(it => it.Id == id && !it.IsDeleted)
+               ?? throw new ValidationException("Customer not found");
     }
 }

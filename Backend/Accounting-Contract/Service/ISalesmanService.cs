@@ -30,4 +30,11 @@ public interface ISalesmanService
     /// <param name="request">Request to process</param>
     /// <returns>Salesmen that are accessible for identities provided in request</returns>
     public Task<IEnumerable<Salesman>> GetAsync(SalesmanGetRequest request);
+    
+    /// <summary>
+    /// Gets single salesman by id.
+    /// </summary>
+    /// <param name="id">Id of the salesman</param>
+    /// <returns>Salesman</returns>
+    public Task<Salesman> GetByIdAsync(int id);
 }

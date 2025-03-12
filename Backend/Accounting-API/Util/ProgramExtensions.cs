@@ -108,6 +108,9 @@ public static class ProgramExtensions
     /// <exception cref="InvalidConfigurationException">Thrown if JwtSettings:Secret configuration is not set</exception>
     public static void AddJwtAuth(this WebApplicationBuilder builder)
     {
+        builder.Services.AddScoped<IAuthorizationHandler, CustomerAuthorizationHandler>();
+        builder.Services.AddScoped<IAuthorizationHandler, SaleAuthorizationHandler>();
+        builder.Services.AddScoped<IAuthorizationHandler, SalesmanAuthorizationHandler>();
         builder.Services.AddScoped<IAuthorizationHandler, UserAuthorizationHandler>();
         builder.Services.AddHttpContextAccessor();
 
@@ -171,6 +174,18 @@ public static class ProgramExtensions
             .MapUserEndpoints();
 
         var accountingRouteGroup = apiRouteGroup.MapGroup("/accounting");
+
+        accountingRouteGroup
+            .MapGroup("/customer")
+            .MapCustomerEndpoints();
+
+        accountingRouteGroup
+            .MapGroup("/sale")
+            .MapSaleEndpoints();
+
+        accountingRouteGroup
+            .MapGroup("/salesman")
+            .MapSalesmanEndpoints();
 
         accountingRouteGroup
             .MapGroup("/data-entry")
