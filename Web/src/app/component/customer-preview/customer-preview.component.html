@@ -1,1 +1,31 @@
-<p>customer-preview works!</p>
+<p-dialog
+  header="Customer Preview"
+  closable="true"
+  closeOnEscape="true"
+  modal="true"
+  (close)="hide()"
+  (onHide)="hide()"
+  [(visible)]="isShown"
+>
+  <p class="font-bold">First Name</p>
+  <p>{{ customer()?.firstName }}</p>
+
+  <p class="font-bold mt-4">Last Name</p>
+  <p>{{ customer()?.lastName }}</p>
+
+  <p class="font-bold mt-4">Birthdate</p>
+  <p>{{ customer()?.birthdate | date:'short' }}</p>
+
+  <p class="font-bold mt-4">Identity Document</p>
+  <p>IssuedBy: {{ getCountryName(customer()?.identityDocument?.issuedBy) }}</p>
+  <p>Type: {{ customer()?.identityDocument?.type }}</p>
+  <p>Number: {{ customer()?.identityDocument?.value }}</p>
+
+  <div class="flex justify-end mt-4">
+    <p-button
+      label="Close"
+      class="p-button-secondary"
+      (onClick)="hide()"
+    ></p-button>
+  </div>
+</p-dialog>

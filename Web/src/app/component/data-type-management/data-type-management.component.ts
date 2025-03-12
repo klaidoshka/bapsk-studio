@@ -28,7 +28,7 @@ import DataTypeField, {
 import {Checkbox} from 'primeng/checkbox';
 import {Select} from 'primeng/select';
 import {DatePicker} from 'primeng/datepicker';
-import {ErrorResolverService} from '../../service/error-resolver.service';
+import {LocalizationService} from '../../service/localization.service';
 
 @Component({
   selector: 'app-data-type-management',
@@ -60,7 +60,7 @@ export class DataTypeManagementComponent implements OnInit {
 
   constructor(
     private dataTypeService: DataTypeService,
-    private errorResolverService: ErrorResolverService,
+    private localizationService: LocalizationService,
     private formBuilder: FormBuilder,
     private instanceService: InstanceService,
     private textService: TextService
@@ -69,7 +69,7 @@ export class DataTypeManagementComponent implements OnInit {
     this.form = this.createForm();
   }
 
-  readonly ngOnInit = () => {
+  ngOnInit() {
     this.isShown.set(this.isShownInitially());
   }
 
@@ -130,14 +130,14 @@ export class DataTypeManagementComponent implements OnInit {
   private readonly create = (request: DataTypeCreateRequest) => {
     this.dataTypeService.create(request).pipe(first()).subscribe({
       next: () => this.messages.set({success: ["DataType has been created successfully."]}),
-      error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
+      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   private readonly edit = (request: DataTypeEditRequest) => {
     this.dataTypeService.edit(request).pipe(first()).subscribe({
       next: () => this.messages.set({success: ["Instance has been edited successfully."]}),
-      error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
+      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 

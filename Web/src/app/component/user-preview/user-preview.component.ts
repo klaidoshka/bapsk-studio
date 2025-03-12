@@ -2,7 +2,7 @@ import {Component, input, OnInit, signal} from '@angular/core';
 import {User} from '../../model/user.model';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
-import {getCountryName} from "../../model/iso-country.model";
+import {getUserCountryName} from "../../model/iso-country.model";
 
 @Component({
   selector: 'app-user-preview',
@@ -18,7 +18,7 @@ export class UserPreviewComponent implements OnInit {
   isShown = signal<boolean>(false);
   isShownInitially = input<boolean>(false);
 
-  readonly ngOnInit = () => {
+  ngOnInit() {
     this.isShown.set(this.isShownInitially());
   }
 
@@ -32,5 +32,5 @@ export class UserPreviewComponent implements OnInit {
     this.isShown.set(true);
   }
 
-  protected readonly getCountryName = getCountryName;
+  protected readonly getCountryName = getUserCountryName;
 }

@@ -14,7 +14,7 @@ import {first} from 'rxjs';
 import {MessageModule} from 'primeng/message';
 import DataType from '../../model/data-type.model';
 import {DatePipe} from '@angular/common';
-import {ErrorResolverService} from '../../service/error-resolver.service';
+import {LocalizationService} from '../../service/localization.service';
 
 @Component({
   selector: 'app-data-entry-showcase',
@@ -41,14 +41,14 @@ export class DataEntryShowcaseComponent implements OnInit {
 
   constructor(
     private dataEntryService: DataEntryService,
-    private errorResolverService: ErrorResolverService
+    private localizationService: LocalizationService
   ) {
     effect(() => {
       this.dataEntries = this.dataEntryService.getAsSignal(this.dataType()!!.id);
     });
   }
 
-  readonly ngOnInit = () => {
+  ngOnInit() {
     this.dataEntries = this.dataEntryService.getAsSignal(this.dataType()!!.id);
   }
 
@@ -64,7 +64,7 @@ export class DataEntryShowcaseComponent implements OnInit {
     this.confirmationComponent().request(() => {
       this.dataEntryService.delete(dataEntry.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['Data entry deleted successfully']}),
-        error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
+        error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
       });
     });
   }

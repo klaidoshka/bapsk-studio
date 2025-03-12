@@ -28,7 +28,6 @@ import {IsoCountries, IsoCountry} from '../../model/iso-country.model';
 export class RegisterComponent {
   filteredCountries: IsoCountry[] = [];
   isSubmitting = signal<boolean>(false);
-  maxDate = new Date();
   messages = signal<string[]>([]);
   registerForm!: FormGroup;
 
@@ -39,7 +38,7 @@ export class RegisterComponent {
     private textService: TextService
   ) {
     this.registerForm = this.formBuilder.group({
-      birthDate: [this.maxDate, Validators.required],
+      birthDate: [new Date(), Validators.required],
       country: [IsoCountries[129], Validators.required],
       email: ["", [Validators.required, Validators.email]],
       firstName: ["", Validators.required],

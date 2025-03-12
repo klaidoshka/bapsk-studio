@@ -10,7 +10,7 @@ import {Button} from 'primeng/button';
 import {Textarea} from 'primeng/textarea';
 import {InputText} from 'primeng/inputtext';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
-import {ErrorResolverService} from '../../service/error-resolver.service';
+import {LocalizationService} from '../../service/localization.service';
 
 @Component({
   selector: 'app-instance-management',
@@ -34,7 +34,7 @@ export class InstanceManagementComponent implements OnInit {
   messages = signal<Messages>({});
 
   constructor(
-    private errorResolverService: ErrorResolverService,
+    private localizationService: LocalizationService,
     private formBuilder: FormBuilder,
     private instanceService: InstanceService,
     private textService: TextService
@@ -45,21 +45,21 @@ export class InstanceManagementComponent implements OnInit {
     });
   }
 
-  readonly ngOnInit = () => {
+  ngOnInit() {
     this.isShown.set(this.isShownInitially());
   }
 
   private readonly create = (request: InstanceCreateRequest) => {
     this.instanceService.create(request).pipe(first()).subscribe({
       next: () => this.messages.set({success: ["Instance has been created successfully."]}),
-      error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
+      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   private readonly edit = (request: InstanceEditRequest) => {
     this.instanceService.edit(request).pipe(first()).subscribe({
       next: () => this.messages.set({success: ["Instance has been edited successfully."]}),
-      error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
+      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 

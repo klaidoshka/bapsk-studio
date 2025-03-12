@@ -11,7 +11,7 @@ import {DataTypeManagementComponent} from '../data-type-management/data-type-man
 import {first} from 'rxjs';
 import {InstanceService} from '../../service/instance.service';
 import {MessageModule} from 'primeng/message';
-import {ErrorResolverService} from '../../service/error-resolver.service';
+import {LocalizationService} from '../../service/localization.service';
 
 @Component({
   selector: 'app-data-type-showcase',
@@ -37,7 +37,7 @@ export class DataTypeShowcaseComponent {
 
   constructor(
     private dataTypeService: DataTypeService,
-    private errorResolverService: ErrorResolverService,
+    private localizationService: LocalizationService,
     private instanceService: InstanceService
   ) {
     this.instanceId = this.instanceService.getActiveInstanceId();
@@ -52,7 +52,7 @@ export class DataTypeShowcaseComponent {
     this.confirmationComponent().request(() => {
       this.dataTypeService.delete(dataType.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['Data type deleted successfully']}),
-        error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
+        error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
       });
     });
   }

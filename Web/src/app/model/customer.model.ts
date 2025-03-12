@@ -2,7 +2,7 @@ import {IdentityDocumentType} from './identity-document-type.model';
 import {IsoCountryCode} from './iso-country.model';
 
 export default interface Customer {
-  birthDate: string;
+  birthdate: string;
   firstName: string;
   id?: number;
   identityDocument: CustomerIdentityDocument;

@@ -12,8 +12,11 @@ export class TextService {
 
       if (char !== char.toUpperCase()) {
         result += word.charAt(i);
-      } else {
+      } else if (char !== '.') {
         result += ' ' + char;
+      } else if (i + 1 < word.length) {
+        result += ' ' + word.charAt(i + 1).toUpperCase();
+        i++;
       }
     }
 

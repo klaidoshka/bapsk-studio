@@ -17,7 +17,7 @@ import {
 } from '../../model/iso-country.model';
 import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
 import {DatePicker} from 'primeng/datepicker';
-import {ErrorResolverService} from '../../service/error-resolver.service';
+import {LocalizationService} from '../../service/localization.service';
 
 @Component({
   selector: 'app-user-management',
@@ -40,25 +40,24 @@ export class UserManagementComponent implements OnInit {
   isFormSet = signal<boolean>(false);
   isShownInitially = input<boolean>(false);
   isShown = signal<boolean>(false);
-  maxDate = new Date();
   messages = signal<Messages>({});
   user = signal<User | null>(null);
 
   constructor(
-    private errorResolverService: ErrorResolverService,
+    private localizationService: LocalizationService,
     private formBuilder: FormBuilder,
     private textService: TextService,
     private userService: UserService
   ) {
   }
 
-  readonly ngOnInit = () => {
+  ngOnInit() {
     this.isShown.set(this.isShownInitially());
   }
 
   private readonly createForm = (user: User | null): FormGroup => {
     return this.formBuilder.group({
-      birthDate: [this.maxDate, Validators.required],
+      birthDate: [new Date(), Validators.required],
       country: [getDefaultIsoCountry(), Validators.required],
       email: ["", [Validators.required, Validators.email]],
       firstName: ["", Validators.required],
@@ -76,14 +75,14 @@ export class UserManagementComponent implements OnInit {
   private readonly create = (request: UserCreateRequest) => {
     this.userService.create(request).pipe(first()).subscribe({
       next: () => this.onSuccess("User has been created successfully."),
-      error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
+      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   private readonly edit = (request: UserEditRequest) => {
     this.userService.edit(request).pipe(first()).subscribe({
       next: () => this.onSuccess("User has been edited successfully."),
-      error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
+      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 

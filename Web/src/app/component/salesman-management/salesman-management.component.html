@@ -1,1 +1,83 @@
-<p>salesman-management works!</p>
+<p-dialog
+  header="Salesman Management"
+  closeOnEscape="true"
+  modal="true"
+  closable="true"
+  [(visible)]="isShown"
+  (onHide)="hide()"
+  (close)="hide()"
+>
+  <div class="min-w-128">
+    <div class="mb-2">
+      <app-messages-showcase [messages]="messages()"/>
+    </div>
+
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 gap-4"
+      [formGroup]="form"
+    >
+      <div>
+        <label
+          for="name"
+          class="block text-sm font-medium text-gray-700"
+        >Name</label>
+        <input
+          formControlName="name"
+          pInputText
+          type="text"
+          id="name"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        />
+        @if (getErrorMessage("name"); as error) {
+          <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+        }
+      </div>
+
+      <ng-container formGroupName="vatPayerCode">
+        <div>
+          <label
+            for="vatPayerCodeValue"
+            class="block text-sm font-medium text-gray-700"
+          >Vat Payer Code</label>
+          <input
+            formControlName="value"
+            pInputText
+            type="text"
+            id="vatPayerCodeValue"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          />
+          @if (getErrorMessage("vatPayerCode.value"); as error) {
+            <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+          }
+        </div>
+
+        <div>
+          <label
+            for="vatPayerCodeIssuedBy"
+            class="block text-sm font-medium text-gray-700"
+          >Vat Payer Code Issued By</label>
+          <p-select
+            inputId="issuedBy"
+            formControlName="issuedBy"
+            [options]="IsoCountries"
+            optionLabel="name"
+            optionValue="code"
+            class="bg-surface-50 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            appendTo="body"
+          ></p-select>
+          @if (getErrorMessage("vatPayerCode.issuedBy"); as error) {
+            <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+          }
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="flex justify-end mt-4">
+      <p-button
+        [label]="salesman() == null ? 'Create' : 'Save'"
+        [disabled]="!form.valid || !form.dirty"
+        (onClick)="save()"
+      ></p-button>
+    </div>
+  </div>
+</p-dialog>

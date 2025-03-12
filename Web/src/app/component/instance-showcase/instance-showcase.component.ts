@@ -9,7 +9,7 @@ import {first} from 'rxjs';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {InstancePreviewComponent} from '../instance-preview/instance-preview.component';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
-import {ErrorResolverService} from '../../service/error-resolver.service';
+import {LocalizationService} from '../../service/localization.service';
 
 @Component({
   selector: 'app-instance-showcase',
@@ -32,7 +32,7 @@ export class InstanceShowcaseComponent {
   previewMenu = viewChild.required(InstancePreviewComponent);
 
   constructor(
-    private errorResolverService: ErrorResolverService,
+    private localizationService: LocalizationService,
     private instanceService: InstanceService
   ) {
     this.instances = this.instanceService.getAsSignal();
@@ -42,7 +42,7 @@ export class InstanceShowcaseComponent {
     this.confirmationComponent().request(() => {
       this.instanceService.delete(instance.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['Instance deleted successfully']}),
-        error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
+        error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
       });
     });
   }

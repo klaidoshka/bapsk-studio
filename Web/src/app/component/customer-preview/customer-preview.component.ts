@@ -1,9 +1,17 @@
 import {Component, input, OnInit, signal} from '@angular/core';
 import Customer from '../../model/customer.model';
+import {Button} from 'primeng/button';
+import {Dialog} from 'primeng/dialog';
+import {DatePipe} from '@angular/common';
+import {getCountryName} from '../../model/iso-country.model';
 
 @Component({
   selector: 'app-customer-preview',
-  imports: [],
+  imports: [
+    Button,
+    Dialog,
+    DatePipe
+  ],
   templateUrl: './customer-preview.component.html',
   styles: ``
 })
@@ -12,7 +20,7 @@ export class CustomerPreviewComponent implements OnInit {
   isShown = signal<boolean>(false);
   isShownInitially = input<boolean>(false);
 
-  readonly ngOnInit = () => {
+  ngOnInit() {
     this.isShown.set(this.isShownInitially());
   }
 
@@ -25,4 +33,6 @@ export class CustomerPreviewComponent implements OnInit {
     this.customer.set(customer);
     this.isShown.set(true);
   }
+
+  protected readonly getCountryName = getCountryName;
 }

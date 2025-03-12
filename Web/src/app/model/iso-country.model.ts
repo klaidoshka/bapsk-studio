@@ -5,12 +5,20 @@ export interface IsoCountry {
   name: string;
 }
 
-export const getCountryName = (user?: User | null): string => {
-  if (!user) {
+export const getUserCountryName = (user?: User | null): string => {
+  if (user == null) {
     return getDefaultIsoCountry().name;
   }
 
   return getIsoCountryByCode(user.country)?.name || getDefaultIsoCountry().name;
+}
+
+export const getCountryName = (code?: IsoCountryCode | null): string => {
+  if (code == null) {
+    return getDefaultIsoCountry().name;
+  }
+
+  return getIsoCountryByCode(code).name;
 }
 
 export const getDefaultIsoCountry = (): IsoCountry => {

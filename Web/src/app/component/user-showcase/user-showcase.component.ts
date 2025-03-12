@@ -9,8 +9,8 @@ import {UserService} from '../../service/user.service';
 import Messages from '../../model/messages.model';
 import {User} from '../../model/user.model';
 import {first} from 'rxjs';
-import {getCountryName} from '../../model/iso-country.model';
-import {ErrorResolverService} from '../../service/error-resolver.service';
+import {getUserCountryName} from '../../model/iso-country.model';
+import {LocalizationService} from '../../service/localization.service';
 
 @Component({
   selector: 'app-user-showcase',
@@ -33,7 +33,7 @@ export class UserShowcaseComponent {
   users!: Signal<User[]>;
 
   constructor(
-    private errorResolverService: ErrorResolverService,
+    private localizationService: LocalizationService,
     private userService: UserService
   ) {
     this.users = this.userService.getAsSignal();
@@ -43,7 +43,7 @@ export class UserShowcaseComponent {
     this.confirmationComponent().request(() => {
       this.userService.delete(user.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['User deleted successfully']}),
-        error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
+        error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
       });
     });
   }
@@ -56,5 +56,5 @@ export class UserShowcaseComponent {
     this.previewMenu().show(user);
   }
 
-  protected readonly getCountryName = getCountryName;
+  protected readonly getCountryName = getUserCountryName;
 }

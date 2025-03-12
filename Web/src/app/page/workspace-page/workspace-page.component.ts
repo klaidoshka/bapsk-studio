@@ -16,7 +16,6 @@ import Salesman from '../../model/salesman.model';
 import {
   CustomerShowcaseComponent
 } from '../../component/customer-showcase/customer-showcase.component';
-import {SaleShowcaseComponent} from '../../component/sale-showcase/sale-showcase.component';
 import {
   SalesmanShowcaseComponent
 } from '../../component/salesman-showcase/salesman-showcase.component';
@@ -28,7 +27,7 @@ import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
 @Component({
   selector: 'app-workspace-page',
   templateUrl: './workspace-page.component.html',
-  imports: [DataEntryShowcaseComponent, Message, CustomerShowcaseComponent, SaleShowcaseComponent, SalesmanShowcaseComponent, NgIf, NgForOf, DropdownModule, FormsModule, AutoComplete],
+  imports: [DataEntryShowcaseComponent, Message, CustomerShowcaseComponent, SalesmanShowcaseComponent, NgIf, NgForOf, DropdownModule, FormsModule, AutoComplete],
   providers: []
 })
 export class WorkspacePageComponent {

@@ -1,1 +1,138 @@
-<p>customer-management works!</p>
+<p-dialog
+  header="Customer Management"
+  closeOnEscape="true"
+  modal="true"
+  closable="true"
+  [(visible)]="isShown"
+  (onHide)="hide()"
+  (close)="hide()"
+>
+  <div class="min-w-128">
+    <div class="mb-2">
+      <app-messages-showcase [messages]="messages()"/>
+    </div>
+
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 gap-4"
+      [formGroup]="form"
+    >
+      <div>
+        <label
+          for="firstName"
+          class="block text-sm font-medium text-gray-700"
+        >First Name</label>
+        <input
+          formControlName="firstName"
+          pInputText
+          type="text"
+          id="firstName"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        />
+        @if (getErrorMessage("firstName"); as error) {
+          <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+        }
+      </div>
+
+      <div>
+        <label
+          for="lastName"
+          class="block text-sm font-medium text-gray-700"
+        >Last Name</label>
+        <input
+          formControlName="lastName"
+          pInputText
+          type="text"
+          id="lastName"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        />
+        @if (getErrorMessage("lastName"); as error) {
+          <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+        }
+      </div>
+
+      <div>
+        <label
+          for="birthdate"
+          class="block text-sm font-medium text-gray-700"
+        >Birthdate</label>
+        <p-datepicker
+          inputId="birthdate"
+          formControlName="birthdate"
+          [showIcon]="true"
+          variant="filled"
+          inputStyleClass="p-2 rounded-md"
+          class="mt-1 block w-fit border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          required
+          appendTo="body"
+        ></p-datepicker>
+        @if (getErrorMessage("birthdate"); as error) {
+          <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+        }
+      </div>
+
+      <ng-container formGroupName="identityDocument">
+        <div>
+          <label
+            for="identityDocumentType"
+            class="block text-sm font-medium text-gray-700"
+          >Identity Document Type</label>
+          <p-select
+            formControlName="type"
+            [options]="identityDocumentTypes"
+            optionValue="value"
+            optionLabel="label"
+            id="identityDocumentType"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          ></p-select>
+          @if (getErrorMessage("identityDocument.type"); as error) {
+            <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+          }
+        </div>
+
+        <div>
+          <label
+            for="identityDocumentIssuedBy"
+            class="block text-sm font-medium text-gray-700"
+          >Identity Document Issued By</label>
+          <p-select
+            inputId="issuedBy"
+            formControlName="issuedBy"
+            [options]="IsoCountries"
+            optionLabel="name"
+            optionValue="code"
+            class="bg-surface-50 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            appendTo="body"
+          ></p-select>
+          @if (getErrorMessage("identityDocument.issuedBy"); as error) {
+            <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+          }
+        </div>
+
+        <div>
+          <label
+            for="identityDocumentValue"
+            class="block text-sm font-medium text-gray-700"
+          >Identity Document Number</label>
+          <input
+            formControlName="value"
+            pInputText
+            type="text"
+            id="identityDocumentValue"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          />
+          @if (getErrorMessage("identityDocument.value"); as error) {
+            <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+          }
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="flex justify-end mt-4">
+      <p-button
+        [label]="customer() == null ? 'Create' : 'Save'"
+        [disabled]="!form.valid || !form.dirty"
+        (onClick)="save()"
+      ></p-button>
+    </div>
+  </div>
+</p-dialog>

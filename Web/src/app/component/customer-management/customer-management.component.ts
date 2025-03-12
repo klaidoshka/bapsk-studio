@@ -1,61 +1,106 @@
 import {Component, input, OnInit, signal} from '@angular/core';
-import {FormBuilder, FormGroup} from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 import Customer, {CustomerCreateRequest, CustomerEditRequest} from '../../model/customer.model';
 import Messages from '../../model/messages.model';
 import {CustomerService} from '../../service/customer.service';
 import {TextService} from '../../service/text.service';
 import {first} from 'rxjs';
-import {ErrorResolverService} from '../../service/error-resolver.service';
+import {LocalizationService} from '../../service/localization.service';
+import {Button} from 'primeng/button';
+import {Dialog} from 'primeng/dialog';
+import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
+import {InputText} from 'primeng/inputtext';
+import {Select} from 'primeng/select';
+import {IdentityDocumentType} from '../../model/identity-document-type.model';
+import {DatePicker} from 'primeng/datepicker';
+import {getDefaultIsoCountry, IsoCountries} from '../../model/iso-country.model';
 
 @Component({
   selector: 'app-customer-management',
-  imports: [],
+  imports: [
+    Button,
+    Dialog,
+    MessagesShowcaseComponent,
+    ReactiveFormsModule,
+    InputText,
+    Select,
+    DatePicker
+  ],
   templateUrl: './customer-management.component.html',
   styles: ``
 })
 export class CustomerManagementComponent implements OnInit {
-  form!: FormGroup;
   customer = signal<Customer | null>(null);
+  form!: FormGroup;
+  instanceId = input.required<number>();
   isShownInitially = input<boolean>(false);
   isShown = signal<boolean>(false);
   messages = signal<Messages>({});
+  identityDocumentTypes = [
+    {label: 'ID Card', value: IdentityDocumentType.NationalId},
+    {label: 'Passport', value: IdentityDocumentType.Passport},
+  ]
 
   constructor(
     private formBuilder: FormBuilder,
     private customerService: CustomerService,
-    private errorResolverService: ErrorResolverService,
+    private localizationService: LocalizationService,
     private textService: TextService
   ) {
     this.form = this.formBuilder.group({
-      // TODO: Add form fields
+      birthdate: [new Date(), [Validators.required]],
+      firstName: ["", [Validators.required, Validators.maxLength(200)]],
+      identityDocument: this.formBuilder.group({
+        issuedBy: [getDefaultIsoCountry().code, [Validators.required]],
+        type: [IdentityDocumentType.Passport, [Validators.required]],
+        value: ["", [Validators.required, Validators.maxLength(50)]]
+      }),
+      lastName: ["", [Validators.required, Validators.maxLength(200)]]
     });
   }
 
-  readonly ngOnInit = () => {
+  ngOnInit() {
     this.isShown.set(this.isShownInitially());
   }
 
   private readonly create = (request: CustomerCreateRequest) => {
     this.customerService.create(request).pipe(first()).subscribe({
       next: () => this.messages.set({success: ["Customer has been created successfully."]}),
-      error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
+      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   private readonly edit = (request: CustomerEditRequest) => {
     this.customerService.edit(request).pipe(first()).subscribe({
       next: () => this.messages.set({success: ["Customer has been edited successfully."]}),
-      error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
+      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   readonly getErrorMessage = (field: string): string | null => {
-    const control = this.form.get(field);
+    const parts = field.split(".");
+    let control: AbstractControl<any, any> | null = null;
+
+    for (const part of parts) {
+      control = control ? control.get(part) : this.form.get(part);
+    }
 
     if (!control || !control.touched || !control.invalid) return "";
 
+    const name = this.textService.capitalize(field);
+
     if (control.errors?.["required"]) {
-      return `${this.textService.capitalize(field)} is required.`;
+      return `${name} is required.`;
+    }
+
+    if (control.errors?.["maxlength"]) {
+      return `${name} must be at most ${control.errors["maxlength"].requiredLength} characters long.`;
     }
 
     return null;
@@ -73,28 +118,46 @@ export class CustomerManagementComponent implements OnInit {
       return;
     }
 
+    const request = {
+      customer: {
+        birthdate: this.form.value.birthdate,
+        firstName: this.form.value.firstName,
+        lastName: this.form.value.lastName,
+        identityDocument: {
+          issuedBy: this.form.value.identityDocument.issuedBy,
+          type: this.form.value.identityDocument.type,
+          value: this.form.value.identityDocument.value
+        }
+      },
+      instanceId: this.instanceId()
+    };
+
     if (this.customer() != null) {
       this.edit({
-        name: this.form.value.name,
-        description: this.form.value.description,
-        customerId: this.customer()!!.id!!
+        ...request,
+        customer: {
+          ...request.customer,
+          id: this.customer()!.id
+        }
       });
     } else {
-      this.create({
-        name: this.form.value.name,
-        description: this.form.value.description
-      });
+      this.create(request);
     }
   }
 
   readonly show = (customer: Customer | null) => {
-    this.form.reset({description: "No description set."});
-
-    if (customer) {
-      this.form.patchValue({...customer});
-    }
-
+    this.updateForm(customer);
     this.customer.set(customer);
     this.isShown.set(true);
   }
+
+  private readonly updateForm = (customer?: Customer | null) => {
+    this.form.reset();
+
+    if (customer != null) {
+      this.form.patchValue({...customer});
+    }
+  }
+
+  protected readonly IsoCountries = IsoCountries;
 }

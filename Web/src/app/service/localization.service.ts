@@ -5,17 +5,17 @@ import ErrorResponse, {ErrorResponseDetails} from '../model/error-response.model
 @Injectable({
   providedIn: 'root'
 })
-export class ErrorResolverService {
+export class LocalizationService {
   private defaultErrorMessage = 'Extremely rare error occurred, please try again later.';
 
   constructor() {
   }
 
-  readonly resolveHttpResponseTo = (response: any, messages: WritableSignal<Messages>) => {
-    messages.set({error: this.resolve(response)});
+  readonly resolveHttpErrorResponseTo = (response: any, messages: WritableSignal<Messages>) => {
+    messages.set({error: this.resolveError(response)});
   }
 
-  readonly resolve = (error: any): string[] => {
+  readonly resolveError = (error: any): string[] => {
     if (error instanceof Error) {
       return [error.message];
     } else if (typeof error === 'string') {

@@ -21,7 +21,7 @@ import {
   DataEntryFieldEditRequest
 } from '../../model/data-entry-field.model';
 import {DatePicker} from 'primeng/datepicker';
-import {ErrorResolverService} from '../../service/error-resolver.service';
+import {LocalizationService} from '../../service/localization.service';
 
 @Component({
   selector: 'app-data-entry-management',
@@ -49,7 +49,7 @@ export class DataEntryManagementComponent implements OnInit {
 
   constructor(
     private dataEntryService: DataEntryService,
-    private errorResolverService: ErrorResolverService,
+    private localizationService: LocalizationService,
     private formBuilder: FormBuilder,
     private instanceService: InstanceService,
     private textService: TextService
@@ -57,7 +57,7 @@ export class DataEntryManagementComponent implements OnInit {
     this.instanceId = computed(() => this.instanceService.getActiveInstance()()?.id || null);
   }
 
-  readonly ngOnInit = () => {
+  ngOnInit() {
     this.isShown.set(this.isShownInitially());
     this.form = this.createForm(this.dataType());
   }
@@ -83,14 +83,14 @@ export class DataEntryManagementComponent implements OnInit {
   private readonly create = (request: DataEntryCreateRequest) => {
     this.dataEntryService.create(request).pipe(first()).subscribe({
       next: () => this.messages.set({success: ["DataEntry has been created successfully."]}),
-      error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
+      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   private readonly edit = (request: DataEntryEditRequest) => {
     this.dataEntryService.edit(request).pipe(first()).subscribe({
       next: () => this.messages.set({success: ["Instance has been edited successfully."]}),
-      error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
+      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 

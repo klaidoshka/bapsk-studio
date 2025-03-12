@@ -6,32 +6,45 @@ import {first} from 'rxjs';
 import {CustomerManagementComponent} from '../customer-management/customer-management.component';
 import {CustomerPreviewComponent} from '../customer-preview/customer-preview.component';
 import {CustomerService} from '../../service/customer.service';
-import {ErrorResolverService} from '../../service/error-resolver.service';
+import {LocalizationService} from '../../service/localization.service';
+import {Button} from 'primeng/button';
+import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
+import {TableModule} from 'primeng/table';
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-customer-showcase',
-  imports: [],
+  imports: [
+    Button,
+    ConfirmationComponent,
+    MessagesShowcaseComponent,
+    TableModule,
+    CustomerManagementComponent,
+    CustomerPreviewComponent,
+    DatePipe
+  ],
   templateUrl: './customer-showcase.component.html',
   styles: ``
 })
 export class CustomerShowcaseComponent {
   customers = input.required<Customer[]>();
   confirmationComponent = viewChild.required(ConfirmationComponent);
+  instanceId = input.required<number>();
   managementMenu = viewChild.required(CustomerManagementComponent);
   messages = signal<Messages>({});
   previewMenu = viewChild.required(CustomerPreviewComponent);
 
   constructor(
     private customerService: CustomerService,
-    private errorResolverService: ErrorResolverService
+    private localizationService: LocalizationService
   ) {
   }
 
   readonly delete = (customer: Customer) => {
     this.confirmationComponent().request(() => {
-      this.customerService.delete(customer.id!!).pipe(first()).subscribe({
+      this.customerService.delete(this.instanceId(), customer.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['Customer deleted successfully']}),
-        error: (response) => this.errorResolverService.resolveHttpResponseTo(response, this.messages)
+        error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
       });
     });
   }
