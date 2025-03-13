@@ -23,7 +23,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       if (
         !(error instanceof HttpErrorResponse) ||
         error.status !== 401 ||
-        authService.isRefreshingAccess() ||
+        authService.isRefreshingAccess()() ||
         error.url?.includes(apiRouter.authRefresh())
       ) {
         return throwError(() => error);

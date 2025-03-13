@@ -1,28 +1,22 @@
-import {Component, computed, input, OnInit, signal} from '@angular/core';
+import {Component, input, OnInit, signal} from '@angular/core';
 import {Button} from "primeng/button";
-import {Dialog} from "primeng/dialog";
 import {MessagesShowcaseComponent} from "../messages-showcase/messages-showcase.component";
-import {NgIf} from "@angular/common";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
-import {Select} from "primeng/select";
 import Messages from '../../model/messages.model';
-import Sale from '../../model/sale.model';
 import {LocalizationService} from '../../service/localization.service';
 import {TextService} from '../../service/text.service';
 import {first} from 'rxjs';
 import {VatReturnDeclarationSubmitRequest} from '../../model/vat-return.model';
 import {VatReturnService} from '../../service/vat-return.service';
 import {Checkbox} from 'primeng/checkbox';
+import {SaleWithVatReturnDeclaration} from '../../model/sale.model';
 
 @Component({
   selector: 'app-vat-return-declaration-submission',
   imports: [
     Button,
-    Dialog,
     MessagesShowcaseComponent,
-    NgIf,
     ReactiveFormsModule,
-    Select,
     Checkbox
   ],
   templateUrl: './vat-return-declaration-submission.component.html',
@@ -34,11 +28,7 @@ export class VatReturnDeclarationSubmissionComponent implements OnInit {
   isShownInitially = input<boolean>(false);
   isShown = signal<boolean>(false);
   messages = signal<Messages>({});
-  sales = input.required<Sale[]>();
-  salesLabeled = computed(() => this.sales().map(sale => ({
-    label: `${sale.date.toLocaleDateString()} (ID: ${sale.id}) | ${sale.customer.firstName} ${sale.customer.lastName} - ${sale.salesman.name} | ${sale.soldGoods.length} goods`,
-    value: sale
-  })));
+  sale = input.required<SaleWithVatReturnDeclaration>();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -47,8 +37,7 @@ export class VatReturnDeclarationSubmissionComponent implements OnInit {
     private vatReturnService: VatReturnService
   ) {
     this.form = this.formBuilder.group({
-      affirmation: [false, [Validators.requiredTrue]],
-      sale: [null, [Validators.required]]
+      affirmation: [false, [Validators.requiredTrue]]
     });
   }
 
@@ -76,10 +65,10 @@ export class VatReturnDeclarationSubmissionComponent implements OnInit {
     return null;
   }
 
-  readonly hide = () => {
-    this.messages.set({});
-    this.isShown.set(false);
+  readonly reset = () => {
     this.form.reset();
+    this.form.markAsUntouched();
+    this.form.markAsPristine();
   }
 
   readonly save = () => {
@@ -91,17 +80,12 @@ export class VatReturnDeclarationSubmissionComponent implements OnInit {
     const request: VatReturnDeclarationSubmitRequest = {
       affirmation: this.form.value.affirmation,
       instanceId: this.instanceId(),
-      sale: this.form.value.sale
+      sale: this.sale()
     };
 
     this.vatReturnService.submit(request).pipe(first()).subscribe({
-      next: () => this.onSuccess("Sale has been created successfully."),
+      next: () => this.onSuccess("Declaration for sale's VAT return has been submitted successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
-  }
-
-  readonly show = () => {
-    this.form.reset();
-    this.isShown.set(true);
   }
 }

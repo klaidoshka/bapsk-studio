@@ -63,7 +63,7 @@ export class VatReturnService {
       new Promise((resolve) => this.getBySaleId(saleId).subscribe(resolve));
     }
 
-    return computed(() => this.store.get(instanceId)!().find(it => it.sale.id === saleId));
+    return computed(() => this.store.get(instanceId)!().find(it => it.saleId === saleId));
   }
 
   readonly submit = (request: VatReturnDeclarationSubmitRequest) => {

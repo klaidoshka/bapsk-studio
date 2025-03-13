@@ -13,6 +13,7 @@ import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.
 import {TableModule} from 'primeng/table';
 import Customer from '../../model/customer.model';
 import Salesman from '../../model/salesman.model';
+import {VatReturnDeclarationPreviewComponent} from '../vat-return-declaration-preview/vat-return-declaration-preview.component';
 
 @Component({
   selector: 'app-sale-showcase',
@@ -23,7 +24,8 @@ import Salesman from '../../model/salesman.model';
     MessagesShowcaseComponent,
     TableModule,
     SaleManagementComponent,
-    SalePreviewComponent
+    SalePreviewComponent,
+    VatReturnDeclarationPreviewComponent
   ],
   templateUrl: './sale-showcase.component.html',
   styles: ``
@@ -34,7 +36,8 @@ export class SaleShowcaseComponent {
   instanceId = input.required<number>();
   managementMenu = viewChild.required(SaleManagementComponent);
   messages = signal<Messages>({});
-  previewMenu = viewChild.required(SalePreviewComponent);
+  previewDeclarationMenu = viewChild.required(VatReturnDeclarationPreviewComponent);
+  previewSaleMenu = viewChild.required(SalePreviewComponent);
   sales = input.required<SaleWithVatReturnDeclaration[]>();
   salesmen = input.required<Salesman[]>();
 
@@ -58,10 +61,10 @@ export class SaleShowcaseComponent {
   }
 
   readonly showVatReturnDeclaration = (sale: SaleWithVatReturnDeclaration) => {
-    // TODO: Implement this
+    this.previewDeclarationMenu().show(sale);
   }
 
-  readonly showPreview = (sale: Sale) => {
-    this.previewMenu().show(sale);
+  readonly showSale = (sale: Sale) => {
+    this.previewSaleMenu().show(sale);
   }
 }

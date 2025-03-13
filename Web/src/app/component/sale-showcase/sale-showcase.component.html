@@ -1,6 +1,8 @@
 <div>
   <app-sale-preview/>
 
+  <app-vat-return-declaration-preview [instanceId]="instanceId()"/>
+
   <app-sale-management
     [customers]="customers()"
     [instanceId]="instanceId()"
@@ -54,7 +56,7 @@
               icon="pi pi-eye"
               type="button"
               variant="text"
-              (onClick)="showPreview(sale)"
+              (onClick)="showSale(sale)"
             ></p-button>
             <p-button
               icon="pi pi-book"

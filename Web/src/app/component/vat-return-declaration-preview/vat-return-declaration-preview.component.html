@@ -1,5 +1,5 @@
 <p-dialog
-  header="Sale Preview"
+  header="Sale Declaration"
   closable="true"
   closeOnEscape="true"
   modal="true"
@@ -7,27 +7,27 @@
   (onHide)="hide()"
   [(visible)]="isShown"
 >
-  <ng-container *ngIf="declaration() != null">
+  <ng-container *ngIf="sale()?.vatReturnDeclaration != null">
     <div class="flex flex-col">
       <div class="flex flex-col md:flex-row">
         <div class="flex-1">
           <p>
             <strong>Sale ID:</strong>
-            {{ declaration()!.sale.id }}
+            {{ sale()!.vatReturnDeclaration!.saleId }}
           </p>
         </div>
 
         <div class="flex-1">
           <p>
             <strong>Declared By:</strong>
-            {{ declaration()!.declaredById }}
+            {{ sale()!.vatReturnDeclaration!.declaredById }}
           </p>
         </div>
 
         <div class="flex-1">
           <p>
             <strong>Correction:</strong>
-            {{ declaration()!.correction }}
+            {{ sale()!.vatReturnDeclaration!.correction }}
           </p>
         </div>
       </div>
@@ -36,13 +36,13 @@
         <div class="flex-1">
           <p>
             <strong>Submit Date:</strong>
-            {{ declaration()!.submitDate | date:'short' }}
+            {{ sale()!.vatReturnDeclaration!.submitDate | date:'short' }}
           </p>
         </div>
         <div class="flex-1">
           <p>
             <strong>State:</strong>
-            {{ getSubmitDeclarationStateLabel(declaration()!.state) }}
+            {{ getSubmitDeclarationStateLabel(sale()!.vatReturnDeclaration!.state) }}
           </p>
         </div>
       </div>
@@ -54,6 +54,21 @@
         class="p-button-secondary"
         (onClick)="hide()"
       ></p-button>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="sale() != null && sale()!.vatReturnDeclaration == null">
+    <div class="p-4 rounded bg-primary-100">
+      <p class="font-bold text-lg mb-2">This sale does not have a submitted VAT return declaration.</p>
+
+      <p>If you want to submit this sale for VAT Return declaration, affirm that the customer in this sale entry is eligible for VAT return service.</p>
+
+      <div class="mt-4">
+        <app-vat-return-declaration-submission
+          [instanceId]="instanceId()"
+          [sale]="sale()!"
+        />
+      </div>
     </div>
   </ng-container>
 </p-dialog>

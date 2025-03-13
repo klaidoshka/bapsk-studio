@@ -1,72 +1,29 @@
-<p-dialog
-  header="VAT Return Declaration Submission"
-  closeOnEscape="true"
-  modal="true"
-  closable="true"
-  [(visible)]="isShown"
-  (onHide)="hide()"
-  (close)="hide()"
->
-  <div
-    [formGroup]="form"
-    class="min-w-128 flex flex-col"
-  >
-    <div class="mb-2">
-      <app-messages-showcase [messages]="messages()"></app-messages-showcase>
-    </div>
-
-    <div class="flex flex-wrap gap-4">
-      <div class="flex-1 min-w-[100px]">
-        <label
-          for="sale"
-          class="block text-sm font-medium text-gray-700"
-        >Sale</label>
-        <p-select
-          formControlName="sale"
-          id="sale"
-          [options]="salesLabeled()"
-          optionValue="value"
-          optionLabel="label"
-          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-          appendTo="body"
-        ></p-select>
-        <div
-          *ngIf="getErrorMessage('sale')"
-          class="text-xs text-red-500 mt-1"
-        >
-          {{ getErrorMessage('sale') }}
-        </div>
-      </div>
-
-      <div class="flex-1 min-w-[100px]">
-        <label
-          for="affirmation"
-          class="block text-sm font-medium text-gray-700"
-        >
-          Affirmation
-        </label>
-        <p-checkbox
-          binary="true"
-          formControlName="affirmation"
-          id="affirmation"
-          class="mt-1 block w-fit"
-        />
-        <div
-          *ngIf="getErrorMessage('affirmation')"
-          class="text-xs text-red-500 mt-1"
-        >
-          {{ getErrorMessage('affirmation') }}
-        </div>
-      </div>
-    </div>
-
-    <!-- Save Button -->
-    <div class="flex justify-end mt-4">
-      <p-button
-        label="Submit"
-        [disabled]="!form.valid || !form.dirty"
-        (onClick)="save()"
-      ></p-button>
-    </div>
+<div>
+  <div class="mb-2">
+    <app-messages-showcase [messages]="messages()"></app-messages-showcase>
   </div>
-</p-dialog>
+
+  <div [formGroup]="form">
+    <label
+      for="affirmation"
+      class="block text-sm font-medium text-gray-700"
+    >
+      Affirmation
+    </label>
+
+    <p-checkbox
+      binary="true"
+      formControlName="affirmation"
+      id="affirmation"
+      class="mt-1 block w-fit"
+    />
+  </div>
+
+  <div class="flex justify-end mt-4">
+    <p-button
+      label="Submit"
+      [disabled]="!form.valid || !form.dirty"
+      (onClick)="save()"
+    ></p-button>
+  </div>
+</div>

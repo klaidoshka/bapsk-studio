@@ -122,7 +122,12 @@ export class WorkspacePageComponent {
       return;
     }
 
-    this.selectedDataType.set(null);
+    if (workspace == WorkspaceType.DataType) {
+      this.selectedDataType.set(this.dataTypes().at(0) || null);
+    } else {
+      this.selectedDataType.set(null);
+    }
+
     this.selectedWorkspace.set(workspace);
   }
 }

@@ -1,9 +1,14 @@
-import {Component, input, OnInit, signal} from '@angular/core';
-import VatReturnDeclaration, {getSubmitDeclarationStateLabel} from '../../model/vat-return.model';
+import {Component, input, OnInit, signal, viewChild} from '@angular/core';
+import {getSubmitDeclarationStateLabel} from '../../model/vat-return.model';
 import {Button} from 'primeng/button';
 import {DatePipe, NgIf} from '@angular/common';
 import {Dialog} from 'primeng/dialog';
 import {TableModule} from 'primeng/table';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {
+  VatReturnDeclarationSubmissionComponent
+} from '../vat-return-declaration-submission/vat-return-declaration-submission.component';
+import {SaleWithVatReturnDeclaration} from '../../model/sale.model';
 
 @Component({
   selector: 'app-vat-return-declaration-preview',
@@ -12,15 +17,22 @@ import {TableModule} from 'primeng/table';
     Dialog,
     NgIf,
     TableModule,
-    DatePipe
+    DatePipe,
+    FormsModule,
+    ReactiveFormsModule,
+    VatReturnDeclarationSubmissionComponent
   ],
   templateUrl: './vat-return-declaration-preview.component.html',
   styles: ``
 })
 export class VatReturnDeclarationPreviewComponent implements OnInit {
-  declaration = signal<VatReturnDeclaration | null>(null);
+  protected readonly getSubmitDeclarationStateLabel = getSubmitDeclarationStateLabel;
+
+  instanceId = input.required<number>();
   isShown = signal<boolean>(false);
   isShownInitially = input<boolean>(false);
+  sale = signal<SaleWithVatReturnDeclaration | null>(null);
+  submissionForm = viewChild(VatReturnDeclarationSubmissionComponent);
 
   ngOnInit() {
     this.isShown.set(this.isShownInitially());
@@ -28,12 +40,12 @@ export class VatReturnDeclarationPreviewComponent implements OnInit {
 
   readonly hide = () => {
     this.isShown.set(false);
-    this.declaration.set(null);
+    this.sale.set(null);
   }
 
-  readonly show = (declaration: VatReturnDeclaration | null) => {
-    this.declaration.set(declaration);
+  readonly show = (sale?: SaleWithVatReturnDeclaration | null) => {
+    this.sale.set(sale || null);
+    this.submissionForm()?.reset();
     this.isShown.set(true);
   }
-  protected readonly getSubmitDeclarationStateLabel = getSubmitDeclarationStateLabel;
 }

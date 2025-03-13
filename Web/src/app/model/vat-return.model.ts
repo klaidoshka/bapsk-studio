@@ -1,9 +1,11 @@
+import Sale from './sale.model';
+
 export default interface VatReturnDeclaration {
   correction: number;
   declaredById?: number;
   id: string;
   instanceId?: number;
-  sale: VatReturnDeclarationSale
+  saleId: number;
   state: SubmitDeclarationState;
   submitDate: string;
 }
@@ -11,17 +13,7 @@ export default interface VatReturnDeclaration {
 export interface VatReturnDeclarationSubmitRequest {
   affirmation: boolean;
   instanceId: number;
-  sale: VatReturnDeclarationSale;
-}
-
-export interface VatReturnDeclarationSale {
-  id: number;
-  customer: {
-    id: number;
-  },
-  salesman: {
-    id: number;
-  }
+  sale: Sale;
 }
 
 export enum SubmitDeclarationState {
