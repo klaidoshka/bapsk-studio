@@ -71,13 +71,9 @@ export class DataTypeService {
           existingSignal.update(old => {
             const index = old.findIndex(it => it.id === id);
 
-            if (index !== -1) {
-              old[index] = dataType;
-            } else {
-              old.push(dataType);
-            }
-
-            return old;
+            return index === -1
+              ? [...old, dataType]
+              : [...old.slice(0, index), dataType, ...old.slice(index + 1)];
           });
         } else {
           this.store.set(dataType.instanceId, signal([dataType]));
@@ -103,16 +99,12 @@ export class DataTypeService {
   readonly getAsSignal = (instanceId: number): Signal<DataType[]> => {
     const existingSignal = this.store.get(instanceId);
 
-    if (existingSignal != null) {
-      return existingSignal.asReadonly();
-    } else {
-      const newSignal = signal<DataType[]>([]);
-
-      this.store.set(instanceId, newSignal);
+    if (existingSignal == null) {
+      this.store.set(instanceId, signal<DataType[]>([]));
 
       new Promise(resolve => this.getAllByInstanceId(instanceId).pipe(first()).subscribe(resolve));
-
-      return newSignal;
     }
+
+    return this.store.get(instanceId)!.asReadonly();
   }
 }

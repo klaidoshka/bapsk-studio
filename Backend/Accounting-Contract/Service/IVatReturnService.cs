@@ -6,13 +6,6 @@ namespace Accounting.Contract.Service;
 public interface IVatReturnService
 {
     /// <summary>
-    /// Gets VTA return declarations for specified instance. If instance id is null, returns all instance-less declarations.
-    /// </summary>
-    /// <param name="instanceId">Instance id</param>
-    /// <returns>Declarations of instance</returns>
-    public Task<IEnumerable<StiVatReturnDeclaration>> GetAsync(int? instanceId);
-
-    /// <summary>
     /// Get specified sale's VTA return declaration
     /// </summary>
     /// <param name="saleId"></param>

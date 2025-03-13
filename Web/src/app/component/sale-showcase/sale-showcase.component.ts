@@ -1,5 +1,5 @@
 import {Component, input, signal, viewChild} from '@angular/core';
-import Sale from '../../model/sale.model';
+import Sale, {SaleWithVatReturnDeclaration} from '../../model/sale.model';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
 import {SaleManagementComponent} from '../sale-management/sale-management.component';
 import Messages from '../../model/messages.model';
@@ -35,7 +35,7 @@ export class SaleShowcaseComponent {
   managementMenu = viewChild.required(SaleManagementComponent);
   messages = signal<Messages>({});
   previewMenu = viewChild.required(SalePreviewComponent);
-  sales = input.required<Sale[]>();
+  sales = input.required<SaleWithVatReturnDeclaration[]>();
   salesmen = input.required<Salesman[]>();
 
   constructor(
@@ -55,6 +55,10 @@ export class SaleShowcaseComponent {
 
   readonly showManagement = (sale: Sale | null) => {
     this.managementMenu().show(sale);
+  }
+
+  readonly showVatReturnDeclaration = (sale: SaleWithVatReturnDeclaration) => {
+    // TODO: Implement this
   }
 
   readonly showPreview = (sale: Sale) => {

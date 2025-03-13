@@ -278,14 +278,14 @@
             </div>
 
             <div class="flex-1 min-w-[120px]">
-              <label class="block text-sm font-medium text-gray-700">VAT Rate</label>
+              <label class="block text-sm font-medium text-gray-700">VAT Rate (%)</label>
               <input
                 formControlName="vatRate"
                 pInputText
                 type="number"
-                [min]="0.00"
-                [max]="1.00"
-                [step]="0.01"
+                [min]="0"
+                [max]="100"
+                [step]="1"
                 class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               />
               <div

@@ -1,14 +1,6 @@
 import {Component, computed, input, OnInit, signal} from '@angular/core';
 import Sale, {SaleCreateRequest, SaleEditRequest, SoldGood} from '../../model/sale.model';
-import {
-  AbstractControl,
-  FormArray,
-  FormBuilder,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
+import {AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import Messages from '../../model/messages.model';
 import {SaleService} from '../../service/sale.service';
 import {LocalizationService} from '../../service/localization.service';
@@ -105,7 +97,7 @@ export class SaleManagementComponent implements OnInit {
       unitOfMeasure: [soldGood?.unitOfMeasure || null, [Validators.required, Validators.maxLength(50)]], // If Other, @1-50, if Code, @3
       unitOfMeasureType: [soldGood?.unitOfMeasureType || UnitOfMeasureType.UnitOfMeasureCode, [Validators.required]],
       unitPrice: [soldGood != null ? soldGood.taxableAmount / soldGood.quantity : 0.00, [Validators.required, Validators.min(0)]],
-      vatRate: [soldGood?.vatRate || 0.21, [Validators.required, Validators.min(0), Validators.max(1)]]
+      vatRate: [(soldGood?.vatRate || 0.21) * 100, [Validators.required, Validators.min(0), Validators.max(100)]]
     }));
     this.soldGoods().markAsDirty();
   }
@@ -213,7 +205,7 @@ export class SaleManagementComponent implements OnInit {
           quantity: +soldGood.quantity,
           sequenceNo: soldGood.sequenceNo.toString(),
           unitPrice: +soldGood.unitPrice,
-          vatRate: +soldGood.vatRate
+          vatRate: (+soldGood.vatRate) / 100
         }))
       },
       instanceId: this.instanceId()

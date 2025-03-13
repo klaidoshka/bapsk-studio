@@ -26,13 +26,9 @@ export class SalesmanService {
       existingSignal.update(salesmen => {
         const index = salesmen.findIndex(c => c.id === salesman.id);
 
-        if (index !== -1) {
-          salesmen[index] = salesman;
-        } else {
-          salesmen.push(salesman);
-        }
-
-        return salesmen;
+        return index !== -1
+          ? [...salesmen.slice(0, index), salesman, ...salesmen.slice(index + 1)]
+          : [...salesmen, salesman];
       });
     } else {
       this.store.set(instanceId, signal([salesman]));

@@ -59,7 +59,7 @@
               <td>{{ soldGood.quantity }}</td>
               <td>{{ soldGood.unitOfMeasure }}</td>
               <td>{{ soldGood.taxableAmount / soldGood.quantity }}</td>
-              <td>{{ soldGood.vatRate }}</td>
+              <td>{{ soldGood.vatRate * 100 }}%</td>
               <td>{{ soldGood.vatAmount }}</td>
               <td>{{ soldGood.totalAmount }}</td>
             </tr>

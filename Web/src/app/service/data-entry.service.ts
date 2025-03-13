@@ -42,9 +42,9 @@ export class DataEntryService {
         const existingSignal = this.store.get(request.dataTypeId);
 
         if (existingSignal != null) {
-          existingSignal.update(old => [...old, dataEntry]);
+          existingSignal.update(old => [...old, this.updateProperties(dataEntry)]);
         } else {
-          this.store.set(request.dataTypeId, signal([dataEntry]));
+          this.store.set(request.dataTypeId, signal([this.updateProperties(dataEntry)]));
         }
       })
     );
@@ -77,16 +77,12 @@ export class DataEntryService {
           existingSignal.update(old => {
             const index = old.findIndex(de => de.id === id);
 
-            if (index !== -1) {
-              old[index] = dataEntry;
-            } else {
-              old.push(dataEntry);
-            }
-
-            return old;
+            return index === -1
+              ? [...old, this.updateProperties(dataEntry)]
+              : [...old.slice(0, index), this.updateProperties(dataEntry), ...old.slice(index + 1)];
           });
         } else {
-          this.store.set(dataEntry.dataTypeId, signal([dataEntry]));
+          this.store.set(dataEntry.dataTypeId, signal([this.updateProperties(dataEntry)]));
         }
       })
     );
@@ -98,9 +94,9 @@ export class DataEntryService {
         const existingSignal = this.store.get(dataTypeId);
 
         if (existingSignal != null) {
-          existingSignal.set(dataEntries);
+          existingSignal.set(dataEntries.map(this.updateProperties));
         } else {
-          this.store.set(dataTypeId, signal(dataEntries))
+          this.store.set(dataTypeId, signal(dataEntries.map(this.updateProperties)))
         }
       })
     );
@@ -113,12 +109,21 @@ export class DataEntryService {
    *
    * @returns Readonly signal of data entries
    */
-  getAsSignal(dataTypeId: number): Signal<DataEntry[]> {
+  readonly getAsSignal = (dataTypeId: number): Signal<DataEntry[]> => {
     if (!this.store.has(dataTypeId)) {
       this.store.set(dataTypeId, signal([]));
-      this.getAll(dataTypeId).subscribe();
+
+      new Promise((resolve) => this.getAll(dataTypeId).pipe(first()).subscribe(resolve));
     }
 
-    return this.store.get(dataTypeId)!!;
+    return this.store.get(dataTypeId)!.asReadonly();
+  }
+
+  readonly updateProperties = (dataEntry: DataEntry): DataEntry => {
+    return {
+      ...dataEntry,
+      createdAt: new Date(dataEntry.createdAt),
+      modifiedAt: dataEntry.modifiedAt != null ? new Date(dataEntry.modifiedAt) : undefined,
+    }
   }
 }

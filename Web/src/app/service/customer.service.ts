@@ -12,7 +12,7 @@ import {IdentityDocumentType} from '../model/identity-document-type.model';
 })
 export class CustomerService {
   // Key: InstanceId
-  private customers = new Map<number, WritableSignal<Customer[]>>();
+  private store = new Map<number, WritableSignal<Customer[]>>();
 
   constructor(
     private apiRouter: ApiRouter,
@@ -21,22 +21,18 @@ export class CustomerService {
   }
 
   private readonly updateSingleInStore = (instanceId: number, customer: Customer) => {
-    const existingSignal = this.customers.get(instanceId);
+    const existingSignal = this.store.get(instanceId);
 
     if (existingSignal != null) {
       existingSignal.update(customers => {
         const index = customers.findIndex(c => c.id === customer.id);
 
-        if (index !== -1) {
-          customers[index] = customer;
-        } else {
-          customers.push(customer);
-        }
-
-        return customers;
+        return index !== -1
+          ? [...customers.slice(0, index), customer, ...customers.slice(index + 1)]
+          : [...customers, customer];
       });
     } else {
-      this.customers.set(instanceId, signal([customer]));
+      this.store.set(instanceId, signal([customer]));
     }
   }
 
@@ -49,12 +45,12 @@ export class CustomerService {
   readonly delete = (instanceId: number, id: number) => {
     return this.httpClient.delete<void>(this.apiRouter.customerDelete(id)).pipe(
       tap(() => {
-        const existingSignal = this.customers.get(instanceId);
+        const existingSignal = this.store.get(instanceId);
 
         if (existingSignal != null) {
           existingSignal.update(customers => customers.filter(c => c.id !== id));
         } else {
-          this.customers.set(instanceId, signal([]));
+          this.store.set(instanceId, signal([]));
         }
       })
     );
@@ -69,12 +65,12 @@ export class CustomerService {
   readonly get = (instanceId: number) => {
     return this.httpClient.get<Customer[]>(this.apiRouter.customerGet(instanceId)).pipe(
       tap(customers => {
-        const existingSignal = this.customers.get(instanceId);
+        const existingSignal = this.store.get(instanceId);
 
         if (existingSignal != null) {
           existingSignal.update(() => customers.map(this.updateProperties));
         } else {
-          this.customers.set(instanceId, signal(customers.map(this.updateProperties)));
+          this.store.set(instanceId, signal(customers.map(this.updateProperties)));
         }
       })
     );
@@ -95,13 +91,13 @@ export class CustomerService {
    * @returns Readonly signal of customers
    */
   readonly getAsSignal = (instanceId: number) => {
-    if (!this.customers.has(instanceId)) {
-      this.customers.set(instanceId, signal([]));
+    if (!this.store.has(instanceId)) {
+      this.store.set(instanceId, signal([]));
 
       new Promise((resolve) => this.get(instanceId).subscribe(resolve));
     }
 
-    return this.customers.get(instanceId)!.asReadonly();
+    return this.store.get(instanceId)!.asReadonly();
   }
 
   readonly updateProperties = (customer: Customer): Customer => {

@@ -42,12 +42,6 @@ public class VatReturnAuthorizationHandler : AuthorizationHandler<VatReturnRequi
         //
         //         break;
         //
-        //     case CustomerRequirement.CrudOperation.Get:
-        //         var getInstanceId = httpContext.FindProperty<int>("instanceId");
-        //         result = new Validation();
-        //
-        //         break;
-        //
         //     case CustomerRequirement.CrudOperation.GetBySaleId:
         //         var getSaleId = httpContext.FindProperty<int>("saleId");
         //         result = new Validation();

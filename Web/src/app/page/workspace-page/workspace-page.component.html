@@ -1,49 +1,51 @@
 <ng-container *ngIf="instanceId() != null">
   <div class="flex">
     <!-- Sidebar -->
-    <div class="fixed top-0 left-0 h-full w-60 bg-gray-800 text-white p-4">
-      <h1 class="text-2xl font-bold mb-4">Workspaces</h1>
-      <button
-        [class]="'block w-full p-2 my-1 bg-primary-500 rounded' + (selectedWorkspace() === type ? ' bg-primary-600' : '')"
-        *ngFor="let type of workspaces"
+    <div class="rounded h-screen sticky top-0 w-50 bg-primary text-white p-4 flex flex-col">
+      <div
+        *ngFor="let type of workspacesPart"
+        class="w-full p-2 my-1 bg-primary-500 rounded hover:cursor-pointer text-center text-l"
+        [class.bg-primary-600]="selectedWorkspace() === type"
         (click)="selectWorkspace(type)"
       >
         {{ getWorkspaceName(type) }}
-      </button>
+      </div>
 
-      <!-- Show DataType selector inside sidebar when DataType workspace is selected -->
-      <div
-        *ngIf="selectedWorkspace() === WorkspaceType.DataType"
-        class="mt-4"
-      >
-        <p-select
-          [(ngModel)]="selectedDataType"
-          [options]="dataTypes()"
-          (onChange)="selectDataType($event.value)"
-          optionLabel="name"
-          placeholder="Select Data Type"
-          class="bg-surface-50 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-        ></p-select>
+      <div [class]="'mt-6 rounded' + (selectedWorkspace() === WorkspaceType.DataType ? ' bg-primary-500' : '')">
+        <div
+          class="w-full p-2 bg-primary-500 rounded hover:cursor-pointer text-center text-l"
+          [class.bg-primary-600]="selectedWorkspace() === WorkspaceType.DataType"
+          (click)="selectWorkspace(WorkspaceType.DataType)"
+        >
+          {{ getWorkspaceName(WorkspaceType.DataType) }}
+        </div>
+
+        <div *ngIf="selectedWorkspace() === WorkspaceType.DataType" class="mt-4">
+          <p-select
+            [(ngModel)]="selectedDataType"
+            [options]="dataTypes()"
+            (onChange)="selectDataType($event.value)"
+            optionLabel="name"
+            placeholder="Select..."
+            class="m-1 w-40 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          ></p-select>
+        </div>
       </div>
     </div>
 
     <!-- Main Content -->
-    <div class="w-full">
+    <div class="flex-grow p-6">
       <ng-container *ngIf="selectedWorkspace() === WorkspaceType.DataType">
         <h1 class="text-xl font-bold">Data Types</h1>
         <h2 class="text-xl font-bold">{{ selectedDataType()?.name }}</h2>
 
-        <!-- TODO: Should actually accept data-entries only? -->
         <app-data-entry-showcase
           *ngIf="selectedDataType()"
           [dataType]="selectedDataType()!!"
         />
 
         <div class="mt-2">
-          <p-message
-            *ngIf="!selectedDataType()"
-            severity="warn"
-          >
+          <p-message *ngIf="!selectedDataType()" severity="warn">
             Please select a data type.
           </p-message>
         </div>
@@ -72,15 +74,6 @@
         <app-salesman-showcase
           [instanceId]="instanceId()!"
           [salesmen]="salesmen()"
-        />
-      </ng-container>
-
-      <ng-container *ngIf="selectedWorkspace() === WorkspaceType.VatReturnDeclarations">
-        <h1 class="text-xl font-bold">VAT Return Declarations</h1>
-        <app-vat-return-declaration-showcase
-          [declarations]="declarations()"
-          [instanceId]="instanceId()!"
-          [sales]="sales()"
         />
       </ng-container>
     </div>

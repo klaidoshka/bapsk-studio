@@ -1,10 +1,7 @@
-import {Injectable, signal, WritableSignal} from '@angular/core';
+import {computed, Injectable, signal, WritableSignal} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
-import VatReturnDeclaration, {
-  SubmitDeclarationState,
-  VatReturnDeclarationSubmitRequest
-} from '../model/vat-return.model';
+import VatReturnDeclaration, {SubmitDeclarationState, VatReturnDeclarationSubmitRequest} from '../model/vat-return.model';
 import {tap} from 'rxjs';
 import {toEnumOrThrow} from '../util/enum.util';
 
@@ -41,42 +38,32 @@ export class VatReturnService {
     }
   }
 
-  readonly get = (instanceId: number) => {
-    return this.httpClient.get<VatReturnDeclaration[]>(this.apiRouter.vatReturnGet(instanceId)).pipe(
-      tap(declarations => {
-        const existingSignal = this.store.get(instanceId);
-
-        if (existingSignal != null) {
-          existingSignal.update(() => declarations.map(this.updateProperties));
-        } else {
-          this.store.set(instanceId, signal(declarations.map(this.updateProperties)));
+  readonly getBySaleId = (saleId: number) => {
+    return this.httpClient.get<VatReturnDeclaration>(this.apiRouter.vatReturnGet(saleId)).pipe(
+      tap(declaration => {
+        if (declaration != null) {
+          this.updateSingleInStore(declaration.instanceId!, this.updateProperties(declaration));
         }
       })
     );
   }
 
-  readonly getBySaleId = (saleId: number) => {
-    return this.httpClient.get<VatReturnDeclaration>(this.apiRouter.vatReturnGetBySaleId(saleId)).pipe(
-      tap(declaration => this.updateSingleInStore(declaration.instanceId!, this.updateProperties(declaration)))
-    );
-  }
-
   /**
-   * Get the declarations as a readonly signal. VatReturnDeclarations are cached and updated whenever
-   * HTTP requests are made via this service.
+   * Get declaration by sale id as signal
    *
-   * @param instanceId
+   * @param instanceId Instance id to easier resolve where sale belongs
+   * @param saleId Sale id to get declaration for
    *
-   * @returns Readonly signal of declarations
+   * @returns Declaration as signal. It may be undefined if declaration is not found.
    */
-  readonly getAsSignal = (instanceId: number) => {
+  readonly getBySaleIdAsSignal = (instanceId: number, saleId: number) => {
     if (!this.store.has(instanceId)) {
       this.store.set(instanceId, signal([]));
 
-      new Promise((resolve) => this.get(instanceId).subscribe(resolve));
+      new Promise((resolve) => this.getBySaleId(saleId).subscribe(resolve));
     }
 
-    return this.store.get(instanceId)!.asReadonly();
+    return computed(() => this.store.get(instanceId)!().find(it => it.sale.id === saleId));
   }
 
   readonly submit = (request: VatReturnDeclarationSubmitRequest) => {

@@ -1,3 +1,4 @@
+using System.Runtime.Serialization;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using Accounting.Contract.Configuration;
@@ -42,8 +43,17 @@ public class StiVatReturnClientService : IStiVatReturnClientService, IAsyncDispo
         SubmitDeclarationRequest request
     )
     {
+        // try
+        // {
         return (await _client.submitDeclarationAsync(request.ToExternalType()))
             .ToInternalType();
+        // }
+        // catch (FaultException<ValidationError> ex)
+        // {
+        //     Console.WriteLine($"Validation Error: {ex.Detail.Value}");
+        //
+        //     throw;
+        // }
     }
 
     private static VATRefundforForeignTravelerTRPortClient CreateClient(
@@ -92,4 +102,11 @@ public class StiVatReturnClientService : IStiVatReturnClientService, IAsyncDispo
         GC.SuppressFinalize(this);
         await _client.CloseAsync();
     }
+}
+
+[DataContract(Namespace = "http://springframework.org/spring-ws")]
+public class ValidationError
+{
+    [DataMember]
+    public string Value { get; set; }
 }

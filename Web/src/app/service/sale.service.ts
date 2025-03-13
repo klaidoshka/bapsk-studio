@@ -30,13 +30,9 @@ export class SaleService {
       existingSignal.update(sales => {
         const index = sales.findIndex(c => c.id === sale.id);
 
-        if (index !== -1) {
-          sales[index] = sale;
-        } else {
-          sales.push(sale);
-        }
-
-        return sales;
+        return index !== -1
+          ? [...sales.slice(0, index), sale, ...sales.slice(index + 1)]
+          : [...sales, sale];
       });
     } else {
       this.store.set(instanceId, signal([sale]));

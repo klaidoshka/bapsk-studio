@@ -9,7 +9,6 @@ public class VatReturnRequirement(VatReturnRequirement.CrudOperation operation) 
     public enum CrudOperation
     {
         Create,
-        Get,
         GetBySaleId
     }
 }

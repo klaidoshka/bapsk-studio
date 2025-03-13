@@ -5,7 +5,6 @@ using Accounting.Contract.Dto.Customer;
 using Accounting.Contract.Dto.Sale;
 using Accounting.Contract.Dto.Salesman;
 using Accounting.Contract.Dto.Sti.VatReturn;
-using Accounting.Contract.Dto.Sti.VatReturn.CancelDeclaration;
 using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
@@ -37,19 +36,6 @@ public class VatReturnService : IVatReturnService
         _stiVatReturn = stiVatReturn;
         _stiVatReturnClientService = stiVatReturnClientService;
         _validator = validator;
-    }
-
-    public async Task<IEnumerable<StiVatReturnDeclaration>> GetAsync(int? instanceId)
-    {
-        return await _database.StiVatReturnDeclarations
-            .Include(it => it.Sale)
-            .ThenInclude(it => it.Customer)
-            .Include(it => it.Sale)
-            .ThenInclude(it => it.Salesman)
-            .Include(it => it.Sale)
-            .ThenInclude(it => it.SoldGoods)
-            .Where(s => s.InstanceId == instanceId)
-            .ToListAsync();
     }
 
     public async Task<StiVatReturnDeclaration?> GetBySaleIdAsync(int saleId)
@@ -96,7 +82,7 @@ public class VatReturnService : IVatReturnService
             declaration.Id = clientRequest.Declaration.Header.DocumentId;
             declaration = (await _database.StiVatReturnDeclarations.AddAsync(declaration)).Entity;
         }
-        
+
         await _database.SaveChangesAsync();
 
         // Upon submission create data that was missing and return ids together with the declaration response.

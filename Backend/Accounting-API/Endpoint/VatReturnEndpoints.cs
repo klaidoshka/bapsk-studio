@@ -30,23 +30,7 @@ public static class VatReturnEndpoints
 
         builder
             .MapGet(
-                String.Empty,
-                async (
-                    int? instanceId,
-                    IVatReturnService vatReturnService
-                ) => Results.Json(
-                    (await vatReturnService.GetAsync(instanceId))
-                    .Select(it => it.ToDto())
-                    .ToList()
-                )
-            )
-            .RequireAuthorization(
-                o => o.AddRequirements(new VatReturnRequirement(VatReturnRequirement.CrudOperation.Get))
-            );
-
-        builder
-            .MapGet(
-                "by-sale/{saleId:int}",
+                "{saleId:int}",
                 async (
                     int saleId,
                     IVatReturnService vatReturnService

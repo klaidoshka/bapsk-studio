@@ -66,16 +66,14 @@ export class InstanceService {
         const index = old.findIndex(i => i.id === instance.id);
 
         if (index !== -1) {
-          old[index] = instance;
-
           if (this.activeInstance() !== null && this.activeInstance()?.id === instance.id) {
             this.activeInstance.set(instance);
           }
-        } else {
-          old.push(instance);
+
+          return [...old.slice(0, index), instance, ...old.slice(index + 1)];
         }
 
-        return old;
+        return [...old, instance];
       }))
     );
   }

@@ -1,7 +1,5 @@
 import {Component, computed, effect, Signal, signal, untracked} from '@angular/core';
-import {
-  DataEntryShowcaseComponent
-} from '../../component/data-entry-showcase/data-entry-showcase.component';
+import {DataEntryShowcaseComponent} from '../../component/data-entry-showcase/data-entry-showcase.component';
 import {DataTypeService} from '../../service/data-type.service';
 import {InstanceService} from '../../service/instance.service';
 import DataType from '../../model/data-type.model';
@@ -11,29 +9,21 @@ import {SaleService} from '../../service/sale.service';
 import {SalesmanService} from '../../service/salesman.service';
 import {WorkspaceType} from './workspace-selector.model';
 import Customer from '../../model/customer.model';
-import Sale from '../../model/sale.model';
+import {SaleWithVatReturnDeclaration} from '../../model/sale.model';
 import Salesman from '../../model/salesman.model';
-import {
-  CustomerShowcaseComponent
-} from '../../component/customer-showcase/customer-showcase.component';
-import {
-  SalesmanShowcaseComponent
-} from '../../component/salesman-showcase/salesman-showcase.component';
+import {CustomerShowcaseComponent} from '../../component/customer-showcase/customer-showcase.component';
+import {SalesmanShowcaseComponent} from '../../component/salesman-showcase/salesman-showcase.component';
 import {NgForOf, NgIf} from '@angular/common';
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
 import {SaleShowcaseComponent} from '../../component/sale-showcase/sale-showcase.component';
 import {Select} from 'primeng/select';
-import VatReturnDeclaration from '../../model/vat-return.model';
 import {VatReturnService} from '../../service/vat-return.service';
-import {
-  VatReturnDeclarationShowcaseComponent
-} from '../../component/vat-return-declaration-showcase/vat-return-declaration-showcase.component';
 
 @Component({
   selector: 'app-workspace-page',
   templateUrl: './workspace-page.component.html',
-  imports: [DataEntryShowcaseComponent, Message, CustomerShowcaseComponent, SalesmanShowcaseComponent, NgIf, NgForOf, DropdownModule, FormsModule, SaleShowcaseComponent, Select, VatReturnDeclarationShowcaseComponent],
+  imports: [DataEntryShowcaseComponent, Message, CustomerShowcaseComponent, SalesmanShowcaseComponent, NgIf, NgForOf, DropdownModule, FormsModule, SaleShowcaseComponent, Select],
   providers: []
 })
 export class WorkspacePageComponent {
@@ -41,16 +31,14 @@ export class WorkspacePageComponent {
 
   customers!: Signal<Customer[]>;
   dataTypes!: Signal<DataType[]>;
-  declarations!: Signal<VatReturnDeclaration[]>;
   instanceId!: Signal<number | null>;
-  sales!: Signal<Sale[]>;
+  sales!: Signal<SaleWithVatReturnDeclaration[]>;
   salesmen!: Signal<Salesman[]>;
   selectedDataType = signal<DataType | null>(null);
   selectedWorkspace = signal<WorkspaceType>(WorkspaceType.DataType);
 
-  workspaces = [
-    WorkspaceType.Customer, WorkspaceType.Sale, WorkspaceType.Salesman,
-    WorkspaceType.VatReturnDeclarations, WorkspaceType.DataType
+  workspacesPart = [
+    WorkspaceType.Customer, WorkspaceType.Salesman, WorkspaceType.Sale
   ];
 
   constructor(
@@ -93,17 +81,20 @@ export class WorkspacePageComponent {
 
     this.sales = computed(() => {
       const instanceId = this.instanceId();
-      return instanceId != null ? saleService.getAsSignal(instanceId)() : [];
+      const sales = instanceId != null ? saleService.getAsSignal(instanceId)() : [];
+
+      return sales.map(sale => {
+        const declaration = computed(() => vatReturnService.getBySaleIdAsSignal(instanceId!, sale.id!)());
+        return {
+          ...sale,
+          vatReturnDeclaration: declaration()
+        };
+      });
     });
 
     this.salesmen = computed(() => {
       const instanceId = this.instanceId();
       return instanceId != null ? salesmanService.getAsSignal(instanceId)() : [];
-    });
-
-    this.declarations = computed(() => {
-      const instanceId = this.instanceId();
-      return instanceId != null ? vatReturnService.getAsSignal(instanceId)() : [];
     });
   }
 
@@ -116,9 +107,7 @@ export class WorkspacePageComponent {
       case WorkspaceType.Salesman:
         return 'Salesmen';
       case WorkspaceType.DataType:
-        return 'Data Types (Your data)';
-      case WorkspaceType.VatReturnDeclarations:
-        return 'VAT Return Declarations';
+        return 'Your Data Types';
     }
   }
 
