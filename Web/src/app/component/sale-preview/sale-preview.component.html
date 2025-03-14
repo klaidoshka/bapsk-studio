@@ -42,9 +42,8 @@
               <th>Sequence No</th>
               <th>Description</th>
               <th>Quantity</th>
-              <th>Unit of Measure</th>
+              <th>Measure Unit</th>
               <th>Unit Price</th>
-              <th>VAT Rate</th>
               <th>VAT Amount</th>
               <th>Total Amount</th>
             </tr>
@@ -59,8 +58,7 @@
               <td>{{ soldGood.quantity }}</td>
               <td>{{ soldGood.unitOfMeasure }}</td>
               <td>{{ soldGood.taxableAmount / soldGood.quantity }}</td>
-              <td>{{ soldGood.vatRate * 100 }}%</td>
-              <td>{{ soldGood.vatAmount }}</td>
+              <td>{{ soldGood.vatAmount }} ({{ soldGood.vatRate }}%)</td>
               <td>{{ soldGood.totalAmount }}</td>
             </tr>
           </ng-template>

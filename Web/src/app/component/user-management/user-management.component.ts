@@ -9,12 +9,7 @@ import {TextService} from '../../service/text.service';
 import {first} from 'rxjs';
 import {User, UserCreateRequest, UserEditRequest} from '../../model/user.model';
 import {UserService} from '../../service/user.service';
-import {
-  getDefaultIsoCountry,
-  getIsoCountryByCode,
-  IsoCountries,
-  IsoCountry
-} from '../../model/iso-country.model';
+import {getDefaultIsoCountry, getIsoCountryByCode, IsoCountries, IsoCountry} from '../../model/iso-country.model';
 import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
 import {DatePicker} from 'primeng/datepicker';
 import {LocalizationService} from '../../service/localization.service';
@@ -120,22 +115,20 @@ export class UserManagementComponent implements OnInit {
       return;
     }
 
+    const request: UserEditRequest = {
+      birthDate: this.form.value.birthDate,
+      country: this.form.value.country.code,
+      email: this.form.value.email,
+      firstName: this.form.value.firstName,
+      lastName: this.form.value.lastName,
+      userId: this.user()!.id
+    }
+
     if (this.user() != null) {
-      this.edit({
-        birthDate: this.form.value.birthDate,
-        country: this.form.value.country.code,
-        email: this.form.value.email,
-        firstName: this.form.value.firstName,
-        lastName: this.form.value.lastName,
-        userId: this.user()!.id
-      });
+      this.edit(request);
     } else {
       this.create({
-        birthDate: this.form.value.birthDate,
-        country: this.form.value.country.code,
-        email: this.form.value.email,
-        firstName: this.form.value.firstName,
-        lastName: this.form.value.lastName,
+        ...request,
         password: this.form.value.password
       });
     }

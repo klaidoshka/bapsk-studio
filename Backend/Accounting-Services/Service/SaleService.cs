@@ -53,9 +53,16 @@ public class SaleService : ISaleService
         // Validate if requester can access the instance
         // Validate if sale exists
 
-        var sale = await _database.Sales.FirstAsync(it => it.Id == request.SaleId);
+        var sale = await _database.Sales
+            .Include(it => it.SoldGoods)
+            .FirstAsync(it => it.Id == request.SaleId);
 
         sale.IsDeleted = true;
+
+        foreach (var soldGood in sale.SoldGoods)
+        {
+            soldGood.IsDeleted = true;
+        }
 
         await _database.SaveChangesAsync();
     }
@@ -100,7 +107,7 @@ public class SaleService : ISaleService
                         it.UnitOfMeasureType = soldGood.UnitOfMeasureType;
                         it.VatRate = soldGood.VatRate;
                         it.TaxableAmount = soldGood.Quantity * soldGood.UnitPrice;
-                        it.VatAmount = it.TaxableAmount * soldGood.VatRate;
+                        it.VatAmount = it.TaxableAmount * soldGood.VatRate / 100;
                         it.TotalAmount = it.TaxableAmount + it.VatAmount;
                     }
                 );
@@ -113,7 +120,7 @@ public class SaleService : ISaleService
         existingSoldGoods.Values
             .Where(soldGood => !requestSoldGoodIds.Contains(soldGood.Id))
             .ToList()
-            .ForEach(soldGood => sale.SoldGoods.Remove(soldGood));
+            .ForEach(soldGood => soldGood.IsDeleted = true);
 
         await _database.SaveChangesAsync();
     }
@@ -125,12 +132,19 @@ public class SaleService : ISaleService
 
         if (request.InstanceId is not null)
         {
-            return await _database.Sales
-                .Include(it => it.Customer)
-                .Include(it => it.Salesman)
-                .Include(it => it.SoldGoods)
-                .Where(it => !it.IsDeleted && it.InstanceId == request.InstanceId)
-                .ToListAsync();
+            return (await _database.Sales
+                    .Include(it => it.Customer)
+                    .Include(it => it.Salesman)
+                    .Include(it => it.SoldGoods)
+                    .Where(it => !it.IsDeleted && it.InstanceId == request.InstanceId)
+                    .ToListAsync())
+                .Also(
+                    sales => sales.ForEach(
+                        s => s.SoldGoods = s.SoldGoods
+                            .Where(it => !it.IsDeleted)
+                            .ToList()
+                    )
+                );
         }
 
         var instanceIds = await _database.InstanceUserMetas
@@ -148,16 +162,27 @@ public class SaleService : ISaleService
                 )
                 .ToListAsync())
             .Where(it => instanceIds.Contains(it.InstanceId!.Value))
-            .ToList();
+            .ToList()
+            .Also(
+                sales => sales.ForEach(
+                    s => s.SoldGoods = s.SoldGoods
+                        .Where(it => !it.IsDeleted)
+                        .ToList()
+                )
+            );
     }
 
     public async Task<Sale> GetByIdAsync(int id)
     {
-        return await _database.Sales
-                   .Include(it => it.Customer)
-                   .Include(it => it.Salesman)
-                   .Include(it => it.SoldGoods)
-                   .FirstOrDefaultAsync(it => it.Id == id && !it.IsDeleted)
-               ?? throw new ValidationException("Sale not found");
+        return (await _database.Sales
+                .Include(it => it.Customer)
+                .Include(it => it.Salesman)
+                .Include(it => it.SoldGoods)
+                .FirstOrDefaultAsync(it => it.Id == id && !it.IsDeleted))
+            ?.Also(
+                s => s.SoldGoods = s.SoldGoods
+                    .Where(it => !it.IsDeleted)
+                    .ToList()
+            ) ?? throw new ValidationException("Sale not found");
     }
 }

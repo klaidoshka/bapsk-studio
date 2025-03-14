@@ -19,7 +19,7 @@ public static class SoldGoodCreateEditExtensions
     public static Entity.SoldGood ToEntity(this SoldGoodCreateEdit soldGood)
     {
         var taxableAmount = soldGood.Quantity * soldGood.UnitPrice;
-        var vatAmount = taxableAmount * soldGood.VatRate;
+        var vatAmount = taxableAmount * soldGood.VatRate / 100;
         var totalAmount = taxableAmount + vatAmount;
         
         return new Entity.SoldGood

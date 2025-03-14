@@ -50,7 +50,7 @@ public class StiVatReturnClientService : IStiVatReturnClientService, IAsyncDispo
             return (await _client.submitDeclarationAsync(request.ToExternalType()))
                 .ToInternalType();
         }
-        catch (FaultException faultEx)
+        catch (FaultException<object> faultEx)
         {
             var fault = faultEx.CreateMessageFault();
 

@@ -6,7 +6,6 @@ import Messages from '../../model/messages.model';
 import {LocalizationService} from '../../service/localization.service';
 import {TextService} from '../../service/text.service';
 import {first} from 'rxjs';
-import {VatReturnDeclarationSubmitRequest} from '../../model/vat-return.model';
 import {VatReturnService} from '../../service/vat-return.service';
 import {Checkbox} from 'primeng/checkbox';
 import {SaleWithVatReturnDeclaration} from '../../model/sale.model';
@@ -77,13 +76,14 @@ export class VatReturnDeclarationSubmissionComponent implements OnInit {
       return;
     }
 
-    const request: VatReturnDeclarationSubmitRequest = {
+    this.vatReturnService.submit({
       affirmation: this.form.value.affirmation,
       instanceId: this.instanceId(),
-      sale: this.sale()
-    };
-
-    this.vatReturnService.submit(request).pipe(first()).subscribe({
+      sale: {
+        ...this.sale(),
+        date: this.sale().date.toISOString() as any
+      }
+    }).pipe(first()).subscribe({
       next: () => this.onSuccess("Declaration for sale's VAT return has been submitted successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });

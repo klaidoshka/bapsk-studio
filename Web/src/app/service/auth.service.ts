@@ -16,7 +16,6 @@ export class AuthService {
   private access!: WritableSignal<AuthResponse | null>;
   private user = computed(() => this.access()?.user || null);
   private userAuthenticated = computed(() => this.access() !== null);
-  private userRefreshing = signal<boolean>(false);
   private userSessionId = computed(() => this.access()?.sessionId || null);
 
   constructor(
@@ -69,10 +68,6 @@ export class AuthService {
     return this.userAuthenticated;
   }
 
-  readonly isRefreshingAccess = (): Signal<boolean> => {
-    return this.userRefreshing.asReadonly();
-  }
-
   readonly login = (request: LoginRequest): Observable<AuthResponse> => {
     return this.httpClient.post<AuthResponse>(
       this.apiRouter.authLogin(),
@@ -92,16 +87,13 @@ export class AuthService {
     );
   }
 
-  readonly markAsRefreshingAccess = (isRefreshing: boolean): void => {
-    if (this.userRefreshing() !== isRefreshing) {
-      this.userRefreshing.set(isRefreshing);
-    }
-  }
-
   readonly register = (request: RegisterRequest): Observable<AuthResponse> => {
     return this.httpClient.post<AuthResponse>(
       this.apiRouter.authRegister(),
-      request
+      {
+        ...request,
+        birthDate: request.birthDate.toISOString() as any
+      } as RegisterRequest
     );
   }
 

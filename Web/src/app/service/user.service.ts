@@ -49,7 +49,10 @@ export class UserService {
 
   readonly create = (request: UserCreateRequest): Observable<User> => {
     return this.httpClient
-    .post<User>(this.apiRouter.userCreate(), request)
+    .post<User>(this.apiRouter.userCreate(), {
+      ...request,
+      birthDate: request.birthDate.toISOString() as any
+    } as UserCreateRequest)
     .pipe(tap(user => this.updateCachedUser(user)));
   };
 
@@ -63,7 +66,10 @@ export class UserService {
   };
 
   readonly edit = (request: UserEditRequest): Observable<void> => {
-    return this.httpClient.put<void>(this.apiRouter.userEdit(request.userId), request).pipe(
+    return this.httpClient.put<void>(this.apiRouter.userEdit(request.userId), {
+      ...request,
+      birthDate: request.birthDate.toISOString() as any
+    } as UserEditRequest).pipe(
       tap(() => {
         const users = this.storeUsers();
         const index = users.findIndex(user => user.id === request.userId);

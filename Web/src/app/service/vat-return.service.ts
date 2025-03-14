@@ -67,7 +67,13 @@ export class VatReturnService {
   }
 
   readonly submit = (request: VatReturnDeclarationSubmitRequest) => {
-    return this.httpClient.post<VatReturnDeclaration>(this.apiRouter.vatReturnSubmit(), request).pipe(
+    return this.httpClient.post<VatReturnDeclaration>(this.apiRouter.vatReturnSubmit(), {
+      ...request,
+      sale: {
+        ...request.sale,
+        date: request.sale.date.toISOString() as any
+      }
+    } as VatReturnDeclarationSubmitRequest).pipe(
       tap(declaration => this.updateSingleInStore(request.instanceId, this.updateProperties(declaration)))
     );
   }

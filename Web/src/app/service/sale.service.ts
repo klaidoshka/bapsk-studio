@@ -40,7 +40,13 @@ export class SaleService {
   }
 
   readonly create = (request: SaleCreateRequest) => {
-    return this.httpClient.post<Sale>(this.apiRouter.saleCreate(), request).pipe(
+    return this.httpClient.post<Sale>(this.apiRouter.saleCreate(), {
+      ...request,
+      sale: {
+        ...request.sale,
+        date: request.sale.date.toISOString() as any
+      }
+    } as SaleCreateRequest).pipe(
       tap(sale => this.updateSingleInStore(request.instanceId, this.updateProperties(sale)))
     );
   }
@@ -60,7 +66,13 @@ export class SaleService {
   }
 
   readonly edit = (request: SaleEditRequest) => {
-    return this.httpClient.put<void>(this.apiRouter.saleEdit(request.sale.id!), request).pipe(
+    return this.httpClient.put<void>(this.apiRouter.saleEdit(request.sale.id!), {
+      ...request,
+      sale: {
+        ...request.sale,
+        date: request.sale.date.toISOString() as any
+      }
+    } as SaleEditRequest).pipe(
       tap(() => this.getById(request.instanceId, request.sale.id!).pipe(first()).subscribe())
     );
   }

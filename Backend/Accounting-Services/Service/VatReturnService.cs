@@ -232,7 +232,7 @@ public class VatReturnService : IVatReturnService
 
         var document = new SubmitDeclarationSalesDocument
         {
-            CashRegisterReceipt = declaration.Sale.InvoiceNo is null
+            CashRegisterReceipt = String.IsNullOrWhiteSpace(declaration.Sale.InvoiceNo)
                 ? new SubmitDeclarationCashRegisterReceipt
                 {
                     CashRegisterNo = declaration.Sale.CashRegisterNo,
@@ -246,17 +246,19 @@ public class VatReturnService : IVatReturnService
                         Description = it.Description,
                         Quantity = it.Quantity,
                         SequenceNo = it.SequenceNo,
-                        TaxableAmount = it.TaxableAmount,
-                        TotalAmount = it.TotalAmount,
+                        TaxableAmount = it.TaxableAmount, // Ensure it is of <18 decimals and 2 of them are decimal places
+                        TotalAmount = it.TotalAmount, // Ensure it is of <18 decimals and 2 of them are decimal places
                         UnitOfMeasure = it.UnitOfMeasure,
                         UnitOfMeasureType = it.UnitOfMeasureType,
-                        VatAmount = it.VatAmount,
-                        VatRate = it.VatRate
+                        VatAmount = it.VatAmount, // Ensure it is of <18 decimals and 2 of them are decimal places
+                        VatRate = it.VatRate // Ensure it is between 0 and 100, only 2 decimal places
                     }
                 )
                 .ToList(),
-            InvoiceNo = declaration.Sale.InvoiceNo,
-            SalesDate = declaration.Sale.Date
+            InvoiceNo = String.IsNullOrWhiteSpace(declaration.Sale.InvoiceNo)
+                ? null
+                : declaration.Sale.InvoiceNo,
+            SalesDate = declaration.Sale.Date // Set date format, timezone
         };
 
         return new SubmitDeclarationRequest
@@ -265,7 +267,7 @@ public class VatReturnService : IVatReturnService
             {
                 Customer = new SubmitDeclarationCustomer
                 {
-                    BirthDate = request.Sale.Customer.Birthdate,
+                    BirthDate = request.Sale.Customer.Birthdate, // Set date format, timezone
                     FirstName = request.Sale.Customer.FirstName,
                     IdentityDocument = new SubmitDeclarationIdentityDocument
                     {
@@ -281,7 +283,7 @@ public class VatReturnService : IVatReturnService
                 Header = new SubmitDeclarationDocumentHeader
                 {
                     Affirmation = SubmitDeclarationDocumentHeaderAffirmation.Y,
-                    CompletionDate = now,
+                    CompletionDate = now, // Set date format, timezone
                     DocumentCorrectionNo = declaration.Correction,
                     DocumentId = declaration.Id
                 },
@@ -304,7 +306,7 @@ public class VatReturnService : IVatReturnService
             RequestId = requestId,
             SenderId = _stiVatReturn.Intermediary.Id,
             Situation = 1,
-            TimeStamp = now
+            TimeStamp = now // Set date format, timezone
         };
     }
 }

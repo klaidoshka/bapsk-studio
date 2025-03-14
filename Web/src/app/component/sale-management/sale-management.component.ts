@@ -93,11 +93,11 @@ export class SaleManagementComponent implements OnInit {
       description: [soldGood?.description || "...", [Validators.required, Validators.maxLength(500)]],
       id: [soldGood?.id || null],
       quantity: [soldGood?.quantity || 1, [Validators.required, Validators.min(1)]],
-      sequenceNo: [soldGood?.sequenceNo || "0000", [Validators.required, Validators.pattern("^[0-9]{4}$")]],
-      unitOfMeasure: [soldGood?.unitOfMeasure || null, [Validators.required, Validators.maxLength(50)]], // If Other, @1-50, if Code, @3
+      sequenceNo: [this.soldGoods().length + 1],
+      unitOfMeasure: [soldGood?.unitOfMeasure || null, [Validators.required, Validators.maxLength(50)]],
       unitOfMeasureType: [soldGood?.unitOfMeasureType || UnitOfMeasureType.UnitOfMeasureCode, [Validators.required]],
       unitPrice: [soldGood != null ? soldGood.taxableAmount / soldGood.quantity : 0.00, [Validators.required, Validators.min(0)]],
-      vatRate: [(soldGood?.vatRate || 0.21) * 100, [Validators.required, Validators.min(0), Validators.max(100)]]
+      vatRate: [soldGood?.vatRate || 21, [Validators.required, Validators.min(0), Validators.max(100)]]
     }));
     this.soldGoods().markAsDirty();
   }
@@ -192,7 +192,7 @@ export class SaleManagementComponent implements OnInit {
       return;
     }
 
-    const request = {
+    const request: SaleEditRequest = {
       sale: {
         cashRegister: this.form.value.cashRegister,
         customerId: this.form.value.customerId,
@@ -203,9 +203,9 @@ export class SaleManagementComponent implements OnInit {
         soldGoods: this.form.value.soldGoods.map((soldGood: any) => ({
           ...soldGood,
           quantity: +soldGood.quantity,
-          sequenceNo: soldGood.sequenceNo.toString(),
+          sequenceNo: soldGood.sequenceNo.toString().padStart(4, "0"),
           unitPrice: +soldGood.unitPrice,
-          vatRate: (+soldGood.vatRate) / 100
+          vatRate: +soldGood.vatRate
         }))
       },
       instanceId: this.instanceId()

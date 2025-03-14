@@ -37,7 +37,13 @@ export class CustomerService {
   }
 
   readonly create = (request: CustomerCreateRequest) => {
-    return this.httpClient.post<Customer>(this.apiRouter.customerCreate(), request).pipe(
+    return this.httpClient.post<Customer>(this.apiRouter.customerCreate(), {
+      ...request,
+      customer: {
+        ...request.customer,
+        birthdate: request.customer.birthdate.toISOString() as any
+      }
+    } as CustomerCreateRequest).pipe(
       tap(customer => this.updateSingleInStore(request.instanceId, this.updateProperties(customer)))
     );
   }
@@ -57,7 +63,13 @@ export class CustomerService {
   }
 
   readonly edit = (request: CustomerEditRequest) => {
-    return this.httpClient.put<void>(this.apiRouter.customerEdit(request.customer.id!), request).pipe(
+    return this.httpClient.put<void>(this.apiRouter.customerEdit(request.customer.id!), {
+      ...request,
+      customer: {
+        ...request.customer,
+        birthdate: request.customer.birthdate.toISOString() as any
+      }
+    } as CustomerEditRequest).pipe(
       tap(() => this.getById(request.instanceId, request.customer.id!).pipe(first()).subscribe())
     );
   }
