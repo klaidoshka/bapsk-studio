@@ -22,8 +22,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error) => {
-      console.log("Error in authInterceptor", error);
-
       if (
         !(error instanceof HttpErrorResponse) ||
         error.status !== 401 ||
@@ -33,42 +31,33 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
 
-      console.log("Passed the first check. Going for token renewal.");
-
       renewingAccess.set(true);
 
       return authService.renewAccess().pipe(
-        switchMap((accessToken) => {
-          if (accessToken) {
-            authService.acceptAuthResponse(accessToken);
+        switchMap((response) => {
+          if (response) {
+            authService.acceptAuthResponse(response);
             renewingAccess.set(false);
-
-            console.log("Got a new access token. Retrying the original request.");
 
             // Retry the original request with the new access token
             return next(
               req.clone({
                 setHeaders: {
-                  Authorization: `Bearer ${accessToken}`
+                  Authorization: `Bearer ${response.accessToken}`
                 },
                 withCredentials: true
               })
             );
           }
 
-          console.log("No new access token. Throwing an error.");
-
           // If no new access token, throw an error
           return throwError(() => error);
         }),
         catchError((error) => {
-          console.log("Caught an error while renewing the access token.", error);
-
           // Redirect to the auth-login page if the refresh token fails
           return authService.logout().pipe(
             switchMap(() => {
-              console.log("Logged out. Redirecting to the login page.");
-              // router.navigate(["/auth/login"]);
+              router.navigate(["/auth/login"]);
               renewingAccess.set(false);
               return throwError(() => error);
             })

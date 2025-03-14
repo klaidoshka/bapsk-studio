@@ -228,7 +228,7 @@ public class VatReturnService : IVatReturnService
     {
         var requestId = $"{Guid.NewGuid():N}";
         var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Vilnius");
-        var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+        var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone).Date;
 
         var document = new SubmitDeclarationSalesDocument
         {
@@ -246,19 +246,19 @@ public class VatReturnService : IVatReturnService
                         Description = it.Description,
                         Quantity = it.Quantity,
                         SequenceNo = it.SequenceNo,
-                        TaxableAmount = it.TaxableAmount, // Ensure it is of <18 decimals and 2 of them are decimal places
-                        TotalAmount = it.TotalAmount, // Ensure it is of <18 decimals and 2 of them are decimal places
+                        TaxableAmount = Math.Round(it.TaxableAmount, 2),
+                        TotalAmount = Math.Round(it.TotalAmount, 2),
                         UnitOfMeasure = it.UnitOfMeasure,
                         UnitOfMeasureType = it.UnitOfMeasureType,
-                        VatAmount = it.VatAmount, // Ensure it is of <18 decimals and 2 of them are decimal places
-                        VatRate = it.VatRate // Ensure it is between 0 and 100, only 2 decimal places
+                        VatAmount = Math.Round(it.VatAmount, 2),
+                        VatRate = Math.Round(it.VatRate, 2)
                     }
                 )
                 .ToList(),
             InvoiceNo = String.IsNullOrWhiteSpace(declaration.Sale.InvoiceNo)
                 ? null
                 : declaration.Sale.InvoiceNo,
-            SalesDate = declaration.Sale.Date // Set date format, timezone
+            SalesDate = TimeZoneInfo.ConvertTimeFromUtc(declaration.Sale.Date.Date, timeZone)
         };
 
         return new SubmitDeclarationRequest
@@ -267,7 +267,7 @@ public class VatReturnService : IVatReturnService
             {
                 Customer = new SubmitDeclarationCustomer
                 {
-                    BirthDate = request.Sale.Customer.Birthdate, // Set date format, timezone
+                    BirthDate = TimeZoneInfo.ConvertTimeFromUtc(request.Sale.Customer.Birthdate.Date, timeZone),
                     FirstName = request.Sale.Customer.FirstName,
                     IdentityDocument = new SubmitDeclarationIdentityDocument
                     {
@@ -283,7 +283,7 @@ public class VatReturnService : IVatReturnService
                 Header = new SubmitDeclarationDocumentHeader
                 {
                     Affirmation = SubmitDeclarationDocumentHeaderAffirmation.Y,
-                    CompletionDate = now, // Set date format, timezone
+                    CompletionDate = now,
                     DocumentCorrectionNo = declaration.Correction,
                     DocumentId = declaration.Id
                 },
@@ -306,7 +306,7 @@ public class VatReturnService : IVatReturnService
             RequestId = requestId,
             SenderId = _stiVatReturn.Intermediary.Id,
             Situation = 1,
-            TimeStamp = now // Set date format, timezone
+            TimeStamp = now
         };
     }
 }
