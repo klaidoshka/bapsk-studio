@@ -19,6 +19,9 @@ import {FormsModule} from '@angular/forms';
 import {SaleShowcaseComponent} from '../../component/sale-showcase/sale-showcase.component';
 import {Select} from 'primeng/select';
 import {VatReturnService} from '../../service/vat-return.service';
+import {DataEntryWithUsers} from '../../model/data-entry.model';
+import {DataEntryService} from '../../service/data-entry.service';
+import {UserService} from '../../service/user.service';
 
 @Component({
   selector: 'app-workspace-page',
@@ -30,6 +33,7 @@ export class WorkspacePageComponent {
   protected readonly WorkspaceType = WorkspaceType;
 
   customers!: Signal<Customer[]>;
+  dataEntries!: Signal<DataEntryWithUsers[]>;
   dataTypes!: Signal<DataType[]>;
   instanceId!: Signal<number | null>;
   sales!: Signal<SaleWithVatReturnDeclaration[]>;
@@ -43,10 +47,12 @@ export class WorkspacePageComponent {
 
   constructor(
     customerService: CustomerService,
+    dataEntryService: DataEntryService,
     dataTypeService: DataTypeService,
     instanceService: InstanceService,
     saleService: SaleService,
     salesmanService: SalesmanService,
+    userService: UserService,
     vatReturnService: VatReturnService
   ) {
     this.instanceId = instanceService.getActiveInstanceId();
@@ -54,6 +60,19 @@ export class WorkspacePageComponent {
     this.customers = computed(() => {
       const instanceId = this.instanceId();
       return instanceId != null ? customerService.getAsSignal(instanceId)() : [];
+    });
+
+    this.dataEntries = computed(() => {
+      const dataTypeId = this.selectedDataType()?.id;
+      const dataEntries = dataTypeId == null ? [] : dataEntryService.getAsSignal(dataTypeId)();
+
+      return dataEntries.map(dataEntry => {
+        return {
+          ...dataEntry,
+          createdBy: computed(() => userService.getIdentityByIdAsSignal(dataEntry.createdById)())()!,
+          modifiedBy: computed(() => userService.getIdentityByIdAsSignal(dataEntry.modifiedById)())()!
+        };
+      });
     });
 
     this.dataTypes = computed(() => {

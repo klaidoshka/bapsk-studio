@@ -13,14 +13,7 @@ export default interface Sale {
   soldGoods: SoldGood[];
 }
 
-export interface SaleWithVatReturnDeclaration {
-  cashRegister?: CashRegister;
-  customer: Customer;
-  date: Date;
-  id?: number;
-  invoiceNo?: string;
-  salesman: Salesman;
-  soldGoods: SoldGood[];
+export interface SaleWithVatReturnDeclaration extends Sale {
   vatReturnDeclaration?: VatReturnDeclaration | null;
 }
 

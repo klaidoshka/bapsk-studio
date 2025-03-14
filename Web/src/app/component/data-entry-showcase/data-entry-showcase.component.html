@@ -21,6 +21,7 @@
 
   <div class="card mt-4">
     <p-table
+      styleClass="w-fit"
       [columns]="dataType().fields || []"
       [value]="dataEntries()"
       [paginator]="true"
@@ -37,6 +38,7 @@
           }
           <th>Created</th>
           <th>Modified</th>
+          <th>Modified By</th>
           <th>Actions</th>
         </tr>
       </ng-template>
@@ -49,8 +51,9 @@
           @for (field of dataEntry.fields; track field.id) {
             <td>{{ field.value }}</td>
           }
-          <td>{{ (dataEntry.createdAt | date:'short') || "N/A" }}</td>
-          <td>{{ (dataEntry.modifiedAt | date:'short') || "N/A" }}</td>
+          <td>{{ dataEntry.createdAt | date:'short' }}</td>
+          <td>{{ dataEntry.modifiedAt | date:'short' }}</td>
+          <td>{{ toUserIdentityFullName(dataEntry.modifiedBy) }}</td>
           <td class="flex flex-nowrap items-center">
             <p-button
               icon="pi pi-eye"

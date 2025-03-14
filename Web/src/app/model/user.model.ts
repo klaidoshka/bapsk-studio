@@ -35,10 +35,13 @@ export interface UserEditRequest {
   userId: number;
 }
 
-export function toUserIdentity(user: User): UserIdentity {
+export const toUserIdentity = (user: User): UserIdentity => {
   return {
     id: user.id,
     firstName: user.firstName,
     lastName: user.lastName
   };
 }
+
+export const toUserFullName = (user: User) => `${user.firstName} ${user.lastName}`;
+export const toUserIdentityFullName = (userIdentity: UserIdentity) => `${userIdentity.firstName} ${userIdentity.lastName}`;

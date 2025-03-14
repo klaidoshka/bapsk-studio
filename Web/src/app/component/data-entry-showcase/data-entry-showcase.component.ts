@@ -1,20 +1,19 @@
-import {Component, effect, input, OnInit, Signal, signal, viewChild} from '@angular/core';
+import {Component, input, signal, viewChild} from '@angular/core';
 import {Button} from "primeng/button";
 import {ConfirmationComponent} from "../confirmation/confirmation.component";
 import {MessagesShowcaseComponent} from "../messages-showcase/messages-showcase.component";
 import {TableModule} from "primeng/table";
 import Messages from '../../model/messages.model';
 import {DataEntryPreviewComponent} from '../data-entry-preview/data-entry-preview.component';
-import DataEntry from '../../model/data-entry.model';
+import DataEntry, {DataEntryWithUsers} from '../../model/data-entry.model';
 import {DataEntryService} from '../../service/data-entry.service';
-import {
-  DataEntryManagementComponent
-} from '../data-entry-management/data-entry-management.component';
+import {DataEntryManagementComponent} from '../data-entry-management/data-entry-management.component';
 import {first} from 'rxjs';
 import {MessageModule} from 'primeng/message';
 import DataType from '../../model/data-type.model';
 import {DatePipe} from '@angular/common';
 import {LocalizationService} from '../../service/localization.service';
+import {toUserIdentityFullName} from '../../model/user.model';
 
 @Component({
   selector: 'app-data-entry-showcase',
@@ -31,9 +30,11 @@ import {LocalizationService} from '../../service/localization.service';
   templateUrl: './data-entry-showcase.component.html',
   styles: ``
 })
-export class DataEntryShowcaseComponent implements OnInit {
+export class DataEntryShowcaseComponent {
+  protected readonly toUserIdentityFullName = toUserIdentityFullName;
+
   confirmationComponent = viewChild.required(ConfirmationComponent);
-  dataEntries!: Signal<DataEntry[]>;
+  dataEntries = input.required<DataEntryWithUsers[]>();
   dataType = input.required<DataType>();
   managementMenu = viewChild.required(DataEntryManagementComponent);
   messages = signal<Messages>({});
@@ -43,20 +44,13 @@ export class DataEntryShowcaseComponent implements OnInit {
     private dataEntryService: DataEntryService,
     private localizationService: LocalizationService
   ) {
-    effect(() => {
-      this.dataEntries = this.dataEntryService.getAsSignal(this.dataType()!!.id);
-    });
-  }
-
-  ngOnInit() {
-    this.dataEntries = this.dataEntryService.getAsSignal(this.dataType()!!.id);
   }
 
   readonly showManagement = (dataEntry: DataEntry | null) => {
     this.managementMenu().show(dataEntry);
   }
 
-  readonly showPreview = (dataEntry: DataEntry) => {
+  readonly showPreview = (dataEntry: DataEntryWithUsers) => {
     this.previewMenu().show(dataEntry);
   }
 

@@ -109,7 +109,7 @@ export class UserService {
     return this.storeUsers.asReadonly();
   };
 
-  readonly getByIdAsSignal = (id: number): Signal<User | null> => {
+  readonly getByIdAsSignal = (id: number): Signal<User | undefined> => {
     const index = this.storeUsers().findIndex(user => user.id === id);
 
     if (index === -1) {
@@ -119,11 +119,11 @@ export class UserService {
     return computed(() =>
       index !== -1
         ? this.storeUsers().at(index)!
-        : (this.storeUsers().find(user => user.id === id) || null)
+        : (this.storeUsers().find(user => user.id === id))
     );
   };
 
-  readonly getIdentityByIdAsSignal = (id: number): Signal<UserIdentity | null> => {
+  readonly getIdentityByIdAsSignal = (id: number): Signal<UserIdentity | undefined> => {
     const index = this.storeIdentities().findIndex(identity => identity.id === id);
 
     if (index === -1) {
@@ -133,7 +133,7 @@ export class UserService {
     return computed(() =>
       index !== -1
         ? this.storeIdentities().at(index)!
-        : (this.storeIdentities().find(it => it.id === id) || null)
+        : (this.storeIdentities().find(it => it.id === id))
     );
   };
 

@@ -1,7 +1,5 @@
-import DataEntryField, {
-  DataEntryFieldCreateRequest,
-  DataEntryFieldEditRequest
-} from './data-entry-field.model';
+import DataEntryField, {DataEntryFieldCreateRequest, DataEntryFieldEditRequest} from './data-entry-field.model';
+import {UserIdentity} from './user.model';
 
 export default interface DataEntry {
   createdAt: Date;
@@ -9,8 +7,13 @@ export default interface DataEntry {
   dataTypeId: number;
   fields: DataEntryField[];
   id: number;
-  modifiedAt?: Date;
-  modifiedById?: number;
+  modifiedAt: Date;
+  modifiedById: number;
+}
+
+export interface DataEntryWithUsers extends DataEntry {
+  createdBy: UserIdentity;
+  modifiedBy: UserIdentity;
 }
 
 export interface DataEntryCreateRequest {

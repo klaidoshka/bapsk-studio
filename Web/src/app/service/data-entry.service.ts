@@ -123,7 +123,7 @@ export class DataEntryService {
     return {
       ...dataEntry,
       createdAt: new Date(dataEntry.createdAt),
-      modifiedAt: dataEntry.modifiedAt != null ? new Date(dataEntry.modifiedAt) : undefined,
+      modifiedAt: new Date(dataEntry.modifiedAt),
     }
   }
 }

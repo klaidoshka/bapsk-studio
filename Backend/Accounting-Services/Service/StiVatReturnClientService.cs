@@ -1,7 +1,9 @@
 using System.Runtime.Serialization;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
+using System.Xml;
 using Accounting.Contract.Configuration;
+using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.Sti.VatReturn.CancelDeclaration;
 using Accounting.Contract.Dto.Sti.VatReturn.ExportedGoods;
 using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
@@ -43,17 +45,33 @@ public class StiVatReturnClientService : IStiVatReturnClientService, IAsyncDispo
         SubmitDeclarationRequest request
     )
     {
-        // try
-        // {
-        return (await _client.submitDeclarationAsync(request.ToExternalType()))
-            .ToInternalType();
-        // }
-        // catch (FaultException<ValidationError> ex)
-        // {
-        //     Console.WriteLine($"Validation Error: {ex.Detail.Value}");
-        //
-        //     throw;
-        // }
+        try
+        {
+            return (await _client.submitDeclarationAsync(request.ToExternalType()))
+                .ToInternalType();
+        }
+        catch (FaultException faultEx)
+        {
+            var fault = faultEx.CreateMessageFault();
+
+            if (!fault.HasDetail)
+            {
+                throw;
+            }
+
+            using var reader = fault.GetReaderAtDetailContents();
+            var errors = new List<string>();
+            
+            while (reader.Read())
+            {
+                if (reader.NodeType == XmlNodeType.Element && reader.LocalName == "ValidationError")
+                {
+                    errors.Add(reader.ReadElementContentAsString());
+                }
+            }
+
+            throw new ValidationException(errors);
+        }
     }
 
     private static VATRefundforForeignTravelerTRPortClient CreateClient(
