@@ -43,5 +43,16 @@ export const toUserIdentity = (user: User): UserIdentity => {
   };
 }
 
-export const toUserFullName = (user: User) => `${user.firstName} ${user.lastName}`;
-export const toUserIdentityFullName = (userIdentity: UserIdentity) => `${userIdentity.firstName} ${userIdentity.lastName}`;
+export const toUserFullName = (user?: User) => {
+  if (user == null) {
+    return '';
+  }
+
+  return `${user.firstName} ${user.lastName}`;
+}
+export const toUserIdentityFullName = (userIdentity?: UserIdentity) => {
+  if (userIdentity == null) {
+    return '';
+  }
+  return `${userIdentity.firstName} ${userIdentity.lastName}`;
+}

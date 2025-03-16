@@ -2,7 +2,7 @@ import {computed, Injectable, signal, WritableSignal} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
 import VatReturnDeclaration, {SubmitDeclarationState, VatReturnDeclarationSubmitRequest} from '../model/vat-return.model';
-import {tap} from 'rxjs';
+import {first, tap} from 'rxjs';
 import {toEnumOrThrow} from '../util/enum.util';
 
 @Injectable({
@@ -31,7 +31,7 @@ export class VatReturnService {
           declarations.push(declaration);
         }
 
-        return declarations;
+        return [...declarations];
       });
     } else {
       this.store.set(instanceId, signal([declaration]));
@@ -59,8 +59,12 @@ export class VatReturnService {
   readonly getBySaleIdAsSignal = (instanceId: number, saleId: number) => {
     if (!this.store.has(instanceId)) {
       this.store.set(instanceId, signal([]));
+    }
 
-      new Promise((resolve) => this.getBySaleId(saleId).subscribe(resolve));
+    const existing = this.store.get(instanceId)!().find(it => it.saleId === saleId);
+
+    if (existing == null) {
+      new Promise((resolve) => this.getBySaleId(saleId).pipe(first()).subscribe(resolve));
     }
 
     return computed(() => this.store.get(instanceId)!().find(it => it.saleId === saleId));

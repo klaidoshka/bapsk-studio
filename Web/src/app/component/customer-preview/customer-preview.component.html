@@ -14,7 +14,7 @@
   <p>{{ customer()?.lastName }}</p>
 
   <p class="font-bold mt-4">Birthdate</p>
-  <p>{{ customer()?.birthdate | date:'short' }}</p>
+  <p>{{ customer()?.birthdate | date:'mediumDate' }}</p>
 
   <p class="font-bold mt-4">Identity Document</p>
   <p>IssuedBy: {{ getCountryName(customer()?.identityDocument?.issuedBy) }}</p>

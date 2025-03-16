@@ -24,3 +24,11 @@ export interface CustomerEditRequest {
   customer: Customer;
   instanceId: number;
 }
+
+export const toCustomerFullName = (customer?: Customer | null): string => {
+  if (customer == null) {
+    return '';
+  }
+
+  return `${customer.firstName} ${customer.lastName}`;
+}

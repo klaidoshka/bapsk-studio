@@ -1,12 +1,14 @@
 <div>
-  <div class="mb-2">
-    <app-messages-showcase [messages]="messages()"></app-messages-showcase>
-  </div>
+  <app-messages-showcase [messages]="messages()"></app-messages-showcase>
 
   <div [formGroup]="form">
+    <p>
+      Submission requires affirmation that this sale's customer is eligible for such service.
+    </p>
+
     <label
       for="affirmation"
-      class="block text-sm font-medium text-gray-700"
+      class="block text-sm font-medium text-gray-700 mt-2"
     >
       Affirmation
     </label>
@@ -21,7 +23,7 @@
 
   <div class="flex justify-end mt-4">
     <p-button
-      label="Submit"
+      [label]="sale().vatReturnDeclaration == null ? 'Submit' : 'Resubmit'"
       [disabled]="!form.valid || !form.dirty"
       (onClick)="save()"
     ></p-button>

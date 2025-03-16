@@ -21,7 +21,7 @@
       <td>{{ user.email }}</td>
       <td>{{ getCountryName(user) }}</td>
       <td>{{ toRoleString(user.role) }}</td>
-      <td>{{ user.birthDate }}</td>
+      <td>{{ user.birthDate | date:'mediumDate' }}</td>
     </tr>
   </ng-template>
 </p-table>

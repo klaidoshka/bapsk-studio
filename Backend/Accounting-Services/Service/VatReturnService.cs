@@ -4,6 +4,7 @@ using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.Customer;
 using Accounting.Contract.Dto.Sale;
 using Accounting.Contract.Dto.Salesman;
+using Accounting.Contract.Dto.Sti;
 using Accounting.Contract.Dto.Sti.VatReturn;
 using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
 using Accounting.Contract.Service;
@@ -56,7 +57,7 @@ public class VatReturnService : IVatReturnService
     {
         (await _validator.ValidateSubmitRequestAsync(request)).AssertValid();
 
-        var declaration = await ResolveDeclarationAsync(request);
+        var (declaration, isNew) = await ResolveDeclarationAsync(request);
 
         var clientRequest = ResolveStiClientRequest(
             request,
@@ -75,29 +76,58 @@ public class VatReturnService : IVatReturnService
         }
 
         declaration.State = clientResponse.DeclarationState;
-        declaration.SubmitDate = clientResponse.ResultDate;
+        declaration.SubmitDate = clientResponse.ResultDate.ToUniversalTime();
 
-        if (String.IsNullOrWhiteSpace(declaration.Id))
+        if (isNew)
         {
-            declaration.Id = clientRequest.Declaration.Header.DocumentId;
             declaration = (await _database.StiVatReturnDeclarations.AddAsync(declaration)).Entity;
+        }
+        else
+        {
+            _database.Update(declaration);
         }
 
         await _database.SaveChangesAsync();
 
-        // Upon submission create data that was missing and return ids together with the declaration response.
+        if (clientResponse.DeclarationState == SubmitDeclarationState.REJECTED)
+        {
+            throw new ValidationException(
+                clientResponse.Errors
+                    .Select(e => e.Details)
+                    .ToList()
+            );
+        }
+
         return declaration;
     }
 
-    private async Task<StiVatReturnDeclaration> ResolveDeclarationAsync(
+    /// <returns>Declaration and check of its new creation (true, or false otherwise)</returns>
+    private async Task<(StiVatReturnDeclaration, bool)> ResolveDeclarationAsync(
         StiVatReturnDeclarationSubmitRequest request
     )
     {
-        var declaration = request.Sale.Id is not null
-            ? (await _database.StiVatReturnDeclarations.FirstOrDefaultAsync(d => d.SaleId == request.Sale.Id)) ?? new()
-            : new();
+        var isNew = true;
+        StiVatReturnDeclaration? declaration;
 
-        if (String.IsNullOrWhiteSpace(declaration.Id))
+        if (request.Sale.Id is not null)
+        {
+            declaration = await _database.StiVatReturnDeclarations.FirstOrDefaultAsync(d => d.SaleId == request.Sale.Id);
+
+            if (declaration is null)
+            {
+                declaration = new();
+            }
+            else
+            {
+                isNew = false;
+            }
+        }
+        else
+        {
+            declaration = new();
+        }
+
+        if (isNew)
         {
             declaration.Id = $"{Guid.NewGuid():N}";
             declaration.DeclaredById = request.RequesterId;
@@ -109,7 +139,7 @@ public class VatReturnService : IVatReturnService
         declaration.Correction += 1;
         declaration.Sale = await ResolveSaleAsync(request.Sale, request.InstanceId);
 
-        return declaration;
+        return (declaration, isNew);
     }
 
     private async Task<Contract.Entity.Sale> ResolveSaleAsync(
@@ -228,12 +258,12 @@ public class VatReturnService : IVatReturnService
     {
         var requestId = $"{Guid.NewGuid():N}";
         var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Vilnius");
-        var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone).Date;
+        var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
 
         var document = new SubmitDeclarationSalesDocument
         {
             CashRegisterReceipt = String.IsNullOrWhiteSpace(declaration.Sale.InvoiceNo)
-                ? new SubmitDeclarationCashRegisterReceipt
+                ? new()
                 {
                     CashRegisterNo = declaration.Sale.CashRegisterNo,
                     ReceiptNo = declaration.Sale.CashRegisterReceiptNo,
@@ -261,41 +291,59 @@ public class VatReturnService : IVatReturnService
             SalesDate = TimeZoneInfo.ConvertTimeFromUtc(declaration.Sale.Date.Date, timeZone)
         };
 
-        return new SubmitDeclarationRequest
+        return new()
         {
-            Declaration = new SubmitDeclaration
+            Declaration = new()
             {
-                Customer = new SubmitDeclarationCustomer
+                Customer = new()
                 {
                     BirthDate = TimeZoneInfo.ConvertTimeFromUtc(request.Sale.Customer.Birthdate.Date, timeZone),
                     FirstName = request.Sale.Customer.FirstName,
-                    IdentityDocument = new SubmitDeclarationIdentityDocument
+                    IdentityDocument = new()
                     {
-                        DocumentNo = new SubmitDeclarationIdDocumentNo
+                        DocumentNo = new()
                         {
                             IssuedBy = request.Sale.Customer.IdentityDocument.IssuedBy,
                             Value = request.Sale.Customer.IdentityDocument.Value
                         },
                         DocumentType = request.Sale.Customer.IdentityDocument.Type
                     },
-                    LastName = request.Sale.Customer.LastName
+                    LastName = request.Sale.Customer.LastName,
+                    OtherDocuments =
+                    [
+                        new()
+                        {
+                            DocumentNo = new()
+                            {
+                                IssuedBy = request.Sale.Customer.IdentityDocument.IssuedBy,
+                                Value = request.Sale.Customer.IdentityDocument.Value
+                            },
+                            DocumentType = request.Sale.Customer.IdentityDocument.Type.ToString()
+                        }
+                    ],
+                    PersonId = new()
+                    {
+                        IssuedBy = request.Sale.Customer.IdentityDocument.IssuedBy,
+                        Value = request.Sale.Customer.IdentityDocument.Value
+                    },
+                    ResidentCountryCode = NonEuCountryCode.UA
                 },
-                Header = new SubmitDeclarationDocumentHeader
+                Header = new()
                 {
                     Affirmation = SubmitDeclarationDocumentHeaderAffirmation.Y,
-                    CompletionDate = now,
+                    CompletionDate = now.Date,
                     DocumentCorrectionNo = declaration.Correction,
                     DocumentId = declaration.Id
                 },
-                Intermediary = new SubmitDeclarationIntermediary
+                Intermediary = new()
                 {
                     Id = _stiVatReturn.Intermediary.Id,
                     Name = _stiVatReturn.Intermediary.Name
                 },
-                Salesman = new SubmitDeclarationSalesman
+                Salesman = new()
                 {
                     Name = request.Sale.Salesman.Name,
-                    VatPayerCode = new SubmitDeclarationLtVatPayerCode
+                    VatPayerCode = new()
                     {
                         IssuedBy = request.Sale.Salesman.VatPayerCode.IssuedBy,
                         Value = request.Sale.Salesman.VatPayerCode.Value
@@ -307,6 +355,8 @@ public class VatReturnService : IVatReturnService
             SenderId = _stiVatReturn.Intermediary.Id,
             Situation = 1,
             TimeStamp = now
+                .ToString("yyyy-MM-ddTHH:mm:ss")
+                .Let(DateTime.Parse),
         };
     }
 }

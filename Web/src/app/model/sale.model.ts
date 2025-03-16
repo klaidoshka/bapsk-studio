@@ -1,7 +1,7 @@
 import Salesman from './salesman.model';
 import Customer from './customer.model';
 import {UnitOfMeasureType} from './unit-of-measure-type.model';
-import VatReturnDeclaration from './vat-return.model';
+import {VatReturnDeclarationWithDeclarer} from './vat-return.model';
 
 export default interface Sale {
   cashRegister?: CashRegister;
@@ -14,7 +14,7 @@ export default interface Sale {
 }
 
 export interface SaleWithVatReturnDeclaration extends Sale {
-  vatReturnDeclaration?: VatReturnDeclaration | null;
+  vatReturnDeclaration?: VatReturnDeclarationWithDeclarer;
 }
 
 export interface SaleCreateEdit {

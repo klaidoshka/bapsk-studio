@@ -26,12 +26,12 @@ public static class SoldGoodExtensions
             Id = soldGood.Id,
             Quantity = soldGood.Quantity,
             SequenceNo = soldGood.SequenceNo,
-            TaxableAmount = soldGood.TaxableAmount,
-            TotalAmount = soldGood.TotalAmount,
+            TaxableAmount = Math.Round(soldGood.TaxableAmount, 2),
+            TotalAmount = Math.Round(soldGood.TotalAmount, 2),
             UnitOfMeasure = soldGood.UnitOfMeasure,
             UnitOfMeasureType = soldGood.UnitOfMeasureType,
-            VatAmount = soldGood.VatAmount,
-            VatRate = soldGood.VatRate
+            VatAmount = Math.Round(soldGood.VatAmount, 2),
+            VatRate = Math.Round(soldGood.VatRate, 2)
         };
     }
 
@@ -43,12 +43,12 @@ public static class SoldGoodExtensions
             Id = soldGood.Id ?? 0,
             Quantity = soldGood.Quantity,
             SequenceNo = soldGood.SequenceNo,
-            TaxableAmount = soldGood.TaxableAmount,
-            TotalAmount = soldGood.TotalAmount,
+            TaxableAmount = Math.Round(soldGood.TaxableAmount, 2),
+            TotalAmount = Math.Round(soldGood.TotalAmount, 2),
             UnitOfMeasure = soldGood.UnitOfMeasure,
             UnitOfMeasureType = soldGood.UnitOfMeasureType,
-            VatAmount = soldGood.VatAmount,
-            VatRate = soldGood.VatRate
+            VatAmount = Math.Round(soldGood.VatAmount, 2),
+            VatRate = Math.Round(soldGood.VatRate, 2)
         };
     }
 }

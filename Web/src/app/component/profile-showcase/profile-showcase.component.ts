@@ -4,10 +4,11 @@ import {User} from '../../model/user.model';
 import {TableModule} from 'primeng/table';
 import {Role} from '../../model/role.model';
 import {getUserIsoCountryLabel} from "../../model/iso-country.model";
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-profile-showcase',
-  imports: [TableModule],
+  imports: [TableModule, DatePipe],
   templateUrl: './profile-showcase.component.html',
   styles: ``
 })

@@ -105,10 +105,10 @@ public class SaleService : ISaleService
                         it.SequenceNo = soldGood.SequenceNo;
                         it.UnitOfMeasure = soldGood.UnitOfMeasure;
                         it.UnitOfMeasureType = soldGood.UnitOfMeasureType;
-                        it.VatRate = soldGood.VatRate;
-                        it.TaxableAmount = soldGood.Quantity * soldGood.UnitPrice;
-                        it.VatAmount = it.TaxableAmount * soldGood.VatRate / 100;
-                        it.TotalAmount = it.TaxableAmount + it.VatAmount;
+                        it.VatRate = Math.Round(soldGood.VatRate, 2);
+                        it.TaxableAmount = Math.Round(soldGood.Quantity * soldGood.UnitPrice, 2);
+                        it.VatAmount = Math.Round(it.TaxableAmount * soldGood.VatRate / 100, 2);
+                        it.TotalAmount = Math.Round(it.TaxableAmount + it.VatAmount, 2);
                     }
                 );
         }

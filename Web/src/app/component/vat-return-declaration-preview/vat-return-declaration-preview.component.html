@@ -7,68 +7,75 @@
   (onHide)="hide()"
   [(visible)]="isShown"
 >
-  <ng-container *ngIf="sale()?.vatReturnDeclaration != null">
-    <div class="flex flex-col">
-      <div class="flex flex-col md:flex-row">
-        <div class="flex-1">
-          <p>
-            <strong>Sale ID:</strong>
-            {{ sale()!.vatReturnDeclaration!.saleId }}
-          </p>
-        </div>
-
-        <div class="flex-1">
-          <p>
-            <strong>Declared By:</strong>
-            {{ sale()!.vatReturnDeclaration!.declaredById }}
-          </p>
-        </div>
-
-        <div class="flex-1">
-          <p>
-            <strong>Correction:</strong>
-            {{ sale()!.vatReturnDeclaration!.correction }}
-          </p>
-        </div>
-      </div>
-
-      <div class="flex flex-col md:flex-row">
-        <div class="flex-1">
-          <p>
-            <strong>Submit Date:</strong>
-            {{ sale()!.vatReturnDeclaration!.submitDate | date:'short' }}
-          </p>
-        </div>
-        <div class="flex-1">
-          <p>
-            <strong>State:</strong>
-            {{ getSubmitDeclarationStateLabel(sale()!.vatReturnDeclaration!.state) }}
-          </p>
-        </div>
-      </div>
+  <div class="flex flex-wrap gap-4">
+    <!-- Left Column -->
+    <div class="flex-1 min-w-[250px]" *ngIf="sale()?.vatReturnDeclaration != null">
+      <p>
+        <strong>Declaration Id:</strong>
+        {{ sale()!.vatReturnDeclaration!.id }}
+      </p>
+      <p>
+        <strong>Declared By:</strong>
+        {{ toUserIdentityFullName(sale()!.vatReturnDeclaration!.declaredBy) }}
+      </p>
+      <p>
+        <strong>Submit Date:</strong>
+        {{ sale()!.vatReturnDeclaration!.submitDate | date:'short' }}
+      </p>
+      <p>
+        <strong>State:</strong>
+        {{ getSubmitDeclarationStateLabel(sale()!.vatReturnDeclaration!.state) }}
+      </p>
+      <p *ngIf="sale()?.vatReturnDeclaration!.correction > 1">
+        <strong>Corrected Times:</strong>
+        {{ sale()!.vatReturnDeclaration!.correction }}
+      </p>
     </div>
 
-    <div class="flex justify-end mt-4">
-      <p-button
-        label="Close"
-        class="p-button-secondary"
-        (onClick)="hide()"
-      ></p-button>
+    <!-- Right Column -->
+    <div class="flex-1 min-w-[250px]">
+      <p>
+        <strong>Customer:</strong>
+        {{ toCustomerFullName(sale()!.customer) }}
+      </p>
+      <p>
+        <strong>Salesman:</strong>
+        {{ sale()!.salesman?.name }}
+      </p>
+      <p>
+        <strong>Sold Goods:</strong>
+        {{ sale()!.soldGoods.length }} good(s) ({{ getSoldGoodsTotalCount(sale()!) }} total items)
+      </p>
+      <p>
+        <strong>VAT to return:</strong>
+        {{ getVATToReturn(sale()!) | currency:'EUR':'symbol':'1.2-2' }}
+      </p>
     </div>
-  </ng-container>
+  </div>
 
-  <ng-container *ngIf="sale() != null && sale()!.vatReturnDeclaration == null">
-    <div class="p-4 rounded bg-primary-100">
-      <p class="font-bold text-lg mb-2">This sale does not have a submitted VAT return declaration.</p>
+  <div
+    *ngIf="sale() != null && (sale()!.vatReturnDeclaration == null || sale()!.vatReturnDeclaration!.state == SubmitDeclarationState.REJECTED)"
+  >
+    <p
+      class="font-bold text-lg my-2"
+      *ngIf="sale()!.vatReturnDeclaration == null"
+    >
+      This sale does not have a submitted VAT return declaration.
+    </p>
 
-      <p>If you want to submit this sale for VAT Return declaration, affirm that the customer in this sale entry is eligible for VAT return service.</p>
-
-      <div class="mt-4">
-        <app-vat-return-declaration-submission
-          [instanceId]="instanceId()"
-          [sale]="sale()!"
-        />
-      </div>
+    <div class="p-4 rounded bg-primary-100 mt-4">
+      <app-vat-return-declaration-submission
+        [instanceId]="instanceId()"
+        [sale]="sale()!"
+      />
     </div>
-  </ng-container>
+  </div>
+
+  <div class="flex justify-end mt-4">
+    <p-button
+      label="Close"
+      class="p-button-secondary"
+      (onClick)="hide()"
+    ></p-button>
+  </div>
 </p-dialog>

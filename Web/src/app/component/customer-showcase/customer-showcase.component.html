@@ -8,9 +8,7 @@
     [header]='"Are you sure about deleting this customer?"'
   />
 
-  <div class="mb-2">
-    <app-messages-showcase [messages]="messages()"/>
-  </div>
+  <app-messages-showcase [messages]="messages()"/>
 
   <p-button
     label="Create"
@@ -44,7 +42,7 @@
         <tr>
           <td>{{ customer.firstName }}</td>
           <td>{{ customer.lastName }}</td>
-          <td>{{ customer.birthdate | date:'short' }}</td>
+          <td>{{ customer.birthdate | date:'mediumDate' }}</td>
           <td>{{ getIdentityDocumentTypeLabel(customer.identityDocument.type) }}</td>
           <td class="flex flex-nowrap items-center">
             <p-button

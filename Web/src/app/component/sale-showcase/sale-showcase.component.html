@@ -14,9 +14,7 @@
     [header]='"Are you sure about deleting this sale?"'
   />
 
-  <div class="mb-2">
-    <app-messages-showcase [messages]="messages()"/>
-  </div>
+  <app-messages-showcase [messages]="messages()"/>
 
   <p-button
     label="Create"
@@ -50,7 +48,7 @@
         <tr>
           <td>{{ sale.customer.firstName + ' ' + sale.customer.lastName }}</td>
           <td>{{ sale.salesman.name }}</td>
-          <td>{{ sale.date | date:'short' }}</td>
+          <td>{{ sale.date | date:'medium' }}</td>
           <td>{{ sale.soldGoods.length }} goods</td>
           <td class="flex flex-nowrap items-center">
             <p-button

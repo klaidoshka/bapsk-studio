@@ -103,10 +103,19 @@ export class WorkspacePageComponent {
       const sales = instanceId != null ? saleService.getAsSignal(instanceId)() : [];
 
       return sales.map(sale => {
-        const declaration = computed(() => vatReturnService.getBySaleIdAsSignal(instanceId!, sale.id!)());
+        const declaration = vatReturnService.getBySaleIdAsSignal(instanceId!, sale.id!)();
         return {
           ...sale,
-          vatReturnDeclaration: declaration()
+          vatReturnDeclaration: declaration != null
+            ? {
+              ...declaration,
+              declaredBy: computed(() =>
+                declaration!.declaredById != null
+                  ? userService.getIdentityByIdAsSignal(declaration!.declaredById!)()
+                  : undefined
+              )()!,
+            }
+            : undefined
         };
       });
     });

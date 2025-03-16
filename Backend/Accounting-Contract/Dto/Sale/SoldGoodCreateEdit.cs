@@ -18,9 +18,10 @@ public static class SoldGoodCreateEditExtensions
 {
     public static Entity.SoldGood ToEntity(this SoldGoodCreateEdit soldGood)
     {
-        var taxableAmount = soldGood.Quantity * soldGood.UnitPrice;
-        var vatAmount = taxableAmount * soldGood.VatRate / 100;
-        var totalAmount = taxableAmount + vatAmount;
+        var vatRate = Math.Round(soldGood.VatRate, 2);
+        var taxableAmount = Math.Round(soldGood.Quantity * soldGood.UnitPrice, 2);
+        var vatAmount = Math.Round(taxableAmount * vatRate / 100, 2);
+        var totalAmount = Math.Round(taxableAmount + vatAmount, 2);
         
         return new Entity.SoldGood
         {
@@ -33,7 +34,7 @@ public static class SoldGoodCreateEditExtensions
             UnitOfMeasure = soldGood.UnitOfMeasure,
             UnitOfMeasureType = soldGood.UnitOfMeasureType,
             VatAmount = vatAmount,
-            VatRate = soldGood.VatRate
+            VatRate = vatRate
         };
     }
 }

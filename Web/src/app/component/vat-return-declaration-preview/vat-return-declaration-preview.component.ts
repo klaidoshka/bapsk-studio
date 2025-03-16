@@ -1,7 +1,7 @@
 import {Component, input, OnInit, signal, viewChild} from '@angular/core';
-import {getSubmitDeclarationStateLabel} from '../../model/vat-return.model';
+import {getSubmitDeclarationStateLabel, SubmitDeclarationState} from '../../model/vat-return.model';
 import {Button} from 'primeng/button';
-import {DatePipe, NgIf} from '@angular/common';
+import {CurrencyPipe, DatePipe, NgIf} from '@angular/common';
 import {Dialog} from 'primeng/dialog';
 import {TableModule} from 'primeng/table';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -9,6 +9,8 @@ import {
   VatReturnDeclarationSubmissionComponent
 } from '../vat-return-declaration-submission/vat-return-declaration-submission.component';
 import {SaleWithVatReturnDeclaration} from '../../model/sale.model';
+import {toUserIdentityFullName} from '../../model/user.model';
+import {toCustomerFullName} from '../../model/customer.model';
 
 @Component({
   selector: 'app-vat-return-declaration-preview',
@@ -20,13 +22,17 @@ import {SaleWithVatReturnDeclaration} from '../../model/sale.model';
     DatePipe,
     FormsModule,
     ReactiveFormsModule,
-    VatReturnDeclarationSubmissionComponent
+    VatReturnDeclarationSubmissionComponent,
+    CurrencyPipe
   ],
   templateUrl: './vat-return-declaration-preview.component.html',
   styles: ``
 })
 export class VatReturnDeclarationPreviewComponent implements OnInit {
+  protected readonly SubmitDeclarationState = SubmitDeclarationState;
   protected readonly getSubmitDeclarationStateLabel = getSubmitDeclarationStateLabel;
+  protected readonly toCustomerFullName = toCustomerFullName;
+  protected readonly toUserIdentityFullName = toUserIdentityFullName;
 
   instanceId = input.required<number>();
   isShown = signal<boolean>(false);
@@ -36,6 +42,18 @@ export class VatReturnDeclarationPreviewComponent implements OnInit {
 
   ngOnInit() {
     this.isShown.set(this.isShownInitially());
+  }
+
+  readonly getSoldGoodsTotalCount = (sale: SaleWithVatReturnDeclaration): number => {
+    return sale.soldGoods
+    .map(it => it.quantity)
+    .reduce((a, b) => a + b);
+  }
+
+  readonly getVATToReturn = (sale: SaleWithVatReturnDeclaration): number => {
+    return sale.soldGoods
+    .map(it => it.vatAmount)
+    .reduce((a, b) => a + b);
   }
 
   readonly hide = () => {
