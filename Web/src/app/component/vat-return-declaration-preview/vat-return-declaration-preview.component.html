@@ -7,7 +7,7 @@
   (onHide)="hide()"
   [(visible)]="isShown"
 >
-  <div class="flex flex-wrap gap-4">
+  <div class="flex flex-wrap gap-4" *ngIf="sale() != null">
     <!-- Left Column -->
     <div class="flex-1 min-w-[250px]" *ngIf="sale()?.vatReturnDeclaration != null">
       <p>
@@ -40,7 +40,7 @@
       </p>
       <p>
         <strong>Salesman:</strong>
-        {{ sale()!.salesman?.name }}
+        {{ sale()!.salesman.name }}
       </p>
       <p>
         <strong>Sold Goods:</strong>

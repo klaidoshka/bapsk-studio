@@ -1,4 +1,3 @@
-using System.Runtime.Serialization;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.Xml;
@@ -61,7 +60,7 @@ public class StiVatReturnClientService : IStiVatReturnClientService, IAsyncDispo
 
             using var reader = fault.GetReaderAtDetailContents();
             var errors = new List<string>();
-            
+
             while (reader.Read())
             {
                 if (reader.NodeType == XmlNodeType.Element && reader.LocalName == "ValidationError")
@@ -105,11 +104,9 @@ public class StiVatReturnClientService : IStiVatReturnClientService, IAsyncDispo
             client.Endpoint.EndpointBehaviors.Add(new MessageLoggingBehavior());
         }
 
-        client.ClientCredentials.ClientCertificate.SetCertificate(
-            StoreLocation.LocalMachine,
-            StoreName.My,
-            X509FindType.FindBySerialNumber,
-            stiVatReturn.CertificateSerialNumber
+        client.ClientCredentials.ClientCertificate.Certificate = X509CertificateLoader.LoadPkcs12FromFile(
+            stiVatReturn.CertificatePath,
+            stiVatReturn.CertificatePassword
         );
 
         return client;
@@ -120,11 +117,4 @@ public class StiVatReturnClientService : IStiVatReturnClientService, IAsyncDispo
         GC.SuppressFinalize(this);
         await _client.CloseAsync();
     }
-}
-
-[DataContract(Namespace = "http://springframework.org/spring-ws")]
-public class ValidationError
-{
-    [DataMember]
-    public string Value { get; set; }
 }
