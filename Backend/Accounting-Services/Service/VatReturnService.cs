@@ -70,7 +70,7 @@ public class VatReturnService : IVatReturnService
         {
             throw new ValidationException(
                 clientResponse.Errors
-                    .Select(e => e.Details)
+                    .Select(e => e.Description)
                     .ToList()
             );
         }
@@ -93,7 +93,7 @@ public class VatReturnService : IVatReturnService
         {
             throw new ValidationException(
                 clientResponse.Errors
-                    .Select(e => e.Details)
+                    .Select(e => e.Description)
                     .ToList()
             );
         }

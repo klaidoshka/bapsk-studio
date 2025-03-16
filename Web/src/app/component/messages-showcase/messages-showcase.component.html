@@ -1,15 +1,13 @@
 @if (messages().success) {
-  @for (message of messages().success; track $index) {
-    <p-message
-      severity="success"
-      text="{{ message }}"
-    ></p-message>
-  }
+  <div class="flex flex-col space-y-1 text-green-600 text-md rounded p-1 bg-green-100">
+    @for (message of messages().success; track $index) {
+      <p>{{ message }}</p>
+    }
+  </div>
 } @else if (messages().error) {
-  @for (message of messages().error; track $index) {
-    <p-message
-      severity="error"
-      text="{{ message }}"
-    ></p-message>
-  }
+  <div class="flex flex-col space-y-1 text-red-600 text-md rounded p-1 bg-red-100">
+    @for (message of messages().error; track $index) {
+      <p>{{ message }}</p>
+    }
+  </div>
 }
