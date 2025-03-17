@@ -1,16 +1,17 @@
-import {effect, Injectable, signal, Signal} from '@angular/core';
+import {computed, effect, Injectable, signal, Signal, WritableSignal} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import Instance, {InstanceCreateRequest, InstanceEditRequest} from '../model/instance.model';
 import {ApiRouter} from './api-router.service';
-import {Observable, of, tap} from 'rxjs';
+import {first, Observable, tap} from 'rxjs';
 import {AuthService} from './auth.service';
+import {DateUtil} from '../util/date.util';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InstanceService {
-  private instance = signal<Instance | null>(null);
-  private instances = signal<Instance[]>([]);
+  private activeInstance = signal<Instance | null>(null);
+  private store = signal<Instance[]>([]);
 
   constructor(
     private apiRouter: ApiRouter,
@@ -18,95 +19,98 @@ export class InstanceService {
     private httpClient: HttpClient
   ) {
     if (this.authService.isAuthenticated()()) {
-      this.refresh().subscribe();
+      this.getAll().pipe(first()).subscribe(this.refreshActiveInstance);
     }
 
     effect(() => {
       const user = this.authService.getUser()();
 
       if (user === null) {
-        this.instance.set(null);
-        this.instances.set([]);
+        this.activeInstance.set(null);
+        this.store.set([]);
         return;
       }
 
-      this.refresh().subscribe();
+      this.getAll().pipe(first()).subscribe(this.refreshActiveInstance);
     });
   }
 
-  create(request: InstanceCreateRequest): Observable<Instance> {
+  private readonly refreshActiveInstance = (instances: Instance[]) => {
+    if (instances.length > 0) {
+      this.activeInstance.set(instances[0]);
+    } else if (this.activeInstance() !== null) {
+      this.activeInstance.set(null);
+    }
+  }
+
+  readonly create = (request: InstanceCreateRequest): Observable<Instance> => {
     return this.httpClient.post<Instance>(this.apiRouter.instanceCreate(), request).pipe(
-      tap((instance: Instance) => {
-        this.instances.update(old => [...old, instance]);
-      })
+      tap((instance: Instance) => this.store.update(old => [...old, this.updateProperties(instance)]))
     );
   }
 
-  delete(id: number): Observable<void> {
+  readonly delete = (id: number): Observable<void> => {
     return this.httpClient.delete<void>(this.apiRouter.instanceDelete(id)).pipe(
-      tap(() => {
-        this.instances.update(old => old.filter(instance => instance.id !== id));
-      })
+      tap(() => this.store.update(old => old.filter(instance => instance.id !== id)))
     );
   }
 
-  edit(request: InstanceEditRequest): Observable<void> {
+  readonly edit = (request: InstanceEditRequest): Observable<void> => {
     return this.httpClient.put<void>(this.apiRouter.instanceEdit(request.instanceId), request).pipe(
-      tap(() => {
-        this.instances.update(old =>
-          old.map(instance =>
-            instance.id === request.instanceId
-              ? {...instance, ...request}
-              : instance
-          )
-        );
-      })
+      tap(() => this.get(request.instanceId).pipe(first()).subscribe())
     );
   }
 
-  get(id: number): Observable<Instance> {
-    const candidate = this.instances().find(instance => instance.id === id);
+  readonly get = (id: number): Observable<Instance> => {
+    return this.httpClient.get<Instance>(this.apiRouter.instanceGetById(id)).pipe(
+      tap((instance: Instance) => this.store.update(old => {
+        const index = old.findIndex(i => i.id === instance.id);
 
-    if (candidate) {
-      return of(candidate);
-    }
+        if (index !== -1) {
+          if (this.activeInstance() !== null && this.activeInstance()?.id === instance.id) {
+            this.activeInstance.set(this.updateProperties(instance));
+          }
 
-    return this.httpClient.get<Instance>(this.apiRouter.instanceGet(id)).pipe(
-      tap((instance: Instance) => {
-        this.instances.update(old => [...old, instance]);
-      })
+          return [...old.slice(0, index), this.updateProperties(instance), ...old.slice(index + 1)];
+        }
+
+        return [...old, this.updateProperties(instance)];
+      }))
     );
   }
 
-  getAll(): Observable<Instance[]> {
-    if (this.instances().length > 0) {
-      return of(this.instances());
-    }
-
+  readonly getAll = (): Observable<Instance[]> => {
     return this.httpClient.get<Instance[]>(this.apiRouter.instanceGetByUser()).pipe(
-      tap((instances: Instance[]) => {
-        this.instances.set(instances);
-      })
+      tap((instances: Instance[]) => this.store.set(instances.map(this.updateProperties)))
     );
   }
 
-  getAllAsSignal(): Signal<Instance[]> {
-    return this.instances;
+  readonly getActiveInstance = (): WritableSignal<Instance | null> => {
+    return this.activeInstance;
   }
 
-  refresh() {
-    return this.httpClient.get<Instance[]>(this.apiRouter.instanceGetByUser()).pipe(
-      tap((instances: Instance[]) => {
-        this.instances.set(instances);
-      })
-    );
+  readonly getActiveInstanceId = (): Signal<number | null> => {
+    return computed(() => this.activeInstance()?.id || null);
   }
 
-  getActiveInstance(): Signal<Instance | null> {
-    return this.instance;
+  /**
+   * Get the instances as a readonly signal. Instances are cached and updated whenever
+   * HTTP requests are made via this service.
+   *
+   * @returns Readonly signal of instances
+   */
+  readonly getAsSignal = (): Signal<Instance[]> => {
+    return this.store.asReadonly();
   }
 
-  setActiveInstance(instance: Instance) {
-    this.instance.set(instance);
+  readonly setActiveInstance = (instance: Instance) => {
+    this.activeInstance.set(instance);
+  }
+
+  readonly updateProperties = (instance: Instance): Instance => {
+    return {
+      ...instance,
+      createdAt: DateUtil.adjustToLocalDate(instance.createdAt)
+    }
   }
 }

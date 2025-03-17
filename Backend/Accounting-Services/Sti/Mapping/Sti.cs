@@ -1,5 +1,5 @@
 using System.Collections.Immutable;
-using Accounting.Contract.Sti;
+using Accounting.Contract.Dto.Sti;
 
 namespace Accounting.Services.Sti.Mapping;
 

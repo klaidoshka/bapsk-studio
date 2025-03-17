@@ -34,6 +34,6 @@ export class InstancePageComponent {
       description: null
     });
 
-    this.$instances = this.instanceService.getAllAsSignal();
+    this.$instances = this.instanceService.getAsSignal();
   }
 }

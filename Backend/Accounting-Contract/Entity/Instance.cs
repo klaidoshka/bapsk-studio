@@ -41,7 +41,7 @@ public class Instance
         ErrorMessage = "Instance name must be between 1 and 255 characters.",
         MinimumLength = 1
     )]
-    public string Name { get; set; } = "";
+    public string Name { get; set; } = String.Empty;
 
     /// <summary>
     /// Navigation property for the user metas of the instance.

@@ -20,6 +20,7 @@
 
 <div class="card mt-4">
   <p-table
+    styleClass="w-fit"
     [value]="users()"
     [paginator]="true"
     [rows]="10"
@@ -42,8 +43,8 @@
       <tr>
         <td>{{ user.firstName + ' ' + user.lastName }}</td>
         <td>{{ user.email }}</td>
-        <td>{{ user.birthdate }}</td>
-        <td>{{ user.country.name }}</td>
+        <td>{{ user.birthDate | date:'mediumDate' }}</td>
+        <td>{{ getCountryName(user) }}</td>
         <td class="flex flex-nowrap items-center">
           <p-button
             icon="pi pi-eye"

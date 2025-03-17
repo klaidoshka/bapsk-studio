@@ -1,9 +1,10 @@
 using Accounting.Contract;
-using Accounting.Contract.Entity;
-using Accounting.Contract.Request;
+using Accounting.Contract.Dto.DataEntry;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;
+using DataEntry = Accounting.Contract.Entity.DataEntry;
+using DataEntryField = Accounting.Contract.Entity.DataEntryField;
 
 namespace Accounting.Services.Service;
 

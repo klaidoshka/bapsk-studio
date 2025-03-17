@@ -1,12 +1,9 @@
 import {Component, input} from '@angular/core';
-import Messages from '../../model/messages-model';
-import {Message} from 'primeng/message';
+import Messages from '../../model/messages.model';
 
 @Component({
   selector: 'app-messages-showcase',
-  imports: [
-    Message
-  ],
+  imports: [],
   templateUrl: './messages-showcase.component.html',
   styles: ``
 })

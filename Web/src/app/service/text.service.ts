@@ -4,7 +4,7 @@ import {Injectable} from '@angular/core';
   providedIn: 'root',
 })
 export class TextService {
-  capitalize(word: string): string {
+  readonly capitalize = (word: string): string => {
     let result = word.charAt(0).toUpperCase();
 
     for (let i = 1; i < word.length; i++) {
@@ -12,15 +12,18 @@ export class TextService {
 
       if (char !== char.toUpperCase()) {
         result += word.charAt(i);
-      } else {
+      } else if (char !== '.') {
         result += ' ' + char;
+      } else if (i + 1 < word.length) {
+        result += ' ' + word.charAt(i + 1).toUpperCase();
+        i++;
       }
     }
 
     return result;
   }
 
-  joinToString(array: string[], separator: string = "\n"): string {
+  readonly joinToString = (array: string[], separator: string = "\n"): string => {
     return array.join(separator);
   }
 }

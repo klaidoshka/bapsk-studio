@@ -1,0 +1,70 @@
+import {Component, input, signal, viewChild} from '@angular/core';
+import Sale, {SaleWithVatReturnDeclaration} from '../../model/sale.model';
+import {ConfirmationComponent} from '../confirmation/confirmation.component';
+import {SaleManagementComponent} from '../sale-management/sale-management.component';
+import Messages from '../../model/messages.model';
+import {SalePreviewComponent} from '../sale-preview/sale-preview.component';
+import {SaleService} from '../../service/sale.service';
+import {LocalizationService} from '../../service/localization.service';
+import {first} from 'rxjs';
+import {Button} from 'primeng/button';
+import {DatePipe} from '@angular/common';
+import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
+import {TableModule} from 'primeng/table';
+import Customer from '../../model/customer.model';
+import Salesman from '../../model/salesman.model';
+import {VatReturnDeclarationPreviewComponent} from '../vat-return-declaration-preview/vat-return-declaration-preview.component';
+
+@Component({
+  selector: 'app-sale-showcase',
+  imports: [
+    Button,
+    ConfirmationComponent,
+    DatePipe,
+    MessagesShowcaseComponent,
+    TableModule,
+    SaleManagementComponent,
+    SalePreviewComponent,
+    VatReturnDeclarationPreviewComponent
+  ],
+  templateUrl: './sale-showcase.component.html',
+  styles: ``
+})
+export class SaleShowcaseComponent {
+  confirmationComponent = viewChild.required(ConfirmationComponent);
+  customers = input.required<Customer[]>();
+  instanceId = input.required<number>();
+  managementMenu = viewChild.required(SaleManagementComponent);
+  messages = signal<Messages>({});
+  previewDeclarationMenu = viewChild.required(VatReturnDeclarationPreviewComponent);
+  previewSaleMenu = viewChild.required(SalePreviewComponent);
+  sales = input.required<SaleWithVatReturnDeclaration[]>();
+  salesmen = input.required<Salesman[]>();
+
+  constructor(
+    private saleService: SaleService,
+    private localizationService: LocalizationService
+  ) {
+  }
+
+  readonly delete = (sale: Sale) => {
+    this.confirmationComponent().request(() => {
+      this.saleService.delete(this.instanceId(), sale.id!!).pipe(first()).subscribe({
+        next: () => this.messages.set({success: ['Sale deleted successfully']}),
+        error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+      });
+    });
+  }
+
+  readonly showManagement = (sale: Sale | null) => {
+    this.managementMenu().show(sale);
+  }
+
+  readonly showVatReturnDeclaration = (sale: SaleWithVatReturnDeclaration) => {
+    this.previewDeclarationMenu().show(sale);
+  }
+
+  readonly showSale = (sale: Sale) => {
+    this.previewSaleMenu().show(sale);
+  }
+}

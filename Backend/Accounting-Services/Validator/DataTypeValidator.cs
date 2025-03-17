@@ -1,6 +1,6 @@
 using Accounting.Contract;
-using Accounting.Contract.Request;
-using Accounting.Contract.Response;
+using Accounting.Contract.Dto;
+using Accounting.Contract.Dto.DataType;
 using Accounting.Contract.Validator;
 using Accounting.Services.Util;
 using Microsoft.EntityFrameworkCore;
@@ -94,6 +94,11 @@ public class DataTypeValidator : IDataTypeValidator
             return new Validation("Data type not found.");
         }
 
+        // if (dataType.Type != DataTypeType.UserMade)
+        // {
+        //     return new Validation("Default data types cannot be deleted.");
+        // }
+
         return dataType.Instance.CreatedById != request.RequesterId
             ? new Validation("You are not allowed to delete this data type.")
             : new Validation();
@@ -157,23 +162,43 @@ public class DataTypeValidator : IDataTypeValidator
             failures.Add($"Duplicate field names: {String.Join(", ", duplicates)}");
         }
 
+        var newFields = request.Fields
+            .Where(f => f.DataTypeFieldId is 0 or null && f.DefaultValue.IsNullOrEmpty())
+            .ToList();
+
         // Check for new fields that have no default value and entries already exist
-        if (dataType.Entries.Count != 0)
+        if (dataType.Entries.Count != 0 && newFields.Count != 0)
         {
-            var newFields = request.Fields
-                .Where(f => f.DataTypeFieldId is 0 or null && f.DefaultValue.IsNullOrEmpty())
-                .Select(
-                    f => $"New field '{f.Name}' has no default value to assign to existing entries."
-                )
-                .ToList();
+            failures.AddRange(
+                newFields
+                    .Select(
+                        f =>
+                            $"New field '{f.Name}' has no default value to assign to existing entries."
+                    )
+                    .ToList()
+            );
 
-            if (newFields.Count != 0)
-            {
-                failures.AddRange(newFields);
-
-                return new Validation(failures);
-            }
+            return new Validation(failures);
         }
+
+        // if (dataType.Type != DataTypeType.UserMade)
+        // {
+        //     // Check for new fields in default data types
+        //     if (newFields.Count != 0)
+        //     {
+        //         return new Validation("Default data types cannot have new fields added.");
+        //     }
+        //
+        //     // Check for missing fields in default data types
+        //     var missingFields = dataType.Fields
+        //         .Where(f => request.Fields.All(rf => rf.DataTypeFieldId != f.Id))
+        //         .ToList();
+        //
+        //     if (missingFields.Count != 0)
+        //     {
+        //         return new Validation("Cannot remove fields from default data types.");
+        //     }
+        // }
 
         // Validate field edits
         failures.AddRange(

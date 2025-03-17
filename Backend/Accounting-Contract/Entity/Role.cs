@@ -1,4 +1,4 @@
-namespace Accounting.Contract.Enumeration;
+namespace Accounting.Contract.Entity;
 
 public enum Role
 {

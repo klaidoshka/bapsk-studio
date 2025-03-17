@@ -1,127 +1,129 @@
-import {effect, Injectable, Signal, signal, WritableSignal} from '@angular/core';
+import {Injectable, Signal, signal, WritableSignal} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
-import {first, Observable, of, tap} from 'rxjs';
+import {first, Observable, tap} from 'rxjs';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../model/data-type.model';
-import {InstanceService} from './instance.service';
+import {DataEntryService} from './data-entry.service';
+import {EnumUtil} from '../util/enum.util';
+import {FieldType} from '../model/data-type-field.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataTypeService {
-  private dataTypes = signal<DataType[]>([]);
-  private instanceId = signal<number | null>(null);
+  // Key: InstanceId
   private store = new Map<number, WritableSignal<DataType[]>>();
 
-  // TODO: Drop instance signal usage, consumer should ask for what it wants
   constructor(
     private apiRouter: ApiRouter,
-    private httpClient: HttpClient,
-    private instanceService: InstanceService
+    private dataEntryService: DataEntryService,
+    private httpClient: HttpClient
   ) {
-    const instance = this.instanceService.getActiveInstance();
-
-    effect(() => {
-      const id = instance()?.id;
-      this.instanceId.set(id || null);
-
-      if (!id) {
-        this.dataTypes.set([]);
-        return;
-      }
-
-      if (!this.store.has(id)) {
-        // Will put the data types in the store and apply current data types to the signal
-        this.getAllByInstanceId(id).subscribe();
-      } else {
-        this.dataTypes.set(this.store.get(id)!!());
-      }
-    });
   }
 
-  create(request: DataTypeCreateRequest): Observable<DataType> {
+  private readonly resolveInstanceId = (dataTypeId: number) => {
+    let instanceId: number | null = null;
+
+    for (const [key, value] of this.store) {
+      if (value().some(dataType => dataType.id === dataTypeId)) {
+        instanceId = key;
+        break;
+      }
+    }
+
+    return instanceId;
+  }
+
+  readonly create = (request: DataTypeCreateRequest): Observable<DataType> => {
     return this.httpClient.post<DataType>(this.apiRouter.dataTypeCreate(), request).pipe(
       tap(dataType => {
-        this.dataTypes.update(old => [...old, dataType]);
+        const existingSignal = this.store.get(request.instanceId);
+
+        if (existingSignal != null) {
+          existingSignal.update(old => [...old, this.updateProperties(dataType)]);
+        } else {
+          this.store.set(request.instanceId, signal([this.updateProperties(dataType)]));
+        }
       })
     );
   }
 
-  delete(id: number): Observable<void> {
+  readonly delete = (id: number): Observable<void> => {
     return this.httpClient.delete<void>(this.apiRouter.dataTypeDelete(id)).pipe(
       tap(() => {
-        this.dataTypes.update(old => old.filter(dataType => dataType.id !== id));
+        const instanceId = this.resolveInstanceId(id);
+
+        if (instanceId != null) {
+          this.store.get(instanceId)!!.update(old => old.filter(dataType => dataType.id !== id));
+        }
       })
     );
   }
 
-  edit(request: DataTypeEditRequest): Observable<void> {
+  readonly edit = (request: DataTypeEditRequest): Observable<void> => {
     return this.httpClient.put<void>(this.apiRouter.dataTypeEdit(request.dataTypeId), request).pipe(
       tap(() => {
-        this.getFromBackend(request.dataTypeId).pipe(first()).subscribe(updatedDataType => {
-          this.dataTypes.update(old => old.map(dataType => {
-            if (dataType.id === updatedDataType.id) {
-              return updatedDataType;
-            }
-            return dataType;
-          }));
+        this.getById(request.dataTypeId).pipe(first()).subscribe(() => {
+          // Refresh data entries, since the data type has changed, some fields may have been removed or added
+          this.dataEntryService.getAll(request.dataTypeId).pipe(first()).subscribe();
         });
       })
     );
   }
 
-  private getFromBackend(id: number): Observable<DataType> {
-    return this.httpClient.get<DataType>(this.apiRouter.dataTypeGet(id));
-  }
-
-  get(id: number): Observable<DataType> {
-    const candidate = this.dataTypes().find(dataType => dataType.id === id);
-
-    if (candidate) {
-      return of(candidate);
-    }
-
-    return this.getFromBackend(id).pipe(
+  readonly getById = (id: number): Observable<DataType> => {
+    return this.httpClient.get<DataType>(this.apiRouter.dataTypeGetById(id)).pipe(
       tap(dataType => {
-        this.dataTypes.update(old => [...old, dataType]);
+        const existingSignal = this.store.get(dataType.instanceId);
+
+        if (existingSignal != null) {
+          existingSignal.update(old => {
+            const index = old.findIndex(it => it.id === id);
+
+            return index === -1
+              ? [...old, this.updateProperties(dataType)]
+              : [...old.slice(0, index), this.updateProperties(dataType), ...old.slice(index + 1)];
+          });
+        } else {
+          this.store.set(dataType.instanceId, signal([this.updateProperties(dataType)]));
+        }
       })
     );
   }
 
-  private getAllByInstanceId(instanceId: number): Observable<DataType[]> {
+  readonly getAllByInstanceId = (instanceId: number): Observable<DataType[]> => {
     return this.httpClient.get<DataType[]>(this.apiRouter.dataTypeGetByInstanceId(instanceId)).pipe(
       tap(dataTypes => {
-        if (!this.store.has(instanceId)) {
-          this.store.set(instanceId, signal<DataType[]>(dataTypes));
+        const existingSignal = this.store.get(instanceId);
+
+        if (existingSignal != null) {
+          existingSignal.update(() => dataTypes.map(this.updateProperties));
         } else {
-          this.store.get(instanceId)!!.set(dataTypes);
+          this.store.set(instanceId, signal(dataTypes.map(this.updateProperties)));
         }
-        this.dataTypes.set(dataTypes);
       })
     );
   }
 
-  getAll(): Observable<DataType[]> {
-    const instanceId = this.instanceService.getActiveInstance()()?.id;
+  readonly getAsSignal = (instanceId: number): Signal<DataType[]> => {
+    const existingSignal = this.store.get(instanceId);
 
-    if (!instanceId) {
-      return of([]);
+    if (existingSignal == null) {
+      this.store.set(instanceId, signal<DataType[]>([]));
+
+      new Promise(resolve => this.getAllByInstanceId(instanceId).pipe(first()).subscribe(resolve));
     }
 
-    if (!this.store.has(instanceId)) {
-      return this.getAllByInstanceId(instanceId);
-    } else {
-      return of(this.store.get(instanceId)!!())
-    }
+    return this.store.get(instanceId)!.asReadonly();
   }
 
-  getAllAsSignal(): Signal<DataType[]> {
-    return this.dataTypes;
-  }
-
-  refresh() {
-    if (this.instanceId()) {
-      this.getAllByInstanceId(this.instanceId()!!).subscribe();
+  readonly updateProperties = (dataType: DataType): DataType => {
+    return {
+      ...dataType,
+      fields: dataType.fields.map(it => ({
+        ...it,
+        type: EnumUtil.toEnumOrThrow(it.type, FieldType)
+      })),
     }
   }
 }

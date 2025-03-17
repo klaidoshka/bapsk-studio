@@ -3,6 +3,7 @@
   closable="true"
   closeOnEscape="true"
   modal="true"
+  styleClass="min-w-128"
   (close)="hide()"
   (onHide)="hide()"
   [(visible)]="isShown"
@@ -14,10 +15,10 @@
   <p>{{ user()?.email }}</p>
 
   <p class="font-bold mt-4">Birthdate</p>
-  <p>{{ user()?.birthDate }}</p>
+  <p>{{ user()?.birthDate | date:'mediumDate' }}</p>
 
   <p class="font-bold mt-4">Country</p>
-  <p>{{ user()?.country?.name }}</p>
+  <p>{{ getCountryName(user()) }}</p>
 
   <div class="flex justify-end mt-4">
     <p-button

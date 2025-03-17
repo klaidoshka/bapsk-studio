@@ -6,16 +6,23 @@ namespace Accounting.Services.Service;
 
 public class FieldTypeService : IFieldTypeService
 {
+    private readonly Dictionary<FieldType, FieldHandler.FieldHandler> _fieldHandlers;
+
+    public FieldTypeService(Dictionary<FieldType, FieldHandler.FieldHandler> fieldHandlers)
+    {
+        _fieldHandlers = fieldHandlers;
+    }
+
     public object Deserialize(FieldType type, string value)
     {
-        return !FieldHandler.FieldHandler.Handlers.TryGetValue(type, out var handler)
+        return !_fieldHandlers.TryGetValue(type, out var handler)
             ? throw new InvalidOperationException($"Type {type} is not supported.")
             : handler.Deserialize(value);
     }
 
     public string Serialize(FieldType type, JsonElement value)
     {
-        return !FieldHandler.FieldHandler.Handlers.TryGetValue(type, out var handler)
+        return !_fieldHandlers.TryGetValue(type, out var handler)
             ? throw new InvalidOperationException($"Type {type} is not supported.")
             : handler.Serialize(value);
     }

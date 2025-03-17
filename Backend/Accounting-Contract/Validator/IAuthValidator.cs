@@ -1,5 +1,5 @@
-using Accounting.Contract.Request;
-using Accounting.Contract.Response;
+using Accounting.Contract.Dto;
+using Accounting.Contract.Dto.Auth;
 
 namespace Accounting.Contract.Validator;
 
@@ -10,7 +10,7 @@ public interface IAuthValidator
     /// </summary>
     /// <param name="meta">User meta for authentication</param>
     /// <returns>Validation instance with possible failures</returns>
-    Validation ValidateAuthMeta(AuthRequestUserMeta meta);
+    Validation ValidateAuthMeta(AuthUserMeta meta);
 
     /// <summary>
     /// Checks if specified login request is valid.

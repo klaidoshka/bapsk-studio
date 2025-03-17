@@ -1,5 +1,5 @@
-using Accounting.Contract.Sti;
-using Accounting.Contract.Sti.SubmitDeclaration;
+using Accounting.Contract.Dto.Sti;
+using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
 using Accounting.Services.Util;
 
 namespace Accounting.Services.Sti.Mapping;
@@ -19,7 +19,7 @@ public static class SubmitDeclaration
     }
 
     private static TFDeclaration_Type ToExternalType(
-        this Contract.Sti.SubmitDeclaration.SubmitDeclaration type
+        this Contract.Dto.Sti.VatReturn.SubmitDeclaration.SubmitDeclaration type
     )
     {
         return new TFDeclaration_Type
@@ -42,8 +42,8 @@ public static class SubmitDeclaration
             Item = customer.ResidentCountryCode?.ConvertToEnum<NonEuCountryCode_Type>() as object
                    ?? customer.ResidentTerritory?.ToExternalType(),
             LastName = customer.LastName,
-            OtherDocument = customer.OtherDocument.ToExternalType(),
-            PersonIn = customer.PersonId.ToExternalType()
+            OtherDocument = customer.OtherDocuments.ToExternalType(),
+            PersonIn = customer.PersonId?.ToExternalType()
         };
     }
 
@@ -58,7 +58,7 @@ public static class SubmitDeclaration
                 issuedBy = document.DocumentNo.IssuedBy.ConvertToEnum<IsoCountryCode_Type>(),
                 Value = document.DocumentNo.Value
             },
-            DocType = document.DocumentType
+            DocType = (int)document.DocumentType
         };
     }
 
@@ -117,7 +117,7 @@ public static class SubmitDeclaration
     {
         return new Intermediary_Type
         {
-            IntermediaryIn = intermediary.IntermediaryId,
+            IntermediaryIn = intermediary.Id,
             Name = intermediary.Name
         };
     }

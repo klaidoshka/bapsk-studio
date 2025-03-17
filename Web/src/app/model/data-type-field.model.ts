@@ -4,6 +4,7 @@ export default interface DataTypeField {
   id: number;
   isRequired: boolean;
   name: string;
+  referenceId: number | null;
   type: FieldType;
 }
 
@@ -11,14 +12,22 @@ export enum FieldType {
   Check = 1,
   Date = 2,
   Number = 3,
-  Text = 4
+  Text = 4,
+  Reference = 5,
+  IsoCountryCode = 6,
+  IdentityDocumentType = 7,
+  UnitOfMeasureType = 8
 }
 
 export const fieldTypes = [
   {label: 'Check', value: FieldType.Check},
   {label: 'Date', value: FieldType.Date},
   {label: 'Number', value: FieldType.Number},
-  {label: 'Text', value: FieldType.Text}
+  {label: 'Text', value: FieldType.Text},
+  {label: 'Reference', value: FieldType.Reference},
+  {label: 'Country', value: FieldType.IsoCountryCode},
+  {label: 'ID Type', value: FieldType.IdentityDocumentType},
+  {label: 'Unit of Measure Type', value: FieldType.UnitOfMeasureType}
 ];
 
 export interface DataTypeFieldCreateRequest {

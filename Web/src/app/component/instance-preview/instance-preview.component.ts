@@ -2,12 +2,14 @@ import {Component, input, OnInit, signal} from '@angular/core';
 import Instance from '../../model/instance.model';
 import {Dialog} from 'primeng/dialog';
 import {Button} from 'primeng/button';
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-instance-preview',
   imports: [
     Dialog,
-    Button
+    Button,
+    DatePipe
   ],
   templateUrl: './instance-preview.component.html',
   styles: ``
@@ -21,12 +23,12 @@ export class InstancePreviewComponent implements OnInit {
     this.isShown.set(this.isShownInitially());
   }
 
-  hide() {
+  readonly hide = () => {
     this.isShown.set(false);
     this.instance.set(null);
   }
 
-  show(instance: Instance | null) {
+  readonly show = (instance: Instance | null) => {
     this.instance.set(instance);
     this.isShown.set(true);
   }

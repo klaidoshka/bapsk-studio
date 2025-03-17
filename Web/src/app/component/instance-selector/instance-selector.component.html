@@ -6,20 +6,29 @@
       <p-button
         label="Create Instance"
         icon="pi pi-plus"
+        class="mt-1 block w-full"
         (onClick)="showManagementMenu()"
       ></p-button>
     }
     @default {
-      <p-autocomplete
-        [(ngModel)]="selectedInstance"
-        optionLabel="name"
-        placeholder="Select Instance"
-        [dropdown]="true"
-        [suggestions]="filteredInstances()"
-        (completeMethod)="filterInstances($event)"
-        (onSelect)="selectInstance($event.value)"
-        class="bg-surface-50 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-      ></p-autocomplete>
+      <div class="flex flex-row gap-x-2 items-center">
+        <label
+          for="instance"
+          class="text-center text-sm gap-y-0"
+        >Current Instance</label>
+
+        @if (selectedInstance() != null) {
+          <p-select
+            inputId="instance"
+            [(ngModel)]="selectedInstance"
+            [options]="instances()"
+            optionLabel="name"
+            styleClass="border-none"
+            placeholder="Select Instance"
+            class="bg-surface-50 mt-1 block w-full rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+          ></p-select>
+        }
+      </div>
     }
   }
 }

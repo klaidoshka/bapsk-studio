@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
+using static Accounting.API.AuthorizationHandler.Requirement.UserRequirement;
 
 namespace Accounting.API.AuthorizationHandler.Requirement;
 
-public class UserRequirement(UserRequirement.CrudOperation operation) : IAuthorizationRequirement
+public class UserRequirement(CrudOperation operation) : IAuthorizationRequirement
 {
     public CrudOperation Operation { get; } = operation;
 

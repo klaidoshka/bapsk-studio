@@ -3,15 +3,14 @@ import DataType from '../../model/data-type.model';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {TableModule} from 'primeng/table';
-import {UpperCasePipe} from '@angular/common';
+import {FieldType, fieldTypes} from '../../model/data-type-field.model';
 
 @Component({
   selector: 'app-data-type-preview',
   imports: [
     Button,
     Dialog,
-    TableModule,
-    UpperCasePipe
+    TableModule
   ],
   templateUrl: './data-type-preview.component.html',
   styles: ``
@@ -25,12 +24,22 @@ export class DataTypePreviewComponent implements OnInit {
     this.isShown.set(this.isShownInitially());
   }
 
-  hide() {
+  readonly getFieldTypeLabel = (type: FieldType) => {
+    const enumKey = Object
+    .keys(FieldType)
+    .find(t => t.toString().toLowerCase() === type.toString().toLowerCase());
+
+    const enumValue = FieldType[enumKey as keyof typeof FieldType];
+
+    return fieldTypes.find(t => t.value === enumValue)?.label;
+  }
+
+  readonly hide = () => {
     this.isShown.set(false);
     this.dataType.set(null);
   }
 
-  show(dataType: DataType | null) {
+  readonly show = (dataType: DataType | null) => {
     this.dataType.set(dataType);
     this.isShown.set(true);
   }

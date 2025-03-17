@@ -1,0 +1,83 @@
+<div class="h-screen w-full">
+  <ng-container *ngIf="instanceId() != null">
+    <div class="flex">
+      <!-- Sidebar -->
+      <div class="rounded h-screen sticky top-0 w-50 bg-primary text-white p-4 flex flex-col">
+        <div
+          *ngFor="let type of workspacesPart"
+          class="w-full p-2 my-1 bg-primary-500 rounded hover:cursor-pointer text-center text-l"
+          [class.bg-primary-600]="selectedWorkspace() === type"
+          (click)="selectWorkspace(type)"
+        >
+          {{ getWorkspaceName(type) }}
+        </div>
+
+        <div [class]="'mt-6 rounded' + (selectedWorkspace() === WorkspaceType.DataType ? ' bg-primary-500' : '')">
+          <div
+            class="w-full p-2 bg-primary-500 rounded hover:cursor-pointer text-center text-l"
+            [class.bg-primary-600]="selectedWorkspace() === WorkspaceType.DataType"
+            (click)="selectWorkspace(WorkspaceType.DataType)"
+          >
+            {{ getWorkspaceName(WorkspaceType.DataType) }}
+          </div>
+
+          <div *ngIf="selectedWorkspace() === WorkspaceType.DataType" class="mt-4">
+            <p-select
+              [(ngModel)]="selectedDataType"
+              [options]="dataTypes()"
+              (onChange)="selectDataType($event.value)"
+              optionLabel="name"
+              placeholder="Select..."
+              class="m-1 w-40 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            ></p-select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="flex-grow p-6">
+        <ng-container *ngIf="selectedWorkspace() === WorkspaceType.DataType">
+          <h1 class="text-xl font-bold">{{ selectedDataType()?.name }}</h1>
+
+          <app-data-entry-showcase
+            *ngIf="selectedDataType() != null"
+            [dataEntries]="dataEntries()"
+            [dataType]="selectedDataType()!"
+          />
+
+          <div class="mt-2">
+            <p-message *ngIf="!selectedDataType()" severity="warn">
+              Please select a data type to view and manage its data.
+            </p-message>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="selectedWorkspace() === WorkspaceType.Customer">
+          <h1 class="text-xl font-bold">Customers</h1>
+          <app-customer-showcase
+            [instanceId]="instanceId()!"
+            [customers]="customers()"
+          />
+        </ng-container>
+
+        <ng-container *ngIf="selectedWorkspace() === WorkspaceType.Sale">
+          <h1 class="text-xl font-bold">Sales</h1>
+          <app-sale-showcase
+            [customers]="customers()"
+            [instanceId]="instanceId()!"
+            [sales]="sales()"
+            [salesmen]="salesmen()"
+          />
+        </ng-container>
+
+        <ng-container *ngIf="selectedWorkspace() === WorkspaceType.Salesman">
+          <h1 class="text-xl font-bold">Salesmen</h1>
+          <app-salesman-showcase
+            [instanceId]="instanceId()!"
+            [salesmen]="salesmen()"
+          />
+        </ng-container>
+      </div>
+    </div>
+  </ng-container>
+</div>

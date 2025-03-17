@@ -1,10 +1,12 @@
 using Accounting.Contract;
-using Accounting.Contract.Entity;
-using Accounting.Contract.Request;
+using Accounting.Contract.Dto.DataType;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Accounting.Services.Util;
 using Microsoft.EntityFrameworkCore;
+using DataEntryField = Accounting.Contract.Entity.DataEntryField;
+using DataType = Accounting.Contract.Entity.DataType;
+using DataTypeField = Accounting.Contract.Entity.DataTypeField;
 
 namespace Accounting.Services.Service;
 
@@ -86,6 +88,7 @@ public class DataTypeService : IDataTypeService
             .Include(dt => dt.Fields)
             .FirstAsync(dt => dt.Id == request.DataTypeId);
 
+        // Update data-type
         dataType.Description = request.Description;
         dataType.Name = request.Name;
 
@@ -104,6 +107,7 @@ public class DataTypeService : IDataTypeService
                 }
             );
 
+        // Update existing fields
         foreach (var field in matchedFields.Values)
         {
             field.Matched.DefaultValue = field.New.DefaultValue.IsNull()
@@ -115,30 +119,44 @@ public class DataTypeService : IDataTypeService
             field.Matched.Type = field.New.Type;
         }
 
+        // Remove fields that are no more in the request
+        dataType.Fields
+            .Where(f => !requestFieldsById.ContainsKey(f.Id))
+            .ToList()
+            .ForEach(f => _database.DataTypeFields.Remove(f));
+
+        // Add new fields and assign default value to current entries
         var newFields = request.Fields
-            .Where(rf => !matchedFields.ContainsKey(rf.DataTypeFieldId ?? 0))
+            .Where(rf => !matchedFields.ContainsKey(rf.DataTypeFieldId ?? -1))
             .ToList();
 
         foreach (var field in newFields)
         {
-            dataType.Fields.Add(
+            var value = _fieldTypeService.Serialize(field.Type, field.DefaultValue);
+
+            var fieldNew = (await _database.DataTypeFields.AddAsync(
                 new DataTypeField
                 {
                     DataTypeId = dataType.Id,
-                    DefaultValue = field.DefaultValue.IsNull()
-                        ? null
-                        : _fieldTypeService.Serialize(field.Type, field.DefaultValue),
+                    DefaultValue = value,
                     IsRequired = field.IsRequired,
                     Name = field.Name,
                     Type = field.Type
                 }
-            );
-        }
+            )).Entity;
 
-        dataType.Fields
-            .Where(f => !requestFieldsById.ContainsKey(f.Id))
-            .ToList()
-            .ForEach(f => { dataType.Fields.Remove(f); });
+            foreach (var dataEntry in dataType.Entries)
+            {
+                dataEntry.Fields.Add(
+                    new DataEntryField
+                    {
+                        DataEntry = dataEntry,
+                        DataTypeField = fieldNew,
+                        Value = value
+                    }
+                );
+            }
+        }
 
         await _database.SaveChangesAsync();
     }

@@ -1,0 +1,82 @@
+<p-dialog
+  header="Sale Declaration"
+  closable="true"
+  closeOnEscape="true"
+  modal="true"
+  styleClass="min-w-128"
+  (close)="hide()"
+  (onHide)="hide()"
+  [(visible)]="isShown"
+>
+  <div class="flex flex-wrap gap-4" *ngIf="sale() != null">
+    <!-- Left Column -->
+    <div class="flex-1 min-w-[250px]" *ngIf="declaration() != null">
+      <p>
+        <strong>Declaration Id:</strong>
+        {{ declaration()!.id }}
+      </p>
+      <p>
+        <strong>Declared By:</strong>
+        {{ toUserIdentityFullName(declaration()!.declaredBy) }}
+      </p>
+      <p>
+        <strong>Submit Date:</strong>
+        {{ declaration()!.submitDate | date:'short' }}
+      </p>
+      <p>
+        <strong>State:</strong>
+        {{ getSubmitDeclarationStateLabel(declaration()!.state) }}
+      </p>
+      <p *ngIf="declaration()!.correction > 1">
+        <strong>Corrected Times:</strong>
+        {{ declaration()!.correction }}
+      </p>
+    </div>
+
+    <!-- Right Column -->
+    <div class="flex-1 min-w-[250px]">
+      <p>
+        <strong>Customer:</strong>
+        {{ toCustomerFullName(sale()!.customer) }}
+      </p>
+      <p>
+        <strong>Salesman:</strong>
+        {{ sale()!.salesman.name }}
+      </p>
+      <p>
+        <strong>Sold Goods:</strong>
+        {{ sale()!.soldGoods.length }} good(s) ({{ getSoldGoodsTotalCount(sale()!) }} total items)
+      </p>
+      <p>
+        <strong>VAT to return:</strong>
+        {{ getVATToReturn(sale()!) | currency:'EUR':'symbol':'1.2-2' }}
+      </p>
+    </div>
+  </div>
+
+  <div
+    *ngIf="sale() != null && (declaration() == null || declaration()!.state == SubmitDeclarationState.REJECTED)"
+  >
+    <p
+      class="font-bold text-lg my-2"
+      *ngIf="declaration() == null"
+    >
+      This sale does not have a submitted VAT return declaration.
+    </p>
+
+    <div class="p-4 rounded bg-primary-100 mt-4">
+      <app-vat-return-declaration-submission
+        [instanceId]="instanceId()"
+        [sale]="sale()!"
+      />
+    </div>
+  </div>
+
+  <div class="flex justify-end mt-4">
+    <p-button
+      label="Close"
+      class="p-button-secondary"
+      (onClick)="hide()"
+    ></p-button>
+  </div>
+</p-dialog>

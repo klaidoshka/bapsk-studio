@@ -1,0 +1,31 @@
+<div>
+  <app-messages-showcase [messages]="messages()"></app-messages-showcase>
+
+  <div [formGroup]="form">
+    <p>
+      Submission requires affirmation that this sale's customer is eligible for such service.
+    </p>
+
+    <label
+      for="affirmation"
+      class="block text-sm font-medium text-gray-700 mt-2"
+    >
+      Affirmation
+    </label>
+
+    <p-checkbox
+      binary="true"
+      formControlName="affirmation"
+      id="affirmation"
+      class="mt-1 block w-fit"
+    />
+  </div>
+
+  <div class="flex justify-end mt-4">
+    <p-button
+      [label]="sale().vatReturnDeclaration == null ? 'Submit' : 'Resubmit'"
+      [disabled]="!form.valid || !form.dirty"
+      (onClick)="save()"
+    ></p-button>
+  </div>
+</div>

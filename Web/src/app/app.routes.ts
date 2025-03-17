@@ -13,7 +13,7 @@ import {
 import {NotFoundPageComponent} from "./page/not-found-page/not-found-page.component";
 import {ProfilePageComponent} from './page/profile-page/profile-page.component';
 import {SessionPageComponent} from './page/session-page/session-page.component';
-import {DataEntryPageComponent} from './page/data-entry-page/data-entry-page.component';
+import {WorkspacePageComponent} from './page/workspace-page/workspace-page.component';
 import {DataTypePageComponent} from './page/data-type-page/data-type-page.component';
 import {InstancePageComponent} from './page/instance-page/instance-page.component';
 import {UserPageComponent} from './page/user-page/user-page.component';
@@ -31,10 +31,6 @@ export const routes: Routes = [
           {
             path: "types",
             loadComponent: () => DataTypePageComponent
-          },
-          {
-            path: "entries",
-            loadComponent: () => DataEntryPageComponent
           }
         ]
       },
@@ -51,6 +47,10 @@ export const routes: Routes = [
           }
         ],
         loadComponent: () => ProfilePageComponent,
+      },
+      {
+        path: "workspace",
+        loadComponent: () => WorkspacePageComponent
       },
       {
         path: "users",

@@ -1,9 +1,10 @@
 import {Component, input, OnInit, signal} from '@angular/core';
-import DataEntry from '../../model/data-entry.model';
+import {DataEntryWithUsers} from '../../model/data-entry.model';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {TableModule} from 'primeng/table';
-import {DatePipe} from '@angular/common';
+import {DatePipe, NgIf} from '@angular/common';
+import {toUserIdentityFullName} from '../../model/user.model';
 
 @Component({
   selector: 'app-data-entry-preview',
@@ -11,13 +12,16 @@ import {DatePipe} from '@angular/common';
     Button,
     Dialog,
     TableModule,
-    DatePipe
+    DatePipe,
+    NgIf
   ],
   templateUrl: './data-entry-preview.component.html',
   styles: ``
 })
 export class DataEntryPreviewComponent implements OnInit {
-  dataEntry = signal<DataEntry | null>(null);
+  protected readonly toUserIdentityFullName = toUserIdentityFullName;
+
+  dataEntry = signal<DataEntryWithUsers | null>(null);
   isShown = signal<boolean>(false);
   isShownInitially = input<boolean>(false);
 
@@ -25,12 +29,12 @@ export class DataEntryPreviewComponent implements OnInit {
     this.isShown.set(this.isShownInitially());
   }
 
-  hide() {
+  readonly hide = () => {
     this.isShown.set(false);
     this.dataEntry.set(null);
   }
 
-  show(dataEntry: DataEntry | null) {
+  readonly show = (dataEntry: DataEntryWithUsers | null) => {
     this.dataEntry.set(dataEntry);
     this.isShown.set(true);
   }

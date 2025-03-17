@@ -5,12 +5,13 @@ import {HttpClient} from '@angular/common/http';
 import {finalize, map, Observable, tap} from 'rxjs';
 import {AuthService} from './auth.service';
 import {Router} from '@angular/router';
+import {DateUtil} from '../util/date.util';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SessionService {
-  private sessions = signal<Session[]>([]);
+  private store = signal<Session[]>([]);
 
   constructor(
     private apiRouter: ApiRouter,
@@ -21,28 +22,31 @@ export class SessionService {
     this.getByUser().subscribe();
   }
 
-  getByUser(): Observable<Session[]> {
+  readonly getByUser = (): Observable<Session[]> => {
     return this.httpClient.get<Session[]>(this.apiRouter.sessionGetByUser()).pipe(
       map((sessions: Session[]) => sessions
         .map(s => {
-          return {...s, createdAt: new Date(s.createdAt)};
+          return {
+            ...s,
+            createdAt: DateUtil.adjustToLocalDate(s.createdAt)
+          };
         })
         .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
       ),
-      tap(sessions => this.sessions.set(sessions))
+      tap(sessions => this.store.set(sessions))
     );
   }
 
-  getByUserAsSignal() {
-    return this.sessions.asReadonly();
+  readonly getByUserAsSignal = () => {
+    return this.store.asReadonly();
   }
 
-  revoke(id: string): Observable<void> {
+  readonly revoke = (id: string): Observable<void> => {
     return this.httpClient.delete<void>(this.apiRouter.sessionRevoke(id))
     .pipe(
       // Remove the session from the client if it's the current session
       tap(() => {
-        this.sessions.update(session => session.filter(s => s.id !== id));
+        this.store.update(session => session.filter(s => s.id !== id));
 
         if (id === this.authService.getSessionId()()) {
           this.authService.logout().pipe(

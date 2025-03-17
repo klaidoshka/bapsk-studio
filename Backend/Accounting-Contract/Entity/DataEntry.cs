@@ -52,17 +52,17 @@ public class DataEntry
     /// <summary>
     /// Last date and time the data entry was modified.
     /// </summary>
-    public DateTime? ModifiedAt { get; set; } = DateTime.UtcNow;
+    public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>
     /// Navigation property for the user who last modified the data entry.
     /// It may be Admin of the application, having no ties to the Instance containing the data entry.
     /// </summary>
     [ForeignKey(nameof(ModifiedById))]
-    public User? ModifiedBy { get; set; }
+    public User ModifiedBy { get; set; }
 
     /// <summary>
     /// Unique identifier of the user who last modified the data entry.
     /// </summary>
-    public int? ModifiedById { get; set; }
+    public int ModifiedById { get; set; }
 }

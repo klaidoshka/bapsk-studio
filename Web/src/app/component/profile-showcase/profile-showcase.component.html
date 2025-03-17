@@ -1,5 +1,5 @@
 <p-table
-  styleClass="w-fit min-w-fit max-w-fit"
+  styleClass="w-fit"
   [value]="[user()]"
 >
   <ng-template #header>
@@ -19,9 +19,9 @@
     <tr>
       <td>{{ user.firstName }} {{ user.lastName }}</td>
       <td>{{ user.email }}</td>
-      <td>{{ user.country.name }}</td>
-      <td>{{ user.role || "N/A" }}</td>
-      <td>{{ user.birthDate }}</td>
+      <td>{{ getCountryName(user) }}</td>
+      <td>{{ toRoleString(user.role) }}</td>
+      <td>{{ user.birthDate | date:'mediumDate' }}</td>
     </tr>
   </ng-template>
 </p-table>

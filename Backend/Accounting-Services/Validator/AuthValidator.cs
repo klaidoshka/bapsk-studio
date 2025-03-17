@@ -1,6 +1,6 @@
 using Accounting.Contract;
-using Accounting.Contract.Request;
-using Accounting.Contract.Response;
+using Accounting.Contract.Dto;
+using Accounting.Contract.Dto.Auth;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;
@@ -24,7 +24,7 @@ public class AuthValidator : IAuthValidator
         _hashService = hashService;
     }
 
-    public Validation ValidateAuthMeta(AuthRequestUserMeta meta)
+    public Validation ValidateAuthMeta(AuthUserMeta meta)
     {
         var failures = new List<string>();
 

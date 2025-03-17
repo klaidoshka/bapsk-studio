@@ -1,192 +1,155 @@
-import {Injectable, Signal, signal, WritableSignal} from '@angular/core';
+import {computed, Injectable, Signal, signal} from '@angular/core';
 import {ApiRouter} from './api-router.service';
-import {
-  toUserIdentity,
-  User,
-  UserCreateRequest,
-  UserEditRequest,
-  UserIdentity
-} from '../model/user.model';
-import {first, Observable, of, tap} from 'rxjs';
+import {toUserIdentity, User, UserCreateRequest, UserEditRequest, UserIdentity} from '../model/user.model';
+import {first, Observable, tap} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
-import {toEnumOrThrow} from '../util/enum.util';
+import {EnumUtil} from '../util/enum.util';
 import {Role} from '../model/role.model';
-import {getIsoCountryByCode} from '../model/iso-country.model';
+import {IsoCountryCode} from '../model/iso-country.model';
+import {DateUtil} from '../util/date.util';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private users = signal(new Map<number, WritableSignal<User | null>>());
-  private userIdentities = signal(new Map<number, WritableSignal<UserIdentity | null>>());
-  private usersSignal = signal<User[]>([]);
+  private storeUsers = signal<User[]>([]);
+  private storeIdentities = signal<UserIdentity[]>([]);
 
   constructor(
     private apiRouter: ApiRouter,
     private httpClient: HttpClient
   ) {
-    // Load initial data. Block until the data is loaded.
-    this.get().subscribe();
   }
 
-  private readonly updateCachedUser = (user: User): Signal<User | null> => {
-    let candidate = this.users().get(user.id);
+  private updateCachedUser = (user: User): void => {
+    const users = this.storeUsers();
+    const index = users.findIndex(u => u.id === user.id);
 
-    if (candidate != null) {
-      candidate.update(_ => ({
-        ...user,
-        country: getIsoCountryByCode(user.country as unknown as string),
-        role: toEnumOrThrow(user.role, Role)
-      }));
+    if (index !== -1) {
+      users[index] = this.updateProperties(user);
     } else {
-      this.users().set(user.id, signal({
-        ...user,
-        country: getIsoCountryByCode(user.country as unknown as string),
-        role: toEnumOrThrow(user.role, Role)
-      }));
+      users.push(this.updateProperties(user));
     }
 
-    this.updateUsersSignal();
+    this.storeUsers.set([...users]);
     this.updateCachedUserIdentity(toUserIdentity(user));
+  };
 
-    return this.users().get(user.id)!;
-  }
+  private updateCachedUserIdentity = (userIdentity: UserIdentity): void => {
+    const identities = this.storeIdentities();
+    const index = identities.findIndex(i => i.id === userIdentity.id);
 
-  private readonly updateCachedUserIdentity = (userIdentity: UserIdentity): Signal<UserIdentity | null> => {
-    let candidateIdentity = this.userIdentities().get(userIdentity.id);
-
-    if (candidateIdentity != null) {
-      candidateIdentity.update(_ => userIdentity);
+    if (index !== -1) {
+      identities[index] = userIdentity;
     } else {
-      this.userIdentities().set(userIdentity.id, signal(userIdentity));
+      identities.push(userIdentity);
     }
 
-    return this.userIdentities().get(userIdentity.id)!;
-  }
-
-  private readonly updateUsersSignal = () => {
-    this.usersSignal.update(() =>
-      Array.from(this.users().values())
-      .map(user => user())
-      .filter(user => user !== null) as User[]
-    );
+    this.storeIdentities.set([...identities]);
   };
 
   readonly create = (request: UserCreateRequest): Observable<User> => {
     return this.httpClient
-    .post<User>(this.apiRouter.userCreate(), request)
-    .pipe(tap((user: User) => this.updateCachedUser(user)));
-  }
+    .post<User>(this.apiRouter.userCreate(), {
+      ...request,
+      birthDate: request.birthDate.toISOString() as any
+    } as UserCreateRequest)
+    .pipe(tap(user => this.updateCachedUser(user)));
+  };
 
   readonly delete = (id: number): Observable<void> => {
-    return this.httpClient
-    .delete<void>(this.apiRouter.userDelete(id))
-    .pipe(
+    return this.httpClient.delete<void>(this.apiRouter.userDelete(id)).pipe(
       tap(() => {
-        // Updating both signals to null to notify subscribers that the user is deleted.
-        const user = this.users().get(id);
+        this.storeUsers.set(this.storeUsers().filter(user => user.id !== id));
+        this.storeIdentities.set(this.storeIdentities().filter(identity => identity.id !== id));
+      })
+    );
+  };
 
-        if (user != null) {
-          user.update(_ => null);
-          this.users().delete(id);
-          this.updateUsersSignal();
-        }
+  readonly edit = (request: UserEditRequest): Observable<void> => {
+    return this.httpClient.put<void>(this.apiRouter.userEdit(request.userId), {
+      ...request,
+      birthDate: request.birthDate.toISOString() as any
+    } as UserEditRequest).pipe(
+      tap(() => {
+        const users = this.storeUsers();
+        const index = users.findIndex(user => user.id === request.userId);
 
-        const userIdentity = this.userIdentities().get(id);
+        if (index !== -1) {
+          users[index] = {
+            ...users[index],
+            ...request
+          };
 
-        if (userIdentity != null) {
-          userIdentity.update(_ => null);
-          this.userIdentities().delete(id);
+          this.storeUsers.set([...users]);
         }
       })
     );
-  }
-
-  readonly edit = (request: UserEditRequest): Observable<void> => {
-    return this.httpClient
-    .put<void>(this.apiRouter.userEdit(request.userId), request)
-    .pipe(
-      tap(() => {
-          const user = this.users().get(request.userId)?.();
-
-          // Must exist, if edit is called.
-          if (user != null) {
-            this.updateCachedUser({
-              ...user,
-              birthDate: request.birthDate,
-              // Will be updated to correct enum within #updateCachedUser.
-              country: request.country as any,
-              email: request.email,
-              firstName: request.firstName,
-              lastName: request.lastName
-            });
-          }
-        }
-      )
-    );
-  }
+  };
 
   readonly get = (): Observable<User[]> => {
-    return this.httpClient
-    .get<User[]>(this.apiRouter.userGet())
-    .pipe(tap((users: User[]) => users.forEach(this.updateCachedUser)));
-  }
-
-  readonly getAsSignal = (): Signal<User[]> => {
-    return this.usersSignal.asReadonly();
-  }
+    return this.httpClient.get<User[]>(this.apiRouter.userGet()).pipe(
+      tap(users => {
+        this.storeUsers.set(users.map(this.updateProperties));
+        this.storeIdentities.set(users.map(toUserIdentity));
+      })
+    );
+  };
 
   readonly getById = (id: number): Observable<User> => {
-    let candidate = this.users().get(id)?.();
-
-    if (candidate != null) {
-      return of(candidate);
-    }
-
-    return this.httpClient
-    .get<User>(this.apiRouter.userGetById(id))
-    .pipe(tap((user: User) => this.updateCachedUser(user)));
-  }
-
-  readonly getByIdAsSignal = (id: number): Signal<User | null> => {
-    const candidate = this.users().get(id);
-
-    if (candidate != null) {
-      return candidate;
-    }
-
-    this.users().set(id, signal(null));
-
-    // Fetch the user identity from the server. It is cached in the signal by underlying call.
-    new Promise((resolve) => this.getById(id).pipe(first()).subscribe(resolve));
-
-    return this.users().get(id)!;
-  }
+    return this.httpClient.get<User>(this.apiRouter.userGetById(id)).pipe(
+      tap(user => this.updateCachedUser(user))
+    );
+  };
 
   readonly getIdentityById = (id: number): Observable<UserIdentity> => {
-    let candidate = this.userIdentities().get(id)?.();
+    return this.httpClient.get<UserIdentity>(this.apiRouter.userGetById(id, true)).pipe(
+      tap(identity => this.updateCachedUserIdentity(identity))
+    );
+  };
 
-    if (candidate != null) {
-      return of(candidate);
+  readonly getAsSignal = (): Signal<User[]> => {
+    if (this.storeUsers().length === 0) {
+      new Promise((resolve) => this.get().pipe(first()).subscribe(resolve));
     }
 
-    return this.httpClient
-    .get<UserIdentity>(this.apiRouter.userGetById(id, true))
-    .pipe(tap((user: UserIdentity) => this.updateCachedUserIdentity(user)));
-  }
+    return this.storeUsers.asReadonly();
+  };
 
-  readonly getIdentityByIdAsSignal = (id: number): Signal<UserIdentity | null> => {
-    const candidate = this.userIdentities().get(id);
+  readonly getByIdAsSignal = (id: number): Signal<User | undefined> => {
+    const index = this.storeUsers().findIndex(user => user.id === id);
 
-    if (candidate != null) {
-      return candidate;
+    if (index === -1) {
+      new Promise((resolve) => this.getById(id).pipe(first()).subscribe(resolve));
     }
 
-    this.userIdentities().set(id, signal(null));
+    return computed(() =>
+      index !== -1
+        ? this.storeUsers().at(index)!
+        : this.storeUsers().find(user => user.id === id)
+    );
+  };
 
-    // Fetch the user identity from the server. It is cached in the signal by underlying call.
-    new Promise((resolve) => this.getIdentityById(id).pipe(first()).subscribe(resolve));
+  readonly getIdentityByIdAsSignal = (id: number): Signal<UserIdentity | undefined> => {
+    const index = this.storeIdentities().findIndex(identity => identity.id === id);
 
-    return this.userIdentities().get(id)!;
-  }
+    if (index === -1) {
+      new Promise((resolve) => this.getIdentityById(id).pipe(first()).subscribe(resolve));
+    }
+
+    return computed(() =>
+      index !== -1
+        ? this.storeIdentities().at(index)!
+        : this.storeIdentities().find(it => it.id === id)
+    );
+  };
+
+  readonly updateProperties = (user: User): User => {
+    return {
+      ...user,
+      birthDate: DateUtil.adjustToLocalDate(user.birthDate),
+      country: EnumUtil.toEnumOrThrow(user.country, IsoCountryCode),
+      role: EnumUtil.toEnumOrThrow(user.role, Role)
+    };
+  };
 }

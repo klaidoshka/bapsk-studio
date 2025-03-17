@@ -1,6 +1,5 @@
 using Accounting.API.Util;
-using Accounting.Contract.Dto;
-using Accounting.Contract.Request;
+using Accounting.Contract.Dto.Instance;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
 

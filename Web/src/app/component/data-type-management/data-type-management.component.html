@@ -2,15 +2,14 @@
   header="Data Type Management"
   closeOnEscape="true"
   modal="true"
+  styleClass="min-w-128"
   closable="true"
   [(visible)]="isShown"
   (onHide)="hide()"
   (close)="hide()"
 >
   <div class="min-w-128">
-    <div class="mb-2">
-      <app-messages-showcase [messages]="messages()"/>
-    </div>
+    <app-messages-showcase [messages]="messages()"/>
 
     <div
       class="grid grid-cols-1 gap-4"
@@ -89,8 +88,9 @@
                     optionLabel="label"
                     optionValue="value"
                     placeholder="Select a type"
-                    (onChange)="clearDefaultValue(i)"
                     appendTo="body"
+                    styleClass="w-full"
+                    (onChange)="updateDefaultValue(i, $event.value)"
                   ></p-select>
                 </td>
 
@@ -106,14 +106,16 @@
                     @case (FieldType.Date) {
                       <p-datepicker
                         formControlName="defaultValue"
-                        class="w-full"
+                        hideOnDateTimeSelect="true"
+                        styleClass="w-full"
                         appendTo="body"
+                        [showTime]="true"
+                        [showIcon]="true"
                       ></p-datepicker>
                     }
                     @case (FieldType.Number) {
                       <input
                         formControlName="defaultValue"
-                        [defaultValue]="0"
                         pInputText
                         type="number"
                         class="w-full"
@@ -165,7 +167,7 @@
 
     <div class="flex justify-end mt-4">
       <p-button
-        label="Save"
+        [label]="dataType() == null ? 'Create' : 'Save'"
         [disabled]="!form.valid || !form.dirty"
         (onClick)="save()"
       ></p-button>

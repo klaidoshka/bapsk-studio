@@ -1,39 +1,38 @@
-import {Component, effect, Signal, signal, viewChild} from '@angular/core';
+import {Component, effect, Signal, viewChild, WritableSignal} from '@angular/core';
 import {DropdownModule} from "primeng/dropdown";
 import Instance from '../../model/instance.model';
 import {AuthService} from '../../service/auth.service';
 import {InstanceService} from '../../service/instance.service';
 import {Button} from 'primeng/button';
-import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {InstanceManagementComponent} from '../instance-management/instance-management.component';
+import {Select} from 'primeng/select';
 
 @Component({
   selector: 'app-instance-selector',
   imports: [
     DropdownModule,
     Button,
-    AutoComplete,
     ReactiveFormsModule,
     FormsModule,
-    InstanceManagementComponent
+    InstanceManagementComponent,
+    Select
   ],
   templateUrl: './instance-selector.component.html',
   styles: ``
 })
 export class InstanceSelectorComponent {
-  filteredInstances = signal<Instance[]>([]);
   instances!: Signal<Instance[]>;
   isAuthenticated!: Signal<boolean>;
   managementMenu = viewChild.required(InstanceManagementComponent);
-  selectedInstance!: Signal<Instance | null>;
+  selectedInstance!: WritableSignal<Instance | null>;
 
   constructor(
     private authService: AuthService,
     private instanceService: InstanceService
   ) {
     this.isAuthenticated = this.authService.isAuthenticated();
-    this.instances = this.instanceService.getAllAsSignal();
+    this.instances = this.instanceService.getAsSignal();
     this.selectedInstance = this.instanceService.getActiveInstance();
 
     effect(() => {
@@ -43,21 +42,13 @@ export class InstanceSelectorComponent {
     });
   }
 
-  filterInstances(event: AutoCompleteCompleteEvent) {
-    const query = event.query.toLowerCase();
-
-    this.filteredInstances.set(this.instances().filter((instance) => {
-      return instance.name.toLowerCase().includes(query);
-    }));
-  }
-
-  selectInstance(instance: Instance | null) {
+  readonly selectInstance = (instance: Instance | null) => {
     if (this.selectedInstance() !== instance && instance !== null) {
       this.instanceService.setActiveInstance(instance);
     }
   }
 
-  showManagementMenu() {
+  readonly showManagementMenu = () => {
     this.managementMenu().show(null);
   }
 }

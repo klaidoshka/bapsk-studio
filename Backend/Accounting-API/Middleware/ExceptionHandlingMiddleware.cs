@@ -1,5 +1,6 @@
 using System.Net;
-using Accounting.Contract.Response;
+using System.ServiceModel;
+using Accounting.Contract.Dto;
 
 namespace Accounting.API.Middleware;
 
@@ -30,7 +31,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
 
         if (exception is not ValidationException)
         {
-            _logger.LogError(exception, "An unexpected error occurred.");
+            _logger.LogError(exception, "An unexpected error occurred while processing the request");
         }
 
         var exceptionResponse = exception switch
@@ -43,7 +44,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
                 HttpStatusCode.NotFound,
                 "The request had invalid arguments."
             ),
-            BadHttpRequestException or InvalidOperationException => new ExceptionResponse(
+            BadHttpRequestException or InvalidOperationException or FaultException => new ExceptionResponse(
                 HttpStatusCode.NotAcceptable,
                 "The request was not acceptable."
             ),
@@ -57,7 +58,8 @@ public class ExceptionHandlingMiddleware : IMiddleware
             ),
             ValidationException it => new ExceptionResponse(
                 HttpStatusCode.BadRequest,
-                it.Validation.FailureMessages
+                it.Validation.FailureMessages,
+                it.Validation.InternalFailureCode
             ),
             _ => new ExceptionResponse(
                 HttpStatusCode.InternalServerError,

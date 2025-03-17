@@ -2,15 +2,14 @@
   header="Data Entry Management"
   closeOnEscape="true"
   modal="true"
+  styleClass="min-w-128"
   closable="true"
   [(visible)]="isShown"
   (onHide)="hide()"
   (close)="hide()"
 >
   <div class="min-w-128">
-    <div class="mb-2">
-      <app-messages-showcase [messages]="messages()"/>
-    </div>
+    <app-messages-showcase [messages]="messages()"/>
 
     <div
       class="grid grid-cols-1 gap-4"
@@ -61,7 +60,7 @@
 
     <div class="flex justify-end mt-4">
       <p-button
-        label="Save"
+        [label]="dataEntry() == null ? 'Create' : 'Save'"
         [disabled]="!form.valid || !form.dirty"
         (onClick)="save()"
       ></p-button>

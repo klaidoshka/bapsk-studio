@@ -8,7 +8,7 @@ public class Session
     /// <summary>
     /// Agent of the user who created the session. Browser, OS, etc.
     /// </summary>
-    public string Agent { get; set; } = "";
+    public string Agent { get; set; } = String.Empty;
 
     /// <summary>
     /// When the session was created.
@@ -24,17 +24,17 @@ public class Session
     /// <summary>
     /// IP address of the user who created the session.
     /// </summary>
-    public string IpAddress { get; set; } = "";
+    public string IpAddress { get; set; } = String.Empty;
 
     /// <summary>
     /// Location of the user who created the session.
     /// </summary>
-    public string Location { get; set; } = "";
+    public string Location { get; set; } = String.Empty;
 
     /// <summary>
     /// Refresh token used to refresh the session's access token.
     /// </summary>
-    public string RefreshToken { get; set; } = "";
+    public string RefreshToken { get; set; } = String.Empty;
 
     /// <summary>
     /// Navigation property for the user who created the session.

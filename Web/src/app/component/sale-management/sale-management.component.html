@@ -1,0 +1,308 @@
+<p-dialog
+  header="Sale Management"
+  closeOnEscape="true"
+  modal="true"
+  styleClass="min-w-128"
+  closable="true"
+  [(visible)]="isShown"
+  (onHide)="hide()"
+  (close)="hide()"
+>
+  <div
+    [formGroup]="form"
+    class="min-w-128 flex flex-col"
+  >
+    <app-messages-showcase [messages]="messages()"/>
+
+    <div class="flex flex-wrap gap-4">
+      <div class="flex-1 min-w-[100px]">
+        <label
+          for="customerId"
+          class="block text-sm font-medium text-gray-700"
+        >Customer</label>
+        <p-select
+          formControlName="customerId"
+          id="customerId"
+          [options]="customersLabeled()"
+          optionValue="value"
+          optionLabel="label"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        ></p-select>
+        <div
+          *ngIf="getErrorMessage('customerId')"
+          class="text-xs text-red-500 mt-1"
+        >
+          {{ getErrorMessage('customerId') }}
+        </div>
+      </div>
+
+      <div class="flex-1 min-w-[100px]">
+        <label
+          for="salesmanId"
+          class="block text-sm font-medium text-gray-700"
+        >Salesman</label>
+        <p-select
+          formControlName="salesmanId"
+          id="salesmanId"
+          [options]="salesmenLabeled()"
+          optionValue="value"
+          optionLabel="label"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        ></p-select>
+        <div
+          *ngIf="getErrorMessage('salesmanId')"
+          class="text-xs text-red-500 mt-1"
+        >
+          {{ getErrorMessage('salesmanId') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap gap-4">
+      <div class="flex-1 min-w-[100px]">
+        <label
+          for="date"
+          class="block text-sm font-medium text-gray-700"
+        >Date</label>
+        <p-datepicker
+          inputId="date"
+          formControlName="date"
+          [showIcon]="true"
+          [showTime]="true"
+          variant="filled"
+          inputStyleClass="p-2 rounded-md"
+          styleClass="w-full"
+          class="mt-1 block border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          required
+          appendTo="body"
+        ></p-datepicker>
+        <div
+          *ngIf="getErrorMessage('date')"
+          class="text-xs text-red-500 mt-1"
+        >
+          {{ getErrorMessage('date') }}
+        </div>
+      </div>
+
+      <div class="flex-1 min-w-[100px] w-fit">
+        <label
+          for="saleReceiptType"
+          class="block text-sm font-medium text-gray-700"
+        >Sale Receipt Type</label
+        >
+        <p-select
+          id="saleReceiptType"
+          [(ngModel)]="selectedSaleReceiptType"
+          [ngModelOptions]="{ standalone: true }"
+          [options]="saleReceiptTypes"
+          optionValue="value"
+          optionLabel="label"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        ></p-select>
+      </div>
+    </div>
+
+    <div class="flex-1 min-w-[100px]">
+      <div
+        *ngIf="selectedSaleReceiptType() === SaleReceiptType.Invoice"
+        class="w-1/2 pr-2"
+      >
+        <label
+          for="invoiceNo"
+          class="block text-sm font-medium text-gray-700"
+        >Invoice No</label
+        >
+        <input
+          formControlName="invoiceNo"
+          pInputText
+          type="text"
+          id="invoiceNo"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+        />
+        <div
+          *ngIf="getErrorMessage('invoiceNo')"
+          class="text-xs text-red-500 mt-1"
+        >
+          {{ getErrorMessage('invoiceNo') }}
+        </div>
+      </div>
+
+      <div
+        *ngIf="selectedSaleReceiptType() === SaleReceiptType.CashRegister"
+        class="flex flex-wrap gap-4"
+        formGroupName="cashRegister"
+      >
+        <div class="flex-1 min-w-[100px]">
+          <label
+            for="cashRegisterNo"
+            class="block text-sm font-medium text-gray-700"
+          >Cash Register No</label
+          >
+          <input
+            formControlName="cashRegisterNo"
+            pInputText
+            type="text"
+            id="cashRegisterNo"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+
+        <div class="flex-1 min-w-[100px]">
+          <label
+            for="receiptNo"
+            class="block text-sm font-medium text-gray-700"
+          >Receipt No</label
+          >
+          <input
+            formControlName="receiptNo"
+            pInputText
+            type="text"
+            id="receiptNo"
+            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Sold Goods Section -->
+    <div class="mt-4">
+      <label class="block text-sm font-medium text-gray-700">Sold Goods</label>
+      <div
+        formArrayName="soldGoods"
+        class="flex flex-col gap-4"
+      >
+        <div
+          *ngFor="let _ of soldGoods().controls; let i = index"
+          [formGroupName]="i"
+          class="border border-gray-300 p-4 rounded-md shadow-md bg-white"
+        >
+          <div class="flex flex-wrap gap-4">
+            <div class="min-w-[250px]">
+              <label class="block text-sm font-medium text-gray-700">Description</label>
+              <input
+                formControlName="description"
+                pInputText
+                type="text"
+                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              />
+              <div
+                *ngIf="getSoldGoodErrorMessage(i, 'description')"
+                class="text-xs text-red-500 mt-1"
+              >
+                {{ getSoldGoodErrorMessage(i, 'description') }}
+              </div>
+            </div>
+
+            <div class="max-w-[100px]">
+              <label class="block text-sm font-medium text-gray-700">Quantity</label>
+              <input
+                formControlName="quantity"
+                pInputText
+                type="number"
+                class="mt-1 block w-[100px] border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              />
+              <div
+                *ngIf="getSoldGoodErrorMessage(i, 'quantity')"
+                class="text-xs text-red-500 mt-1"
+              >
+                {{ getSoldGoodErrorMessage(i, 'quantity') }}
+              </div>
+            </div>
+
+            <div class="max-w-[150px]">
+              <label class="block text-sm font-medium text-gray-700">Unit Price</label>
+              <input
+                formControlName="unitPrice"
+                pInputText
+                type="number"
+                class="mt-1 block w-[150px] border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              />
+              <div
+                *ngIf="getSoldGoodErrorMessage(i, 'unitPrice')"
+                class="text-xs text-red-500 mt-1"
+              >
+                {{ getSoldGoodErrorMessage(i, 'unitPrice') }}
+              </div>
+            </div>
+
+            <div class="max-w-[120px]">
+              <label class="block text-sm font-medium text-gray-700">Measure Unit</label>
+              <input
+                formControlName="unitOfMeasure"
+                pInputText
+                type="text"
+                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              />
+              <div
+                *ngIf="getSoldGoodErrorMessage(i, 'unitOfMeasure')"
+                class="text-xs text-red-500 mt-1"
+              >
+                {{ getSoldGoodErrorMessage(i, 'unitOfMeasure') }}
+              </div>
+            </div>
+
+            <div class="max-w-[150px]">
+              <label class="block text-sm font-medium text-gray-700">Measure Type</label>
+              <p-select
+                styleClass="mt-1 w-[150px]"
+                formControlName="unitOfMeasureType"
+                optionValue="value"
+                optionLabel="label"
+                [options]="measurementUnits"
+              />
+              <div
+                *ngIf="getSoldGoodErrorMessage(i, 'unitOfMeasureType')"
+                class="text-xs text-red-500 mt-1"
+              >
+                {{ getSoldGoodErrorMessage(i, 'unitOfMeasureType') }}
+              </div>
+            </div>
+
+            <div class="max-w-[80px]">
+              <label class="block text-sm font-medium text-gray-700">VAT Rate (%)</label>
+              <input
+                formControlName="vatRate"
+                pInputText
+                type="number"
+                [min]="0"
+                [max]="100"
+                [step]="1"
+                class="mt-1 block w-[80px] border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              />
+              <div
+                *ngIf="getSoldGoodErrorMessage(i, 'vatRate')"
+                class="text-xs text-red-500 mt-1"
+              >
+                {{ getSoldGoodErrorMessage(i, 'vatRate') }}
+              </div>
+            </div>
+
+            <div class="mt-3 flex justify-end">
+              <p-button
+                label="Remove"
+                (onClick)="removeSoldGood(i)"
+              ></p-button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Button -->
+        <div class="mt-4">
+          <p-button
+            label="Add Sold Good"
+            (onClick)="addSoldGood()"
+          ></p-button>
+        </div>
+      </div>
+
+      <!-- Save Button -->
+      <div class="flex justify-end mt-4">
+        <p-button
+          [label]="sale() == null ? 'Create' : 'Save'"
+          [disabled]="!form.valid || !form.dirty"
+          (onClick)="save()"
+        ></p-button>
+      </div>
+    </div>
+  </div>
+</p-dialog>

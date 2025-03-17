@@ -1,8 +1,10 @@
 <p-dialog
+  *ngIf="dataEntry() != null"
   header="Data Type Preview"
   closable="true"
   closeOnEscape="true"
   modal="true"
+  styleClass="min-w-128"
   (close)="hide()"
   (onHide)="hide()"
   [(visible)]="isShown"
@@ -10,26 +12,26 @@
   <div class="flex flex-wrap">
     <div class="w-1/2">
       <p class="font-bold">Created At</p>
-      <p>{{ (dataEntry()?.createdAt | date:'short') || "N/A" }}</p>
+      <p>{{ dataEntry()!.createdAt | date:'short' }}</p>
     </div>
     <div class="w-1/2">
       <p class="font-bold">Created By</p>
-      <p>{{ dataEntry()?.createdById || "N/A" }}</p>
+      <p>{{ toUserIdentityFullName(dataEntry()!.createdBy) }}</p>
     </div>
     <div class="w-1/2 mt-4">
       <p class="font-bold">Modified At</p>
-      <p>{{ (dataEntry()?.modifiedAt | date:'short') || "N/A" }}</p>
+      <p>{{ dataEntry()!.modifiedAt | date:'short' }}</p>
     </div>
     <div class="w-1/2 mt-4">
       <p class="font-bold">Modified By</p>
-      <p>{{ dataEntry()?.modifiedById || "N/A" }}</p>
+      <p>{{ toUserIdentityFullName(dataEntry()!.modifiedBy) }}</p>
     </div>
   </div>
 
   <p class="font-bold mt-4">Values</p>
 
   <p-table
-    [columns]="dataEntry()?.fields || []"
+    [columns]="dataEntry()!.fields || []"
     [value]="[dataEntry()]"
   >
     <ng-template
@@ -45,7 +47,7 @@
 
     <ng-template #body>
       <tr>
-        @for (field of dataEntry()?.fields; track field.id) {
+        @for (field of dataEntry()!.fields; track field.id) {
           <td>{{ field.value }}</td>
         }
       </tr>

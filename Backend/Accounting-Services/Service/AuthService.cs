@@ -1,8 +1,7 @@
 using Accounting.Contract;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Dto;
-using Accounting.Contract.Request;
-using Accounting.Contract.Response;
+using Accounting.Contract.Dto.Auth;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;

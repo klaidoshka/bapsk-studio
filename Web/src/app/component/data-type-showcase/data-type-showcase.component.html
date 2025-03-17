@@ -8,9 +8,7 @@
     [header]='"Are you sure about deleting this data type?"'
   />
 
-  <div class="mb-2">
-    <app-messages-showcase [messages]="messages()"/>
-  </div>
+  <app-messages-showcase [messages]="messages()"/>
 
   @if (!instanceId()) {
     <p-message severity="warn">Please select an instance to manage data types.</p-message>
@@ -25,6 +23,7 @@
 
   <div class="card mt-4">
     <p-table
+      styleClass="w-fit"
       [value]="dataTypes()"
       [paginator]="true"
       [rows]="10"

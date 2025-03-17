@@ -8,7 +8,6 @@ public class DataTypeField
     /// <summary>
     /// Navigation property for the data type that the field belongs to.
     /// </summary>
-    [ForeignKey(nameof(DataTypeId))]
     public DataType DataType { get; set; }
 
     /// <summary>
@@ -41,7 +40,17 @@ public class DataTypeField
         ErrorMessage = "Field name must be between 1 and 100 characters.",
         MinimumLength = 1
     )]
-    public string Name { get; set; } = "";
+    public string Name { get; set; } = String.Empty;
+
+    /// <summary>
+    /// Navigation property for the reference data type. This is only set when FieldType is Reference.
+    /// </summary>
+    public DataType? Reference { get; set; }
+
+    /// <summary>
+    /// Reference to another data type. This is only set when FieldType is Reference.
+    /// </summary>
+    public int? ReferenceId { get; set; }
 
     /// <summary>
     /// Type of the field value.

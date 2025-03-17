@@ -1,0 +1,78 @@
+<p-dialog
+  header="Sale Preview"
+  closable="true"
+  closeOnEscape="true"
+  modal="true"
+  styleClass="min-w-128"
+  (close)="hide()"
+  (onHide)="hide()"
+  [(visible)]="isShown"
+>
+  <ng-container *ngIf="sale() != null">
+    <div class="flex flex-col">
+      <div class="flex flex-col md:flex-row">
+        <div class="flex flex-col md:w-1/2">
+          <p>
+            <strong>Invoice No:</strong> {{ sale()!.invoiceNo || '-' }}
+          </p>
+          <p>
+            <strong>Sale Date:</strong> {{ sale()!.date | date: 'medium' }}
+          </p>
+          <p>
+            <strong>Customer:</strong> {{
+              sale()!.customer.firstName + ' ' + sale()!.customer.lastName
+            }}
+          </p>
+          <p>
+            <strong>Salesman:</strong> {{ sale()!.salesman.name }}
+          </p>
+        </div>
+        <div class="flex flex-col md:w-1/2">
+          <p>
+            <strong>Cash Register No:</strong> {{ sale()!.cashRegister?.cashRegisterNo || '-' }}
+          </p>
+          <p>
+            <strong>Receipt No:</strong> {{ sale()!.cashRegister?.receiptNo || '-' }}
+          </p>
+        </div>
+      </div>
+      <div class="card mt-4">
+        <p-table [value]="sale()!.soldGoods">
+          <ng-template #header>
+            <tr>
+              <th>Sequence No</th>
+              <th>Description</th>
+              <th>Quantity</th>
+              <th>Measure Unit</th>
+              <th>Unit Price</th>
+              <th>VAT Amount</th>
+              <th>Total Amount</th>
+            </tr>
+          </ng-template>
+          <ng-template
+            #body
+            let-soldGood
+          >
+            <tr>
+              <td>{{ soldGood.sequenceNo }}</td>
+              <td>{{ soldGood.description }}</td>
+              <td>{{ soldGood.quantity }}</td>
+              <td>{{ soldGood.unitOfMeasure }}</td>
+              <td>{{ soldGood.taxableAmount / soldGood.quantity }}</td>
+              <td>{{ soldGood.vatAmount }} ({{ soldGood.vatRate }}%)</td>
+              <td>{{ soldGood.totalAmount }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <div class="flex justify-end mt-4">
+      <p-button
+        label="Close"
+        class="p-button-secondary"
+        (onClick)="hide()"
+      ></p-button>
+    </div>
+  </ng-container>
+</p-dialog>

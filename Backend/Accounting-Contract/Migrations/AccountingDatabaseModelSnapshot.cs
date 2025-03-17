@@ -22,6 +22,83 @@ namespace Accounting.Contract.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("Accounting.Contract.Entity.Customer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Birthdate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("IdentityDocumentIssuedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("IdentityDocumentNumber")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("IdentityDocumentType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("IdentityDocumentValue")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("InstanceId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ResidenceCountry")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstanceId");
+
+                    b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.CustomerOtherDocument", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IssuedBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("CustomerOtherDocuments");
+                });
+
             modelBuilder.Entity("Accounting.Contract.Entity.DataEntry", b =>
                 {
                     b.Property<int>("Id")
@@ -42,10 +119,10 @@ namespace Accounting.Contract.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<DateTime?>("ModifiedAt")
+                    b.Property<DateTime>("ModifiedAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int?>("ModifiedById")
+                    b.Property<int>("ModifiedById")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -99,6 +176,9 @@ namespace Accounting.Contract.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
+                    b.Property<int?>("DisplayFieldId")
+                        .HasColumnType("int");
+
                     b.Property<int>("InstanceId")
                         .HasColumnType("int");
 
@@ -139,12 +219,17 @@ namespace Accounting.Contract.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
+                    b.Property<int?>("ReferenceId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("DataTypeId");
+
+                    b.HasIndex("ReferenceId");
 
                     b.ToTable("DataTypeFields");
                 });
@@ -201,18 +286,79 @@ namespace Accounting.Contract.Migrations
                     b.ToTable("InstanceUserMetas");
                 });
 
-            modelBuilder.Entity("Accounting.Contract.Entity.SaleTaxFreeDeclaration", b =>
+            modelBuilder.Entity("Accounting.Contract.Entity.Sale", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasMaxLength(34)
-                        .HasColumnType("varchar(34)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.Property<int>("Correction")
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CashRegisterNo")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CashRegisterReceiptNo")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int?>("InstanceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("InvoiceNo")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("SalesmanId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("SaleTaxFreeDeclarations");
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("InstanceId");
+
+                    b.HasIndex("SalesmanId");
+
+                    b.ToTable("Sales");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.Salesman", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("InstanceId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("VatPayerCode")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("VatPayerCodeIssuedBy")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstanceId");
+
+                    b.ToTable("Salesmen");
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.Session", b =>
@@ -250,6 +396,92 @@ namespace Accounting.Contract.Migrations
                     b.ToTable("Sessions");
                 });
 
+            modelBuilder.Entity("Accounting.Contract.Entity.SoldGood", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SaleId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SequenceNo")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<decimal>("TaxableAmount")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<string>("UnitOfMeasure")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("UnitOfMeasureType")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("VatAmount")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal>("VatRate")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SaleId");
+
+                    b.ToTable("SoldGoods");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.StiVatReturnDeclaration", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(34)
+                        .HasColumnType("varchar(34)");
+
+                    b.Property<int>("Correction")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DeclaredById")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("InstanceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SaleId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("State")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SubmitDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeclaredById");
+
+                    b.HasIndex("InstanceId");
+
+                    b.HasIndex("SaleId");
+
+                    b.ToTable("StiVatReturnDeclarations");
+                });
+
             modelBuilder.Entity("Accounting.Contract.Entity.User", b =>
                 {
                     b.Property<int>("Id")
@@ -270,7 +502,6 @@ namespace Accounting.Contract.Migrations
 
                     b.Property<string>("EmailNormalized")
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("FirstName")
@@ -299,6 +530,26 @@ namespace Accounting.Contract.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Accounting.Contract.Entity.Customer", b =>
+                {
+                    b.HasOne("Accounting.Contract.Entity.Instance", "Instance")
+                        .WithMany()
+                        .HasForeignKey("InstanceId");
+
+                    b.Navigation("Instance");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.CustomerOtherDocument", b =>
+                {
+                    b.HasOne("Accounting.Contract.Entity.Customer", "Customer")
+                        .WithMany("OtherDocuments")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
             modelBuilder.Entity("Accounting.Contract.Entity.DataEntry", b =>
                 {
                     b.HasOne("Accounting.Contract.Entity.User", "CreatedBy")
@@ -315,7 +566,9 @@ namespace Accounting.Contract.Migrations
 
                     b.HasOne("Accounting.Contract.Entity.User", "ModifiedBy")
                         .WithMany()
-                        .HasForeignKey("ModifiedById");
+                        .HasForeignKey("ModifiedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("CreatedBy");
 
@@ -362,7 +615,13 @@ namespace Accounting.Contract.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Accounting.Contract.Entity.DataType", "Reference")
+                        .WithMany()
+                        .HasForeignKey("ReferenceId");
+
                     b.Navigation("DataType");
+
+                    b.Navigation("Reference");
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.Instance", b =>
@@ -395,6 +654,40 @@ namespace Accounting.Contract.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Accounting.Contract.Entity.Sale", b =>
+                {
+                    b.HasOne("Accounting.Contract.Entity.Customer", "Customer")
+                        .WithMany("Sales")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Accounting.Contract.Entity.Instance", "Instance")
+                        .WithMany()
+                        .HasForeignKey("InstanceId");
+
+                    b.HasOne("Accounting.Contract.Entity.Salesman", "Salesman")
+                        .WithMany("Sales")
+                        .HasForeignKey("SalesmanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Instance");
+
+                    b.Navigation("Salesman");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.Salesman", b =>
+                {
+                    b.HasOne("Accounting.Contract.Entity.Instance", "Instance")
+                        .WithMany()
+                        .HasForeignKey("InstanceId");
+
+                    b.Navigation("Instance");
+                });
+
             modelBuilder.Entity("Accounting.Contract.Entity.Session", b =>
                 {
                     b.HasOne("Accounting.Contract.Entity.User", "User")
@@ -404,6 +697,47 @@ namespace Accounting.Contract.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.SoldGood", b =>
+                {
+                    b.HasOne("Accounting.Contract.Entity.Sale", "Sale")
+                        .WithMany("SoldGoods")
+                        .HasForeignKey("SaleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sale");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.StiVatReturnDeclaration", b =>
+                {
+                    b.HasOne("Accounting.Contract.Entity.User", "DeclaredBy")
+                        .WithMany()
+                        .HasForeignKey("DeclaredById");
+
+                    b.HasOne("Accounting.Contract.Entity.Instance", "Instance")
+                        .WithMany()
+                        .HasForeignKey("InstanceId");
+
+                    b.HasOne("Accounting.Contract.Entity.Sale", "Sale")
+                        .WithMany()
+                        .HasForeignKey("SaleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DeclaredBy");
+
+                    b.Navigation("Instance");
+
+                    b.Navigation("Sale");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.Customer", b =>
+                {
+                    b.Navigation("OtherDocuments");
+
+                    b.Navigation("Sales");
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.DataEntry", b =>
@@ -421,6 +755,16 @@ namespace Accounting.Contract.Migrations
             modelBuilder.Entity("Accounting.Contract.Entity.Instance", b =>
                 {
                     b.Navigation("UserMetas");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.Sale", b =>
+                {
+                    b.Navigation("SoldGoods");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.Salesman", b =>
+                {
+                    b.Navigation("Sales");
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.User", b =>

@@ -3,6 +3,7 @@
   closable="true"
   closeOnEscape="true"
   modal="true"
+  styleClass="min-w-128"
   (close)="hide()"
   (onHide)="hide()"
   [(visible)]="isShown"
@@ -12,6 +13,9 @@
 
   <p class="font-bold mt-4">Description</p>
   <p>{{ instance()?.description }}</p>
+
+  <p class="font-bold mt-4">Created</p>
+  <p>{{ instance()?.createdAt | date:'medium' }}</p>
 
   <div class="flex justify-end mt-4">
     <p-button

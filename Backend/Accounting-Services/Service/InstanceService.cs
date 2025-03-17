@@ -1,9 +1,10 @@
 using Accounting.Contract;
-using Accounting.Contract.Entity;
-using Accounting.Contract.Request;
+using Accounting.Contract.Dto.Instance;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;
+using Instance = Accounting.Contract.Entity.Instance;
+using InstanceUserMeta = Accounting.Contract.Entity.InstanceUserMeta;
 
 namespace Accounting.Services.Service;
 
@@ -12,7 +13,10 @@ public class InstanceService : IInstanceService
     private readonly AccountingDatabase _database;
     private readonly IInstanceValidator _instanceValidator;
 
-    public InstanceService(AccountingDatabase database, IInstanceValidator instanceValidator)
+    public InstanceService(
+        AccountingDatabase database,
+        IInstanceValidator instanceValidator
+    )
     {
         _database = database;
         _instanceValidator = instanceValidator;
