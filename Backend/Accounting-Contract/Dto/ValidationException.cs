@@ -1,3 +1,5 @@
+using Accounting.Contract.Configuration;
+
 namespace Accounting.Contract.Dto;
 
 public class ValidationException(Validation validation) : Exception(
@@ -6,6 +8,6 @@ public class ValidationException(Validation validation) : Exception(
 {
     public Validation Validation { get; } = validation;
 
-    public ValidationException(string message) : this(new Validation(message)) { }
-    public ValidationException(IEnumerable<string> messages) : this(new Validation(messages)) { }
+    public ValidationException(string message, InternalFailure? internalFailure = null) : this(new Validation(message, internalFailure)) { }
+    public ValidationException(IEnumerable<string> messages, InternalFailure? internalFailure = null) : this(new Validation(messages, internalFailure)) { }
 }

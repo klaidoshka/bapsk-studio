@@ -10,6 +10,7 @@ import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.
 import {InstancePreviewComponent} from '../instance-preview/instance-preview.component';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
 import {LocalizationService} from '../../service/localization.service';
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-instance-showcase',
@@ -19,7 +20,8 @@ import {LocalizationService} from '../../service/localization.service';
     TableModule,
     MessagesShowcaseComponent,
     InstancePreviewComponent,
-    ConfirmationComponent
+    ConfirmationComponent,
+    DatePipe
   ],
   templateUrl: './instance-showcase.component.html',
   styles: ``

@@ -5,6 +5,7 @@ import {HttpClient} from '@angular/common/http';
 import {finalize, map, Observable, tap} from 'rxjs';
 import {AuthService} from './auth.service';
 import {Router} from '@angular/router';
+import {DateUtil} from '../util/date.util';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +26,10 @@ export class SessionService {
     return this.httpClient.get<Session[]>(this.apiRouter.sessionGetByUser()).pipe(
       map((sessions: Session[]) => sessions
         .map(s => {
-          return {...s, createdAt: new Date(s.createdAt)};
+          return {
+            ...s,
+            createdAt: DateUtil.adjustToLocalDate(s.createdAt)
+          };
         })
         .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
       ),

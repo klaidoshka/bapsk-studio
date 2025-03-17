@@ -39,7 +39,7 @@ export class SaleManagementComponent implements OnInit {
   protected readonly SaleReceiptType = SaleReceiptType;
   customers = input.required<Customer[]>();
   customersLabeled = computed(() => this.customers().map((customer) => ({
-    label: `${customer.firstName} ${customer.lastName} (${customer.identityDocument.value})`,
+    label: `${customer.firstName} ${customer.lastName} (${customer.identityDocument.number})`,
     value: customer.id
   })));
   form!: FormGroup;

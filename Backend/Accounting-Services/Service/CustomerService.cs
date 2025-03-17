@@ -2,6 +2,7 @@ using Accounting.Contract;
 using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.Customer;
 using Accounting.Contract.Service;
+using Accounting.Services.Util;
 using Microsoft.EntityFrameworkCore;
 using Customer = Accounting.Contract.Entity.Customer;
 
@@ -27,11 +28,16 @@ public class CustomerService : ICustomerService
             {
                 Birthdate = request.Customer.Birthdate,
                 FirstName = request.Customer.FirstName,
-                IdentityDocument = request.Customer.IdentityDocument.Value,
                 IdentityDocumentIssuedBy = request.Customer.IdentityDocument.IssuedBy,
+                IdentityDocumentNumber = request.Customer.IdentityDocument.Number,
                 IdentityDocumentType = request.Customer.IdentityDocument.Type,
+                IdentityDocumentValue = request.Customer.IdentityDocument.Value,
                 InstanceId = request.InstanceId,
-                LastName = request.Customer.LastName
+                LastName = request.Customer.LastName,
+                OtherDocuments = request.Customer.OtherDocuments
+                    .Select(it => it.ToEntity())
+                    .ToList(),
+                ResidenceCountry = request.Customer.ResidenceCountry
             }
         )).Entity;
 
@@ -60,14 +66,57 @@ public class CustomerService : ICustomerService
         // Validate if customer exists
         // Validate properties
 
-        var customer = await _database.Customers.FirstAsync(it => it.Id == request.Customer.Id);
+        var customer = await _database.Customers
+            .Include(it => it.OtherDocuments)
+            .FirstAsync(it => it.Id == request.Customer.Id);
 
         customer.Birthdate = request.Customer.Birthdate;
         customer.FirstName = request.Customer.FirstName;
-        customer.IdentityDocument = request.Customer.IdentityDocument.Value;
+        customer.IdentityDocumentNumber = request.Customer.IdentityDocument.Number;
         customer.IdentityDocumentIssuedBy = request.Customer.IdentityDocument.IssuedBy;
         customer.IdentityDocumentType = request.Customer.IdentityDocument.Type;
+        customer.IdentityDocumentValue = request.Customer.IdentityDocument.Value;
         customer.LastName = request.Customer.LastName;
+
+        var documentsCurrent = customer.OtherDocuments.ToDictionary(it => it.Id);
+
+        var documentsNew = request.Customer.OtherDocuments
+            .ToDictionary(it => it.Id)
+            .Where(it => !documentsCurrent.ContainsKey(it.Key))
+            .ToDictionary(it => it.Key, it => it.Value);
+
+        foreach (var document in documentsNew)
+        {
+            customer.OtherDocuments.Add(document.Value.ToEntity());
+        }
+
+        var documentsProvided = request.Customer.OtherDocuments.ToDictionary(it => it.Id);
+
+        var otherDocumentsMissing = documentsCurrent
+            .Where(it => !documentsProvided.ContainsKey(it.Key))
+            .Select(it => it.Value)
+            .ToList();
+
+        foreach (var document in otherDocumentsMissing)
+        {
+            customer.OtherDocuments.Remove(document);
+        }
+
+        documentsProvided
+            .Where(it => !documentsNew.ContainsKey(it.Key))
+            .Select(it => it.Value)
+            .ToList()
+            .ForEach(
+                it => documentsCurrent[it.Id]
+                    .Also(
+                        document =>
+                        {
+                            document.IssuedBy = it.IssuedBy;
+                            document.Type = it.Type;
+                            document.Value = it.Value;
+                        }
+                    )
+            );
 
         await _database.SaveChangesAsync();
     }
@@ -80,6 +129,7 @@ public class CustomerService : ICustomerService
         if (request.InstanceId is not null)
         {
             return await _database.Customers
+                .Include(it => it.OtherDocuments)
                 .Where(it => !it.IsDeleted && it.InstanceId == request.InstanceId)
                 .ToListAsync();
         }
@@ -90,18 +140,21 @@ public class CustomerService : ICustomerService
             .ToHashSetAsync();
 
         return (await _database.Customers
-            .Where(
-                it => !it.IsDeleted &&
-                      it.InstanceId != null
-            )
-            .ToListAsync())
+                .Include(it => it.OtherDocuments)
+                .Where(
+                    it => !it.IsDeleted &&
+                          it.InstanceId != null
+                )
+                .ToListAsync())
             .Where(it => instanceIds.Contains(it.InstanceId!.Value))
             .ToList();
     }
 
     public async Task<Customer> GetByIdAsync(int id)
     {
-        return await _database.Customers.FirstOrDefaultAsync(it => it.Id == id && !it.IsDeleted)
+        return await _database.Customers
+                   .Include(it => it.OtherDocuments)
+                   .FirstOrDefaultAsync(it => it.Id == id && !it.IsDeleted)
                ?? throw new ValidationException("Customer not found");
     }
 }

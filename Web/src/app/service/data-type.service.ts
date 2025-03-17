@@ -4,6 +4,8 @@ import {HttpClient} from '@angular/common/http';
 import {first, Observable, tap} from 'rxjs';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../model/data-type.model';
 import {DataEntryService} from './data-entry.service';
+import {EnumUtil} from '../util/enum.util';
+import {FieldType} from '../model/data-type-field.model';
 
 @Injectable({
   providedIn: 'root'
@@ -38,9 +40,9 @@ export class DataTypeService {
         const existingSignal = this.store.get(request.instanceId);
 
         if (existingSignal != null) {
-          existingSignal.update(old => [...old, dataType]);
+          existingSignal.update(old => [...old, this.updateProperties(dataType)]);
         } else {
-          this.store.set(request.instanceId, signal([dataType]));
+          this.store.set(request.instanceId, signal([this.updateProperties(dataType)]));
         }
       })
     );
@@ -79,11 +81,11 @@ export class DataTypeService {
             const index = old.findIndex(it => it.id === id);
 
             return index === -1
-              ? [...old, dataType]
-              : [...old.slice(0, index), dataType, ...old.slice(index + 1)];
+              ? [...old, this.updateProperties(dataType)]
+              : [...old.slice(0, index), this.updateProperties(dataType), ...old.slice(index + 1)];
           });
         } else {
-          this.store.set(dataType.instanceId, signal([dataType]));
+          this.store.set(dataType.instanceId, signal([this.updateProperties(dataType)]));
         }
       })
     );
@@ -95,9 +97,9 @@ export class DataTypeService {
         const existingSignal = this.store.get(instanceId);
 
         if (existingSignal != null) {
-          existingSignal.update(() => dataTypes);
+          existingSignal.update(() => dataTypes.map(this.updateProperties));
         } else {
-          this.store.set(instanceId, signal(dataTypes));
+          this.store.set(instanceId, signal(dataTypes.map(this.updateProperties)));
         }
       })
     );
@@ -113,5 +115,15 @@ export class DataTypeService {
     }
 
     return this.store.get(instanceId)!.asReadonly();
+  }
+
+  readonly updateProperties = (dataType: DataType): DataType => {
+    return {
+      ...dataType,
+      fields: dataType.fields.map(it => ({
+        ...it,
+        type: EnumUtil.toEnumOrThrow(it.type, FieldType)
+      })),
+    }
   }
 }

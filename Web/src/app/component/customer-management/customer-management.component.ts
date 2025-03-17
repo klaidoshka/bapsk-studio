@@ -30,6 +30,8 @@ import {getDefaultIsoCountry, IsoCountries} from '../../model/iso-country.model'
   styles: ``
 })
 export class CustomerManagementComponent implements OnInit {
+  protected readonly IsoCountries = IsoCountries;
+
   customer = signal<Customer | null>(null);
   form!: FormGroup;
   instanceId = input.required<number>();
@@ -52,8 +54,9 @@ export class CustomerManagementComponent implements OnInit {
       firstName: ["", [Validators.required, Validators.maxLength(200)]],
       identityDocument: this.formBuilder.group({
         issuedBy: [getDefaultIsoCountry().code, [Validators.required]],
+        number: ["", [Validators.required, Validators.maxLength(50)]],
         type: [IdentityDocumentType.Passport, [Validators.required]],
-        value: ["", [Validators.required, Validators.maxLength(50)]]
+        value: [null, [Validators.maxLength(50)]]
       }),
       lastName: ["", [Validators.required, Validators.maxLength(200)]]
     });
@@ -125,6 +128,7 @@ export class CustomerManagementComponent implements OnInit {
         lastName: this.form.value.lastName,
         identityDocument: {
           issuedBy: this.form.value.identityDocument.issuedBy,
+          number: this.form.value.identityDocument.number,
           type: this.form.value.identityDocument.type,
           value: this.form.value.identityDocument.value
         }
@@ -158,6 +162,4 @@ export class CustomerManagementComponent implements OnInit {
       this.form.patchValue({...customer});
     }
   }
-
-  protected readonly IsoCountries = IsoCountries;
 }

@@ -5,8 +5,9 @@ import {HttpClient} from '@angular/common/http';
 import {first, tap} from 'rxjs';
 import {CustomerService} from './customer.service';
 import {SalesmanService} from './salesman.service';
-import {toEnumOrThrow} from '../util/enum.util';
+import {EnumUtil} from '../util/enum.util';
 import {UnitOfMeasureType} from '../model/unit-of-measure-type.model';
+import {DateUtil} from '../util/date.util';
 
 @Injectable({
   providedIn: 'root'
@@ -118,12 +119,12 @@ export class SaleService {
   readonly updateProperties = (sale: Sale): Sale => {
     return {
       ...sale,
-      date: new Date(sale.date),
+      date: DateUtil.adjustToLocalDate(sale.date),
       customer: this.customerService.updateProperties(sale.customer),
       salesman: this.salesmanService.updateProperties(sale.salesman),
       soldGoods: sale.soldGoods.map(soldGood => ({
         ...soldGood,
-        unitOfMeasureType: toEnumOrThrow(soldGood.unitOfMeasureType, UnitOfMeasureType)
+        unitOfMeasureType: EnumUtil.toEnumOrThrow(soldGood.unitOfMeasureType, UnitOfMeasureType)
       }))
     }
   }

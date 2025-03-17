@@ -4,6 +4,7 @@ using Accounting.Contract;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Accounting.Contract.Migrations
 {
     [DbContext(typeof(AccountingDatabase))]
-    partial class AccountingDatabaseModelSnapshot : ModelSnapshot
+    [Migration("20250316155706_Add_Customer_PersonalCode_Field")]
+    partial class Add_Customer_PersonalCode_Field
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,43 +63,11 @@ namespace Accounting.Contract.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("ResidenceCountry")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("InstanceId");
 
                     b.ToTable("Customers");
-                });
-
-            modelBuilder.Entity("Accounting.Contract.Entity.CustomerOtherDocument", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IssuedBy")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.ToTable("CustomerOtherDocuments");
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.DataEntry", b =>
@@ -539,17 +510,6 @@ namespace Accounting.Contract.Migrations
                     b.Navigation("Instance");
                 });
 
-            modelBuilder.Entity("Accounting.Contract.Entity.CustomerOtherDocument", b =>
-                {
-                    b.HasOne("Accounting.Contract.Entity.Customer", "Customer")
-                        .WithMany("OtherDocuments")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-                });
-
             modelBuilder.Entity("Accounting.Contract.Entity.DataEntry", b =>
                 {
                     b.HasOne("Accounting.Contract.Entity.User", "CreatedBy")
@@ -735,8 +695,6 @@ namespace Accounting.Contract.Migrations
 
             modelBuilder.Entity("Accounting.Contract.Entity.Customer", b =>
                 {
-                    b.Navigation("OtherDocuments");
-
                     b.Navigation("Sales");
                 });
 

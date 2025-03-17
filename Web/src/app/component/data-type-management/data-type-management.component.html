@@ -2,6 +2,7 @@
   header="Data Type Management"
   closeOnEscape="true"
   modal="true"
+  styleClass="min-w-128"
   closable="true"
   [(visible)]="isShown"
   (onHide)="hide()"
@@ -87,8 +88,9 @@
                     optionLabel="label"
                     optionValue="value"
                     placeholder="Select a type"
-                    (onChange)="clearDefaultValue(i)"
                     appendTo="body"
+                    styleClass="w-full"
+                    (onChange)="updateDefaultValue(i, $event.value)"
                   ></p-select>
                 </td>
 
@@ -104,14 +106,16 @@
                     @case (FieldType.Date) {
                       <p-datepicker
                         formControlName="defaultValue"
-                        class="w-full"
+                        hideOnDateTimeSelect="true"
+                        styleClass="w-full"
                         appendTo="body"
+                        [showTime]="true"
+                        [showIcon]="true"
                       ></p-datepicker>
                     }
                     @case (FieldType.Number) {
                       <input
                         formControlName="defaultValue"
-                        [defaultValue]="0"
                         pInputText
                         type="number"
                         class="w-full"

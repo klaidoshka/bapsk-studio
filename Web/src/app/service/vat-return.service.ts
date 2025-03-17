@@ -2,8 +2,10 @@ import {computed, Injectable, signal, WritableSignal} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
 import VatReturnDeclaration, {SubmitDeclarationState, VatReturnDeclarationSubmitRequest} from '../model/vat-return.model';
-import {first, tap} from 'rxjs';
-import {toEnumOrThrow} from '../util/enum.util';
+import {catchError, first, tap} from 'rxjs';
+import {EnumUtil} from '../util/enum.util';
+import ErrorResponse from '../model/error-response.model';
+import {InternalFailure} from '../model/internal-failure-code.model';
 
 @Injectable({
   providedIn: 'root'
@@ -78,14 +80,27 @@ export class VatReturnService {
         date: request.sale.date.toISOString() as any
       }
     } as VatReturnDeclarationSubmitRequest).pipe(
-      tap(declaration => this.updateSingleInStore(request.instanceId, this.updateProperties(declaration)))
+      tap(declaration => this.updateSingleInStore(request.instanceId, this.updateProperties(declaration))),
+      catchError(response => {
+        const errorResponse = response as ErrorResponse | undefined;
+
+        if (errorResponse?.error?.internalFailure != null) {
+          const failure = EnumUtil.toEnum(errorResponse.error.internalFailure, InternalFailure);
+
+          if (failure == InternalFailure.VatReturnDeclarationSubmitRejectedButUpdated) {
+            this.getBySaleId(request.sale.id).pipe(first()).subscribe();
+          }
+        }
+
+        throw response;
+      })
     );
   }
 
   readonly updateProperties = (declaration: VatReturnDeclaration): VatReturnDeclaration => {
     return {
       ...declaration,
-      state: toEnumOrThrow(declaration.state, SubmitDeclarationState),
+      state: EnumUtil.toEnumOrThrow(declaration.state, SubmitDeclarationState),
     }
   }
 }

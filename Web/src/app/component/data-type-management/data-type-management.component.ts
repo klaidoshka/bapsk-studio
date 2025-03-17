@@ -1,13 +1,5 @@
 import {Component, computed, input, OnInit, Signal, signal} from '@angular/core';
-import {
-  AbstractControl,
-  FormArray,
-  FormBuilder,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
+import {AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {DataTypeService} from '../../service/data-type.service';
 import {TextService} from '../../service/text.service';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../../model/data-type.model';
@@ -20,15 +12,12 @@ import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.
 import {Textarea} from 'primeng/textarea';
 import {InstanceService} from '../../service/instance.service';
 import {TableModule} from 'primeng/table';
-import DataTypeField, {
-  DataTypeFieldEditRequest,
-  FieldType,
-  fieldTypes
-} from '../../model/data-type-field.model';
+import DataTypeField, {DataTypeFieldEditRequest, FieldType, fieldTypes} from '../../model/data-type-field.model';
 import {Checkbox} from 'primeng/checkbox';
 import {Select} from 'primeng/select';
 import {DatePicker} from 'primeng/datepicker';
 import {LocalizationService} from '../../service/localization.service';
+import {IsoCountryCode} from '../../model/iso-country.model';
 
 @Component({
   selector: 'app-data-type-management',
@@ -99,9 +88,7 @@ export class DataTypeManagementComponent implements OnInit {
     if (field) {
       this.formFields.push(this.formBuilder.group({
         name: [field.name, Validators.required],
-        type: [fieldTypes.find(t =>
-          t.label.toLowerCase() == field.type.toString().toLowerCase()
-        )?.value, Validators.required],
+        type: [field.type, Validators.required],
         defaultValue: [field.defaultValue],
         isRequired: [field.isRequired, Validators.required]
       }));
@@ -117,8 +104,30 @@ export class DataTypeManagementComponent implements OnInit {
     this.formFields.markAsDirty();
   }
 
-  readonly clearDefaultValue = (index: number) => {
-    this.formFields.at(index).patchValue({defaultValue: ""});
+  readonly updateDefaultValue = (index: number, type: FieldType) => {
+    const field = this.formFields.at(index);
+
+    switch (type) {
+      case FieldType.Check:
+        field.patchValue({defaultValue: false});
+        break;
+
+      case FieldType.Date:
+        field.patchValue({defaultValue: new Date()});
+        break;
+
+      case FieldType.Number:
+        field.patchValue({defaultValue: 0});
+        break;
+
+      case FieldType.IsoCountryCode:
+        field.patchValue({defaultValue: IsoCountryCode.LT});
+        break;
+
+      default:
+        field.patchValue({defaultValue: ""});
+        break;
+    }
   }
 
   readonly removeField = (index: number) => {

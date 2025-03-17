@@ -58,12 +58,7 @@ public class VatReturnService : IVatReturnService
         (await _validator.ValidateSubmitRequestAsync(request)).AssertValid();
 
         var (declaration, isNew) = await ResolveDeclarationAsync(request);
-
-        var clientRequest = ResolveStiClientRequest(
-            request,
-            declaration
-        );
-
+        var clientRequest = ResolveStiClientRequest(declaration);
         var clientResponse = await _stiVatReturnClientService.SubmitDeclarationAsync(clientRequest);
 
         if (clientResponse.DeclarationState == null)
@@ -94,7 +89,8 @@ public class VatReturnService : IVatReturnService
             throw new ValidationException(
                 clientResponse.Errors
                     .Select(e => e.Description)
-                    .ToList()
+                    .ToList(),
+                InternalFailure.VatReturnDeclarationSubmitRejectedButUpdated
             );
         }
 
@@ -251,22 +247,72 @@ public class VatReturnService : IVatReturnService
         return soldGoodsResolved;
     }
 
-    private SubmitDeclarationRequest ResolveStiClientRequest(
-        StiVatReturnDeclarationSubmitRequest request,
-        StiVatReturnDeclaration declaration
-    )
+    private SubmitDeclarationRequest ResolveStiClientRequest(StiVatReturnDeclaration declaration)
     {
         var requestId = $"{Guid.NewGuid():N}";
         var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Vilnius");
         var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
+        
+        var customerIdentityDocument = new SubmitDeclarationIdentityDocument
+        {
+            DocumentNo = new()
+            {
+                IssuedBy = declaration.Sale.Customer.IdentityDocumentIssuedBy,
+                Value = declaration.Sale.Customer.IdentityDocumentNumber
+            },
+            DocumentType = declaration.Sale.Customer.IdentityDocumentType
+        };
 
-        var document = new SubmitDeclarationSalesDocument
+        var customerPersonalCode = declaration.Sale.Customer.IdentityDocumentValue is not null
+            ? new SubmitDeclarationPersonId
+            {
+                IssuedBy = declaration.Sale.Customer.IdentityDocumentIssuedBy,
+                Value = declaration.Sale.Customer.IdentityDocumentValue
+            }
+            : null;
+
+        var customerOtherDocuments = declaration.Sale.Customer.OtherDocuments
+            .Select(
+                it => new SubmitDeclarationOtherDocument
+                {
+                    DocumentNo = new SubmitDeclarationOtherDocumentNo
+                    {
+                        IssuedBy = it.IssuedBy,
+                        Value = it.Value
+                    },
+                    DocumentType = it.Type
+                }
+            )
+            .ToList();
+
+        var customer = new SubmitDeclarationCustomer
+        {
+            BirthDate = TimeZoneInfo.ConvertTimeFromUtc(declaration.Sale.Customer.Birthdate.Date, timeZone),
+            FirstName = declaration.Sale.Customer.FirstName,
+            IdentityDocument = customerIdentityDocument,
+            LastName = declaration.Sale.Customer.LastName,
+            OtherDocuments = customerOtherDocuments,
+            PersonId = customerPersonalCode,
+            ResidentCountryCode = declaration.Sale.Customer.ResidenceCountry.ConvertToEnumOrNull<NonEuCountryCode>()
+        };
+
+        var salesman = new SubmitDeclarationSalesman
+        {
+            Name = declaration.Sale.Salesman.Name,
+            VatPayerCode = new SubmitDeclarationLtVatPayerCode
+            {
+                IssuedBy = declaration.Sale.Salesman.VatPayerCodeIssuedBy,
+                Value = declaration.Sale.Salesman.VatPayerCode
+            }
+        };
+
+        var sale = new SubmitDeclarationSalesDocument
         {
             CashRegisterReceipt = String.IsNullOrWhiteSpace(declaration.Sale.InvoiceNo)
-                ? new()
+                ? new SubmitDeclarationCashRegisterReceipt
                 {
-                    CashRegisterNo = declaration.Sale.CashRegisterNo,
-                    ReceiptNo = declaration.Sale.CashRegisterReceiptNo,
+                    CashRegisterNo = declaration.Sale.CashRegisterNo!,
+                    ReceiptNo = declaration.Sale.CashRegisterReceiptNo!,
                 }
                 : null,
             Goods = declaration.Sale.SoldGoods
@@ -293,63 +339,23 @@ public class VatReturnService : IVatReturnService
 
         return new()
         {
-            Declaration = new()
+            Declaration = new SubmitDeclaration
             {
-                Customer = new()
-                {
-                    BirthDate = TimeZoneInfo.ConvertTimeFromUtc(request.Sale.Customer.Birthdate.Date, timeZone),
-                    FirstName = request.Sale.Customer.FirstName,
-                    IdentityDocument = new()
-                    {
-                        DocumentNo = new()
-                        {
-                            IssuedBy = request.Sale.Customer.IdentityDocument.IssuedBy,
-                            Value = request.Sale.Customer.IdentityDocument.Value
-                        },
-                        DocumentType = request.Sale.Customer.IdentityDocument.Type
-                    },
-                    LastName = request.Sale.Customer.LastName,
-                    OtherDocuments =
-                    [
-                        new()
-                        {
-                            DocumentNo = new()
-                            {
-                                IssuedBy = request.Sale.Customer.IdentityDocument.IssuedBy,
-                                Value = request.Sale.Customer.IdentityDocument.Value
-                            },
-                            DocumentType = request.Sale.Customer.IdentityDocument.Type.ToString()
-                        }
-                    ],
-                    PersonId = new()
-                    {
-                        IssuedBy = request.Sale.Customer.IdentityDocument.IssuedBy,
-                        Value = request.Sale.Customer.IdentityDocument.Value
-                    },
-                    ResidentCountryCode = NonEuCountryCode.UA
-                },
-                Header = new()
+                Customer = customer,
+                Header = new SubmitDeclarationDocumentHeader
                 {
                     Affirmation = SubmitDeclarationDocumentHeaderAffirmation.Y,
                     CompletionDate = now.Date,
                     DocumentCorrectionNo = declaration.Correction,
                     DocumentId = declaration.Id
                 },
-                Intermediary = new()
+                Intermediary = new SubmitDeclarationIntermediary
                 {
                     Id = _stiVatReturn.Intermediary.Id,
                     Name = _stiVatReturn.Intermediary.Name
                 },
-                Salesman = new()
-                {
-                    Name = request.Sale.Salesman.Name,
-                    VatPayerCode = new()
-                    {
-                        IssuedBy = request.Sale.Salesman.VatPayerCode.IssuedBy,
-                        Value = request.Sale.Salesman.VatPayerCode.Value
-                    }
-                },
-                SalesDocuments = [document]
+                Salesman = salesman,
+                SalesDocuments = [sale]
             },
             RequestId = requestId,
             SenderId = _stiVatReturn.Intermediary.Id,

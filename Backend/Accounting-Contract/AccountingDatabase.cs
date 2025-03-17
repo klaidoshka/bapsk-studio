@@ -6,6 +6,7 @@ namespace Accounting.Contract;
 public class AccountingDatabase : DbContext
 {
     public DbSet<Customer> Customers { get; set; }
+    public DbSet<CustomerOtherDocument> CustomerOtherDocuments { get; set; }
     public DbSet<DataEntry> DataEntries { get; set; }
     public DbSet<DataEntryField> DataEntryFields { get; set; }
     public DbSet<DataType> DataTypes { get; set; }

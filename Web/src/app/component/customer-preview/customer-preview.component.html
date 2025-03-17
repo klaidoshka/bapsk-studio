@@ -3,6 +3,7 @@
   closable="true"
   closeOnEscape="true"
   modal="true"
+  styleClass="min-w-128"
   (close)="hide()"
   (onHide)="hide()"
   [(visible)]="isShown"
@@ -17,9 +18,10 @@
   <p>{{ customer()?.birthdate | date:'mediumDate' }}</p>
 
   <p class="font-bold mt-4">Identity Document</p>
-  <p>IssuedBy: {{ getCountryName(customer()?.identityDocument?.issuedBy) }}</p>
+  <p>Issued By: {{ getCountryName(customer()?.identityDocument?.issuedBy) }}</p>
   <p>Type: {{ getIdentityDocumentTypeLabel(customer()?.identityDocument?.type) }}</p>
-  <p>Number: {{ customer()?.identityDocument?.value }}</p>
+  <p>Number: {{ customer()?.identityDocument?.number }}</p>
+  <p>Personal Code: {{ customer()?.identityDocument?.value || "Unprovided"}}</p>
 
   <div class="flex justify-end mt-4">
     <p-button

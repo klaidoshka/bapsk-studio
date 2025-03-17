@@ -4,6 +4,7 @@ import Instance, {InstanceCreateRequest, InstanceEditRequest} from '../model/ins
 import {ApiRouter} from './api-router.service';
 import {first, Observable, tap} from 'rxjs';
 import {AuthService} from './auth.service';
+import {DateUtil} from '../util/date.util';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,7 @@ export class InstanceService {
     private httpClient: HttpClient
   ) {
     if (this.authService.isAuthenticated()()) {
-      this.getAll().subscribe(this.refreshActiveInstance);
+      this.getAll().pipe(first()).subscribe(this.refreshActiveInstance);
     }
 
     effect(() => {
@@ -30,7 +31,7 @@ export class InstanceService {
         return;
       }
 
-      this.getAll().subscribe(this.refreshActiveInstance);
+      this.getAll().pipe(first()).subscribe(this.refreshActiveInstance);
     });
   }
 
@@ -44,7 +45,7 @@ export class InstanceService {
 
   readonly create = (request: InstanceCreateRequest): Observable<Instance> => {
     return this.httpClient.post<Instance>(this.apiRouter.instanceCreate(), request).pipe(
-      tap((instance: Instance) => this.store.update(old => [...old, instance]))
+      tap((instance: Instance) => this.store.update(old => [...old, this.updateProperties(instance)]))
     );
   }
 
@@ -67,20 +68,20 @@ export class InstanceService {
 
         if (index !== -1) {
           if (this.activeInstance() !== null && this.activeInstance()?.id === instance.id) {
-            this.activeInstance.set(instance);
+            this.activeInstance.set(this.updateProperties(instance));
           }
 
-          return [...old.slice(0, index), instance, ...old.slice(index + 1)];
+          return [...old.slice(0, index), this.updateProperties(instance), ...old.slice(index + 1)];
         }
 
-        return [...old, instance];
+        return [...old, this.updateProperties(instance)];
       }))
     );
   }
 
   readonly getAll = (): Observable<Instance[]> => {
     return this.httpClient.get<Instance[]>(this.apiRouter.instanceGetByUser()).pipe(
-      tap((instances: Instance[]) => this.store.set(instances))
+      tap((instances: Instance[]) => this.store.set(instances.map(this.updateProperties)))
     );
   }
 
@@ -104,5 +105,12 @@ export class InstanceService {
 
   readonly setActiveInstance = (instance: Instance) => {
     this.activeInstance.set(instance);
+  }
+
+  readonly updateProperties = (instance: Instance): Instance => {
+    return {
+      ...instance,
+      createdAt: DateUtil.adjustToLocalDate(instance.createdAt)
+    }
   }
 }

@@ -2,12 +2,14 @@ import {Component, input, OnInit, signal} from '@angular/core';
 import Instance from '../../model/instance.model';
 import {Dialog} from 'primeng/dialog';
 import {Button} from 'primeng/button';
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-instance-preview',
   imports: [
     Dialog,
-    Button
+    Button,
+    DatePipe
   ],
   templateUrl: './instance-preview.component.html',
   styles: ``

@@ -3,7 +3,7 @@ import Salesman, {SalesmanCreateRequest, SalesmanEditRequest} from '../model/sal
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
 import {first, tap} from 'rxjs';
-import {toEnumOrThrow} from '../util/enum.util';
+import {EnumUtil} from '../util/enum.util';
 import {IsoCountryCode} from '../model/iso-country.model';
 
 @Injectable({
@@ -104,7 +104,7 @@ export class SalesmanService {
       ...salesman,
       vatPayerCode: {
         ...salesman.vatPayerCode,
-        issuedBy: toEnumOrThrow(salesman.vatPayerCode.issuedBy, IsoCountryCode)
+        issuedBy: EnumUtil.toEnumOrThrow(salesman.vatPayerCode.issuedBy, IsoCountryCode)
       }
     };
   }

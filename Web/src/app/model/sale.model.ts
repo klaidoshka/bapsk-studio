@@ -7,7 +7,7 @@ export default interface Sale {
   cashRegister?: CashRegister;
   customer: Customer;
   date: Date;
-  id?: number;
+  id: number;
   invoiceNo?: string;
   salesman: Salesman;
   soldGoods: SoldGood[];
@@ -44,7 +44,7 @@ export interface CashRegister {
 
 export interface SoldGood {
   description: string;
-  id?: number;
+  id: number;
   quantity: number;
   sequenceNo: string;
   taxableAmount: number;

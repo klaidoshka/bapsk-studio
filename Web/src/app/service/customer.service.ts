@@ -3,9 +3,10 @@ import {HttpClient} from '@angular/common/http';
 import {ApiRouter} from './api-router.service';
 import Customer, {CustomerCreateRequest, CustomerEditRequest} from '../model/customer.model';
 import {first, tap} from 'rxjs';
-import {toEnumOrThrow} from '../util/enum.util';
+import {EnumUtil} from '../util/enum.util';
 import {IsoCountryCode} from '../model/iso-country.model';
 import {IdentityDocumentType} from '../model/identity-document-type.model';
+import {DateUtil} from '../util/date.util';
 
 @Injectable({
   providedIn: 'root'
@@ -115,11 +116,11 @@ export class CustomerService {
   readonly updateProperties = (customer: Customer): Customer => {
     return {
       ...customer,
-      birthdate: new Date(customer.birthdate),
+      birthdate: DateUtil.adjustToLocalDate(customer.birthdate),
       identityDocument: {
         ...customer.identityDocument,
-        issuedBy: toEnumOrThrow(customer.identityDocument.issuedBy, IsoCountryCode),
-        type: toEnumOrThrow(customer.identityDocument.type, IdentityDocumentType)
+        issuedBy: EnumUtil.toEnumOrThrow(customer.identityDocument.issuedBy, IsoCountryCode),
+        type: EnumUtil.toEnumOrThrow(customer.identityDocument.type, IdentityDocumentType)
       }
     };
   }

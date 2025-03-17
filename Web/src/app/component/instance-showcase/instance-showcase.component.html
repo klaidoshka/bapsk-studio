@@ -29,6 +29,7 @@
         <tr>
           <th>Name</th>
           <th>Description</th>
+          <th>Created</th>
           <th>Actions</th>
         </tr>
       </ng-template>
@@ -40,6 +41,7 @@
         <tr>
           <td>{{ instance.name }}</td>
           <td>{{ instance.description }}</td>
+          <td>{{ instance.createdAt | date:'medium' }}</td>
           <td class="flex flex-nowrap items-center">
             <p-button
               icon="pi pi-eye"

@@ -55,7 +55,7 @@ public class StiVatReturnDeclaration
     /// Navigation property for the sale of the declaration.
     /// </summary>
     [ForeignKey(nameof(SaleId))]
-    public Sale? Sale { get; set; }
+    public Sale Sale { get; set; }
 
     /// <summary>
     /// Sale identifier of the declaration.

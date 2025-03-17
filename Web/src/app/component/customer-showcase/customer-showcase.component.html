@@ -30,7 +30,8 @@
           <th>First Name</th>
           <th>Last Name</th>
           <th>Birthdate</th>
-          <th>ID</th>
+          <th>Identity Document</th>
+          <th>Personal Code</th>
           <th>Actions</th>
         </tr>
       </ng-template>
@@ -44,6 +45,7 @@
           <td>{{ customer.lastName }}</td>
           <td>{{ customer.birthdate | date:'mediumDate' }}</td>
           <td>{{ getIdentityDocumentTypeLabel(customer.identityDocument.type) }}</td>
+          <td>{{ customer.identityDocument.value || 'Unprovided' }}</td>
           <td class="flex flex-nowrap items-center">
             <p-button
               icon="pi pi-eye"

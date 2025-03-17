@@ -1,3 +1,5 @@
+using Accounting.Contract.Entity;
+
 namespace Accounting.Contract.Dto.Customer;
 
 public class Customer
@@ -5,10 +7,10 @@ public class Customer
     public DateTime Birthdate { get; set; } = DateTime.UtcNow;
     public string FirstName { get; set; } = String.Empty;
     public int? Id { get; set; }
-
     public CustomerIdentityDocument IdentityDocument { get; set; } = new();
-
     public string LastName { get; set; } = String.Empty;
+    public IEnumerable<CustomerOtherDocument> OtherDocuments { get; set; } = new List<CustomerOtherDocument>();
+    public IsoCountryCode ResidenceCountry { get; set; }
 }
 
 public static class CustomerExtensions
@@ -23,10 +25,15 @@ public static class CustomerExtensions
             IdentityDocument = new CustomerIdentityDocument
             {
                 IssuedBy = customer.IdentityDocumentIssuedBy,
+                Number = customer.IdentityDocumentNumber,
                 Type = customer.IdentityDocumentType,
-                Value = customer.IdentityDocument
+                Value = customer.IdentityDocumentValue
             },
-            LastName = customer.LastName
+            LastName = customer.LastName,
+            OtherDocuments = customer.OtherDocuments
+                .Select(it => it.ToDto())
+                .ToList(),
+            ResidenceCountry = customer.ResidenceCountry
         };
     }
 
@@ -38,8 +45,9 @@ public static class CustomerExtensions
             FirstName = customer.FirstName,
             Id = customer.Id ?? 0,
             IdentityDocumentIssuedBy = customer.IdentityDocument.IssuedBy,
+            IdentityDocumentNumber = customer.IdentityDocument.Number,
             IdentityDocumentType = customer.IdentityDocument.Type,
-            IdentityDocument = customer.IdentityDocument.Value,
+            IdentityDocumentValue = customer.IdentityDocument.Value,
             LastName = customer.LastName
         };
     }

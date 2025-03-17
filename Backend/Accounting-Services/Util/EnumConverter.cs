@@ -20,4 +20,15 @@ public static class EnumConverter
 
         throw new InvalidEnumArgumentException($"Unknown enum value: {value}");
     }
+
+    /// <summary>
+    /// Converts an enum value to another enum type. Returns null if conversion fails.
+    /// </summary>
+    /// <param name="value">Initial enum value</param>
+    /// <typeparam name="TEnumTo">Type of target enum to look for case-insensitive value for</typeparam>
+    /// <returns>Enum value or null</returns>
+    public static TEnumTo ConvertToEnumOrNull<TEnumTo>(this Enum value) where TEnumTo : struct, Enum
+    {
+        return Enum.TryParse(value.ToString(), true, out TEnumTo target) ? target : default;
+    }
 }

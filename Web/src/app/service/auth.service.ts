@@ -4,9 +4,7 @@ import {finalize, Observable, of} from "rxjs";
 import {AuthResponse, LoginRequest, RegisterRequest} from "../model/auth.model";
 import {User} from "../model/user.model";
 import {ApiRouter} from "./api-router.service";
-import {toEnumOrThrow} from '../util/enum.util';
-import {Role} from '../model/role.model';
-import {IsoCountryCode} from '../model/iso-country.model';
+import {UserService} from './user.service';
 
 @Injectable({
   providedIn: "root"
@@ -20,7 +18,8 @@ export class AuthService {
 
   constructor(
     private apiRouter: ApiRouter,
-    private httpClient: HttpClient
+    private httpClient: HttpClient,
+    private userService: UserService
   ) {
     this.access = signal<AuthResponse | null>(this.getAccess());
   }
@@ -28,11 +27,7 @@ export class AuthService {
   readonly acceptAuthResponse = (response: AuthResponse): void => {
     response = {
       ...response,
-      user: {
-        ...response.user,
-        country: toEnumOrThrow(response.user.country, IsoCountryCode),
-        role: toEnumOrThrow(response.user.role, Role)
-      }
+      user: this.userService.updateProperties(response.user)
     };
 
     localStorage.setItem(this.accessKey, JSON.stringify(response));

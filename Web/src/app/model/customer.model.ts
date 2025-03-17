@@ -11,8 +11,9 @@ export default interface Customer {
 
 export interface CustomerIdentityDocument {
   issuedBy: IsoCountryCode;
+  number: string;
   type: IdentityDocumentType;
-  value: string;
+  value?: string;
 }
 
 export interface CustomerCreateRequest {

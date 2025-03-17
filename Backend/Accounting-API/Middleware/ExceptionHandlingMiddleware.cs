@@ -31,7 +31,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
 
         if (exception is not ValidationException)
         {
-            _logger.LogError(exception, "An unexpected error occurred.");
+            _logger.LogError(exception, "An unexpected error occurred while processing the request");
         }
 
         var exceptionResponse = exception switch
@@ -58,7 +58,8 @@ public class ExceptionHandlingMiddleware : IMiddleware
             ),
             ValidationException it => new ExceptionResponse(
                 HttpStatusCode.BadRequest,
-                it.Validation.FailureMessages
+                it.Validation.FailureMessages,
+                it.Validation.InternalFailureCode
             ),
             _ => new ExceptionResponse(
                 HttpStatusCode.InternalServerError,

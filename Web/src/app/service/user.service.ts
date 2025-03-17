@@ -3,9 +3,10 @@ import {ApiRouter} from './api-router.service';
 import {toUserIdentity, User, UserCreateRequest, UserEditRequest, UserIdentity} from '../model/user.model';
 import {first, Observable, tap} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
-import {toEnumOrThrow} from '../util/enum.util';
+import {EnumUtil} from '../util/enum.util';
 import {Role} from '../model/role.model';
 import {IsoCountryCode} from '../model/iso-country.model';
+import {DateUtil} from '../util/date.util';
 
 @Injectable({
   providedIn: 'root'
@@ -125,7 +126,7 @@ export class UserService {
     return computed(() =>
       index !== -1
         ? this.storeUsers().at(index)!
-        : (this.storeUsers().find(user => user.id === id))
+        : this.storeUsers().find(user => user.id === id)
     );
   };
 
@@ -139,16 +140,16 @@ export class UserService {
     return computed(() =>
       index !== -1
         ? this.storeIdentities().at(index)!
-        : (this.storeIdentities().find(it => it.id === id))
+        : this.storeIdentities().find(it => it.id === id)
     );
   };
 
-  private updateProperties = (user: User): User => {
+  readonly updateProperties = (user: User): User => {
     return {
       ...user,
-      birthDate: new Date(user.birthDate),
-      country: toEnumOrThrow(user.country, IsoCountryCode),
-      role: toEnumOrThrow(user.role, Role)
+      birthDate: DateUtil.adjustToLocalDate(user.birthDate),
+      country: EnumUtil.toEnumOrThrow(user.country, IsoCountryCode),
+      role: EnumUtil.toEnumOrThrow(user.role, Role)
     };
   };
 }

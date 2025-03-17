@@ -3,6 +3,7 @@ import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
 import {first, Observable, tap} from 'rxjs';
 import DataEntry, {DataEntryCreateRequest, DataEntryEditRequest} from '../model/data-entry.model';
+import {DateUtil} from '../util/date.util';
 
 @Injectable({
   providedIn: 'root'
@@ -122,8 +123,8 @@ export class DataEntryService {
   readonly updateProperties = (dataEntry: DataEntry): DataEntry => {
     return {
       ...dataEntry,
-      createdAt: new Date(dataEntry.createdAt),
-      modifiedAt: new Date(dataEntry.modifiedAt),
+      createdAt: DateUtil.adjustToLocalDate(dataEntry.createdAt),
+      modifiedAt: DateUtil.adjustToLocalDate(dataEntry.modifiedAt),
     }
   }
 }

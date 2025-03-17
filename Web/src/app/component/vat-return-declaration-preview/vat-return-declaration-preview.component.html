@@ -3,32 +3,33 @@
   closable="true"
   closeOnEscape="true"
   modal="true"
+  styleClass="min-w-128"
   (close)="hide()"
   (onHide)="hide()"
   [(visible)]="isShown"
 >
   <div class="flex flex-wrap gap-4" *ngIf="sale() != null">
     <!-- Left Column -->
-    <div class="flex-1 min-w-[250px]" *ngIf="sale()?.vatReturnDeclaration != null">
+    <div class="flex-1 min-w-[250px]" *ngIf="declaration() != null">
       <p>
         <strong>Declaration Id:</strong>
-        {{ sale()!.vatReturnDeclaration!.id }}
+        {{ declaration()!.id }}
       </p>
       <p>
         <strong>Declared By:</strong>
-        {{ toUserIdentityFullName(sale()!.vatReturnDeclaration!.declaredBy) }}
+        {{ toUserIdentityFullName(declaration()!.declaredBy) }}
       </p>
       <p>
         <strong>Submit Date:</strong>
-        {{ sale()!.vatReturnDeclaration!.submitDate | date:'short' }}
+        {{ declaration()!.submitDate | date:'short' }}
       </p>
       <p>
         <strong>State:</strong>
-        {{ getSubmitDeclarationStateLabel(sale()!.vatReturnDeclaration!.state) }}
+        {{ getSubmitDeclarationStateLabel(declaration()!.state) }}
       </p>
-      <p *ngIf="sale()?.vatReturnDeclaration!.correction > 1">
+      <p *ngIf="declaration()!.correction > 1">
         <strong>Corrected Times:</strong>
-        {{ sale()!.vatReturnDeclaration!.correction }}
+        {{ declaration()!.correction }}
       </p>
     </div>
 
@@ -54,11 +55,11 @@
   </div>
 
   <div
-    *ngIf="sale() != null && (sale()!.vatReturnDeclaration == null || sale()!.vatReturnDeclaration!.state == SubmitDeclarationState.REJECTED)"
+    *ngIf="sale() != null && (declaration() == null || declaration()!.state == SubmitDeclarationState.REJECTED)"
   >
     <p
       class="font-bold text-lg my-2"
-      *ngIf="sale()!.vatReturnDeclaration == null"
+      *ngIf="declaration() == null"
     >
       This sale does not have a submitted VAT return declaration.
     </p>
