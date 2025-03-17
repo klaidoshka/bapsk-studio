@@ -6,6 +6,13 @@ namespace Accounting.Contract.Service;
 public interface IVatReturnService
 {
     /// <summary>
+    /// Generates QR code for VTA return declaration summary
+    /// </summary>
+    /// <param name="declaration">Declaration to serialize into QR codes for preview in customs</param>
+    /// <returns>Single or multiple QR codes in Base64 format for singular declaration</returns>
+    public IEnumerable<string> GenerateQrCodes(StiVatReturnDeclaration declaration);
+    
+    /// <summary>
     /// Get specified sale's VTA return declaration
     /// </summary>
     /// <param name="saleId"></param>

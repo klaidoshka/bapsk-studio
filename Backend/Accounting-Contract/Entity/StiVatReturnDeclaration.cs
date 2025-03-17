@@ -50,6 +50,11 @@ public class StiVatReturnDeclaration
     /// Only null if declared by the system from external requests.
     /// </summary>
     public int? InstanceId { get; set; }
+    
+    /// <summary>
+    /// Navigation property for the QR codes of this declaration.
+    /// </summary>
+    public virtual ICollection<StiVatReturnDeclarationQrCode> QrCodes { get; set; }
 
     /// <summary>
     /// Navigation property for the sale of the declaration.

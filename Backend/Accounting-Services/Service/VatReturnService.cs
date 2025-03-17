@@ -1,3 +1,6 @@
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Accounting.Contract;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Dto;
@@ -6,7 +9,9 @@ using Accounting.Contract.Dto.Sale;
 using Accounting.Contract.Dto.Salesman;
 using Accounting.Contract.Dto.Sti;
 using Accounting.Contract.Dto.Sti.VatReturn;
+using Accounting.Contract.Dto.Sti.VatReturn.Qr;
 using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
+using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Accounting.Services.Util;
@@ -21,6 +26,15 @@ namespace Accounting.Services.Service;
 
 public class VatReturnService : IVatReturnService
 {
+    private static JsonSerializerOptions JsonOptions => new(JsonSerializerDefaults.Web)
+    {
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        PropertyNameCaseInsensitive = true,
+        NumberHandling = JsonNumberHandling.AllowReadingFromString,
+        Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
+
     private readonly AccountingDatabase _database;
     private readonly StiVatReturn _stiVatReturn;
     private readonly IStiVatReturnClientService _stiVatReturnClientService;
@@ -39,9 +53,76 @@ public class VatReturnService : IVatReturnService
         _validator = validator;
     }
 
+    public IEnumerable<string> GenerateQrCodes(StiVatReturnDeclaration declaration)
+    {
+        var qrCodeDeclaration = new QrCodeDocument
+        {
+            DocHeader = new QrCodeDocumentHeader
+            {
+                CompletionDate = declaration.SubmitDate.Date,
+                DocCorrNo = declaration.Correction,
+                DocId = declaration.Id
+            },
+            Customer = new QrCodeCustomer
+            {
+                FirstName = declaration.Sale.Customer.FirstName,
+                LastName = declaration.Sale.Customer.LastName,
+                IdentityDocumentNo = declaration.Sale.Customer.IdentityDocumentNumber
+            },
+            Goods = declaration.Sale.SoldGoods
+                .OrderBy(it => Int32.Parse(it.SequenceNo))
+                .Select(
+                    it =>
+                    {
+                        var good = new QrCodeSoldGood
+                        {
+                            Description = it.Description,
+                            Quantity = it.Quantity,
+                            SequenceNo = Int32.Parse(it.SequenceNo),
+                            TotalAmount = Math.Round(it.TotalAmount, 2)
+                        };
+
+                        if (it.UnitOfMeasureType == UnitOfMeasureType.UnitOfMeasureOther)
+                        {
+                            good.UnitOfMeasureOther = it.UnitOfMeasure;
+                        }
+                        else
+                        {
+                            good.UnitOfMeasureCode = it.UnitOfMeasure;
+                        }
+
+                        return good;
+                    }
+                )
+                .ToList()
+        };
+
+        var json = QrGeneratorUtil.CleanUpBeforeGenerating(
+            JsonSerializer.Serialize(qrCodeDeclaration, JsonOptions)
+        );
+
+        var chunks = QrGeneratorUtil.CreateQrCodeEnvelopeChunks(json);
+
+        var qrCodes = chunks
+            .Select(
+                it =>
+                {
+                    var chunkJson = QrGeneratorUtil.CleanUpBeforeGenerating(
+                        JsonSerializer.Serialize(it, JsonOptions)
+                    );
+
+                    return QrGeneratorUtil.GenerateQrCode(chunkJson);
+                }
+            )
+            .ToList();
+
+        return qrCodes;
+    }
+
     public async Task<StiVatReturnDeclaration?> GetBySaleIdAsync(int saleId)
     {
         return await _database.StiVatReturnDeclarations
+            .Include(it => it.QrCodes)
             .Include(it => it.Sale)
             .ThenInclude(it => it.Customer)
             .Include(it => it.Sale)
@@ -82,6 +163,24 @@ public class VatReturnService : IVatReturnService
             _database.Update(declaration);
         }
 
+        _database.RemoveRange(declaration.QrCodes);
+
+        declaration.QrCodes.Clear();
+
+        var qrCodes = GenerateQrCodes(declaration);
+
+        foreach (var qrCode in qrCodes)
+        {
+            declaration.QrCodes.Add(
+                new()
+                {
+                    Declaration = declaration,
+                    DeclarationId = declaration.Id,
+                    Value = qrCode
+                }
+            );
+        }
+
         await _database.SaveChangesAsync();
 
         if (clientResponse.DeclarationState == SubmitDeclarationState.REJECTED)
@@ -107,7 +206,9 @@ public class VatReturnService : IVatReturnService
 
         if (request.Sale.Id is not null)
         {
-            declaration = await _database.StiVatReturnDeclarations.FirstOrDefaultAsync(d => d.SaleId == request.Sale.Id);
+            declaration = await _database.StiVatReturnDeclarations
+                .Include(it => it.QrCodes)
+                .FirstOrDefaultAsync(d => d.SaleId == request.Sale.Id);
 
             if (declaration is null)
             {
@@ -252,7 +353,7 @@ public class VatReturnService : IVatReturnService
         var requestId = $"{Guid.NewGuid():N}";
         var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Vilnius");
         var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
-        
+
         var customerIdentityDocument = new SubmitDeclarationIdentityDocument
         {
             DocumentNo = new()

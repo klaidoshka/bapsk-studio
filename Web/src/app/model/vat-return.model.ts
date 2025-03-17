@@ -6,6 +6,7 @@ export default interface VatReturnDeclaration {
   declaredById?: number;
   id: string;
   instanceId?: number;
+  qrCodes: string[];
   saleId: number;
   state: SubmitDeclarationState;
   submitDate: string;
