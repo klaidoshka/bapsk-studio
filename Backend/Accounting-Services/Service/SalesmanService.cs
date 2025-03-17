@@ -1,7 +1,7 @@
 using Accounting.Contract;
-using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.Salesman;
 using Accounting.Contract.Service;
+using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;
 using Salesman = Accounting.Contract.Entity.Salesman;
 
@@ -10,17 +10,20 @@ namespace Accounting.Services.Service;
 public class SalesmanService : ISalesmanService
 {
     private readonly AccountingDatabase _database;
+    private readonly ISalesmanValidator _salesmanValidator;
 
-    public SalesmanService(AccountingDatabase database)
+    public SalesmanService(AccountingDatabase database, ISalesmanValidator salesmanValidator)
     {
         _database = database;
+        _salesmanValidator = salesmanValidator;
     }
 
     public async Task<Salesman> CreateAsync(SalesmanCreateRequest request)
     {
-        // Validate if instance exists
-        // Validate if requester can access the instance
+        // Validate if instance exists (HIGHER LEVEL)
+        // Validate if requester can access the instance (HIGHER LEVEL)
         // Validate properties
+        (await _salesmanValidator.ValidateSalesmanAsync(request.Salesman)).AssertValid();
 
         var salesman = (await _database.Salesmen.AddAsync(
             new Salesman
@@ -39,9 +42,10 @@ public class SalesmanService : ISalesmanService
 
     public async Task DeleteAsync(SalesmanDeleteRequest request)
     {
-        // Validate if instance exists
-        // Validate if requester can access the instance
+        // Validate if instance exists (HIGHER LEVEL)
+        // Validate if requester can access the instance (HIGHER LEVEL)
         // Validate if salesman exists
+        (await _salesmanValidator.ValidateDeleteRequestAsync(request.SalesmanId)).AssertValid();
 
         var salesman = await _database.Salesmen.FirstAsync(it => it.Id == request.SalesmanId);
 
@@ -52,10 +56,11 @@ public class SalesmanService : ISalesmanService
 
     public async Task EditAsync(SalesmanEditRequest request)
     {
-        // Validate if instance exists
-        // Validate if requester can access the instance
+        // Validate if instance exists (HIGHER LEVEL)
+        // Validate if requester can access the instance (HIGHER LEVEL)
         // Validate if salesman exists
         // Validate properties
+        (await _salesmanValidator.ValidateEditRequestAsync(request.Salesman)).AssertValid();
 
         var salesman = await _database.Salesmen.FirstAsync(it => it.Id == request.Salesman.Id);
 
@@ -68,34 +73,21 @@ public class SalesmanService : ISalesmanService
 
     public async Task<IEnumerable<Salesman>> GetAsync(SalesmanGetRequest request)
     {
-        // Validate if instance exists
-        // Validate if requester can access the instance
+        // Validate if instance exists (HIGHER LEVEL)
+        // Validate if requester can access the instance (HIGHER LEVEL)
+        (await _salesmanValidator.ValidateGetRequestAsync(request.InstanceId)).AssertValid();
 
-        if (request.InstanceId is not null)
-        {
-            return await _database.Salesmen
-                .Where(it => !it.IsDeleted && it.InstanceId == request.InstanceId)
-                .ToListAsync();
-        }
-
-        var instanceIds = await _database.InstanceUserMetas
-            .Where(it => it.UserId == request.RequesterId)
-            .Select(it => it.InstanceId)
-            .ToHashSetAsync();
-
-        return (await _database.Salesmen
-                .Where(
-                    it => !it.IsDeleted &&
-                          it.InstanceId != null
-                )
-                .ToListAsync())
-            .Where(it => instanceIds.Contains(it.InstanceId!.Value))
-            .ToList();
+        return await _database.Salesmen
+            .Where(it => !it.IsDeleted && it.InstanceId == request.InstanceId)
+            .ToListAsync();
     }
 
     public async Task<Salesman> GetByIdAsync(int id)
     {
-        return await _database.Salesmen.FirstOrDefaultAsync(it => it.Id == id && !it.IsDeleted)
-               ?? throw new ValidationException("Salesman not found");
+        // Validate if salesman exists
+        // Validate if requester can access the instance (HIGHER LEVEL)
+        (await _salesmanValidator.ValidateGetByIdRequestAsync(id)).AssertValid();
+        
+        return await _database.Salesmen.FirstAsync(it => it.Id == id && !it.IsDeleted);
     }
 }

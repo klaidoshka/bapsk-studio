@@ -1,7 +1,7 @@
 using Accounting.Contract;
-using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.Sale;
 using Accounting.Contract.Service;
+using Accounting.Contract.Validator;
 using Accounting.Services.Util;
 using Microsoft.EntityFrameworkCore;
 using Sale = Accounting.Contract.Entity.Sale;
@@ -11,17 +11,20 @@ namespace Accounting.Services.Service;
 public class SaleService : ISaleService
 {
     private readonly AccountingDatabase _database;
+    private readonly ISaleValidator _saleValidator;
 
-    public SaleService(AccountingDatabase database)
+    public SaleService(AccountingDatabase database, ISaleValidator saleValidator)
     {
         _database = database;
+        _saleValidator = saleValidator;
     }
 
     public async Task<Sale> CreateAsync(SaleCreateRequest request)
     {
-        // Validate if instance exists
-        // Validate if requester can access the instance
+        // Validate if instance exists (HIGHER LEVEL)
+        // Validate if requester can access the instance (HIGHER LEVEL)
         // Validate properties
+        (await _saleValidator.ValidateSaleAsync(request.Sale)).AssertValid();
 
         var customer = await _database.Customers.FirstAsync(it => it.Id == request.Sale.CustomerId);
         var salesman = await _database.Salesmen.FirstAsync(it => it.Id == request.Sale.SalesmanId);
@@ -49,9 +52,10 @@ public class SaleService : ISaleService
 
     public async Task DeleteAsync(SaleDeleteRequest request)
     {
-        // Validate if instance exists
-        // Validate if requester can access the instance
+        // Validate if instance exists (HIGHER LEVEL)
+        // Validate if requester can access the instance (HIGHER LEVEL)
         // Validate if sale exists
+        (await _saleValidator.ValidateDeleteRequestAsync(request.SaleId)).AssertValid();
 
         var sale = await _database.Sales
             .Include(it => it.SoldGoods)
@@ -69,10 +73,11 @@ public class SaleService : ISaleService
 
     public async Task EditAsync(SaleEditRequest request)
     {
-        // Validate if instance exists
-        // Validate if requester can access the instance
+        // Validate if instance exists (HIGHER LEVEL)
+        // Validate if requester can access the instance (HIGHER LEVEL)
         // Validate if sale exists
         // Validate properties
+        (await _saleValidator.ValidateEditRequestAsync(request.Sale)).AssertValid();
 
         var sale = await _database.Sales
             .Include(it => it.SoldGoods)
@@ -127,42 +132,16 @@ public class SaleService : ISaleService
 
     public async Task<IEnumerable<Sale>> GetAsync(SaleGetRequest request)
     {
-        // Validate if instance exists
-        // Validate if requester can access the instance
-
-        if (request.InstanceId is not null)
-        {
-            return (await _database.Sales
-                    .Include(it => it.Customer)
-                    .Include(it => it.Salesman)
-                    .Include(it => it.SoldGoods)
-                    .Where(it => !it.IsDeleted && it.InstanceId == request.InstanceId)
-                    .ToListAsync())
-                .Also(
-                    sales => sales.ForEach(
-                        s => s.SoldGoods = s.SoldGoods
-                            .Where(it => !it.IsDeleted)
-                            .ToList()
-                    )
-                );
-        }
-
-        var instanceIds = await _database.InstanceUserMetas
-            .Where(it => it.UserId == request.RequesterId)
-            .Select(it => it.InstanceId)
-            .ToHashSetAsync();
-
+        // Validate if instance exists (HIGHER LEVEL)
+        // Validate if requester can access the instance (HIGHER LEVEL)
+        (await _saleValidator.ValidateGetRequestAsync(request.InstanceId)).AssertValid();
+        
         return (await _database.Sales
                 .Include(it => it.Customer)
                 .Include(it => it.Salesman)
                 .Include(it => it.SoldGoods)
-                .Where(
-                    it => !it.IsDeleted &&
-                          it.InstanceId != null
-                )
+                .Where(it => !it.IsDeleted && it.InstanceId == request.InstanceId)
                 .ToListAsync())
-            .Where(it => instanceIds.Contains(it.InstanceId!.Value))
-            .ToList()
             .Also(
                 sales => sales.ForEach(
                     s => s.SoldGoods = s.SoldGoods
@@ -174,15 +153,19 @@ public class SaleService : ISaleService
 
     public async Task<Sale> GetByIdAsync(int id)
     {
+        // Validate if sale exists
+        // Validate if requester can access (HIGHER LEVEL)
+        (await _saleValidator.ValidateGetByIdRequestAsync(id)).AssertValid();
+
         return (await _database.Sales
                 .Include(it => it.Customer)
                 .Include(it => it.Salesman)
                 .Include(it => it.SoldGoods)
-                .FirstOrDefaultAsync(it => it.Id == id && !it.IsDeleted))
-            ?.Also(
+                .FirstAsync(it => it.Id == id && !it.IsDeleted))
+            .Also(
                 s => s.SoldGoods = s.SoldGoods
                     .Where(it => !it.IsDeleted)
                     .ToList()
-            ) ?? throw new ValidationException("Sale not found");
+            );
     }
 }

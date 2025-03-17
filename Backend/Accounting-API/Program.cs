@@ -52,6 +52,7 @@ builder.Services.AddScoped<Dictionary<FieldType, FieldHandler>>(
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthValidator, AuthValidator>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<ICustomerValidator, CustomerValidator>();
 builder.Services.AddScoped<IDataEntryService, DataEntryService>();
 builder.Services.AddScoped<IDataEntryValidator, DataEntryValidator>();
 builder.Services.AddScoped<IDataTypeService, DataTypeService>();
@@ -65,7 +66,9 @@ builder.Services.AddScoped<IInstanceUserMetaService, InstanceUserMetaService>();
 builder.Services.AddScoped<IInstanceUserMetaValidator, InstanceUserMetaValidator>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ISaleService, SaleService>();
+builder.Services.AddScoped<ISaleValidator, SaleValidator>();
 builder.Services.AddScoped<ISalesmanService, SalesmanService>();
+builder.Services.AddScoped<ISalesmanValidator, SalesmanValidator>();
 builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddScoped<ISessionValidator, SessionValidator>();
 builder.Services.AddScoped<IStiVatReturnClientService, StiVatReturnClientService>();

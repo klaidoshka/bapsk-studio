@@ -63,7 +63,7 @@ public static class CustomerEndpoints
             .MapGet(
                 String.Empty,
                 async (
-                    int? instanceId,
+                    int instanceId,
                     HttpContext httpContext,
                     ICustomerService customerService
                 ) => Results.Json(

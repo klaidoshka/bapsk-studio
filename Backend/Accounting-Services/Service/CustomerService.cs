@@ -1,7 +1,7 @@
 using Accounting.Contract;
-using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.Customer;
 using Accounting.Contract.Service;
+using Accounting.Contract.Validator;
 using Accounting.Services.Util;
 using Microsoft.EntityFrameworkCore;
 using Customer = Accounting.Contract.Entity.Customer;
@@ -11,17 +11,21 @@ namespace Accounting.Services.Service;
 public class CustomerService : ICustomerService
 {
     private readonly AccountingDatabase _database;
+    private readonly ICustomerValidator _customerValidator;
 
-    public CustomerService(AccountingDatabase database)
+    public CustomerService(AccountingDatabase database, ICustomerValidator customerValidator)
     {
         _database = database;
+        _customerValidator = customerValidator;
     }
 
     public async Task<Customer> CreateAsync(CustomerCreateRequest request)
     {
-        // Validate if instance exists
-        // Validate if requester can access the instance
+        // Validate if instance exists (HIGHER LEVEL)
+        // Validate if requester can access the instance (HIGHER LEVEL)
         // Validate properties
+        
+        (await _customerValidator.ValidateCustomerAsync(request.Customer)).AssertValid();
 
         var customer = (await _database.Customers.AddAsync(
             new Customer
@@ -48,9 +52,11 @@ public class CustomerService : ICustomerService
 
     public async Task DeleteAsync(CustomerDeleteRequest request)
     {
-        // Validate if instance exists
-        // Validate if requester can access the instance
         // Validate if customer exists
+        // Validate if instance exists (HIGHER LEVEL)
+        // Validate if requester can access the instance (HIGHER LEVEL)
+        
+        (await _customerValidator.ValidateDeleteRequestAsync(request.CustomerId)).AssertValid();
 
         var customer = await _database.Customers.FirstAsync(it => it.Id == request.CustomerId);
 
@@ -61,10 +67,12 @@ public class CustomerService : ICustomerService
 
     public async Task EditAsync(CustomerEditRequest request)
     {
-        // Validate if instance exists
-        // Validate if requester can access the instance
+        // Validate if instance exists (HIGHER LEVEL)
+        // Validate if requester can access the instance (HIGHER LEVEL)
         // Validate if customer exists
         // Validate properties
+        
+        (await _customerValidator.ValidateEditRequestAsync(request.Customer)).AssertValid();
 
         var customer = await _database.Customers
             .Include(it => it.OtherDocuments)
@@ -124,37 +132,25 @@ public class CustomerService : ICustomerService
     public async Task<IEnumerable<Customer>> GetAsync(CustomerGetRequest request)
     {
         // Validate if instance exists
-        // Validate if requester can access the instance
+        // Validate if requester can access the instance (HIGHER LEVEL)
+        
+        (await _customerValidator.ValidateGetRequestAsync(request.InstanceId)).AssertValid();
 
-        if (request.InstanceId is not null)
-        {
-            return await _database.Customers
-                .Include(it => it.OtherDocuments)
-                .Where(it => !it.IsDeleted && it.InstanceId == request.InstanceId)
-                .ToListAsync();
-        }
-
-        var instanceIds = await _database.InstanceUserMetas
-            .Where(it => it.UserId == request.RequesterId)
-            .Select(it => it.InstanceId)
-            .ToHashSetAsync();
-
-        return (await _database.Customers
-                .Include(it => it.OtherDocuments)
-                .Where(
-                    it => !it.IsDeleted &&
-                          it.InstanceId != null
-                )
-                .ToListAsync())
-            .Where(it => instanceIds.Contains(it.InstanceId!.Value))
-            .ToList();
+        return await _database.Customers
+            .Include(it => it.OtherDocuments)
+            .Where(it => !it.IsDeleted && it.InstanceId == request.InstanceId)
+            .ToListAsync();
     }
 
     public async Task<Customer> GetByIdAsync(int id)
     {
+        // Validate if customer exists
+        // Validate if requester can access the instance (HIGHER LEVEL)
+        
+        (await _customerValidator.ValidateGetByIdRequestAsync(id)).AssertValid();
+        
         return await _database.Customers
                    .Include(it => it.OtherDocuments)
-                   .FirstOrDefaultAsync(it => it.Id == id && !it.IsDeleted)
-               ?? throw new ValidationException("Customer not found");
+                   .FirstAsync(it => it.Id == id && !it.IsDeleted);
     }
 }
