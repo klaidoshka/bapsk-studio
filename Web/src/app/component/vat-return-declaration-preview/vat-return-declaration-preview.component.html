@@ -54,6 +54,19 @@
     </div>
   </div>
 
+  <div *ngIf="sale() != null && declaration()?.qrCodes?.length">
+    <div class="border border-gray-300 rounded my-2 w-fit">
+      <div class="bg-gray-100 p-2 cursor-pointer" (click)="showQrCodes.set(!showQrCodes())">
+        <p class="font-bold text-md">QR Codes</p>
+      </div>
+      <div class="p-4" *ngIf="showQrCodes()">
+        <div *ngFor="let qrCode of declaration()!.qrCodes" class="qr-code-item">
+          <img [src]="'data:image/png;base64,' + qrCode" alt="Declaration's QR code chunk" class="w-48 h-48"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div
     *ngIf="sale() != null && (declaration() == null || declaration()!.state == SubmitDeclarationState.REJECTED)"
   >
@@ -70,13 +83,5 @@
         [sale]="sale()!"
       />
     </div>
-  </div>
-
-  <div class="flex justify-end mt-4">
-    <p-button
-      label="Close"
-      class="p-button-secondary"
-      (onClick)="hide()"
-    ></p-button>
   </div>
 </p-dialog>

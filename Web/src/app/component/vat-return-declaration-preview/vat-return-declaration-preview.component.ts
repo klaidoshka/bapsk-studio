@@ -4,8 +4,7 @@ import {
   SubmitDeclarationState,
   VatReturnDeclarationWithDeclarer
 } from '../../model/vat-return.model';
-import {Button} from 'primeng/button';
-import {CurrencyPipe, DatePipe, NgIf} from '@angular/common';
+import {CurrencyPipe, DatePipe, NgForOf, NgIf} from '@angular/common';
 import {Dialog} from 'primeng/dialog';
 import {TableModule} from 'primeng/table';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -20,7 +19,6 @@ import {VatReturnService} from '../../service/vat-return.service';
 @Component({
   selector: 'app-vat-return-declaration-preview',
   imports: [
-    Button,
     Dialog,
     NgIf,
     TableModule,
@@ -28,7 +26,8 @@ import {VatReturnService} from '../../service/vat-return.service';
     FormsModule,
     ReactiveFormsModule,
     VatReturnDeclarationSubmissionComponent,
-    CurrencyPipe
+    CurrencyPipe,
+    NgForOf
   ],
   templateUrl: './vat-return-declaration-preview.component.html',
   styles: ``
@@ -44,6 +43,7 @@ export class VatReturnDeclarationPreviewComponent implements OnInit {
   isShown = signal<boolean>(false);
   isShownInitially = input<boolean>(false);
   sale = signal<SaleWithVatReturnDeclaration | undefined>(undefined);
+  showQrCodes = signal<boolean>(false);
   submissionForm = viewChild(VatReturnDeclarationSubmissionComponent);
 
   constructor(private vatReturnService: VatReturnService) {

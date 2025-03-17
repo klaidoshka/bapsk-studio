@@ -8,6 +8,7 @@ public class StiVatReturnDeclaration
     public int? DeclaredById { get; set; }
     public string Id { get; set; }
     public int? InstanceId { get; set; }
+    public IEnumerable<string> QrCodes { get; set; }
     public int SaleId { get; set; }
     public SubmitDeclarationState? State { get; set; }
     public DateTime SubmitDate { get; set; }
@@ -23,6 +24,9 @@ public static class StiVatReturnDeclarationExtensions
             DeclaredById = declaration.DeclaredById,
             Id = declaration.Id,
             InstanceId = declaration.InstanceId,
+            QrCodes = declaration.QrCodes
+                .Select(it => it.Value)
+                .ToList(),
             SaleId = declaration.SaleId,
             State = declaration.State,
             SubmitDate = declaration.SubmitDate

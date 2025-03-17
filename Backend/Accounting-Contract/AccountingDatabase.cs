@@ -18,6 +18,7 @@ public class AccountingDatabase : DbContext
     public DbSet<Session> Sessions { get; set; }
     public DbSet<SoldGood> SoldGoods { get; set; }
     public DbSet<StiVatReturnDeclaration> StiVatReturnDeclarations { get; set; }
+    public DbSet<StiVatReturnDeclarationQrCode> StiVatReturnDeclarationQrCodes { get; set; }
     public DbSet<User> Users { get; set; }
 
     public AccountingDatabase(DbContextOptions<AccountingDatabase> options) : base(options) { }
