@@ -200,10 +200,6 @@ public static class ProgramExtensions
             .MapGroup("/instance")
             .MapInstanceEndpoints();
 
-        accountingRouteGroup
-            .MapGroup("/instance-user-meta")
-            .MapInstanceMetaEndpoints();
-
         var stiRouteGroup = accountingRouteGroup
             .MapGroup("/sti");
 

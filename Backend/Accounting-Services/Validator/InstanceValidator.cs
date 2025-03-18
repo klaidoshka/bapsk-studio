@@ -31,13 +31,24 @@ public class InstanceValidator : IInstanceValidator
             return new Validation("Instance must have a name.");
         }
 
-        return user.InstancesCreated.Any(
+        var exists = user.InstancesCreated.Any(
             ic => ic.Name.Equals(
                 request.Name,
                 StringComparison.InvariantCultureIgnoreCase
             )
-        )
-            ? new Validation("You already have create an instance with this name.")
+        );
+
+        if (exists)
+        {
+            return new Validation("You already have created an instance with this name.");
+        }
+
+        var userIds = request.UserMetas
+            .Select(it => it.UserId)
+            .ToHashSet();
+
+        return await _database.Users.CountAsync(u => userIds.Contains(u.Id)) != userIds.Count
+            ? new Validation("One or more users were not found.")
             : new Validation();
     }
 
@@ -69,8 +80,20 @@ public class InstanceValidator : IInstanceValidator
             return new Validation("Instance must have a name.");
         }
 
-        return instance.CreatedById != request.RequesterId
-            ? new Validation("You cannot edit an instance you did not create.")
+        if (instance.CreatedById != request.RequesterId)
+        {
+            return new Validation("You cannot edit an instance you did not create.");
+        }
+
+        var users = request.UserMetas
+            .Select(it => it.UserId)
+            .ToHashSet()
+            .Select(async id => await _database.Users.FindAsync(id))
+            .Select(t => t.Result)
+            .ToList();
+
+        return users.Any(it => it == null)
+            ? new Validation("One or more users were not found.")
             : new Validation();
     }
 

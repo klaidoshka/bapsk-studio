@@ -26,18 +26,25 @@ public class InstanceService : IInstanceService
     {
         (await _instanceValidator.ValidateInstanceCreateRequestAsync(request)).AssertValid();
 
-        var user = (await _database.Users.FindAsync(request.RequesterId))!;
-
         var instance = new Instance
         {
             CreatedAt = DateTime.UtcNow,
-            CreatedBy = user,
+            CreatedById = request.RequesterId,
             Description = request.Description,
-            Name = request.Name,
-            UserMetas = new List<InstanceUserMeta>()
+            Name = request.Name
         };
 
-        instance.UserMetas.Add(new InstanceUserMeta { User = user });
+        instance.UserMetas.Add(new InstanceUserMeta { UserId = request.RequesterId });
+
+        var userIds = request.UserMetas
+            .Where(it => it.UserId != request.RequesterId)
+            .Select(it => it.UserId)
+            .ToList();
+
+        foreach (var userId in userIds)
+        {
+            instance.UserMetas.Add(new InstanceUserMeta { UserId = userId });
+        }
 
         instance = (await _database.Instances.AddAsync(instance)).Entity;
 
@@ -61,10 +68,48 @@ public class InstanceService : IInstanceService
     {
         (await _instanceValidator.ValidateInstanceEditRequestAsync(request)).AssertValid();
 
-        var instance = await _database.Instances.FirstAsync(it => it.Id == request.InstanceId);
+        var instance = await _database.Instances
+            .Include(it => it.UserMetas)
+            .FirstAsync(it => it.Id == request.InstanceId);
 
         instance.Description = request.Description;
         instance.Name = request.Name;
+
+        var existingUserIds = instance.UserMetas
+            .Select(it => it.UserId)
+            .ToHashSet();
+
+        var providedUserIds = request.UserMetas
+            .Select(it => it.UserId)
+            .ToHashSet();
+
+        var missingUserIds = existingUserIds
+            .Except(providedUserIds)
+            .Where(it => it != instance.CreatedById)
+            .ToList();
+
+        foreach (var missingUserId in missingUserIds)
+        {
+            instance.UserMetas
+                .Where(it => it.UserId == missingUserId)
+                .ToList()
+                .ForEach(
+                    it =>
+                    {
+                        _database.Remove(it);
+                        instance.UserMetas.Remove(it);
+                    }
+                );
+        }
+
+        var newUserIds = providedUserIds
+            .Except(existingUserIds)
+            .ToList();
+
+        foreach (var newUserId in newUserIds)
+        {
+            instance.UserMetas.Add(new InstanceUserMeta { UserId = newUserId });
+        }
 
         await _database.SaveChangesAsync();
     }
