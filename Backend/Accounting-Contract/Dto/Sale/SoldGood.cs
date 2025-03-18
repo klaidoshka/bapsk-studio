@@ -6,7 +6,7 @@ public class SoldGood
 {
     public string Description { get; set; }
     public int? Id { get; set; }
-    public int Quantity { get; set; }
+    public decimal Quantity { get; set; }
     public string SequenceNo { get; set; }
     public decimal TaxableAmount { get; set; }
     public decimal TotalAmount { get; set; }

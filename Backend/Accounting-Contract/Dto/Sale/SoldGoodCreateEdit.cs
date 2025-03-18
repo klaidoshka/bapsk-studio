@@ -6,7 +6,7 @@ public class SoldGoodCreateEdit
 {
     public string Description { get; set; }
     public int? Id { get; set; }
-    public int Quantity { get; set; }
+    public decimal Quantity { get; set; }
     public string SequenceNo { get; set; }
     public string UnitOfMeasure { get; set; }
     public UnitOfMeasureType UnitOfMeasureType { get; set; }
