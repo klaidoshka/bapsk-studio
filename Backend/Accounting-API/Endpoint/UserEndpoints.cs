@@ -61,20 +61,20 @@ public static class UserEndpoints
         builder.MapGet(
             String.Empty,
             async (
+                string? email,
                 bool? returnIdentityOnly,
                 HttpContext httpContext,
                 IUserService userService
-            ) => Results.Json(
-                (await userService.GetAsync(
+            ) => Results.Json((await userService.GetAsync(
                     new UserGetRequest
                     {
+                        Email = email,
                         RequesterId = httpContext.GetUserIdOrThrow(),
                         ReturnIdentityOnly = returnIdentityOnly ?? false
                     }
                 ))
-                .Select(it => (object) (returnIdentityOnly == true ? it.ToIdentityDto() : it.ToDto()))
-                .ToList()
-            )
+                .Select(it => (object)((returnIdentityOnly == true) ? it.ToIdentityDto() : it.ToDto()))
+                .ToList())
         );
 
         builder.MapGet(

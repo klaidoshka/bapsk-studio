@@ -35,7 +35,7 @@ export class WorkspacePageComponent {
   customers!: Signal<Customer[]>;
   dataEntries!: Signal<DataEntryWithUsers[]>;
   dataTypes!: Signal<DataType[]>;
-  instanceId!: Signal<number | null>;
+  instanceId!: Signal<number | undefined>;
   sales!: Signal<SaleWithVatReturnDeclaration[]>;
   salesmen!: Signal<Salesman[]>;
   selectedDataType = signal<DataType | null>(null);

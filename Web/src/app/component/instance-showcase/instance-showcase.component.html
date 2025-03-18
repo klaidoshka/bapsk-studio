@@ -14,7 +14,7 @@
     label="Create"
     icon="pi pi-plus"
     type="button"
-    (onClick)="showManagement(null)"
+    (onClick)="showManagement()"
   ></p-button>
 
   <div class="card mt-4">
@@ -30,6 +30,7 @@
           <th>Name</th>
           <th>Description</th>
           <th>Created</th>
+          <th>Users</th>
           <th>Actions</th>
         </tr>
       </ng-template>
@@ -41,7 +42,8 @@
         <tr>
           <td>{{ instance.name }}</td>
           <td>{{ instance.description }}</td>
-          <td>{{ instance.createdAt | date:'medium' }}</td>
+          <td>{{ instance.createdAt | date:'mediumDate' }}</td>
+          <td>{{ instance.userMetas.length }} user(s)</td>
           <td class="flex flex-nowrap items-center">
             <p-button
               icon="pi pi-eye"

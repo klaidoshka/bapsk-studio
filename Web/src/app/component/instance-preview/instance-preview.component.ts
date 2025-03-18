@@ -1,34 +1,34 @@
-import {Component, input, OnInit, signal} from '@angular/core';
-import Instance from '../../model/instance.model';
+import {Component, signal} from '@angular/core';
+import {InstanceWithUsers} from '../../model/instance.model';
 import {Dialog} from 'primeng/dialog';
 import {Button} from 'primeng/button';
-import {DatePipe} from '@angular/common';
+import {DatePipe, NgIf} from '@angular/common';
+import {TableModule} from 'primeng/table';
+import {toUserFullName} from '../../model/user.model';
 
 @Component({
   selector: 'app-instance-preview',
   imports: [
     Dialog,
     Button,
-    DatePipe
+    DatePipe,
+    NgIf,
+    TableModule
   ],
   templateUrl: './instance-preview.component.html',
   styles: ``
 })
-export class InstancePreviewComponent implements OnInit {
-  instance = signal<Instance | null>(null);
+export class InstancePreviewComponent {
+  protected readonly toUserFullName = toUserFullName;
+  instance = signal<InstanceWithUsers | undefined>(undefined);
   isShown = signal<boolean>(false);
-  isShownInitially = input<boolean>(false);
-
-  ngOnInit() {
-    this.isShown.set(this.isShownInitially());
-  }
 
   readonly hide = () => {
     this.isShown.set(false);
-    this.instance.set(null);
+    this.instance.set(undefined);
   }
 
-  readonly show = (instance: Instance | null) => {
+  readonly show = (instance: InstanceWithUsers) => {
     this.instance.set(instance);
     this.isShown.set(true);
   }

@@ -144,6 +144,26 @@ export class UserService {
     );
   };
 
+  readonly getIdentityByEmail = (email: string): UserIdentity | undefined => {
+    const emailNormalized = email.toLowerCase();
+    const index = this.storeUsers().findIndex(user => user.email.toLowerCase() === emailNormalized);
+
+    if (index !== -1) {
+      return toUserIdentity(this.storeUsers().at(index)!);
+    }
+
+    let identity: UserIdentity | undefined = undefined;
+
+    this.httpClient.get<UserIdentity>(this.apiRouter.userGetByEmail(email, true)).pipe(
+      tap(identity => this.updateCachedUserIdentity(identity)),
+      first()
+    ).subscribe(user => identity = user);
+
+    console.log(identity);
+
+    return identity;
+  }
+
   readonly updateProperties = (user: User): User => {
     return {
       ...user,

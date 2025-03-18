@@ -30,7 +30,7 @@ import {LocalizationService} from '../../service/localization.service';
 export class DataTypeShowcaseComponent {
   dataTypes!: Signal<DataType[]>;
   confirmationComponent = viewChild.required(ConfirmationComponent);
-  instanceId!: Signal<number | null>;
+  instanceId!: Signal<number | undefined>;
   managementMenu = viewChild.required(DataTypeManagementComponent);
   messages = signal<Messages>({});
   previewMenu = viewChild.required(DataTypePreviewComponent);

@@ -50,7 +50,7 @@ public class InstanceService : IInstanceService
     {
         (await _instanceValidator.ValidateInstanceDeleteRequestAsync(request)).AssertValid();
 
-        var instance = (await _database.Instances.FindAsync(request.InstanceId))!;
+        var instance = await _database.Instances.FirstAsync(it => it.Id == request.InstanceId);
 
         _database.Instances.Remove(instance);
 
@@ -61,7 +61,7 @@ public class InstanceService : IInstanceService
     {
         (await _instanceValidator.ValidateInstanceEditRequestAsync(request)).AssertValid();
 
-        var instance = (await _database.Instances.FindAsync(request.InstanceId))!;
+        var instance = await _database.Instances.FirstAsync(it => it.Id == request.InstanceId);
 
         instance.Description = request.Description;
         instance.Name = request.Name;
@@ -73,7 +73,9 @@ public class InstanceService : IInstanceService
     {
         (await _instanceValidator.ValidateInstanceGetRequestAsync(request)).AssertValid();
 
-        return (await _database.Instances.FindAsync(request.InstanceId))!;
+        return await _database.Instances
+            .Include(i => i.UserMetas)
+            .FirstAsync(it => it.Id == request.InstanceId);
     }
 
     public async Task<IEnumerable<Instance>> GetByUserIdAsync(InstanceGetByUserRequest request)

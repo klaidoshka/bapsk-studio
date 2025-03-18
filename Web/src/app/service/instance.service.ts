@@ -10,7 +10,7 @@ import {DateUtil} from '../util/date.util';
   providedIn: 'root'
 })
 export class InstanceService {
-  private activeInstance = signal<Instance | null>(null);
+  private activeInstance = signal<Instance | undefined>(undefined);
   private store = signal<Instance[]>([]);
 
   constructor(
@@ -25,8 +25,8 @@ export class InstanceService {
     effect(() => {
       const user = this.authService.getUser()();
 
-      if (user === null) {
-        this.activeInstance.set(null);
+      if (user == null) {
+        this.activeInstance.set(undefined);
         this.store.set([]);
         return;
       }
@@ -38,8 +38,8 @@ export class InstanceService {
   private readonly refreshActiveInstance = (instances: Instance[]) => {
     if (instances.length > 0) {
       this.activeInstance.set(instances[0]);
-    } else if (this.activeInstance() !== null) {
-      this.activeInstance.set(null);
+    } else if (this.activeInstance() != null) {
+      this.activeInstance.set(undefined);
     }
   }
 
@@ -85,12 +85,12 @@ export class InstanceService {
     );
   }
 
-  readonly getActiveInstance = (): WritableSignal<Instance | null> => {
+  readonly getActiveInstance = (): WritableSignal<Instance | undefined> => {
     return this.activeInstance;
   }
 
-  readonly getActiveInstanceId = (): Signal<number | null> => {
-    return computed(() => this.activeInstance()?.id || null);
+  readonly getActiveInstanceId = (): Signal<number | undefined> => {
+    return computed(() => this.activeInstance()?.id);
   }
 
   /**
