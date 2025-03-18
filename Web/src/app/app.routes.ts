@@ -2,17 +2,11 @@ import {Routes} from "@angular/router";
 import {LoginComponent} from "./component/auth-login/login.component";
 import {RegisterComponent} from "./component/auth-register/register.component";
 import {AnonymousOnlyChildGuard, AnonymousOnlyGuard} from "./guard/anonymous-only.guard";
-import {
-  AuthenticatedOnlyChildGuard,
-  AuthenticatedOnlyGuard
-} from "./guard/authenticated-only.guard.";
+import {AuthenticatedOnlyChildGuard, AuthenticatedOnlyGuard} from "./guard/authenticated-only.guard.";
 import {AuthPageComponent} from "./page/auth-page/auth-page.component";
-import {
-  AuthenticatedLayoutComponent
-} from "./page/authenticated-layout/authenticated-layout.component";
+import {AuthenticatedLayoutComponent} from "./page/authenticated-layout/authenticated-layout.component";
 import {NotFoundPageComponent} from "./page/not-found-page/not-found-page.component";
 import {ProfilePageComponent} from './page/profile-page/profile-page.component';
-import {SessionPageComponent} from './page/session-page/session-page.component';
 import {WorkspacePageComponent} from './page/workspace-page/workspace-page.component';
 import {DataTypePageComponent} from './page/data-type-page/data-type-page.component';
 import {InstancePageComponent} from './page/instance-page/instance-page.component';
@@ -40,12 +34,6 @@ export const routes: Routes = [
       },
       {
         path: "profile",
-        children: [
-          {
-            path: "sessions",
-            loadComponent: () => SessionPageComponent
-          }
-        ],
         loadComponent: () => ProfilePageComponent,
       },
       {
