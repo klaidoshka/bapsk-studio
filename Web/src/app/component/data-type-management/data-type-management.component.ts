@@ -1,4 +1,4 @@
-import {Component, computed, input, OnInit, Signal, signal} from '@angular/core';
+import {Component, input, OnInit, Signal, signal} from '@angular/core';
 import {AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {DataTypeService} from '../../service/data-type.service';
 import {TextService} from '../../service/text.service';
@@ -42,7 +42,7 @@ export class DataTypeManagementComponent implements OnInit {
   FieldType = FieldType;
   fieldTypes = fieldTypes;
   form!: FormGroup;
-  instanceId!: Signal<number | null>;
+  instanceId!: Signal<number | undefined>;
   isShown = signal<boolean>(false);
   isShownInitially = input<boolean>(false);
   messages = signal<Messages>({});
@@ -54,7 +54,7 @@ export class DataTypeManagementComponent implements OnInit {
     private instanceService: InstanceService,
     private textService: TextService
   ) {
-    this.instanceId = computed(() => this.instanceService.getActiveInstance()()?.id || null)
+    this.instanceId = this.instanceService.getActiveInstanceId();
     this.form = this.createForm();
   }
 
@@ -194,12 +194,12 @@ export class DataTypeManagementComponent implements OnInit {
       this.edit({
         name: this.form.value.name,
         description: this.form.value.description,
-        dataTypeId: this.dataType()!!.id!!,
+        dataTypeId: this.dataType()!.id!,
         fields: updatedFields
       });
     } else {
       this.create({
-        instanceId: this.instanceId()!!,
+        instanceId: this.instanceId()!,
         name: this.form.value.name,
         description: this.form.value.description,
         fields: this.formFields.value

@@ -84,6 +84,11 @@ export class ApiRouter {
     `${this.baseServerUrl}/user/${id}?${this.toParameters({
       returnIdentityOnly: returnIdentityOnly
     })}`
+  public readonly userGetByEmail = (email: string, returnIdentityOnly: boolean = false) =>
+    `${this.baseServerUrl}/user?${this.toParameters({
+      email: email,
+      returnIdentityOnly: returnIdentityOnly
+    })}`
 
   public readonly vatReturnSubmit = () => `${this.accountingUrl}/sti/vat-return`;
   public readonly vatReturnGet = (saleId: number) => `${this.accountingUrl}/sti/vat-return/${saleId}`;

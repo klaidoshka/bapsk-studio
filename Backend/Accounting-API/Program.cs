@@ -62,8 +62,6 @@ builder.Services.AddScoped<IFieldTypeValidator, FieldTypeValidator>();
 builder.Services.AddScoped<IHashService, HashService>();
 builder.Services.AddScoped<IInstanceService, InstanceService>();
 builder.Services.AddScoped<IInstanceValidator, InstanceValidator>();
-builder.Services.AddScoped<IInstanceUserMetaService, InstanceUserMetaService>();
-builder.Services.AddScoped<IInstanceUserMetaValidator, InstanceUserMetaValidator>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<ISaleService, SaleService>();
 builder.Services.AddScoped<ISaleValidator, SaleValidator>();

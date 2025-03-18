@@ -74,13 +74,12 @@ public class UserService : IUserService
 
     public async Task<IEnumerable<User>> GetAsync(UserGetRequest request)
     {
-        var requester =
-            (await _database.Users.FirstOrDefaultAsync(u => u.Id == request.RequesterId))!;
+        var requester = (await _database.Users.FirstOrDefaultAsync(u => u.Id == request.RequesterId))!;
 
         if (request.ReturnIdentityOnly || requester.Role == Role.Admin)
         {
             return await _database.Users
-                .Where(u => u.IsDeleted == false)
+                .Where(u => u.IsDeleted == false && (request.Email == null || u.Email == request.Email))
                 .ToListAsync();
         }
         
@@ -91,7 +90,7 @@ public class UserService : IUserService
             .Where(u => u.UserId == requester.Id)
             .SelectMany(u => u.Instance.UserMetas)
             .Select(u => u.User)
-            .Where(u => u.IsDeleted == false)
+            .Where(u => u.IsDeleted == false && (request.Email == null || u.Email == request.Email))
             .ToListAsync();
     }
 

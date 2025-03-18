@@ -10,7 +10,7 @@ import {RegisterRequest} from "../../model/auth.model";
 import ErrorResponse from "../../model/error-response.model";
 import {AuthService} from "../../service/auth.service";
 import {TextService} from "../../service/text.service";
-import {IsoCountries, IsoCountry} from '../../model/iso-country.model';
+import {getDefaultIsoCountry, IsoCountries, IsoCountry} from '../../model/iso-country.model';
 
 @Component({
   selector: "app-auth-register",
@@ -39,7 +39,7 @@ export class RegisterComponent {
   ) {
     this.registerForm = this.formBuilder.group({
       birthDate: [new Date(), Validators.required],
-      country: [IsoCountries[129], Validators.required],
+      country: [getDefaultIsoCountry(), Validators.required],
       email: ["", [Validators.required, Validators.email]],
       firstName: ["", Validators.required],
       lastName: ["", Validators.required],

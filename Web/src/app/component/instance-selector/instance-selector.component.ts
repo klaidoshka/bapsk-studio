@@ -25,7 +25,7 @@ export class InstanceSelectorComponent {
   instances!: Signal<Instance[]>;
   isAuthenticated!: Signal<boolean>;
   managementMenu = viewChild.required(InstanceManagementComponent);
-  selectedInstance!: WritableSignal<Instance | null>;
+  selectedInstance!: WritableSignal<Instance | undefined>;
 
   constructor(
     private authService: AuthService,
@@ -49,6 +49,6 @@ export class InstanceSelectorComponent {
   }
 
   readonly showManagementMenu = () => {
-    this.managementMenu().show(null);
+    this.managementMenu().show();
   }
 }

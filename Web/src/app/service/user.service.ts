@@ -1,7 +1,7 @@
 import {computed, Injectable, Signal, signal} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {toUserIdentity, User, UserCreateRequest, UserEditRequest, UserIdentity} from '../model/user.model';
-import {first, Observable, tap} from 'rxjs';
+import {first, Observable, of, switchMap, tap} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {EnumUtil} from '../util/enum.util';
 import {Role} from '../model/role.model';
@@ -143,6 +143,21 @@ export class UserService {
         : this.storeIdentities().find(it => it.id === id)
     );
   };
+
+  readonly getIdentityByEmail = (email: string): Observable<UserIdentity | undefined> => {
+    const emailNormalized = email.toLowerCase();
+    const index = this.storeUsers().findIndex(user => user.email.toLowerCase() === emailNormalized);
+
+    if (index !== -1) {
+      return of(toUserIdentity(this.storeUsers().at(index)!));
+    }
+
+    return this.httpClient.get<UserIdentity[]>(this.apiRouter.userGetByEmail(email, true)).pipe(
+      tap(identities => identities.forEach(this.updateCachedUserIdentity)),
+      switchMap(identities => of(identities.length > 0 ? identities[0] : undefined)),
+      first()
+    );
+  }
 
   readonly updateProperties = (user: User): User => {
     return {
