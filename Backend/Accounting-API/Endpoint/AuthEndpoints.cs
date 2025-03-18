@@ -1,6 +1,5 @@
 using Accounting.API.Util;
 using Accounting.Contract.Dto.Auth;
-using Accounting.Contract.Dto.User;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,7 +29,7 @@ public static class AuthEndpoints
                     {
                         AccessToken = token.AccessToken,
                         SessionId = token.SessionId,
-                        User = token.User.ToDto()
+                        UserId = token.User.Id
                     }
                 );
             }
@@ -86,7 +85,7 @@ public static class AuthEndpoints
                     {
                         AccessToken = token.AccessToken,
                         SessionId = token.SessionId,
-                        User = token.User.ToDto()
+                        UserId = token.User.Id
                     }
                 );
             }
@@ -112,7 +111,7 @@ public static class AuthEndpoints
                     {
                         AccessToken = token.AccessToken,
                         SessionId = token.SessionId,
-                        User = token.User.ToDto()
+                        UserId = token.User.Id
                     }
                 );
             }

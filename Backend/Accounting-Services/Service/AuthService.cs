@@ -1,5 +1,4 @@
 using Accounting.Contract;
-using Accounting.Contract.Configuration;
 using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.Auth;
 using Accounting.Contract.Service;
@@ -16,21 +15,18 @@ public class AuthService : IAuthService
     private readonly AccountingDatabase _database;
     private readonly IHashService _hashService;
     private readonly IJwtService _jwtService;
-    private readonly JwtSettings _jwtSettings;
 
     public AuthService(
         IAuthValidator authValidator,
         AccountingDatabase database,
         IHashService hashService,
-        IJwtService jwtService,
-        JwtSettings jwtSettings
+        IJwtService jwtService
     )
     {
         _authValidator = authValidator;
         _database = database;
         _hashService = hashService;
         _jwtService = jwtService;
-        _jwtSettings = jwtSettings;
     }
 
     public async Task<JwtTokenPair> LoginAsync(LoginRequest request)

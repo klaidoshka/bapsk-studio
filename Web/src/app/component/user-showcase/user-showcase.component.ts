@@ -50,7 +50,7 @@ export class UserShowcaseComponent {
     });
   }
 
-  readonly showManagement = (user: User | null) => {
+  readonly showManagement = (user?: User) => {
     this.managementMenu().show(user);
   }
 

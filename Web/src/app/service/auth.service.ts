@@ -10,11 +10,12 @@ import {UserService} from './user.service';
   providedIn: "root"
 })
 export class AuthService {
-  private accessKey = "__accounting_access__";
-  private access!: WritableSignal<AuthResponse | null>;
-  private user = computed(() => this.access()?.user || null);
-  private userAuthenticated = computed(() => this.access() !== null);
-  private userSessionId = computed(() => this.access()?.sessionId || null);
+  private readonly accessKey: string = "__accounting_access__";
+  private readonly userKey: string = "__accounting_user__";
+  private readonly access!: WritableSignal<AuthResponse | null>;
+  private readonly user!: Signal<User | undefined>;
+  private readonly userAuthenticated!: Signal<boolean>;
+  private readonly userSessionId!: Signal<string | undefined>;
 
   constructor(
     private apiRouter: ApiRouter,
@@ -22,15 +23,14 @@ export class AuthService {
     private userService: UserService
   ) {
     this.access = signal<AuthResponse | null>(this.getAccess());
+    this.user = this.toUser();
+    this.userAuthenticated = computed(() => this.access() !== null);
+    this.userSessionId = computed(() => this.access()?.sessionId);
   }
 
   readonly acceptAuthResponse = (response: AuthResponse): void => {
-    response = {
-      ...response,
-      user: this.userService.updateProperties(response.user)
-    };
-
     localStorage.setItem(this.accessKey, JSON.stringify(response));
+
     this.access.set(response);
   }
 
@@ -44,6 +44,7 @@ export class AuthService {
 
   private readonly getAccess = (): AuthResponse | null => {
     const access = localStorage.getItem(this.accessKey);
+
     return access !== null ? JSON.parse(access) : null;
   }
 
@@ -51,11 +52,11 @@ export class AuthService {
     return this.access()?.accessToken || null;
   }
 
-  readonly getSessionId = (): Signal<string | null> => {
+  readonly getSessionId = (): Signal<string | undefined> => {
     return this.userSessionId;
   }
 
-  readonly getUser = (): Signal<User | null> => {
+  readonly getUser = (): Signal<User | undefined> => {
     return this.user;
   }
 
@@ -94,5 +95,29 @@ export class AuthService {
 
   readonly renewAccess = (): Observable<AuthResponse> => {
     return this.httpClient.post<AuthResponse>(this.apiRouter.authRefresh(), {});
+  }
+
+  private readonly toUser = (): Signal<User | undefined> => {
+    return computed(() => {
+      const userId = this.access()?.userId;
+
+      if (userId == null) {
+        const value = localStorage.getItem(this.userKey);
+
+        return value !== null ? JSON.parse(value) : undefined;
+      }
+
+      const user = this.userService.getByIdAsSignal(userId)();
+
+      if (user == null) {
+        const value = localStorage.getItem(this.userKey);
+
+        return value !== null ? JSON.parse(value) : undefined;
+      }
+
+      localStorage.setItem(this.userKey, JSON.stringify(user));
+
+      return user;
+    })
   }
 }

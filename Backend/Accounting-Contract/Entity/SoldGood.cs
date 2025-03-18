@@ -25,7 +25,7 @@ public class SoldGood
     /// <summary>
     /// Quantity of the sold good.
     /// </summary>
-    public int Quantity { get; set; }
+    public decimal Quantity { get; set; }
 
     /// <summary>
     /// Navigational property to the sale that the good was sold in.

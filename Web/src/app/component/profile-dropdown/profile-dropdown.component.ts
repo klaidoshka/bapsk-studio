@@ -1,13 +1,4 @@
-import {
-  Component,
-  computed,
-  effect,
-  signal,
-  Signal,
-  untracked,
-  viewChild,
-  ViewEncapsulation
-} from '@angular/core';
+import {Component, computed, effect, signal, Signal, untracked, viewChild, ViewEncapsulation} from '@angular/core';
 import {ButtonModule} from 'primeng/button';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {AuthService} from '../../service/auth.service';
@@ -44,7 +35,7 @@ export class ProfileDropdownComponent {
   ) {
     this.displayName = computed(() => {
       const user = this.authService.getUser()();
-      return user !== null ? user.firstName + ' ' + user.lastName : 'Profile';
+      return user != null ? user.firstName + ' ' + user.lastName : 'Profile';
     });
 
     this.entries.set(this.getEmptyEntries());
@@ -90,11 +81,6 @@ export class ProfileDropdownComponent {
             label: 'Profile',
             icon: 'pi pi-user-edit',
             routerLink: "/profile"
-          },
-          {
-            label: 'Sessions',
-            icon: 'pi pi-clock',
-            routerLink: "/profile/sessions",
           },
           {
             label: 'Instances',
