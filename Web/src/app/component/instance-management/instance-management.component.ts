@@ -1,4 +1,4 @@
-import {Component, signal} from '@angular/core';
+import {ChangeDetectorRef, Component, signal} from '@angular/core';
 import Instance, {InstanceCreateRequest, InstanceEditRequest, InstanceWithUsers} from '../../model/instance.model';
 import {Dialog} from 'primeng/dialog';
 import {
@@ -41,7 +41,6 @@ import {TableModule} from 'primeng/table';
   styles: ``
 })
 export class InstanceManagementComponent {
-  protected readonly toUserIdentityFullName = toUserIdentityFullName;
   form!: FormGroup;
   formUser!: FormGroup;
   instance = signal<Instance | undefined>(undefined);
@@ -55,7 +54,8 @@ export class InstanceManagementComponent {
     private instanceService: InstanceService,
     private localizationService: LocalizationService,
     private textService: TextService,
-    private userService: UserService
+    private userService: UserService,
+    private cdr: ChangeDetectorRef
   ) {
     this.form = this.formBuilder.group({
       name: ["", Validators.required],
@@ -105,21 +105,24 @@ export class InstanceManagementComponent {
 
     this.formUser.reset();
 
-    const user = this.userService.getIdentityByEmail(email!);
+    this.userService.getIdentityByEmail(email!).subscribe(user => {
+      if (!user) {
+        this.messagesUserMetas.set({error: [`User with email '${email}' does not exist.`]});
+        return;
+      } else if (this.messagesUserMetas().error) {
+        this.messagesUserMetas.set({});
+      }
 
-    if (!user) {
-      this.messagesUserMetas.set({error: [`User with email '${email}' does not exist.`]});
-      return;
-    } else if (this.messagesUserMetas().error) {
-      this.messagesUserMetas.set({});
-    }
+      this.formUsers().push(this.formBuilder.group({
+        id: [user?.id],
+        email: [email],
+        name: [toUserIdentityFullName(user)],
+        isOwnerOrSelf: [this.instance()?.createdById === user?.id || this.authService.getUser()()!.id === user?.id]
+      }));
 
-    this.formUsers().push(this.formBuilder.group({
-      id: [user?.id],
-      email: [email],
-      name: [toUserIdentityFullName(user)],
-      isOwner: [this.instance()?.createdById === user?.id]
-    }));
+      this.form.markAsDirty();
+      this.cdr.detectChanges();
+    });
   }
 
   readonly formUsers = () => {
@@ -164,6 +167,8 @@ export class InstanceManagementComponent {
 
   readonly removeUser = (index: number) => {
     this.formUsers().removeAt(index);
+
+    this.form.markAsDirty();
   }
 
   readonly save = () => {
@@ -172,19 +177,21 @@ export class InstanceManagementComponent {
       return;
     }
 
+    const request: InstanceCreateRequest = {
+      name: this.form.value.name,
+      description: this.form.value.description,
+      userMetas: this.form.value.userMetas.map((um: any) => ({
+        userId: um.id
+      }))
+    }
+
     if (this.instance() != null) {
       this.edit({
-        name: this.form.value.name,
-        description: this.form.value.description,
-        instanceId: this.instance()!!.id!!,
-        userMetas: []
+        ...request,
+        instanceId: this.instance()!.id!
       });
     } else {
-      this.create({
-        name: this.form.value.name,
-        description: this.form.value.description,
-        userMetas: []
-      });
+      this.create(request);
     }
   }
 
