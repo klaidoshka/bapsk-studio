@@ -1,4 +1,4 @@
-import {Component, input, OnInit, signal} from '@angular/core';
+import {Component, signal} from '@angular/core';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -29,14 +29,13 @@ import {LocalizationService} from '../../service/localization.service';
   templateUrl: './user-management.component.html',
   styles: ``
 })
-export class UserManagementComponent implements OnInit {
+export class UserManagementComponent {
   filteredCountries: IsoCountry[] = [];
   form!: FormGroup;
   isFormSet = signal<boolean>(false);
-  isShownInitially = input<boolean>(false);
   isShown = signal<boolean>(false);
   messages = signal<Messages>({});
-  user = signal<User | null>(null);
+  user = signal<User | undefined>(undefined);
 
   constructor(
     private localizationService: LocalizationService,
@@ -44,10 +43,6 @@ export class UserManagementComponent implements OnInit {
     private textService: TextService,
     private userService: UserService
   ) {
-  }
-
-  ngOnInit() {
-    this.isShown.set(this.isShownInitially());
   }
 
   private readonly createForm = (user: User | null): FormGroup => {
@@ -134,7 +129,7 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-  readonly show = (user: User | null) => {
+  readonly show = (user?: User) => {
     if (user) {
       this.form = this.createForm(user);
       this.form.patchValue({

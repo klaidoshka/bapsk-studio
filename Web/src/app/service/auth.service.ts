@@ -12,7 +12,7 @@ import {UserService} from './user.service';
 export class AuthService {
   private accessKey = "__accounting_access__";
   private access!: WritableSignal<AuthResponse | null>;
-  private user = computed(() => this.access()?.user || null);
+  private user = computed(() => this.access()?.user);
   private userAuthenticated = computed(() => this.access() !== null);
   private userSessionId = computed(() => this.access()?.sessionId || null);
 
@@ -55,7 +55,7 @@ export class AuthService {
     return this.userSessionId;
   }
 
-  readonly getUser = (): Signal<User | null> => {
+  readonly getUser = (): Signal<User | undefined> => {
     return this.user;
   }
 

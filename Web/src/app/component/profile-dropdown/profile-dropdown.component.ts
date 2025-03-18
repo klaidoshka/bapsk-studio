@@ -35,7 +35,7 @@ export class ProfileDropdownComponent {
   ) {
     this.displayName = computed(() => {
       const user = this.authService.getUser()();
-      return user !== null ? user.firstName + ' ' + user.lastName : 'Profile';
+      return user != null ? user.firstName + ' ' + user.lastName : 'Profile';
     });
 
     this.entries.set(this.getEmptyEntries());
