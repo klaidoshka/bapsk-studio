@@ -1,9 +1,7 @@
-import {User} from './user.model';
-
 export interface AuthResponse {
   accessToken: string;
   sessionId: string;
-  user: User;
+  userId: number;
 }
 
 export interface LoginRequest {

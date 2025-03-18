@@ -13,7 +13,7 @@ public class AuthResponse
     public Guid SessionId { get; set; }
 
     /// <summary>
-    /// User information.
+    /// User id associated with the token.
     /// </summary>
-    public User.User User { get; set; }
+    public int UserId { get; set; }
 }

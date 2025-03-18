@@ -23,7 +23,7 @@ import {Toast} from 'primeng/toast';
   styles: ``
 })
 export class SessionShowcaseComponent {
-  currentSessionId: Signal<string | null>;
+  currentSessionId: Signal<string | undefined>;
   sessions: Signal<Session[]>;
   confirmationComponent = viewChild.required(ConfirmationComponent);
 
