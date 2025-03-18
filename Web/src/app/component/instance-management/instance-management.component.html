@@ -106,7 +106,7 @@
         <p-button
           class="mt-1"
           label="Add user"
-          [disabled]="formUser.invalid || !formUser.valid"
+          [disabled]="formUser.invalid"
           (onClick)="addUser()"
         ></p-button>
       </div>
@@ -115,7 +115,7 @@
     <div class="flex justify-end mt-4">
       <p-button
         [label]="instance() == null ? 'Create' : 'Save'"
-        [disabled]="!form.valid || !form.dirty"
+        [disabled]="form.invalid || !form.dirty"
         (onClick)="save()"
       ></p-button>
     </div>

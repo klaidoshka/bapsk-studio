@@ -70,16 +70,21 @@ export class InstanceManagementComponent {
 
   private readonly create = (request: InstanceCreateRequest) => {
     this.instanceService.create(request).pipe(first()).subscribe({
-      next: () => this.messages.set({success: ["Instance has been created successfully."]}),
+      next: () => this.onSuccess("Instance has been created successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   private readonly edit = (request: InstanceEditRequest) => {
     this.instanceService.edit(request).pipe(first()).subscribe({
-      next: () => this.messages.set({success: ["Instance has been edited successfully."]}),
+      next: () => this.onSuccess("Instance has been edited successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
+  }
+
+  private readonly onSuccess = (message: string) => {
+    this.messages.set({success: [message]});
+    this.form.markAsPristine();
   }
 
   private readonly validateEmailExists = (formArray: FormArray): ValidatorFn => {
