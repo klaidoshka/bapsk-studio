@@ -37,4 +37,20 @@ public static class SaleExtensions
                 .ToList()
         };
     }
+
+    public static SaleCreateEdit ToDtoCreateEdit(this Sale sale)
+    {
+        return new SaleCreateEdit
+        {
+            CashRegister = sale.CashRegister,
+            CustomerId = sale.Customer.Id ?? 0,
+            Date = sale.Date,
+            Id = sale.Id ?? 0,
+            InvoiceNo = sale.InvoiceNo,
+            SalesmanId = sale.Salesman.Id ?? 0,
+            SoldGoods = sale.SoldGoods
+                .Select(it => it.ToDtoCreateEdit())
+                .ToList()
+        };
+    }
 }

@@ -25,7 +25,9 @@ public class CustomerService : ICustomerService
         // Validate if requester can access the instance (HIGHER LEVEL)
         // Validate properties
         
-        (await _customerValidator.ValidateCustomerAsync(request.Customer)).AssertValid();
+        _customerValidator
+            .ValidateCustomer(request.Customer)
+            .AssertValid();
 
         var customer = (await _database.Customers.AddAsync(
             new Customer
@@ -85,6 +87,7 @@ public class CustomerService : ICustomerService
         customer.IdentityDocumentType = request.Customer.IdentityDocument.Type;
         customer.IdentityDocumentValue = request.Customer.IdentityDocument.Value;
         customer.LastName = request.Customer.LastName;
+        customer.ResidenceCountry = request.Customer.ResidenceCountry;
 
         var documentsCurrent = customer.OtherDocuments.ToDictionary(it => it.Id);
 

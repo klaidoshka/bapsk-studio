@@ -36,36 +36,4 @@ public class FieldTypeValidator : IFieldTypeValidator
             ? new Validation($"Field type {type} is not supported.")
             : handler.Validate(value);
     }
-
-    public Validation ValidateValues(
-        ICollection<DataTypeField> fields,
-        IDictionary<int, JsonElement> values
-    )
-    {
-        var failures = new List<string>();
-
-        foreach (var field in fields)
-        {
-            // Check whether field is required but not provided and has no default value
-            if (field.IsRequired && field.DefaultValue == null && !values.ContainsKey(field.Id))
-            {
-                failures.Add($"Field '{field.Name}' is required.");
-
-                continue;
-            }
-
-            // If value not provided, means default value will be used, skip validation
-            if (!values.TryGetValue(field.Id, out var value))
-            {
-                continue;
-            }
-
-            // Validate provided value
-            var validation = ValidateValue(field, value);
-
-            failures.AddRange(validation.FailureMessages);
-        }
-
-        return new Validation(failures);
-    }
 }

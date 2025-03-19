@@ -7,6 +7,8 @@ export default interface Customer {
   id?: number;
   identityDocument: CustomerIdentityDocument;
   lastName: string;
+  otherDocuments: CustomerOtherDocument[];
+  residenceCountry: IsoCountryCode;
 }
 
 export interface CustomerIdentityDocument {
@@ -14,6 +16,12 @@ export interface CustomerIdentityDocument {
   number: string;
   type: IdentityDocumentType;
   value?: string;
+}
+
+export interface CustomerOtherDocument {
+  issuedBy: IsoCountryCode;
+  type: string;
+  value: string;
 }
 
 export interface CustomerCreateRequest {

@@ -15,6 +15,7 @@ import {SaleWithVatReturnDeclaration} from '../../model/sale.model';
 import {toUserIdentityFullName} from '../../model/user.model';
 import {toCustomerFullName} from '../../model/customer.model';
 import {VatReturnService} from '../../service/vat-return.service';
+import {RoundPipe} from '../../pipe/round.pipe';
 
 @Component({
   selector: 'app-vat-return-declaration-preview',
@@ -27,7 +28,8 @@ import {VatReturnService} from '../../service/vat-return.service';
     ReactiveFormsModule,
     VatReturnDeclarationSubmissionComponent,
     CurrencyPipe,
-    NgForOf
+    NgForOf,
+    RoundPipe
   ],
   templateUrl: './vat-return-declaration-preview.component.html',
   styles: ``
@@ -60,12 +62,6 @@ export class VatReturnDeclarationPreviewComponent implements OnInit {
 
   ngOnInit() {
     this.isShown.set(this.isShownInitially());
-  }
-
-  readonly getSoldGoodsTotalCount = (sale: SaleWithVatReturnDeclaration): number => {
-    return sale.soldGoods
-    .map(it => it.quantity)
-    .reduce((a, b) => a + b);
   }
 
   readonly getVATToReturn = (sale: SaleWithVatReturnDeclaration): number => {

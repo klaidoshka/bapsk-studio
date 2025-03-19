@@ -167,7 +167,7 @@ public static class SubmitDeclaration
                     Item = g.UnitOfMeasure,
                     ItemElementName = g.UnitOfMeasureType.ConvertToEnum<ItemChoiceType>(),
                     Quantity = g.Quantity,
-                    SequenceNo = g.SequenceNo,
+                    SequenceNo = g.SequenceNo.ToString().PadLeft(4, '0'),
                     TaxableAmount = g.TaxableAmount,
                     TotalAmount = g.TotalAmount,
                     VatAmount = g.VatAmount,

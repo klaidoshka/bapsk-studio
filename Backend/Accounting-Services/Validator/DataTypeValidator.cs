@@ -181,25 +181,6 @@ public class DataTypeValidator : IDataTypeValidator
             return new Validation(failures);
         }
 
-        // if (dataType.Type != DataTypeType.UserMade)
-        // {
-        //     // Check for new fields in default data types
-        //     if (newFields.Count != 0)
-        //     {
-        //         return new Validation("Default data types cannot have new fields added.");
-        //     }
-        //
-        //     // Check for missing fields in default data types
-        //     var missingFields = dataType.Fields
-        //         .Where(f => request.Fields.All(rf => rf.DataTypeFieldId != f.Id))
-        //         .ToList();
-        //
-        //     if (missingFields.Count != 0)
-        //     {
-        //         return new Validation("Cannot remove fields from default data types.");
-        //     }
-        // }
-
         // Validate field edits
         failures.AddRange(
             request.Fields.SelectMany(
@@ -230,14 +211,20 @@ public class DataTypeValidator : IDataTypeValidator
         DataTypeGetByInstanceRequest request
     )
     {
-        var instance = await _database.Instances.FindAsync(request.InstanceId);
+        var instance = await _database.Instances
+            .Include(it => it.UserMetas)
+            .FirstOrDefaultAsync(it => it.Id == request.InstanceId && !it.IsDeleted);
 
         if (instance == null)
         {
-            return new Validation("Instance not found.");
+            return new Validation("Instance was not found.");
         }
 
-        return instance.CreatedById != request.RequesterId
+        var userIds = instance.UserMetas
+            .Select(it => it.UserId)
+            .ToHashSet();
+
+        return !userIds.Contains(request.RequesterId)
             ? new Validation("You are not allowed to view data types in this instance.")
             : new Validation();
     }

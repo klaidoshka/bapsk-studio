@@ -23,7 +23,9 @@ public class SalesmanService : ISalesmanService
         // Validate if instance exists (HIGHER LEVEL)
         // Validate if requester can access the instance (HIGHER LEVEL)
         // Validate properties
-        (await _salesmanValidator.ValidateSalesmanAsync(request.Salesman)).AssertValid();
+        _salesmanValidator
+            .ValidateSalesman(request.Salesman)
+            .AssertValid();
 
         var salesman = (await _database.Salesmen.AddAsync(
             new Salesman

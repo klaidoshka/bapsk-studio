@@ -7,7 +7,6 @@ public class SoldGoodCreateEdit
     public string Description { get; set; }
     public int? Id { get; set; }
     public decimal Quantity { get; set; }
-    public string SequenceNo { get; set; }
     public string UnitOfMeasure { get; set; }
     public UnitOfMeasureType UnitOfMeasureType { get; set; }
     public decimal UnitPrice { get; set; }
@@ -28,7 +27,6 @@ public static class SoldGoodCreateEditExtensions
             Description = soldGood.Description,
             Id = soldGood.Id ?? 0,
             Quantity = soldGood.Quantity,
-            SequenceNo = soldGood.SequenceNo,
             TaxableAmount = taxableAmount,
             TotalAmount = totalAmount,
             UnitOfMeasure = soldGood.UnitOfMeasure,

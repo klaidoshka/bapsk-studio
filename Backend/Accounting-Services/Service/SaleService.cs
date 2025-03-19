@@ -24,7 +24,9 @@ public class SaleService : ISaleService
         // Validate if instance exists (HIGHER LEVEL)
         // Validate if requester can access the instance (HIGHER LEVEL)
         // Validate properties
-        (await _saleValidator.ValidateSaleAsync(request.Sale)).AssertValid();
+        _saleValidator
+            .ValidateSale(request.Sale)
+            .AssertValid();
 
         var customer = await _database.Customers.FirstAsync(it => it.Id == request.Sale.CustomerId);
         var salesman = await _database.Salesmen.FirstAsync(it => it.Id == request.Sale.SalesmanId);
@@ -40,7 +42,11 @@ public class SaleService : ISaleService
                 InvoiceNo = request.Sale.InvoiceNo,
                 Salesman = salesman,
                 SoldGoods = request.Sale.SoldGoods
-                    .Select(it => it.ToEntity())
+                    .Select(
+                        (it, index) => it
+                            .ToEntity()
+                            .Also(e => e.SequenceNo = index + 1)
+                    )
                     .ToList()
             }
         )).Entity;
@@ -91,12 +97,17 @@ public class SaleService : ISaleService
         sale.SalesmanId = request.Sale.SalesmanId;
 
         var existingSoldGoods = sale.SoldGoods.ToDictionary(it => it.Id);
+        var maxSequenceNo = existingSoldGoods.Values.Max(it => it.SequenceNo);
 
         foreach (var soldGood in request.Sale.SoldGoods)
         {
             if (soldGood.Id is null)
             {
-                sale.SoldGoods.Add(soldGood.ToEntity());
+                var soldGoodEntity = soldGood.ToEntity();
+                
+                soldGoodEntity.SequenceNo = ++maxSequenceNo;
+                
+                sale.SoldGoods.Add(soldGoodEntity);
 
                 continue;
             }
@@ -107,10 +118,10 @@ public class SaleService : ISaleService
                     {
                         it.Description = soldGood.Description;
                         it.Quantity = soldGood.Quantity;
-                        it.SequenceNo = soldGood.SequenceNo;
                         it.UnitOfMeasure = soldGood.UnitOfMeasure;
                         it.UnitOfMeasureType = soldGood.UnitOfMeasureType;
                         it.VatRate = Math.Round(soldGood.VatRate, 2);
+                        // TODO: Fix Quantity * UnitPrice calculation, it differs by UnitOfMeasureType
                         it.TaxableAmount = Math.Round(soldGood.Quantity * soldGood.UnitPrice, 2);
                         it.VatAmount = Math.Round(it.TaxableAmount * soldGood.VatRate / 100, 2);
                         it.TotalAmount = Math.Round(it.TaxableAmount + it.VatAmount, 2);
@@ -135,7 +146,7 @@ public class SaleService : ISaleService
         // Validate if instance exists (HIGHER LEVEL)
         // Validate if requester can access the instance (HIGHER LEVEL)
         (await _saleValidator.ValidateGetRequestAsync(request.InstanceId)).AssertValid();
-        
+
         return (await _database.Sales
                 .Include(it => it.Customer)
                 .Include(it => it.Salesman)

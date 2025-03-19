@@ -41,7 +41,7 @@ public class SoldGood
     /// <summary>
     /// Sequence number of the sold good.
     /// </summary>
-    public string SequenceNo { get; set; }
+    public int SequenceNo { get; set; }
 
     /// <summary>
     /// Total price of the sold good, excluding VAT.

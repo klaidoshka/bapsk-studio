@@ -172,7 +172,7 @@
         class="flex flex-col gap-4"
       >
         <div
-          *ngFor="let _ of soldGoods().controls; let i = index"
+          *ngFor="let soldGood of soldGoods().controls; let i = index"
           [formGroupName]="i"
           class="border border-gray-300 p-4 rounded-md shadow-md bg-white"
         >
@@ -225,22 +225,6 @@
               </div>
             </div>
 
-            <div class="max-w-[120px]">
-              <label class="block text-sm font-medium text-gray-700">Measure Unit</label>
-              <input
-                formControlName="unitOfMeasure"
-                pInputText
-                type="text"
-                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              />
-              <div
-                *ngIf="getSoldGoodErrorMessage(i, 'unitOfMeasure')"
-                class="text-xs text-red-500 mt-1"
-              >
-                {{ getSoldGoodErrorMessage(i, 'unitOfMeasure') }}
-              </div>
-            </div>
-
             <div class="max-w-[150px]">
               <label class="block text-sm font-medium text-gray-700">Measure Type</label>
               <p-select
@@ -249,12 +233,41 @@
                 optionValue="value"
                 optionLabel="label"
                 [options]="measurementUnits"
+                (onChange)="clearMeasurement(i, $event.value)"
               />
               <div
                 *ngIf="getSoldGoodErrorMessage(i, 'unitOfMeasureType')"
                 class="text-xs text-red-500 mt-1"
               >
                 {{ getSoldGoodErrorMessage(i, 'unitOfMeasureType') }}
+              </div>
+            </div>
+
+            <div class="max-w-[120px]">
+              <label class="block text-sm font-medium text-gray-700">Measure Unit</label>
+              @if (getMeasurementUnit(i) == UnitOfMeasureType.UnitOfMeasureOther) {
+                <input
+                  formControlName="unitOfMeasure"
+                  pInputText
+                  type="text"
+                  class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                />
+              } @else {
+                <p-select
+                  formControlName="unitOfMeasure"
+                  [options]="standardMeasurements"
+                  optionValue="code"
+                  optionLabel="label"
+                  styleClass="min-w-[120px]"
+                  class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  appendTo="body"
+                />
+              }
+              <div
+                *ngIf="getSoldGoodErrorMessage(i, 'unitOfMeasure')"
+                class="text-xs text-red-500 mt-1"
+              >
+                {{ getSoldGoodErrorMessage(i, 'unitOfMeasure') }}
               </div>
             </div>
 

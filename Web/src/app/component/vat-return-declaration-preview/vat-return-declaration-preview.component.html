@@ -45,7 +45,7 @@
       </p>
       <p>
         <strong>Sold Goods:</strong>
-        {{ sale()!.soldGoods.length }} good(s) ({{ getSoldGoodsTotalCount(sale()!) }} total items)
+        {{ sale()!.soldGoods.length }} good(s)
       </p>
       <p>
         <strong>VAT to return:</strong>
@@ -54,14 +54,47 @@
     </div>
   </div>
 
+  <div class="card mt-4" *ngIf="sale() != null">
+    <p-table [value]="sale()!.soldGoods">
+      <ng-template #header>
+        <tr>
+          <th>Sequence No</th>
+          <th>Description</th>
+          <th>Quantity</th>
+          <th>Measure Unit</th>
+          <th>Unit Price</th>
+          <th>VAT Amount</th>
+          <th>Total Amount</th>
+        </tr>
+      </ng-template>
+      <ng-template
+        #body
+        let-soldGood
+      >
+        <tr>
+          <td>{{ soldGood.sequenceNo }}</td>
+          <td>{{ soldGood.description }}</td>
+          <td>{{ soldGood.quantity }}</td>
+          <td>{{ soldGood.unitOfMeasure }}</td>
+          <td>{{ soldGood.taxableAmount / soldGood.quantity | round:2 }}</td>
+          <td>{{ soldGood.vatAmount | round:2 }} ({{ soldGood.vatRate | round:2 }}%)</td>
+          <td>{{ soldGood.totalAmount | round:2 }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
   <div *ngIf="sale() != null && declaration()?.qrCodes?.length">
     <div class="border border-gray-300 rounded my-2 w-fit">
       <div class="bg-gray-100 p-2 cursor-pointer" (click)="showQrCodes.set(!showQrCodes())">
         <p class="font-bold text-md">QR Codes</p>
       </div>
       <div class="p-4" *ngIf="showQrCodes()">
-        <div *ngFor="let qrCode of declaration()!.qrCodes" class="qr-code-item">
-          <img [src]="'data:image/png;base64,' + qrCode" alt="Declaration's QR code chunk" class="w-48 h-48"/>
+        <div
+          class="flex flex-wrap gap-4 max-w-152"
+          *ngFor="let qrCode of declaration()!.qrCodes; let i = index"
+        >
+          <img [src]="'data:image/png;base64,' + qrCode" [alt]="'Declaration\'s #' + (i + 1) + ' QR code chunk'" class="w-48 h-48"/>
         </div>
       </div>
     </div>

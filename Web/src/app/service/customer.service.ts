@@ -121,7 +121,12 @@ export class CustomerService {
         ...customer.identityDocument,
         issuedBy: EnumUtil.toEnumOrThrow(customer.identityDocument.issuedBy, IsoCountryCode),
         type: EnumUtil.toEnumOrThrow(customer.identityDocument.type, IdentityDocumentType)
-      }
+      },
+      otherDocuments: customer.otherDocuments.map(it => ({
+        ...it,
+        issuedBy: EnumUtil.toEnumOrThrow(it.issuedBy, IsoCountryCode),
+      })),
+      residenceCountry: EnumUtil.toEnumOrThrow(customer.residenceCountry, IsoCountryCode)
     };
   }
 }
