@@ -70,7 +70,7 @@ public class VatReturnService : IVatReturnService
                 IdentityDocumentNo = declaration.Sale.Customer.IdentityDocumentNumber
             },
             Goods = declaration.Sale.SoldGoods
-                .OrderBy(it => Int32.Parse(it.SequenceNo))
+                .OrderBy(it => it.SequenceNo)
                 .Select(
                     it =>
                     {
@@ -78,7 +78,7 @@ public class VatReturnService : IVatReturnService
                         {
                             Description = it.Description,
                             Quantity = it.Quantity,
-                            SequenceNo = Int32.Parse(it.SequenceNo),
+                            SequenceNo = it.SequenceNo,
                             TotalAmount = Math.Round(it.TotalAmount, 2)
                         };
 

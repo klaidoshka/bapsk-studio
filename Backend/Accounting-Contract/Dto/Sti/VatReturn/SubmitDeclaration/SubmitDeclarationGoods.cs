@@ -34,9 +34,9 @@ public class SubmitDeclarationGoods
     /// <summary>
     ///     Item's unique sequence number in the declaration. Must be on the printed declaration
     ///     or shown in electronic form together with other declaration information.
-    ///     4 characters.
+    ///     4 digits (1-9999).
     /// </summary>
-    public required string SequenceNo { get; set; }
+    public required int SequenceNo { get; set; }
 
     /// <summary>
     ///     Price without VAT (eur), 18 digits from which 2 decimal places.

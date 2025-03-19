@@ -15,7 +15,7 @@ public class InstanceValidator : IInstanceValidator
         _database = database;
     }
 
-    public async Task<Validation> ValidateInstanceCreateRequestAsync(InstanceCreateRequest request)
+    public async Task<Validation> ValidateCreateRequestAsync(InstanceCreateRequest request)
     {
         var user = await _database.Users
             .Include(u => u.InstancesCreated)
@@ -52,11 +52,11 @@ public class InstanceValidator : IInstanceValidator
             : new Validation();
     }
 
-    public async Task<Validation> ValidateInstanceDeleteRequestAsync(InstanceDeleteRequest request)
+    public async Task<Validation> ValidateDeleteRequestAsync(InstanceDeleteRequest request)
     {
         var instance = await _database.Instances.FindAsync(request.InstanceId);
 
-        if (instance == null)
+        if (instance == null || instance.IsDeleted)
         {
             return new Validation("Instance was not found.");
         }
@@ -66,23 +66,23 @@ public class InstanceValidator : IInstanceValidator
             : new Validation();
     }
 
-    public async Task<Validation> ValidateInstanceEditRequestAsync(InstanceEditRequest request)
+    public async Task<Validation> ValidateEditRequestAsync(InstanceEditRequest request)
     {
         var instance = await _database.Instances.FindAsync(request.InstanceId);
 
-        if (instance == null)
+        if (instance == null || instance.IsDeleted)
         {
             return new Validation("Instance was not found.");
-        }
-
-        if (String.IsNullOrWhiteSpace(request.Name))
-        {
-            return new Validation("Instance must have a name.");
         }
 
         if (instance.CreatedById != request.RequesterId)
         {
             return new Validation("You cannot edit an instance you did not create.");
+        }
+
+        if (String.IsNullOrWhiteSpace(request.Name))
+        {
+            return new Validation("Instance must have a name.");
         }
 
         var users = request.UserMetas
@@ -97,13 +97,20 @@ public class InstanceValidator : IInstanceValidator
             : new Validation();
     }
 
-    public async Task<Validation> ValidateInstanceGetRequestAsync(InstanceGetRequest request)
+    public async Task<Validation> ValidateExistsAsync(int instanceId)
+    {
+        return await _database.Instances.AnyAsync(it => it.Id == instanceId && !it.IsDeleted)
+            ? new Validation()
+            : new Validation("Instance was not found.");
+    }
+
+    public async Task<Validation> ValidateGetRequestAsync(InstanceGetRequest request)
     {
         var instance = await _database.Instances
             .Include(i => i.UserMetas)
             .FirstOrDefaultAsync(i => i.Id == request.InstanceId);
 
-        if (instance == null)
+        if (instance == null || instance.IsDeleted)
         {
             return new Validation("Instance was not found.");
         }

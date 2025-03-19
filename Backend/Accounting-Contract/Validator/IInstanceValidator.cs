@@ -5,31 +5,13 @@ namespace Accounting.Contract.Validator;
 
 public interface IInstanceValidator
 {
-    /// <summary>
-    /// Validates the request to create an instance
-    /// </summary>
-    /// <param name="request">Request to process</param>
-    /// <returns>Validation result</returns>
-    public Task<Validation> ValidateInstanceCreateRequestAsync(InstanceCreateRequest request);
+    public Task<Validation> ValidateCreateRequestAsync(InstanceCreateRequest request);
 
-    /// <summary>
-    /// Validates the request to delete an instance
-    /// </summary>
-    /// <param name="request">Request to process</param>
-    /// <returns>Validation result</returns>
-    public Task<Validation> ValidateInstanceDeleteRequestAsync(InstanceDeleteRequest request);
+    public Task<Validation> ValidateDeleteRequestAsync(InstanceDeleteRequest request);
 
-    /// <summary>
-    /// Validates the request to edit an instance
-    /// </summary>
-    /// <param name="request">Request to process</param>
-    /// <returns>Validation result</returns>
-    public Task<Validation> ValidateInstanceEditRequestAsync(InstanceEditRequest request);
+    public Task<Validation> ValidateEditRequestAsync(InstanceEditRequest request);
 
-    /// <summary>
-    /// Validates the request to get an instance
-    /// </summary>
-    /// <param name="request">Request to process</param>
-    /// <returns>Validation result</returns>
-    public Task<Validation> ValidateInstanceGetRequestAsync(InstanceGetRequest request);
+    public Task<Validation> ValidateExistsAsync(int instanceId);
+
+    public Task<Validation> ValidateGetRequestAsync(InstanceGetRequest request);
 }

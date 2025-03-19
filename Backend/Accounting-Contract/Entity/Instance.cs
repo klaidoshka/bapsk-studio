@@ -33,11 +33,10 @@ public class Instance
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     
-    // TODO: Implement soft delete
-    // /// <summary>
-    // /// Marks whether the instance is deleted.
-    // /// </summary>
-    // public bool IsDeleted { get; set; }
+    /// <summary>
+    /// Marks whether the instance is deleted.
+    /// </summary>
+    public bool IsDeleted { get; set; }
 
     /// <summary>
     /// Name of the instance.

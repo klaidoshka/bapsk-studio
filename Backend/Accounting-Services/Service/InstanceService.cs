@@ -24,7 +24,7 @@ public class InstanceService : IInstanceService
 
     public async Task<Instance> CreateAsync(InstanceCreateRequest request)
     {
-        (await _instanceValidator.ValidateInstanceCreateRequestAsync(request)).AssertValid();
+        (await _instanceValidator.ValidateCreateRequestAsync(request)).AssertValid();
 
         var instance = new Instance
         {
@@ -55,18 +55,18 @@ public class InstanceService : IInstanceService
 
     public async Task DeleteAsync(InstanceDeleteRequest request)
     {
-        (await _instanceValidator.ValidateInstanceDeleteRequestAsync(request)).AssertValid();
+        (await _instanceValidator.ValidateDeleteRequestAsync(request)).AssertValid();
 
         var instance = await _database.Instances.FirstAsync(it => it.Id == request.InstanceId);
 
-        _database.Instances.Remove(instance);
+        instance.IsDeleted = true;
 
         await _database.SaveChangesAsync();
     }
 
     public async Task EditAsync(InstanceEditRequest request)
     {
-        (await _instanceValidator.ValidateInstanceEditRequestAsync(request)).AssertValid();
+        (await _instanceValidator.ValidateEditRequestAsync(request)).AssertValid();
 
         var instance = await _database.Instances
             .Include(it => it.UserMetas)
@@ -116,11 +116,11 @@ public class InstanceService : IInstanceService
 
     public async Task<Instance> GetAsync(InstanceGetRequest request)
     {
-        (await _instanceValidator.ValidateInstanceGetRequestAsync(request)).AssertValid();
+        (await _instanceValidator.ValidateGetRequestAsync(request)).AssertValid();
 
         return await _database.Instances
             .Include(i => i.UserMetas)
-            .FirstAsync(it => it.Id == request.InstanceId);
+            .FirstAsync(it => it.Id == request.InstanceId && !it.IsDeleted);
     }
 
     public async Task<IEnumerable<Instance>> GetByUserIdAsync(InstanceGetByUserRequest request)
@@ -129,7 +129,10 @@ public class InstanceService : IInstanceService
             .Include(i => i.UserMetas)
             .ThenInclude(um => um.User)
             .Where(
-                i => i.UserMetas.Any(um => um.UserId == request.RequesterId && !um.User.IsDeleted)
+                i => i.UserMetas.Any(
+                         um => um.UserId == request.RequesterId && !um.User.IsDeleted
+                     ) &&
+                     !i.IsDeleted
             )
             .ToListAsync();
     }

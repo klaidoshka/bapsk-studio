@@ -25,7 +25,9 @@ public class CustomerService : ICustomerService
         // Validate if requester can access the instance (HIGHER LEVEL)
         // Validate properties
         
-        (await _customerValidator.ValidateCustomerAsync(request.Customer)).AssertValid();
+        _customerValidator
+            .ValidateCustomer(request.Customer)
+            .AssertValid();
 
         var customer = (await _database.Customers.AddAsync(
             new Customer

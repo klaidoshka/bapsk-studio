@@ -27,7 +27,7 @@ public static class EnumConverter
     /// <param name="value">Initial enum value</param>
     /// <typeparam name="TEnumTo">Type of target enum to look for case-insensitive value for</typeparam>
     /// <returns>Enum value or null</returns>
-    public static TEnumTo ConvertToEnumOrNull<TEnumTo>(this Enum value) where TEnumTo : struct, Enum
+    public static TEnumTo? ConvertToEnumOrNull<TEnumTo>(this Enum value) where TEnumTo : struct, Enum
     {
         return Enum.TryParse(value.ToString(), true, out TEnumTo target) ? target : default;
     }
