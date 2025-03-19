@@ -15,6 +15,7 @@ import {SaleWithVatReturnDeclaration} from '../../model/sale.model';
 import {toUserIdentityFullName} from '../../model/user.model';
 import {toCustomerFullName} from '../../model/customer.model';
 import {VatReturnService} from '../../service/vat-return.service';
+import {RoundPipe} from '../../pipe/round.pipe';
 
 @Component({
   selector: 'app-vat-return-declaration-preview',
@@ -27,7 +28,8 @@ import {VatReturnService} from '../../service/vat-return.service';
     ReactiveFormsModule,
     VatReturnDeclarationSubmissionComponent,
     CurrencyPipe,
-    NgForOf
+    NgForOf,
+    RoundPipe
   ],
   templateUrl: './vat-return-declaration-preview.component.html',
   styles: ``

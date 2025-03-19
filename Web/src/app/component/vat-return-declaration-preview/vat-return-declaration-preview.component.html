@@ -54,6 +54,36 @@
     </div>
   </div>
 
+  <div class="card mt-4" *ngIf="sale() != null">
+    <p-table [value]="sale()!.soldGoods">
+      <ng-template #header>
+        <tr>
+          <th>Sequence No</th>
+          <th>Description</th>
+          <th>Quantity</th>
+          <th>Measure Unit</th>
+          <th>Unit Price</th>
+          <th>VAT Amount</th>
+          <th>Total Amount</th>
+        </tr>
+      </ng-template>
+      <ng-template
+        #body
+        let-soldGood
+      >
+        <tr>
+          <td>{{ soldGood.sequenceNo }}</td>
+          <td>{{ soldGood.description }}</td>
+          <td>{{ soldGood.quantity }}</td>
+          <td>{{ soldGood.unitOfMeasure }}</td>
+          <td>{{ soldGood.taxableAmount / soldGood.quantity | round:2 }}</td>
+          <td>{{ soldGood.vatAmount | round:2 }} ({{ soldGood.vatRate | round:2 }}%)</td>
+          <td>{{ soldGood.totalAmount | round:2 }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
   <div *ngIf="sale() != null && declaration()?.qrCodes?.length">
     <div class="border border-gray-300 rounded my-2 w-fit">
       <div class="bg-gray-100 p-2 cursor-pointer" (click)="showQrCodes.set(!showQrCodes())">

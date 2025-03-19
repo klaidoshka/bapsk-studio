@@ -142,7 +142,7 @@ export class SaleManagementComponent implements OnInit {
       description: [soldGood?.description || "...", [Validators.required, Validators.maxLength(500)]],
       id: [soldGood?.id || null],
       quantity: [soldGood?.quantity || 1, [Validators.required, Validators.min(1)]],
-      unitOfMeasure: [soldGood?.unitOfMeasure || null, [Validators.required, Validators.maxLength(50)]],
+      unitOfMeasure: [soldGood?.unitOfMeasure || defaultStandardMeasurement, [Validators.required, Validators.maxLength(50)]],
       unitOfMeasureType: [soldGood?.unitOfMeasureType || UnitOfMeasureType.UnitOfMeasureCode, [Validators.required]],
       unitPrice: [soldGood != null ? NumberUtil.round(soldGood.taxableAmount / soldGood.quantity, 2) : 0, [Validators.required, Validators.min(0)]],
       vatRate: [soldGood?.vatRate || 21, [Validators.required, Validators.min(0), Validators.max(100)]]

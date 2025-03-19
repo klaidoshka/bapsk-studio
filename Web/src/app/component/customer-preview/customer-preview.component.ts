@@ -2,16 +2,21 @@ import {Component, input, OnInit, signal} from '@angular/core';
 import Customer from '../../model/customer.model';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
-import {DatePipe} from '@angular/common';
+import {DatePipe, NgIf} from '@angular/common';
 import {getIsoCountryLabel} from '../../model/iso-country.model';
 import {getIdentityDocumentTypeLabel} from '../../model/identity-document-type.model';
+import {PrimeTemplate} from 'primeng/api';
+import {TableModule} from 'primeng/table';
 
 @Component({
   selector: 'app-customer-preview',
   imports: [
     Button,
     Dialog,
-    DatePipe
+    DatePipe,
+    PrimeTemplate,
+    TableModule,
+    NgIf
   ],
   templateUrl: './customer-preview.component.html',
   styles: ``

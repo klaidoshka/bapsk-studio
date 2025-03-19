@@ -11,7 +11,7 @@ namespace Accounting.Services.Validator;
 public class CustomerValidator : ICustomerValidator
 {
     private static readonly DateTime CustomerVatReturnMinimalBirthdate = DateTime.Parse("1920-01-01");
-    
+
     private readonly AccountingDatabase _database;
     private readonly IInstanceValidator _instanceValidator;
 
@@ -60,8 +60,8 @@ public class CustomerValidator : ICustomerValidator
     public async Task<Validation> ValidateExistsAsync(int customerId)
     {
         return await _database.Customers.AnyAsync(it => it.Id == customerId && !it.IsDeleted)
-            ? new Validation("Customer was not found.")
-            : new Validation();
+            ? new Validation()
+            : new Validation("Customer was not found.");
     }
 
     public async Task<Validation> ValidateGetByIdRequestAsync(int customerId)
@@ -113,11 +113,11 @@ public class CustomerValidator : ICustomerValidator
         {
             failures.Add("Customer's other documents are required if ID is issued by EU country or United Kingdom.");
         }
-        
+
         for (var i = 0; i < otherDocuments.Count; i++)
         {
             var document = otherDocuments[i];
-            
+
             if (document.Type.Length is < 1 or > 100)
             {
                 failures.Add($"Customer's other document #{i + 1} type must be between 1 and 100 characters.");

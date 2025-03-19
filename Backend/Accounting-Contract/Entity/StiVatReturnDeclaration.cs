@@ -1,9 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
+using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Contract.Entity;
 
+[Index(nameof(SaleId), IsUnique = true)]
 public class StiVatReturnDeclaration
 {
     /// <summary>
@@ -50,7 +52,7 @@ public class StiVatReturnDeclaration
     /// Only null if declared by the system from external requests.
     /// </summary>
     public int? InstanceId { get; set; }
-    
+
     /// <summary>
     /// Navigation property for the QR codes of this declaration.
     /// </summary>

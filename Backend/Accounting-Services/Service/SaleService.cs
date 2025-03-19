@@ -121,6 +121,7 @@ public class SaleService : ISaleService
                         it.UnitOfMeasure = soldGood.UnitOfMeasure;
                         it.UnitOfMeasureType = soldGood.UnitOfMeasureType;
                         it.VatRate = Math.Round(soldGood.VatRate, 2);
+                        // TODO: Fix Quantity * UnitPrice calculation, it differs by UnitOfMeasureType
                         it.TaxableAmount = Math.Round(soldGood.Quantity * soldGood.UnitPrice, 2);
                         it.VatAmount = Math.Round(it.TaxableAmount * soldGood.VatRate / 100, 2);
                         it.TotalAmount = Math.Round(it.TaxableAmount + it.VatAmount, 2);

@@ -479,7 +479,8 @@ namespace Accounting.Contract.Migrations
 
                     b.HasIndex("InstanceId");
 
-                    b.HasIndex("SaleId");
+                    b.HasIndex("SaleId")
+                        .IsUnique();
 
                     b.ToTable("StiVatReturnDeclarations");
                 });

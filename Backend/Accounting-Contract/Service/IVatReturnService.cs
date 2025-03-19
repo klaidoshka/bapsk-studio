@@ -5,6 +5,8 @@ namespace Accounting.Contract.Service;
 
 public interface IVatReturnService
 {
+    public Task<string> GenerateDeclarationIdAsync();
+
     public IEnumerable<string> GenerateQrCodes(StiVatReturnDeclaration declaration);
 
     public Task<StiVatReturnDeclaration?> GetBySaleIdAsync(int saleId);

@@ -5,7 +5,7 @@ namespace Accounting.Contract.Validator;
 
 public interface ISaleValidator
 {
-    public Validation ValidateSale(SaleCreateEdit sale);
+    public Validation ValidateSale(SaleCreateEdit sale, bool includeSoldGoods = true);
 
     public Task<Validation> ValidateDeleteRequestAsync(int saleId);
 

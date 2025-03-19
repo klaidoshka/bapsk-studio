@@ -20,7 +20,7 @@ public class SaleValidator : ISaleValidator
         _instanceValidator = instanceValidator;
     }
 
-    public Validation ValidateSale(SaleCreateEdit sale)
+    public Validation ValidateSale(SaleCreateEdit sale, bool includeSoldGoods = true)
     {
         var failures = new List<string>();
 
@@ -35,6 +35,7 @@ public class SaleValidator : ISaleValidator
         }
 
         if (
+            String.IsNullOrWhiteSpace(sale.InvoiceNo) &&
             sale.CashRegister is not null &&
             (String.IsNullOrWhiteSpace(sale.CashRegister.CashRegisterNo) ||
              String.IsNullOrWhiteSpace(sale.CashRegister.ReceiptNo))
@@ -43,9 +44,11 @@ public class SaleValidator : ISaleValidator
             failures.Add("Both CashRegisterNo and ReceiptNo must be provided if InvoiceNo is not provided.");
         }
 
-        ValidateSoldGoods(sale.SoldGoods.ToList())
-            .FailureMessages
-            .Also(it => failures.AddRange(it));
+        if (includeSoldGoods)
+        {
+            ValidateSoldGoods(sale.SoldGoods.ToList())
+                .Also(it => failures.AddRange(it.FailureMessages));
+        }
 
         return new Validation(failures);
     }
@@ -117,7 +120,9 @@ public class SaleValidator : ISaleValidator
         return new Validation(
             sequenceNo is null
                 ? failures
-                : failures.Select(it => $"Sold good #{sequenceNo}: {it}")
+                : failures
+                    .Select(it => $"Sold good #{sequenceNo}: {it}")
+                    .ToList()
         );
     }
 
@@ -148,7 +153,7 @@ public class SaleValidator : ISaleValidator
 
         // Converting to CreateEdit DTO, because it has sufficient properties for validation
         // And so we can reuse the existing validation methods
-        ValidateSale(saleCreateEdit)
+        ValidateSale(saleCreateEdit, false)
             .Also(it => failures.AddRange(it.FailureMessages));
 
         if (
@@ -185,10 +190,10 @@ public class SaleValidator : ISaleValidator
 
     public Validation ValidateVatReturnSoldGood(SoldGoodCreateEdit soldGood, int? sequenceNo = null)
     {
-        var failures = new List<string>();
+        var failuresInitial = ValidateSoldGood(soldGood, sequenceNo).FailureMessages
+            .ToList();
 
-        ValidateSoldGood(soldGood, sequenceNo)
-            .Also(it => failures.AddRange(it.FailureMessages));
+        var failures = new List<string>();
 
         if (soldGood.Description.Length is < 1 or > 500)
         {
@@ -203,11 +208,16 @@ public class SaleValidator : ISaleValidator
             failures.Add("Measurement unit must be between 1 and 50 characters when using other unit.");
         }
 
-        return new Validation(
-            sequenceNo is null
-                ? failures
-                : failures.Select(it => $"Sold good #{sequenceNo}: {it}")
-        );
+        if (sequenceNo is not null)
+        {
+            failures = failures
+                .Select(it => $"Sold good #{sequenceNo}: {it}")
+                .ToList();
+        }
+
+        failuresInitial.AddRange(failures);
+
+        return new Validation(failuresInitial);
     }
 
     public Validation ValidateVatReturnSoldGoods(ICollection<SoldGoodCreateEdit> soldGoods)

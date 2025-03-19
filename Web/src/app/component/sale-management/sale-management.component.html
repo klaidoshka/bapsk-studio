@@ -252,13 +252,13 @@
                   type="text"
                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                 />
-              }
-              @else {
+              } @else {
                 <p-select
                   formControlName="unitOfMeasure"
                   [options]="standardMeasurements"
                   optionValue="code"
                   optionLabel="label"
+                  styleClass="min-w-[120px]"
                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                   appendTo="body"
                 />
