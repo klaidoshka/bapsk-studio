@@ -50,35 +50,6 @@ public class VatReturnValidator : IVatReturnValidator
             }
         }
 
-        if (request.Sale is null && request.DeclarationId is null)
-        {
-            return new Validation("Either sale or declaration ID must be provided.");
-        }
-
-        var sale = request.Sale;
-
-        if (request.DeclarationId is not null)
-        {
-            var saleEntity = await _database.StiVatReturnDeclarations
-                .Include(it => it.Sale)
-                .ThenInclude(it => it.Customer)
-                .ThenInclude(it => it.OtherDocuments)
-                .Include(it => it.Sale)
-                .ThenInclude(it => it.Salesman)
-                .Include(it => it.Sale)
-                .ThenInclude(it => it.SoldGoods)
-                .Where(it => it.Id == request.DeclarationId)
-                .Select(it => it.Sale)
-                .FirstOrDefaultAsync();
-
-            if (saleEntity is null)
-            {
-                return new Validation("Declaration was not found.");
-            }
-
-            sale = saleEntity.ToDto();
-        }
-
         if (!request.Affirmation)
         {
             return new Validation("It must be affirmed that the customer can use VAT return service.");
@@ -86,28 +57,35 @@ public class VatReturnValidator : IVatReturnValidator
 
         var failures = new List<string>();
 
-        (await ValidateCustomerAsync(sale!.Customer))
+        (await ValidateCustomerAsync(request.Sale.Customer, request.Sale.Id))
             .Also(it => failures.AddRange(it.FailureMessages));
 
-        (await ValidateSalesmanAsync(sale.Salesman))
+        (await ValidateSalesmanAsync(request.Sale.Salesman, request.Sale.Id))
             .Also(it => failures.AddRange(it.FailureMessages));
 
-        (await ValidateSaleAsync(sale))
+        (await ValidateSaleAsync(request.Sale))
             .Also(it => failures.AddRange(it.FailureMessages));
 
         return new Validation(failures);
     }
 
-    private async Task<Validation> ValidateCustomerAsync(Customer customer)
+    private async Task<Validation> ValidateCustomerAsync(Customer customer, int? saleId)
     {
-        if (customer.Id == null)
+        if (customer.Id is null && saleId is null)
         {
             return _customerValidator.ValidateVatReturnCustomer(customer);
         }
 
-        var customerEntity = await _database.Customers
-            .Include(it => it.OtherDocuments)
-            .FirstOrDefaultAsync(it => it.Id == customer.Id && !it.IsDeleted);
+        var customerEntity = customer.Id is not null
+            ? await _database.Customers.FirstOrDefaultAsync(
+                it => it.Id == customer.Id && !it.IsDeleted
+            )
+            : await _database.Sales
+                .Include(it => it.Customer)
+                .ThenInclude(it => it.OtherDocuments)
+                .Where(it => it.Id == saleId && !it.IsDeleted)
+                .Select(it => it.Customer)
+                .FirstOrDefaultAsync();
 
         return customerEntity is null
             ? new Validation("Customer was not found.")
@@ -116,7 +94,7 @@ public class VatReturnValidator : IVatReturnValidator
 
     private async Task<Validation> ValidateSaleAsync(Sale sale)
     {
-        if (sale.Id == null)
+        if (sale.Id is null)
         {
             return _saleValidator.ValidateVatReturnSale(sale);
         }
@@ -135,16 +113,22 @@ public class VatReturnValidator : IVatReturnValidator
             : _saleValidator.ValidateVatReturnSale(saleEntity.ToDto());
     }
 
-    private async Task<Validation> ValidateSalesmanAsync(Salesman salesman)
+    private async Task<Validation> ValidateSalesmanAsync(Salesman salesman, int? saleId)
     {
-        if (salesman.Id == null)
+        if (salesman.Id is null && saleId is null)
         {
             return _salesmanValidator.ValidateVatReturnSalesman(salesman);
         }
 
-        var salesmanEntity = await _database.Salesmen.FirstOrDefaultAsync(
-            it => it.Id == salesman.Id && !it.IsDeleted
-        );
+        var salesmanEntity = salesman.Id is not null
+            ? await _database.Salesmen.FirstOrDefaultAsync(
+                it => it.Id == salesman.Id && !it.IsDeleted
+            )
+            : await _database.Sales
+                .Include(it => it.Salesman)
+                .Where(it => it.Id == saleId && !it.IsDeleted)
+                .Select(it => it.Salesman)
+                .FirstOrDefaultAsync();
 
         return salesmanEntity is null
             ? new Validation("Salesman was not found.")

@@ -84,7 +84,7 @@ public class SalesmanValidator : ISalesmanValidator
             failures.Add("Salesman's VAT payer code must be issued by Lithuania.");
         }
 
-        if (salesman.VatPayerCode.Value.Length != 12 || !Int32.TryParse(salesman.VatPayerCode.Value, out _))
+        if (salesman.VatPayerCode.Value.Length != 12 || !salesman.VatPayerCode.Value.All(Char.IsDigit))
         {
             failures.Add("Salesman's VatPayerCode must be made out of 12 digits.");
         }

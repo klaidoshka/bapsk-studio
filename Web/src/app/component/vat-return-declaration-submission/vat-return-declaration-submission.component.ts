@@ -76,10 +76,20 @@ export class VatReturnDeclarationSubmissionComponent implements OnInit {
       return;
     }
 
+    const sale = this.sale();
+
     this.vatReturnService.submit({
       affirmation: this.form.value.affirmation,
       instanceId: this.instanceId(),
-      sale: this.sale()
+      sale: {
+        id: sale.id,
+        customer: {
+          id: sale.customer.id!
+        },
+        salesman: {
+          id: sale.salesman.id!
+        }
+      }
     }).pipe(first()).subscribe({
       next: () => this.onSuccess("Declaration for sale's VAT return has been submitted successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)

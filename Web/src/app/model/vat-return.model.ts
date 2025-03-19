@@ -1,4 +1,3 @@
-import Sale from './sale.model';
 import {UserIdentity} from './user.model';
 
 export default interface VatReturnDeclaration {
@@ -19,7 +18,17 @@ export interface VatReturnDeclarationWithDeclarer extends VatReturnDeclaration {
 export interface VatReturnDeclarationSubmitRequest {
   affirmation: boolean;
   instanceId: number;
-  sale: Sale;
+  sale: VatReturnDeclarationSubmitRequestSale;
+}
+
+export interface VatReturnDeclarationSubmitRequestSale {
+  id: number;
+  customer: {
+    id: number;
+  };
+  salesman: {
+    id: number;
+  };
 }
 
 export enum SubmitDeclarationState {
