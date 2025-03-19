@@ -46,7 +46,7 @@ export interface SoldGood {
   description: string;
   id: number;
   quantity: number;
-  sequenceNo: string;
+  sequenceNo: number;
   taxableAmount: number;
   totalAmount: number;
   unitOfMeasure: string;
@@ -59,7 +59,6 @@ export interface SoldGoodCreateEdit {
   description: string;
   id?: number;
   quantity: number;
-  sequenceNo: string;
   unitOfMeasure: string;
   unitOfMeasureType: UnitOfMeasureType;
   unitPrice: number;

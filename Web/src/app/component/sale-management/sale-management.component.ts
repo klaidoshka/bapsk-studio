@@ -17,6 +17,8 @@ import {Select} from 'primeng/select';
 import {SaleReceiptType} from './sale-receipt-type.model';
 import {NgForOf, NgIf} from '@angular/common';
 import {UnitOfMeasureType} from '../../model/unit-of-measure-type.model';
+import {defaultStandardMeasurement, StandardMeasurements} from './standard-measurement.model';
+import {NumberUtil} from '../../util/number.util';
 
 @Component({
   selector: 'app-sale-management',
@@ -37,6 +39,7 @@ import {UnitOfMeasureType} from '../../model/unit-of-measure-type.model';
 })
 export class SaleManagementComponent implements OnInit {
   protected readonly SaleReceiptType = SaleReceiptType;
+  protected readonly UnitOfMeasureType = UnitOfMeasureType;
   customers = input.required<Customer[]>();
   customersLabeled = computed(() => this.customers().map((customer) => ({
     label: `${customer.firstName} ${customer.lastName} (${customer.identityDocument.number})`,
@@ -62,6 +65,7 @@ export class SaleManagementComponent implements OnInit {
     {label: 'Receipt', value: SaleReceiptType.CashRegister}
   ]
   selectedSaleReceiptType = signal<SaleReceiptType>(SaleReceiptType.Invoice);
+  standardMeasurements = StandardMeasurements
 
   constructor(
     private formBuilder: FormBuilder,
@@ -86,27 +90,6 @@ export class SaleManagementComponent implements OnInit {
     this.isShown.set(this.isShownInitially());
   }
 
-  readonly soldGoods = () => this.form.controls["soldGoods"] as FormArray;
-
-  readonly addSoldGood = (soldGood?: SoldGood | null) => {
-    this.soldGoods().push(this.formBuilder.group({
-      description: [soldGood?.description || "...", [Validators.required, Validators.maxLength(500)]],
-      id: [soldGood?.id || null],
-      quantity: [soldGood?.quantity || 1, [Validators.required, Validators.min(1)]],
-      sequenceNo: [this.soldGoods().length + 1],
-      unitOfMeasure: [soldGood?.unitOfMeasure || null, [Validators.required, Validators.maxLength(50)]],
-      unitOfMeasureType: [soldGood?.unitOfMeasureType || UnitOfMeasureType.UnitOfMeasureCode, [Validators.required]],
-      unitPrice: [soldGood != null ? soldGood.taxableAmount / soldGood.quantity : 0.00, [Validators.required, Validators.min(0)]],
-      vatRate: [soldGood?.vatRate || 21, [Validators.required, Validators.min(0), Validators.max(100)]]
-    }));
-    this.soldGoods().markAsDirty();
-  }
-
-  readonly removeSoldGood = (index: number) => {
-    this.soldGoods().removeAt(index);
-    this.soldGoods().markAsDirty();
-  }
-
   private readonly onSuccess = (message: string) => {
     this.messages.set({success: [message]});
     this.form.markAsUntouched();
@@ -125,6 +108,54 @@ export class SaleManagementComponent implements OnInit {
       next: () => this.onSuccess("Sale has been edited successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
+  }
+
+  private readonly updateForm = (sale?: Sale | null) => {
+    this.form.reset();
+    this.soldGoods().clear();
+
+    if (sale != null) {
+      this.selectedSaleReceiptType.set(
+        sale.invoiceNo?.trim()?.length
+          ? SaleReceiptType.Invoice
+          : SaleReceiptType.CashRegister
+      );
+
+      this.form.patchValue({
+        ...sale,
+        customerId: sale.customer.id,
+        salesmanId: sale.salesman.id
+      });
+
+      sale.soldGoods.forEach((soldGood) => {
+        this.addSoldGood(soldGood);
+      });
+
+      this.soldGoods().markAsPristine();
+    } else {
+      this.selectedSaleReceiptType.set(SaleReceiptType.Invoice);
+    }
+  }
+
+  readonly addSoldGood = (soldGood?: SoldGood | null) => {
+    this.soldGoods().push(this.formBuilder.group({
+      description: [soldGood?.description || "...", [Validators.required, Validators.maxLength(500)]],
+      id: [soldGood?.id || null],
+      quantity: [soldGood?.quantity || 1, [Validators.required, Validators.min(1)]],
+      unitOfMeasure: [soldGood?.unitOfMeasure || null, [Validators.required, Validators.maxLength(50)]],
+      unitOfMeasureType: [soldGood?.unitOfMeasureType || UnitOfMeasureType.UnitOfMeasureCode, [Validators.required]],
+      unitPrice: [soldGood != null ? NumberUtil.round(soldGood.taxableAmount / soldGood.quantity, 2) : 0, [Validators.required, Validators.min(0)]],
+      vatRate: [soldGood?.vatRate || 21, [Validators.required, Validators.min(0), Validators.max(100)]]
+    }));
+    this.soldGoods().markAsDirty();
+  }
+
+  readonly clearMeasurement = (index: number, type: UnitOfMeasureType) => {
+    if (type == UnitOfMeasureType.UnitOfMeasureCode) {
+      this.soldGoods().at(index).get("unitOfMeasure")?.setValue(defaultStandardMeasurement);
+    } else {
+      this.soldGoods().at(index).get("unitOfMeasure")?.setValue(null);
+    }
   }
 
   readonly getErrorMessage = (field: string): string | null => {
@@ -148,6 +179,10 @@ export class SaleManagementComponent implements OnInit {
     }
 
     return null;
+  }
+
+  readonly getMeasurementUnit = (index: number): UnitOfMeasureType => {
+    return this.soldGoods().at(index).get("unitOfMeasureType")?.value || UnitOfMeasureType.UnitOfMeasureCode;
   }
 
   readonly getSoldGoodErrorMessage = (index: number, field: string): string | null => {
@@ -186,6 +221,11 @@ export class SaleManagementComponent implements OnInit {
     this.form.reset();
   }
 
+  readonly removeSoldGood = (index: number) => {
+    this.soldGoods().removeAt(index);
+    this.soldGoods().markAsDirty();
+  }
+
   readonly save = () => {
     if (!this.form.valid) {
       this.messages.set({error: ["Please fill out the form."]});
@@ -203,7 +243,6 @@ export class SaleManagementComponent implements OnInit {
         soldGoods: this.form.value.soldGoods.map((soldGood: any) => ({
           ...soldGood,
           quantity: +soldGood.quantity,
-          sequenceNo: soldGood.sequenceNo.toString().padStart(4, "0"),
           unitPrice: +soldGood.unitPrice,
           vatRate: +soldGood.vatRate
         }))
@@ -224,31 +263,5 @@ export class SaleManagementComponent implements OnInit {
     this.isShown.set(true);
   }
 
-  private readonly updateForm = (sale?: Sale | null) => {
-    this.form.reset();
-    this.soldGoods().clear();
-
-
-    if (sale != null) {
-      this.selectedSaleReceiptType.set(
-        sale.invoiceNo?.trim()?.length
-          ? SaleReceiptType.Invoice
-          : SaleReceiptType.CashRegister
-      );
-
-      this.form.patchValue({
-        ...sale,
-        customerId: sale.customer.id,
-        salesmanId: sale.salesman.id
-      });
-
-      sale.soldGoods.forEach((soldGood) => {
-        this.addSoldGood(soldGood);
-      });
-
-      this.soldGoods().markAsPristine();
-    } else {
-      this.selectedSaleReceiptType.set(SaleReceiptType.Invoice);
-    }
-  }
+  readonly soldGoods = () => this.form.controls["soldGoods"] as FormArray;
 }
