@@ -23,12 +23,12 @@ public class DataType
     /// <summary>
     /// Navigation property for the entries that the data type has.
     /// </summary>
-    public virtual ICollection<DataEntry> Entries { get; set; }
+    public virtual ICollection<DataEntry> Entries { get; set; } = new List<DataEntry>();
 
     /// <summary>
     /// Navigation property for the fields that the data type has.
     /// </summary>
-    public virtual ICollection<DataTypeField> Fields { get; set; }
+    public virtual ICollection<DataTypeField> Fields { get; set; } = new List<DataTypeField>();
 
     /// <summary>
     /// Unique identifier of the data type.

@@ -37,6 +37,7 @@
           <th>Salesman</th>
           <th>Sale Date</th>
           <th>Sold Goods</th>
+          <th>Total Price</th>
           <th>Actions</th>
         </tr>
       </ng-template>
@@ -46,10 +47,11 @@
         let-sale
       >
         <tr>
-          <td>{{ sale.customer.firstName + ' ' + sale.customer.lastName }}</td>
+          <td>{{ toCustomerFullName(sale.customer) }}</td>
           <td>{{ sale.salesman.name }}</td>
           <td>{{ sale.date | date:'medium' }}</td>
-          <td>{{ sale.soldGoods.length }} goods</td>
+          <td>{{ sale.soldGoods.length }} good(s)</td>
+          <td>{{ getTotalPrice(sale.soldGoods) | currency:'EUR':'symbol':'1.2-2' }}</td>
           <td class="flex flex-nowrap items-center">
             <p-button
               icon="pi pi-eye"

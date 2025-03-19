@@ -4,6 +4,7 @@ import {Button} from 'primeng/button';
 import {DatePipe, NgIf} from '@angular/common';
 import {Dialog} from 'primeng/dialog';
 import {TableModule} from 'primeng/table';
+import {RoundPipe} from '../../pipe/round.pipe';
 
 @Component({
   selector: 'app-sale-preview',
@@ -12,7 +13,8 @@ import {TableModule} from 'primeng/table';
     DatePipe,
     Dialog,
     TableModule,
-    NgIf
+    NgIf,
+    RoundPipe
   ],
   templateUrl: './sale-preview.component.html',
   styles: ``

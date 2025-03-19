@@ -54,7 +54,7 @@ public class StiVatReturnDeclaration
     /// <summary>
     /// Navigation property for the QR codes of this declaration.
     /// </summary>
-    public virtual ICollection<StiVatReturnDeclarationQrCode> QrCodes { get; set; }
+    public virtual ICollection<StiVatReturnDeclarationQrCode> QrCodes { get; set; } = new List<StiVatReturnDeclarationQrCode>();
 
     /// <summary>
     /// Navigation property for the sale of the declaration.

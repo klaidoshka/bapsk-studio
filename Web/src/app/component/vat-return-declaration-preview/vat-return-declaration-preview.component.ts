@@ -62,12 +62,6 @@ export class VatReturnDeclarationPreviewComponent implements OnInit {
     this.isShown.set(this.isShownInitially());
   }
 
-  readonly getSoldGoodsTotalCount = (sale: SaleWithVatReturnDeclaration): number => {
-    return sale.soldGoods
-    .map(it => it.quantity)
-    .reduce((a, b) => a + b);
-  }
-
   readonly getVATToReturn = (sale: SaleWithVatReturnDeclaration): number => {
     return sale.soldGoods
     .map(it => it.vatAmount)
