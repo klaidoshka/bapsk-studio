@@ -8,6 +8,7 @@ export default interface Customer {
   identityDocument: CustomerIdentityDocument;
   lastName: string;
   otherDocuments: CustomerOtherDocument[];
+  residenceCountry: IsoCountryCode;
 }
 
 export interface CustomerIdentityDocument {

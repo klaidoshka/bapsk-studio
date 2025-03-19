@@ -12,6 +12,7 @@ import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.
 import {TableModule} from 'primeng/table';
 import {DatePipe} from '@angular/common';
 import {getIdentityDocumentTypeLabel} from '../../model/identity-document-type.model';
+import {getIsoCountryLabel} from '../../model/iso-country.model';
 
 @Component({
   selector: 'app-customer-showcase',
@@ -28,6 +29,8 @@ import {getIdentityDocumentTypeLabel} from '../../model/identity-document-type.m
   styles: ``
 })
 export class CustomerShowcaseComponent {
+  protected readonly getIdentityDocumentTypeLabel = getIdentityDocumentTypeLabel;
+  protected readonly getIsoCountryLabel = getIsoCountryLabel;
   customers = input.required<Customer[]>();
   confirmationComponent = viewChild.required(ConfirmationComponent);
   instanceId = input.required<number>();
@@ -57,6 +60,4 @@ export class CustomerShowcaseComponent {
   readonly showPreview = (customer: Customer) => {
     this.previewMenu().show(customer);
   }
-
-  protected readonly getIdentityDocumentTypeLabel = getIdentityDocumentTypeLabel;
 }

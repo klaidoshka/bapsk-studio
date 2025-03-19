@@ -100,7 +100,7 @@ public class CustomerValidator : ICustomerValidator
         {
             failures.Add("Customer's ID number must be between 1 and 50 characters.");
         }
-
+        
         if (customer.ResidenceCountry.ConvertToEnumOrNull<NonEuCountryCode>() == null)
         {
             failures.Add("Customer's residence country must be a non-EU country.");

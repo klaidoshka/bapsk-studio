@@ -29,6 +29,6 @@ public static class EnumConverter
     /// <returns>Enum value or null</returns>
     public static TEnumTo? ConvertToEnumOrNull<TEnumTo>(this Enum value) where TEnumTo : struct, Enum
     {
-        return Enum.TryParse(value.ToString(), true, out TEnumTo target) ? target : default;
+        return Enum.TryParse(value.ToString(), true, out TEnumTo target) ? target : null;
     }
 }

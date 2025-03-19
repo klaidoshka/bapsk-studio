@@ -18,6 +18,9 @@
   <p class="font-bold mt-4">Birthdate</p>
   <p>{{ customer()!.birthdate | date:'mediumDate' }}</p>
 
+  <p class="font-bold mt-4">Residence Country</p>
+  <p>{{ getIsoCountryLabel(customer()!.residenceCountry) }}</p>
+
   <p class="font-bold mt-4">Identity Document</p>
   <p>Issued By: {{ getCountryName(customer()!.identityDocument!.issuedBy) }}</p>
   <p>Type: {{ getIdentityDocumentTypeLabel(customer()!.identityDocument!.type) }}</p>

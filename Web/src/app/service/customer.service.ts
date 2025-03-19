@@ -125,7 +125,8 @@ export class CustomerService {
       otherDocuments: customer.otherDocuments.map(it => ({
         ...it,
         issuedBy: EnumUtil.toEnumOrThrow(it.issuedBy, IsoCountryCode),
-      }))
+      })),
+      residenceCountry: EnumUtil.toEnumOrThrow(customer.residenceCountry, IsoCountryCode)
     };
   }
 }

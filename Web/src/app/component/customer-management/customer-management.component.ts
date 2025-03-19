@@ -62,7 +62,8 @@ export class CustomerManagementComponent implements OnInit {
         value: [null, [Validators.maxLength(50)]]
       }),
       lastName: ["", [Validators.required, Validators.maxLength(200)]],
-      otherDocuments: this.formBuilder.array([])
+      otherDocuments: this.formBuilder.array([]),
+      residenceCountry: [getDefaultIsoCountry().code, [Validators.required]]
     });
   }
 
@@ -174,7 +175,8 @@ export class CustomerManagementComponent implements OnInit {
           type: this.form.value.identityDocument.type,
           value: this.form.value.identityDocument.value
         },
-        otherDocuments: this.form.value.otherDocuments
+        otherDocuments: this.form.value.otherDocuments,
+        residenceCountry: this.form.value.residenceCountry
       },
       instanceId: this.instanceId()
     };

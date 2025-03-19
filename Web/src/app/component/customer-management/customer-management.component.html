@@ -42,21 +42,39 @@
         </div>
       </div>
 
-      <div>
-        <label for="birthdate" class="block text-sm font-medium text-gray-700">Birthdate</label>
-        <p-datepicker
-          inputId="birthdate"
-          formControlName="birthdate"
-          [showIcon]="true"
-          variant="filled"
-          inputStyleClass="p-2 rounded-md"
-          class="mt-1 block w-fit border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-          required
-          appendTo="body"
-        ></p-datepicker>
-        @if (getErrorMessage("birthdate"); as error) {
-          <div class="text-xs text-red-500 mt-1">{{ error }}</div>
-        }
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex-1">
+          <label for="birthdate" class="block text-sm font-medium text-gray-700">Birthdate</label>
+          <p-datepicker
+            inputId="birthdate"
+            formControlName="birthdate"
+            [showIcon]="true"
+            variant="filled"
+            inputStyleClass="p-2 rounded-md"
+            class="mt-1 block w-fit border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            required
+            appendTo="body"
+          ></p-datepicker>
+          @if (getErrorMessage("birthdate"); as error) {
+            <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+          }
+        </div>
+
+        <div class="flex-1">
+          <label for="residenceCountry" class="block text-sm font-medium text-gray-700">Residence Country</label>
+          <p-select
+            inputId="residenceCountry"
+            formControlName="residenceCountry"
+            [options]="IsoCountries"
+            optionLabel="name"
+            optionValue="code"
+            class="bg-surface-50 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            appendTo="body"
+          ></p-select>
+          @if (getErrorMessage("residenceCountry"); as error) {
+            <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+          }
+        </div>
       </div>
 
       <div formGroupName="identityDocument">

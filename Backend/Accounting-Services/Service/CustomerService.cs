@@ -87,6 +87,7 @@ public class CustomerService : ICustomerService
         customer.IdentityDocumentType = request.Customer.IdentityDocument.Type;
         customer.IdentityDocumentValue = request.Customer.IdentityDocument.Value;
         customer.LastName = request.Customer.LastName;
+        customer.ResidenceCountry = request.Customer.ResidenceCountry;
 
         var documentsCurrent = customer.OtherDocuments.ToDictionary(it => it.Id);
 
