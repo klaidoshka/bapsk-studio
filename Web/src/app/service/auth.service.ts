@@ -36,8 +36,9 @@ export class AuthService {
 
   readonly cleanupCredentials = (): void => {
     localStorage.removeItem(this.accessKey);
+    localStorage.removeItem(this.userKey);
 
-    if (this.access() !== null) {
+    if (this.access() != null) {
       this.access.set(null);
     }
   }
