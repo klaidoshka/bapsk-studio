@@ -1,9 +1,11 @@
+using System.Net.Http.Json;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Accounting.Contract;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Dto;
+using Accounting.Contract.Dto.Butenta;
 using Accounting.Contract.Dto.Sti;
 using Accounting.Contract.Dto.Sti.VatReturn;
 using Accounting.Contract.Dto.Sti.VatReturn.Qr;
@@ -27,22 +29,27 @@ public class VatReturnService : IVatReturnService
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
 
+    private readonly ICountryService _countryService;
     private readonly AccountingDatabase _database;
     private readonly StiVatReturn _stiVatReturn;
     private readonly IStiVatReturnClientService _stiVatReturnClientService;
     private readonly IVatReturnValidator _validator;
 
     public VatReturnService(
+        ICountryService countryService,
         AccountingDatabase database,
         StiVatReturn stiVatReturn,
         IStiVatReturnClientService stiVatReturnClientService,
         IVatReturnValidator validator
     )
     {
+        _countryService = countryService;
         _database = database;
         _stiVatReturn = stiVatReturn;
         _stiVatReturnClientService = stiVatReturnClientService;
         _validator = validator;
+
+        // TODO: _validator.ValidateConfiguration();
     }
 
     private async Task ConsumeSubmitDeclarationResponse(
@@ -107,7 +114,7 @@ public class VatReturnService : IVatReturnService
     private async Task<(StiVatReturnDeclaration, bool)> ResolveDeclarationAsync(StiVatReturnDeclarationSubmitRequest request)
     {
         var isCreatedNow = !await _database.StiVatReturnDeclarations.AnyAsync(it => it.SaleId == request.Sale.Id);
-        
+
         var declaration = !isCreatedNow
             ? await _database.StiVatReturnDeclarations
                 .Include(it => it.QrCodes)
@@ -137,7 +144,7 @@ public class VatReturnService : IVatReturnService
     {
         var nextId = await _database.StiVatReturnDeclarations.CountAsync() + 1;
 
-        return $"{_stiVatReturn.Intermediary.Id}/VAT.R/{nextId}";
+        return $"{_stiVatReturn.Sender.Id}/VAT.R/{nextId}";
     }
 
     public IEnumerable<string> GenerateQrCodes(StiVatReturnDeclaration declaration)
@@ -164,6 +171,20 @@ public class VatReturnService : IVatReturnService
             .ToList();
 
         return qrCodes;
+    }
+
+    public Task<StiVatReturnDeclaration?> GetByIdAsync(string id)
+    {
+        return _database.StiVatReturnDeclarations
+            .Include(it => it.QrCodes)
+            .Include(it => it.Sale)
+            .ThenInclude(it => it.Customer)
+            .ThenInclude(it => it.OtherDocuments)
+            .Include(it => it.Sale)
+            .ThenInclude(it => it.Salesman)
+            .Include(it => it.Sale)
+            .ThenInclude(it => it.SoldGoods)
+            .FirstOrDefaultAsync(d => d.Id == id);
     }
 
     public async Task<StiVatReturnDeclaration?> GetBySaleIdAsync(int saleId)
@@ -205,6 +226,45 @@ public class VatReturnService : IVatReturnService
             clientResponse,
             isCreatedNow
         );
+
+        return declaration;
+    }
+
+    public async Task<StiVatReturnDeclaration> SubmitButentaTradeAsync(int tradeId)
+    {
+        var httpClient = new HttpClient();
+        var tradesResponse = await httpClient.GetFromJsonAsync<TradesResponse>($"https://0.0.0.0/api/v1/trade/{tradeId}");
+
+        if (tradesResponse == null)
+        {
+            throw new ValidationException("Trade not found");
+        }
+
+        var trade = tradesResponse.Documents.ElementAtOrDefault(0) ?? throw new ValidationException("Trade not found");
+        var sale = trade.ToEntityWithoutCustomer();
+        var clientsResponse = await httpClient.GetFromJsonAsync<ClientsResponse>($"https://0.0.0.0/api/v1/clients");
+
+        if (clientsResponse == null)
+        {
+            throw new ValidationException("Client cannot be found");
+        }
+
+        var client = clientsResponse.Clients.FirstOrDefault(c => c.Name == trade.ReceiverName);
+
+        if (client == null)
+        {
+            throw new ValidationException("Client not found");
+        }
+
+        sale.Customer = client.ToEntity(_countryService.GetCountryCode(client.Country));
+
+        var declaration = new StiVatReturnDeclaration
+        {
+            Correction = 1,
+            Sale = sale
+        };
+
+        // TODO: Submit declaration
 
         return declaration;
     }

@@ -51,6 +51,7 @@ builder.Services.AddScoped<Dictionary<FieldType, FieldHandler>>(
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthValidator, AuthValidator>();
+builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ICustomerValidator, CustomerValidator>();
 builder.Services.AddScoped<IDataEntryService, DataEntryService>();

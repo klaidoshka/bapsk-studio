@@ -157,16 +157,16 @@ public static class SubmitDeclarationRequestExtensions
                 },
                 Intermediary = new SubmitDeclarationIntermediary
                 {
-                    Id = vatReturnConfiguration.Intermediary.Id,
-                    Name = vatReturnConfiguration.Intermediary.Name
+                    Id = vatReturnConfiguration.Sender.Id,
+                    Name = vatReturnConfiguration.Sender.Name
                 },
                 Salesman = salesman,
                 SalesDocuments = [sale]
             },
             RequestId = requestId,
-            SenderId = vatReturnConfiguration.Intermediary.Id,
+            SenderId = vatReturnConfiguration.Sender.Id,
             Situation = 1,
-            TimeStamp = nowNoMillis,
+            TimeStamp = nowNoMillis
         };
     }
 }

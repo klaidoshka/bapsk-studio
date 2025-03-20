@@ -44,7 +44,7 @@ export class SalesmanManagementComponent implements OnInit {
       name: ["", [Validators.required, Validators.maxLength(300)]],
       vatPayerCode: this.formBuilder.group({
         issuedBy: ["", [Validators.required]],
-        value: ["", [Validators.required, Validators.pattern("^[0-9]{12}$")]]
+        value: ["", [Validators.required, Validators.pattern("^[0-9]{9,12}$")]]
       })
     });
   }
@@ -94,7 +94,7 @@ export class SalesmanManagementComponent implements OnInit {
     }
 
     if (control.errors?.["pattern"]) {
-      return `${name} must be a 12-digit number.`;
+      return `${name} must be a 9 or 12 digits number.`;
     }
 
     return null;

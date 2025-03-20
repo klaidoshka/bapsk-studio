@@ -143,6 +143,7 @@
       </div>
 
       <div formArrayName="otherDocuments" class="flex flex-col gap-4">
+        <label class="block text-sm font-medium text-gray-700">Other Documents</label>
         <div
           *ngFor="let _ of otherDocuments().controls; let i = index"
           [formGroupName]="i"

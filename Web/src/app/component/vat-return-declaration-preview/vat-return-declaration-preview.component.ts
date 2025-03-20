@@ -56,7 +56,7 @@ export class VatReturnDeclarationPreviewComponent implements OnInit {
         return;
       }
 
-      this.declaration = this.vatReturnService.getBySaleIdAsSignal(this.instanceId(), saleId);
+      this.declaration = this.vatReturnService.getWithDeclarerBySaleIdAsSignal(this.instanceId(), saleId);
     });
   }
 

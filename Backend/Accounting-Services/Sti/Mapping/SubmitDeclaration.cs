@@ -194,7 +194,7 @@ public static class SubmitDeclaration
         {
             DeclarationState = response.submitDeclarationResponse.DeclState
                 .ConvertToEnum<SubmitDeclarationState>(),
-            Errors = response.submitDeclarationResponse.Errors.ToInternalType(),
+            Errors = response.submitDeclarationResponse.Errors?.ToInternalType() ?? [],
             ResultDate = response.submitDeclarationResponse.ResultDate,
             ResultStatus = response.submitDeclarationResponse.ResultStatus
                 .ConvertToEnum<ResultStatus>(),

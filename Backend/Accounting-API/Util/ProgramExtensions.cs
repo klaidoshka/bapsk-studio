@@ -4,6 +4,7 @@ using Accounting.API.AuthorizationHandler;
 using Accounting.API.Endpoint;
 using Accounting.Contract;
 using Accounting.Contract.Configuration;
+using Accounting.Services.Util;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -207,6 +208,13 @@ public static class ProgramExtensions
 
         stiRouteGroup
             .MapGroup("/vat-return")
-            .MapVatReturnEndpoints();
+            .Also(
+                it =>
+                {
+                    it.MapVatReturnEndpoints();
+                    
+                    it.MapButentaEndpoints();
+                }
+            );
     }
 }

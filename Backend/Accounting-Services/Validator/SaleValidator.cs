@@ -109,7 +109,7 @@ public class SaleValidator : ISaleValidator
         }
 
         if (
-            soldGood.UnitOfMeasureType != UnitOfMeasureType.UnitOfMeasureCode &&
+            soldGood.UnitOfMeasureType == UnitOfMeasureType.UnitOfMeasureCode &&
             (String.IsNullOrWhiteSpace(soldGood.UnitOfMeasure) ||
              soldGood.UnitOfMeasure.Length != 3)
         )

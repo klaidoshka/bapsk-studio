@@ -21,7 +21,7 @@ public static class CancelDeclaration
     {
         return new CancelDeclarationResponse
         {
-            Errors = response.cancelDeclarationResponse.Errors.ToInternalType(),
+            Errors = response.cancelDeclarationResponse.Errors?.ToInternalType() ?? [],
             ResultDate = response.cancelDeclarationResponse.ResultDate,
             ResultStatus = response.cancelDeclarationResponse.ResultStatus
                 .ConvertToEnum<ResultStatus>()

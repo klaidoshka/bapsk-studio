@@ -1,11 +1,16 @@
 import {computed, Injectable, signal, WritableSignal} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
-import VatReturnDeclaration, {SubmitDeclarationState, VatReturnDeclarationSubmitRequest} from '../model/vat-return.model';
+import VatReturnDeclaration, {
+  SubmitDeclarationState,
+  VatReturnDeclarationSubmitRequest,
+  VatReturnDeclarationWithDeclarer
+} from '../model/vat-return.model';
 import {catchError, first, tap} from 'rxjs';
 import {EnumUtil} from '../util/enum.util';
 import ErrorResponse from '../model/error-response.model';
 import {InternalFailure} from '../model/internal-failure-code.model';
+import {UserService} from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +21,8 @@ export class VatReturnService {
 
   constructor(
     private apiRouter: ApiRouter,
-    private httpClient: HttpClient
+    private httpClient: HttpClient,
+    private userService: UserService,
   ) {
   }
 
@@ -70,6 +76,21 @@ export class VatReturnService {
     }
 
     return computed(() => this.store.get(instanceId)!().find(it => it.saleId === saleId));
+  }
+
+  readonly getWithDeclarerBySaleIdAsSignal = (instanceId: number, saleId: number) => {
+    return computed(() => {
+      const declaration = this.getBySaleIdAsSignal(instanceId, saleId)();
+
+      if (declaration == null) {
+        return undefined;
+      }
+
+      return {
+        ...declaration,
+        declaredBy: declaration?.declaredById == null ? undefined : this.userService.getByIdAsSignal(declaration.declaredById)()
+      } as VatReturnDeclarationWithDeclarer;
+    });
   }
 
   readonly submit = (request: VatReturnDeclarationSubmitRequest) => {

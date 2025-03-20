@@ -9,7 +9,11 @@ public interface IVatReturnService
 
     public IEnumerable<string> GenerateQrCodes(StiVatReturnDeclaration declaration);
 
+    public Task<StiVatReturnDeclaration?> GetByIdAsync(string id);
+
     public Task<StiVatReturnDeclaration?> GetBySaleIdAsync(int saleId);
 
     public Task<StiVatReturnDeclaration> SubmitAsync(StiVatReturnDeclarationSubmitRequest request);
+
+    public Task<StiVatReturnDeclaration> SubmitButentaTradeAsync(int tradeId);
 }
