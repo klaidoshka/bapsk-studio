@@ -3,6 +3,7 @@ import {IsoCountryCode} from './iso-country.model';
 
 export default interface Customer {
   birthdate: Date;
+  email?: string;
   firstName: string;
   id?: number;
   identityDocument: CustomerIdentityDocument;

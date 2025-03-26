@@ -227,6 +227,11 @@ public class SaleValidator : ISaleValidator
             return new Validation("At least one sold good must be provided.");
         }
 
+        if (soldGoods.Sum(it => it.TotalPriceAdjusted) < 40)
+        {
+            return new Validation("Total price of sold goods must reach at least €40.");
+        }
+
         var failures = new List<string>();
 
         for (var i = 0; i < soldGoods.Count; i++)

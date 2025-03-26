@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
@@ -36,17 +37,33 @@ public class ButentaService : IButentaService
     public async Task<ICollection<Client>> GetClientsAsync()
     {
         using var client = CreateClient();
-        var clientsResponse = await client.GetFromJsonAsync<ClientsResponse>(_butenta.ClientsEndpoint);
 
-        return clientsResponse is null ? [] : clientsResponse.Clients;
+        try
+        {
+            var clientsResponse = await client.GetFromJsonAsync<ClientsResponse>(_butenta.ClientsEndpoint);
+
+            return clientsResponse is null ? [] : clientsResponse.Clients;
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        {
+            return [];
+        }
     }
 
     public async Task<Trade?> GetTradeAsync(int tradeId)
     {
         using var client = CreateClient();
-        var tradesResponse = await client.GetFromJsonAsync<TradesResponse>($"{_butenta.TradeEndpoint}/{tradeId}");
 
-        return tradesResponse?.Documents.ElementAtOrDefault(0);
+        try
+        {
+            var tradesResponse = await client.GetFromJsonAsync<TradesResponse>($"{_butenta.TradeEndpoint}/{tradeId}");
+
+            return tradesResponse?.Documents.ElementAtOrDefault(0);
+        }
+        catch (HttpRequestException exception) when (exception.StatusCode == HttpStatusCode.NotFound)
+        {
+            return null;
+        }
     }
 
     public async Task<TradeWithClients?> GetTradeWithClientsAsync(int tradeId)
@@ -100,6 +117,7 @@ public class ButentaService : IButentaService
             .ThenInclude(it => it.QrCodes)
             .Where(it => it.Id == tradeId)
             .Select(it => it.Declaration)
+            .AsSplitQuery()
             .FirstOrDefaultAsync();
     }
 }

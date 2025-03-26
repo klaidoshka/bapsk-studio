@@ -23,11 +23,11 @@ public static class ButentaEndpoints
             .AllowAnonymous();
 
         builder.MapGet(
-                "declaration/{declarationId}",
+                "trade-declaration/{tradeId:int}",
                 async (
-                    string declarationId,
-                    IVatReturnService vatReturnService
-                ) => Results.Json(await vatReturnService.GetByIdAsync(declarationId))
+                    int tradeId,
+                    IButentaService butentaService
+                ) => Results.Json(await butentaService.GetVatReturnDeclarationByTradeId(tradeId))
             )
             .AllowAnonymous();
     }

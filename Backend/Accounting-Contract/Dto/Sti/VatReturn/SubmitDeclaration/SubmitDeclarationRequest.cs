@@ -126,7 +126,7 @@ public static class SubmitDeclarationRequestExtensions
                     it => new SubmitDeclarationGoods
                     {
                         Description = it.Description,
-                        Quantity = Math.Truncate(it.Quantity),
+                        Quantity = it.Quantity,
                         SequenceNo = it.SequenceNo,
                         TaxableAmount = Math.Round(it.TaxableAmount, 2),
                         TotalAmount = Math.Round(it.TotalAmount, 2),

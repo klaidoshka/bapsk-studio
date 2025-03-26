@@ -1,0 +1,9 @@
+@endpoint = http://localhost:5125/api/v1/accounting/sti/butenta-vat-return
+
+POST {{endpoint}}/submit-trade/10085
+
+###
+
+GET {{endpoint}}/trade-declaration/10085
+Accept: application/json
+Content-Type: application/json

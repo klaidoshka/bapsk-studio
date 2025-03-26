@@ -14,7 +14,13 @@ public class EmailService : IEmailService
         _email = email;
     }
 
-    public async Task SendAsync(string toEmail, string subject, string body, bool isHtml = true)
+    public async Task SendAsync(
+        string toEmail,
+        string subject,
+        string body,
+        ICollection<Attachment> attachments,
+        bool isHtml = true
+    )
     {
         using var client = new SmtpClient(_email.Host, _email.Port);
 
@@ -27,7 +33,13 @@ public class EmailService : IEmailService
         message.Subject = subject;
         message.Body = body;
         message.IsBodyHtml = isHtml;
+
         message.To.Add(toEmail);
+
+        foreach (var attachment in attachments)
+        {
+            message.Attachments.Add(attachment);
+        }
 
         await client.SendMailAsync(message);
     }

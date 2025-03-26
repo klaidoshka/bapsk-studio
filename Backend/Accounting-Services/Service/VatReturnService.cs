@@ -188,6 +188,17 @@ public class VatReturnService : IVatReturnService
         return declaration;
     }
 
+    private async Task SendEmailIfExistsAsync(StiVatReturnDeclaration declaration)
+    {
+        if (declaration.Sale.Customer.Email is not null)
+        {
+            await _emailService.SendAsync(
+                declaration.Sale.Customer.Email,
+                Emails.VatReturnDeclarationStatusChange(declaration)
+            );
+        }
+    }
+
     public async Task<string> GenerateDeclarationIdAsync()
     {
         var nextId = await _database.StiVatReturnDeclarations.CountAsync() + 1;
@@ -221,20 +232,6 @@ public class VatReturnService : IVatReturnService
         return qrCodes;
     }
 
-    public Task<StiVatReturnDeclaration?> GetByIdAsync(string id)
-    {
-        return _database.StiVatReturnDeclarations
-            .Include(it => it.QrCodes)
-            .Include(it => it.Sale)
-            .ThenInclude(it => it.Customer)
-            .ThenInclude(it => it.OtherDocuments)
-            .Include(it => it.Sale)
-            .ThenInclude(it => it.Salesman)
-            .Include(it => it.Sale)
-            .ThenInclude(it => it.SoldGoods)
-            .FirstOrDefaultAsync(d => d.Id == id);
-    }
-
     public async Task<StiVatReturnDeclaration?> GetBySaleIdAsync(int saleId)
     {
         return await _database.StiVatReturnDeclarations
@@ -246,6 +243,7 @@ public class VatReturnService : IVatReturnService
             .ThenInclude(it => it.Salesman)
             .Include(it => it.Sale)
             .ThenInclude(it => it.SoldGoods)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(d => d.SaleId == saleId);
     }
 
@@ -274,6 +272,8 @@ public class VatReturnService : IVatReturnService
             clientResponse,
             declaration.Correction == 1
         );
+
+        await SendEmailIfExistsAsync(declaration);
 
         return declaration;
     }
@@ -307,20 +307,7 @@ public class VatReturnService : IVatReturnService
             declaration.Correction == 1
         );
 
-        // if (declaration.Sale.Customer.Email is not null)
-        // {
-        await _emailService.SendAsync(
-            // declaration.Sale.Customer.Email,
-            "some.email@gmail.com",
-            Emails.VatReturnDeclarationStatusChange(
-                declaration.Id,
-                declaration.State,
-                declaration.QrCodes
-                    .Select(it => it.Value)
-                    .ToList()
-            )
-        );
-        // }
+        await SendEmailIfExistsAsync(declaration);
 
         return declaration;
     }

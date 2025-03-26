@@ -54,6 +54,7 @@ export class CustomerManagementComponent implements OnInit {
   ) {
     this.form = this.formBuilder.group({
       birthdate: [new Date(), [Validators.required]],
+      email: [""],
       firstName: ["", [Validators.required, Validators.maxLength(200)]],
       identityDocument: this.formBuilder.group({
         issuedBy: [getDefaultIsoCountry().code, [Validators.required]],
@@ -167,6 +168,7 @@ export class CustomerManagementComponent implements OnInit {
     const request: CustomerCreateRequest = {
       customer: {
         birthdate: this.form.value.birthdate,
+        email: this.form.value.email,
         firstName: this.form.value.firstName,
         lastName: this.form.value.lastName,
         identityDocument: {
