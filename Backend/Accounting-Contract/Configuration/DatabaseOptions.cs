@@ -1,8 +1,5 @@
 namespace Accounting.Contract.Configuration;
 
-/// <summary>
-/// Configuration for database connection.
-/// </summary>
 public class DatabaseOptions
 {
     /// <summary>

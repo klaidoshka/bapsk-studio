@@ -1,8 +1,5 @@
 namespace Accounting.Contract.Configuration;
 
-/// <summary>
-/// Configuration for JWT token.
-/// </summary>
 public class JwtSettings
 {
     /// <summary>

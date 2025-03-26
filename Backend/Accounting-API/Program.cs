@@ -14,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configuration
 builder.AddConfiguration<JwtSettings>("JwtSettings");
+builder.AddConfiguration<Email>("Email");
 builder.AddConfiguration<Logging>("Logging");
 builder.AddConfiguration<StiVatReturn>("StiVatReturn");
 
@@ -58,6 +59,7 @@ builder.Services.AddScoped<IDataEntryService, DataEntryService>();
 builder.Services.AddScoped<IDataEntryValidator, DataEntryValidator>();
 builder.Services.AddScoped<IDataTypeService, DataTypeService>();
 builder.Services.AddScoped<IDataTypeValidator, DataTypeValidator>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IFieldTypeService, FieldTypeService>();
 builder.Services.AddScoped<IFieldTypeValidator, FieldTypeValidator>();
 builder.Services.AddScoped<IHashService, HashService>();

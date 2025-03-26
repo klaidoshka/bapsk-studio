@@ -31,6 +31,7 @@ public class VatReturnService : IVatReturnService
 
     private readonly ICountryService _countryService;
     private readonly AccountingDatabase _database;
+    private readonly IEmailService _emailService;
     private readonly StiVatReturn _stiVatReturn;
     private readonly IStiVatReturnClientService _stiVatReturnClientService;
     private readonly IVatReturnValidator _validator;
@@ -38,6 +39,7 @@ public class VatReturnService : IVatReturnService
     public VatReturnService(
         ICountryService countryService,
         AccountingDatabase database,
+        IEmailService emailService,
         StiVatReturn stiVatReturn,
         IStiVatReturnClientService stiVatReturnClientService,
         IVatReturnValidator validator
@@ -45,11 +47,10 @@ public class VatReturnService : IVatReturnService
     {
         _countryService = countryService;
         _database = database;
+        _emailService = emailService;
         _stiVatReturn = stiVatReturn;
         _stiVatReturnClientService = stiVatReturnClientService;
         _validator = validator;
-
-        // TODO: _validator.ValidateConfiguration();
     }
 
     private async Task ConsumeSubmitDeclarationResponse(

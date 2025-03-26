@@ -1,8 +1,5 @@
 namespace Accounting.Contract.Configuration;
 
-/// <summary>
-/// Configuration responsible for STI VAT return settings.
-/// </summary>
 public class StiVatReturn
 {
     public string CertificatePassword { get; set; } = null!;
