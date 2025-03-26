@@ -1,5 +1,8 @@
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using Accounting.Contract;
+using Accounting.Contract.Configuration;
 using Accounting.Contract.Dto.Butenta;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
@@ -9,25 +12,39 @@ namespace Accounting.Services.Service;
 
 public class ButentaService : IButentaService
 {
+    private readonly Butenta _butenta;
     private readonly AccountingDatabase _database;
 
-    public ButentaService(AccountingDatabase database)
+    public ButentaService(Butenta butenta, AccountingDatabase database)
     {
+        _butenta = butenta;
         _database = database;
+    }
+
+    private HttpClient CreateClient()
+    {
+        var client = new HttpClient();
+
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Basic",
+            Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_butenta.Auth.Username}:{_butenta.Auth.Password}"))
+        );
+
+        return client;
     }
 
     public async Task<ICollection<Client>> GetClientsAsync()
     {
-        using var httpClient = new HttpClient();
-        var clientsResponse = await httpClient.GetFromJsonAsync<ClientsResponse>($"http://0.0.0.0/api/v1/clients");
+        using var client = CreateClient();
+        var clientsResponse = await client.GetFromJsonAsync<ClientsResponse>(_butenta.ClientsEndpoint);
 
         return clientsResponse is null ? [] : clientsResponse.Clients;
     }
 
     public async Task<Trade?> GetTradeAsync(int tradeId)
     {
-        using var httpClient = new HttpClient();
-        var tradesResponse = await httpClient.GetFromJsonAsync<TradesResponse>($"http://0.0.0.0/api/v1/trade/{tradeId}");
+        using var client = CreateClient();
+        var tradesResponse = await client.GetFromJsonAsync<TradesResponse>($"{_butenta.TradeEndpoint}/{tradeId}");
 
         return tradesResponse?.Documents.ElementAtOrDefault(0);
     }

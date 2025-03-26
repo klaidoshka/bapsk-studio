@@ -13,8 +13,9 @@ using Accounting.Services.Validator;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configuration
-builder.AddConfiguration<JwtSettings>("JwtSettings");
+builder.AddConfiguration<Butenta>("Butenta");
 builder.AddConfiguration<Email>("Email");
+builder.AddConfiguration<JwtSettings>("JwtSettings");
 builder.AddConfiguration<Logging>("Logging");
 builder.AddConfiguration<StiVatReturn>("StiVatReturn");
 
@@ -52,6 +53,7 @@ builder.Services.AddScoped<Dictionary<FieldType, FieldHandler>>(
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthValidator, AuthValidator>();
+builder.Services.AddScoped<IButentaService, ButentaService>();
 builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ICustomerValidator, CustomerValidator>();
