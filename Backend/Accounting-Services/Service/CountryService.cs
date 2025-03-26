@@ -5,9 +5,9 @@ namespace Accounting.Services.Service;
 
 public class CountryService : ICountryService
 {
-    public IsoCountryCode GetCountryCode(string name)
+    public IsoCountryCode GetCountryCode(string name, IsoCountryCode @default = IsoCountryCode.LT)
     {
         // TODO: Implement this method
-        return IsoCountryCode.LT;
+        return @default;
     }
 }

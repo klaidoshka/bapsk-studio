@@ -9,6 +9,11 @@ public class Customer
     /// Birthdate of the customer
     /// </summary>
     public DateTime Birthdate { get; set; } = DateTime.UtcNow;
+    
+    /// <summary>
+    /// Email of the customer
+    /// </summary>
+    public string? Email { get; set; }
 
     /// <summary>
     /// First name of the customer.

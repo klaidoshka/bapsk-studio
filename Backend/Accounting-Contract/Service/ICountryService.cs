@@ -4,5 +4,5 @@ namespace Accounting.Contract.Service;
 
 public interface ICountryService
 {
-    public IsoCountryCode GetCountryCode(string name);
+    public IsoCountryCode GetCountryCode(string name, IsoCountryCode @default = IsoCountryCode.LT);
 }

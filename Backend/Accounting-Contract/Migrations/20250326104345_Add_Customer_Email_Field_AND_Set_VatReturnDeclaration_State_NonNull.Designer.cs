@@ -4,6 +4,7 @@ using Accounting.Contract;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Accounting.Contract.Migrations
 {
     [DbContext(typeof(AccountingDatabase))]
-    partial class AccountingDatabaseModelSnapshot : ModelSnapshot
+    [Migration("20250326104345_Add_Customer_Email_Field_AND_Set_VatReturnDeclaration_State_NonNull")]
+    partial class Add_Customer_Email_Field_AND_Set_VatReturnDeclaration_State_NonNull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
