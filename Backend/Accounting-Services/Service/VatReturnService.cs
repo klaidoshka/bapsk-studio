@@ -73,6 +73,7 @@ public class VatReturnService : IVatReturnService
             );
         }
 
+        SubmitDeclarationState? stateOld = isCreatedNow ? null : declaration.State;
         declaration.State = response.DeclarationState.Value;
         declaration.SubmitDate = response.ResultDate.ToUniversalTime();
 
@@ -104,6 +105,11 @@ public class VatReturnService : IVatReturnService
         }
 
         await _database.SaveChangesAsync();
+
+        if (stateOld != declaration.State)
+        {
+            await SendEmailIfExistsAsync(declaration);
+        }
 
         if (response.DeclarationState == SubmitDeclarationState.REJECTED)
         {
@@ -273,8 +279,6 @@ public class VatReturnService : IVatReturnService
             declaration.Correction == 1
         );
 
-        await SendEmailIfExistsAsync(declaration);
-
         return declaration;
     }
 
@@ -306,8 +310,6 @@ public class VatReturnService : IVatReturnService
             clientResponse,
             declaration.Correction == 1
         );
-
-        await SendEmailIfExistsAsync(declaration);
 
         return declaration;
     }
