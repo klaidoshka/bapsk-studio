@@ -1,4 +1,4 @@
-import {Component, effect, signal, untracked} from '@angular/core';
+import {Component, signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {getSubmitDeclarationStateLabel, VatReturnDeclarationWithSale} from '../../model/vat-return.model';
 import {VatReturnService} from '../../service/vat-return.service';
@@ -32,47 +32,46 @@ export class DeclarationPreviewPageComponent {
 
   constructor(
     route: ActivatedRoute,
-    vatReturnService: VatReturnService
+    private vatReturnService: VatReturnService
   ) {
     route.queryParams.subscribe(params => {
       const previewCode = params['code'];
 
-      if (previewCode) {
-        this.declarationPreviewCode.set(previewCode);
-      } else if (this.declarationPreviewCode()) {
-        this.declarationPreviewCode.set(undefined);
+      if (!previewCode) {
+        return;
       }
-    });
 
-    effect(() => {
-      const id = this.declarationPreviewCode();
-
-      if (!id) {
-        untracked(() => {
-          if (this.declaration()) {
-            this.declaration.set(undefined);
-          }
-        });
-      } else {
-        vatReturnService.getWithSaleByPreviewCode(id).pipe(first()).subscribe(declaration => {
-          untracked(() => {
-            if (declaration) {
-              this.declaration.set(declaration);
-            } else if (this.declaration()) {
-              this.declaration.set(undefined);
-            }
-          });
-        });
-      }
+      this.declarationPreviewCode.set(previewCode);
+      this.loadDeclaration(previewCode);
     });
   }
 
   protected readonly getSubmitDeclarationStateLabel = getSubmitDeclarationStateLabel;
   protected readonly toCustomerFullName = toCustomerFullName;
 
+  readonly loadDeclaration = (code: string) => {
+    this.vatReturnService.getWithSaleByPreviewCode(code).pipe(first()).subscribe(declaration => {
+      if (declaration) {
+        this.declaration.set(declaration);
+      } else if (this.declaration()) {
+        this.declaration.set(undefined);
+      }
+    });
+  }
+
   readonly getVATToReturn = (sale: SaleWithVatReturnDeclaration): number => {
     return sale.soldGoods
     .map(it => it.vatAmount)
     .reduce((a, b) => a + b);
+  }
+
+  readonly refresh = () => {
+    const code = this.declarationPreviewCode();
+
+    if (!code) {
+      return;
+    }
+
+    this.loadDeclaration(code);
   }
 }

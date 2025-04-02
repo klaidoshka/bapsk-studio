@@ -1,7 +1,7 @@
 import {Component, input, OnInit, signal} from '@angular/core';
 import Sale from '../../model/sale.model';
 import {Button} from 'primeng/button';
-import {DatePipe, NgIf} from '@angular/common';
+import {CurrencyPipe, DatePipe, NgIf} from '@angular/common';
 import {Dialog} from 'primeng/dialog';
 import {TableModule} from 'primeng/table';
 import {RoundPipe} from '../../pipe/round.pipe';
@@ -14,7 +14,8 @@ import {RoundPipe} from '../../pipe/round.pipe';
     Dialog,
     TableModule,
     NgIf,
-    RoundPipe
+    RoundPipe,
+    CurrencyPipe
   ],
   templateUrl: './sale-preview.component.html',
   styles: ``
