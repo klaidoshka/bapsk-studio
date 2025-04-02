@@ -22,6 +22,20 @@ public static class ButentaEndpoints
             )
             .AllowAnonymous();
 
+        builder
+            .MapPost(
+                "update-trade/{tradeId:int}",
+                async (
+                    int tradeId,
+                    IVatReturnService vatReturnService
+                ) =>
+                {
+                    await vatReturnService.UpdateButentaTradeAsync(tradeId);
+
+                    return Results.Ok();
+                }
+            );
+
         builder.MapGet(
                 "trade-declaration/{tradeId:int}",
                 async (

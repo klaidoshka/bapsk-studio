@@ -6,7 +6,9 @@ using Accounting.Contract;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.Butenta;
+using Accounting.Contract.Dto.Customer;
 using Accounting.Contract.Dto.Sale;
+using Accounting.Contract.Dto.Salesman;
 using Accounting.Contract.Dto.Sti;
 using Accounting.Contract.Dto.Sti.VatReturn;
 using Accounting.Contract.Dto.Sti.VatReturn.Qr;
@@ -17,6 +19,7 @@ using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Accounting.Services.Util;
 using Microsoft.EntityFrameworkCore;
+using Sale = Accounting.Contract.Entity.Sale;
 using StiVatReturnDeclaration = Accounting.Contract.Entity.StiVatReturnDeclaration;
 
 namespace Accounting.Services.Service;
@@ -34,8 +37,11 @@ public class VatReturnService : IVatReturnService
 
     private readonly IButentaService _butentaService;
     private readonly ICountryService _countryService;
+    private readonly ICustomerService _customerService;
     private readonly AccountingDatabase _database;
     private readonly IEmailService _emailService;
+    private readonly ISaleService _saleService;
+    private readonly ISalesmanService _salesmanService;
     private readonly StiVatReturn _stiVatReturn;
     private readonly IStiVatReturnClientService _stiVatReturnClientService;
     private readonly IVatReturnValidator _validator;
@@ -43,8 +49,11 @@ public class VatReturnService : IVatReturnService
     public VatReturnService(
         IButentaService butentaService,
         ICountryService countryService,
+        ICustomerService customerService,
         AccountingDatabase database,
         IEmailService emailService,
+        ISaleService saleService,
+        ISalesmanService salesmanService,
         StiVatReturn stiVatReturn,
         IStiVatReturnClientService stiVatReturnClientService,
         IVatReturnValidator validator
@@ -52,8 +61,11 @@ public class VatReturnService : IVatReturnService
     {
         _butentaService = butentaService;
         _countryService = countryService;
+        _customerService = customerService;
         _database = database;
         _emailService = emailService;
+        _saleService = saleService;
+        _salesmanService = salesmanService;
         _stiVatReturn = stiVatReturn;
         _stiVatReturnClientService = stiVatReturnClientService;
         _validator = validator;
@@ -134,18 +146,7 @@ public class VatReturnService : IVatReturnService
             return declaration;
         }
 
-        var trade = await _butentaService.GetTradeWithClientsAsync(tradeId);
-
-        if (trade == null)
-        {
-            throw new ValidationException(
-                "Trade unresolved. It, receiver (customer), or supplier (salesman) might not exist."
-            );
-        }
-
-        var customerCountry = _countryService.GetCountryCode(trade.Receiver.Country);
-        var salesmanCountry = _countryService.GetCountryCode(trade.Supplier.Country);
-        var sale = trade.ToEntity(customerCountry, salesmanCountry);
+        var sale = await MapButentaTradeToSaleAsync(tradeId);
 
         declaration = new StiVatReturnDeclaration
         {
@@ -279,6 +280,23 @@ public class VatReturnService : IVatReturnService
             .FirstOrDefaultAsync(d => d.SaleId == saleId);
     }
 
+    public async Task<Sale> MapButentaTradeToSaleAsync(int tradeId)
+    {
+        var trade = await _butentaService.GetTradeWithClientsAsync(tradeId);
+
+        if (trade == null)
+        {
+            throw new ValidationException(
+                "Trade unresolved. It, receiver (customer), or supplier (salesman) might not exist."
+            );
+        }
+
+        var customerCountry = _countryService.GetCountryCode(trade.Receiver.Country);
+        var salesmanCountry = _countryService.GetCountryCode(trade.Supplier.Country);
+
+        return trade.ToEntity(customerCountry, salesmanCountry);
+    }
+
     public string ReadDeclarationIdFromPreviewCode(string code)
     {
         var decoded = Encoding.ASCII.GetString(Convert.FromBase64String(code));
@@ -323,8 +341,6 @@ public class VatReturnService : IVatReturnService
 
     public async Task<StiVatReturnDeclaration> SubmitButentaTradeAsync(int tradeId)
     {
-        // TODO: Handle any changes to sale/customer/salesman/soldGoods
-        // Maybe create new endpoint that would fetch and apply changes, otherwise keep this as it is.
         var declaration = await ResolveButentaDeclarationAsync(tradeId);
 
         (await _validator.ValidateSubmitRequestAsync(
@@ -351,5 +367,52 @@ public class VatReturnService : IVatReturnService
         );
 
         return declaration;
+    }
+
+    public async Task UpdateButentaTradeAsync(int tradeId)
+    {
+        var saleCurrent = (await _butentaService.GetVatReturnDeclarationByTradeId(tradeId))?.Sale;
+
+        if (saleCurrent is null)
+        {
+            throw new ValidationException("Trade is not submitted yet");
+        }
+
+        var saleUpdated = await MapButentaTradeToSaleAsync(tradeId);
+        await using var transaction = await _database.Database.BeginTransactionAsync();
+
+        try
+        {
+            await _customerService.EditAsync(
+                new CustomerEditRequest
+                {
+                    Customer = saleCurrent.Customer.ToDto()
+                }
+            );
+
+            await _salesmanService.EditAsync(
+                new SalesmanEditRequest
+                {
+                    Salesman = saleUpdated.Salesman.ToDto()
+                }
+            );
+
+            await _saleService.EditAsync(
+                new SaleEditRequest
+                {
+                    Sale = saleUpdated
+                        .ToDto()
+                        .ToDtoCreateEdit()
+                }
+            );
+
+            await transaction.CommitAsync();
+        }
+        catch (Exception)
+        {
+            await transaction.RollbackAsync();
+
+            throw;
+        }
     }
 }
