@@ -6,10 +6,16 @@ namespace Accounting.Contract.Service;
 public interface IVatReturnService
 {
     public Task<string> GenerateDeclarationIdAsync();
+    
+    public string GenerateDeclarationPreviewCode(StiVatReturnDeclaration declaration);
 
     public IEnumerable<string> GenerateQrCodes(StiVatReturnDeclaration declaration);
+    
+    public Task<StiVatReturnDeclaration?> GetByIdAsync(string id);
 
     public Task<StiVatReturnDeclaration?> GetBySaleIdAsync(int saleId);
+    
+    public string ReadDeclarationIdFromPreviewCode(string code);
 
     public Task<StiVatReturnDeclaration> SubmitAsync(StiVatReturnDeclarationSubmitRequest request);
 

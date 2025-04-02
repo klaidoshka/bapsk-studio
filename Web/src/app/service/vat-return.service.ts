@@ -4,13 +4,15 @@ import {HttpClient} from '@angular/common/http';
 import VatReturnDeclaration, {
   SubmitDeclarationState,
   VatReturnDeclarationSubmitRequest,
-  VatReturnDeclarationWithDeclarer
+  VatReturnDeclarationWithDeclarer,
+  VatReturnDeclarationWithSale
 } from '../model/vat-return.model';
 import {catchError, first, tap} from 'rxjs';
 import {EnumUtil} from '../util/enum.util';
 import ErrorResponse from '../model/error-response.model';
 import {InternalFailure} from '../model/internal-failure-code.model';
 import {UserService} from './user.service';
+import {SaleService} from './sale.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +24,7 @@ export class VatReturnService {
   constructor(
     private apiRouter: ApiRouter,
     private httpClient: HttpClient,
+    private saleService: SaleService,
     private userService: UserService,
   ) {
   }
@@ -44,6 +47,22 @@ export class VatReturnService {
     } else {
       this.store.set(instanceId, signal([declaration]));
     }
+  }
+
+  readonly getWithSaleByPreviewCode = (id: string) => {
+    return this.httpClient.get<VatReturnDeclarationWithSale>(this.apiRouter.vatReturnGetByPreviewCode(id)).pipe(
+      tap(declaration => {
+        if (declaration != null) {
+          this.updateSingleInStore(
+            declaration.instanceId!,
+            this.updateProperties({
+              ...declaration,
+              sale: this.saleService.updateProperties(declaration.sale)
+            } as VatReturnDeclarationWithSale)
+          );
+        }
+      })
+    );
   }
 
   readonly getBySaleId = (saleId: number) => {

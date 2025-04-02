@@ -1,5 +1,6 @@
 using Accounting.API.AuthorizationHandler.Requirement;
 using Accounting.API.Util;
+using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.Sti.VatReturn;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -39,5 +40,27 @@ public static class VatReturnEndpoints
             .RequireAuthorization(
                 o => o.AddRequirements(new VatReturnRequirement(VatReturnRequirement.CrudOperation.GetBySaleId))
             );
+
+        builder
+            .MapGet(
+                String.Empty,
+                async (
+                    string code,
+                    IVatReturnService vatReturnService
+                ) =>
+                {
+                    try
+                    {
+                        var declarationId = vatReturnService.ReadDeclarationIdFromPreviewCode(code);
+
+                        return Results.Json((await vatReturnService.GetByIdAsync(declarationId))?.ToDtoWithSale());
+                    }
+                    catch (Exception)
+                    {
+                        throw new ValidationException("Invalid preview code");
+                    }
+                }
+            )
+            .AllowAnonymous();
     }
 }

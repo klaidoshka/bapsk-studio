@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -200,7 +201,10 @@ public class VatReturnService : IVatReturnService
         {
             await _emailService.SendAsync(
                 declaration.Sale.Customer.Email,
-                Emails.VatReturnDeclarationStatusChange(declaration)
+                Emails.VatReturnDeclarationStatusChange(
+                    declaration,
+                    GenerateDeclarationPreviewCode(declaration)
+                )
             );
         }
     }
@@ -210,6 +214,13 @@ public class VatReturnService : IVatReturnService
         var nextId = await _database.StiVatReturnDeclarations.CountAsync() + 1;
 
         return $"{_stiVatReturn.Sender.Id}/VAT.R/{nextId}";
+    }
+
+    public string GenerateDeclarationPreviewCode(StiVatReturnDeclaration declaration)
+    {
+        var code = $"${declaration.SaleId}${declaration.Sale.CustomerId}${declaration.Id}${declaration.Sale.SalesmanId}";
+
+        return Convert.ToBase64String(Encoding.ASCII.GetBytes(code));
     }
 
     public IEnumerable<string> GenerateQrCodes(StiVatReturnDeclaration declaration)
@@ -238,6 +249,21 @@ public class VatReturnService : IVatReturnService
         return qrCodes;
     }
 
+    public Task<StiVatReturnDeclaration?> GetByIdAsync(string id)
+    {
+        return _database.StiVatReturnDeclarations
+            .Include(it => it.QrCodes)
+            .Include(it => it.Sale)
+            .ThenInclude(it => it.Customer)
+            .ThenInclude(it => it.OtherDocuments)
+            .Include(it => it.Sale)
+            .ThenInclude(it => it.Salesman)
+            .Include(it => it.Sale)
+            .ThenInclude(it => it.SoldGoods)
+            .AsSplitQuery()
+            .FirstOrDefaultAsync(d => d.Id == id);
+    }
+
     public async Task<StiVatReturnDeclaration?> GetBySaleIdAsync(int saleId)
     {
         return await _database.StiVatReturnDeclarations
@@ -251,6 +277,19 @@ public class VatReturnService : IVatReturnService
             .ThenInclude(it => it.SoldGoods)
             .AsSplitQuery()
             .FirstOrDefaultAsync(d => d.SaleId == saleId);
+    }
+
+    public string ReadDeclarationIdFromPreviewCode(string code)
+    {
+        var decoded = Encoding.ASCII.GetString(Convert.FromBase64String(code));
+        var parts = decoded.Split('$');
+
+        if (parts.Length != 5)
+        {
+            throw new ValidationException("Invalid declaration preview code.");
+        }
+
+        return parts[3];
     }
 
     public async Task<StiVatReturnDeclaration> SubmitAsync(

@@ -1,0 +1,29 @@
+using Accounting.Contract.Dto.Sale;
+
+namespace Accounting.Contract.Dto.Sti.VatReturn;
+
+public class StiVatReturnDeclarationWithSale : StiVatReturnDeclaration
+{
+    public Sale.Sale Sale { get; set; }
+}
+
+public static class StiVatReturnDeclarationWithSaleExtensions
+{
+    public static StiVatReturnDeclarationWithSale ToDtoWithSale(this Entity.StiVatReturnDeclaration declaration)
+    {
+        return new StiVatReturnDeclarationWithSale
+        {
+            Correction = declaration.Correction,
+            DeclaredById = declaration.DeclaredById,
+            Id = declaration.Id,
+            InstanceId = declaration.InstanceId,
+            QrCodes = declaration.QrCodes
+                .Select(it => it.Value)
+                .ToList(),
+            Sale = declaration.Sale.ToDto(),
+            SaleId = declaration.SaleId,
+            State = declaration.State,
+            SubmitDate = declaration.SubmitDate
+        };
+    }
+}

@@ -1,4 +1,5 @@
 import {UserIdentity} from './user.model';
+import Sale from './sale.model';
 
 export default interface VatReturnDeclaration {
   correction: number;
@@ -9,6 +10,10 @@ export default interface VatReturnDeclaration {
   saleId: number;
   state: SubmitDeclarationState;
   submitDate: string;
+}
+
+export interface VatReturnDeclarationWithSale extends VatReturnDeclaration {
+  sale: Sale
 }
 
 export interface VatReturnDeclarationWithDeclarer extends VatReturnDeclaration {

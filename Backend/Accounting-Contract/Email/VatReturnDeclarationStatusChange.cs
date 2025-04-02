@@ -17,7 +17,6 @@ public class VatReturnDeclarationStatusChange : IEmailForm
                                  <h1 style="font-weight: 700;">Status Change</h1>
                                  <h2 style="font-size: 20px; font-weight: 700;">VAT Return Declaration</h2>
                                </div>
-                           
                                <div style="padding: 24px;">
                                  <p style="color: #374151;">Dear Customer,</p>
                                  <p style="margin-top: 16px; color: #374151;">
@@ -25,8 +24,11 @@ public class VatReturnDeclarationStatusChange : IEmailForm
                                    status to <strong>{{Status}}</strong>.
                                  </p>
                                  <p style="margin-top: 16px; color: #374151;">
-                                   Please find the QR codes below for more details.
+                                   <a href="http://localhost:4200/declaration?code={{PreviewCode}}" style="color: #1a0dab; text-decoration: underline;">
+                                     Press here to open declaration preview
+                                  </a>
                                  </p>
+                                 {{QrCodesBelow}}
                                  <p style="margin-top: 16px; color: #374151;">Thank you for using our services.</p>
                                </div>
                              </div>
@@ -37,7 +39,7 @@ public class VatReturnDeclarationStatusChange : IEmailForm
 
     public string Subject { get; }
 
-    public VatReturnDeclarationStatusChange(StiVatReturnDeclaration declaration)
+    public VatReturnDeclarationStatusChange(StiVatReturnDeclaration declaration, string previewCode)
     {
         var color = declaration.State != SubmitDeclarationState.REJECTED ? "#22c55e" : "#ef4444";
 
@@ -62,14 +64,34 @@ public class VatReturnDeclarationStatusChange : IEmailForm
         Body = BuildBody(
             color,
             declaration.Id,
-            statusText
+            statusText,
+            previewCode,
+            declaration.QrCodes.Count > 0
         );
 
         Subject = $"VAT Return Declaration - {declaration.Id} - Status Change";
     }
 
-    private string BuildBody(string color, string id, string status) => Html
-        .Replace("{{Color}}", color)
-        .Replace("{{Id}}", id)
-        .Replace("{{Status}}", status);
+    private string BuildBody(string color, string id, string status, string previewCode, bool qrCodesAssigned)
+    {
+        var html = Html
+            .Replace("{{Color}}", color)
+            .Replace("{{Id}}", id)
+            .Replace("{{PreviewCode}}", previewCode)
+            .Replace("{{Status}}", status);
+
+        if (qrCodesAssigned)
+        {
+            html = html.Replace(
+                "{{QrCodesBelow}}",
+                """
+                <p style="margin-top: 16px; color: #374151;">
+                  Upon leaving the country you will have to show attached QR codes to the customs.
+                </p>
+                """
+            );
+        }
+
+        return html;
+    }
 }
