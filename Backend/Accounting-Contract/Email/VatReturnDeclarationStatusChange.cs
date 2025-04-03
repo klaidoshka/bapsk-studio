@@ -80,17 +80,16 @@ public class VatReturnDeclarationStatusChange : IEmailForm
             .Replace("{{PreviewCode}}", previewCode)
             .Replace("{{Status}}", status);
 
-        if (qrCodesAssigned)
-        {
-            html = html.Replace(
-                "{{QrCodesBelow}}",
-                """
-                <p style="margin-top: 16px; color: #374151;">
-                  Upon leaving the country you will have to show attached QR codes to the customs.
-                </p>
-                """
-            );
-        }
+        html = html.Replace(
+            "{{QrCodesBelow}}",
+            qrCodesAssigned
+                ? """
+                  <p style="margin-top: 16px; color: #374151;">
+                    Upon leaving the country you will have to show attached QR codes to the customs.
+                  </p>
+                  """
+                : ""
+        );
 
         return html;
     }

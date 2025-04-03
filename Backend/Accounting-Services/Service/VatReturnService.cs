@@ -103,18 +103,21 @@ public class VatReturnService : IVatReturnService
 
         declaration.QrCodes.Clear();
 
-        var qrCodes = GenerateQrCodes(declaration);
-
-        foreach (var qrCode in qrCodes)
+        if (response.DeclarationState.Value != SubmitDeclarationState.REJECTED)
         {
-            declaration.QrCodes.Add(
-                new()
-                {
-                    Declaration = declaration,
-                    DeclarationId = declaration.Id,
-                    Value = qrCode
-                }
-            );
+            var qrCodes = GenerateQrCodes(declaration);
+
+            foreach (var qrCode in qrCodes)
+            {
+                declaration.QrCodes.Add(
+                    new()
+                    {
+                        Declaration = declaration,
+                        DeclarationId = declaration.Id,
+                        Value = qrCode
+                    }
+                );
+            }
         }
 
         await _database.SaveChangesAsync();
