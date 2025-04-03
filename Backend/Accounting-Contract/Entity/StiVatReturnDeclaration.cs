@@ -72,7 +72,7 @@ public class StiVatReturnDeclaration
     /// <summary>
     /// Status of the declaration.
     /// </summary>
-    public SubmitDeclarationState? State { get; set; }
+    public SubmitDeclarationState State { get; set; }
 
     /// <summary>
     /// Date of last declaration submission.

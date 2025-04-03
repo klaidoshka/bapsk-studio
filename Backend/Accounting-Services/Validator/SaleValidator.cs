@@ -109,7 +109,7 @@ public class SaleValidator : ISaleValidator
         }
 
         if (
-            soldGood.UnitOfMeasureType != UnitOfMeasureType.UnitOfMeasureCode &&
+            soldGood.UnitOfMeasureType == UnitOfMeasureType.UnitOfMeasureCode &&
             (String.IsNullOrWhiteSpace(soldGood.UnitOfMeasure) ||
              soldGood.UnitOfMeasure.Length != 3)
         )
@@ -225,6 +225,11 @@ public class SaleValidator : ISaleValidator
         if (soldGoods.Count == 0)
         {
             return new Validation("At least one sold good must be provided.");
+        }
+
+        if (soldGoods.Sum(it => it.TotalPriceAdjusted) < 40)
+        {
+            return new Validation("Total price of sold goods must reach at least €40.");
         }
 
         var failures = new List<string>();

@@ -76,9 +76,9 @@
           <td>{{ soldGood.description }}</td>
           <td>{{ soldGood.quantity }}</td>
           <td>{{ soldGood.unitOfMeasure }}</td>
-          <td>{{ soldGood.taxableAmount / soldGood.quantity | round:2 }}</td>
-          <td>{{ soldGood.vatAmount | round:2 }} ({{ soldGood.vatRate | round:2 }}%)</td>
-          <td>{{ soldGood.totalAmount | round:2 }}</td>
+          <td>{{ soldGood.taxableAmount / soldGood.quantity | round:2 | currency:'EUR':'symbol':'1.2-2' }}</td>
+          <td>{{ soldGood.vatAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }} ({{ soldGood.vatRate | round:2 }}%)</td>
+          <td>{{ soldGood.totalAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}</td>
         </tr>
       </ng-template>
     </p-table>
@@ -101,7 +101,7 @@
   </div>
 
   <div
-    *ngIf="sale() != null && (declaration() == null || declaration()!.state == SubmitDeclarationState.REJECTED)"
+    *ngIf="sale() != null"
   >
     <p
       class="font-bold text-lg my-2"

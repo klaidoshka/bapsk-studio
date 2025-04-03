@@ -208,5 +208,9 @@ public static class ProgramExtensions
         stiRouteGroup
             .MapGroup("/vat-return")
             .MapVatReturnEndpoints();
+        
+        stiRouteGroup
+            .MapGroup("/butenta-vat-return")
+            .MapButentaEndpoints();
     }
 }

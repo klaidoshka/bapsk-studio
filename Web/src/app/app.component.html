@@ -1,20 +1,22 @@
 <p-toast key="root"></p-toast>
 
-<header class="flex px-4 py-1 bg-white shadow-md sticky top-0 z-10">
-  <div class="flex items-center space-x-4">
-    <p
-      class="text-xl font-bold cursor-pointer hover:opacity-70"
-      routerLink="/"
-    >Accounting</p>
-  </div>
+<div class="flex flex-col">
+  <header class="flex w-full h-12 px-4 py-1 bg-white shadow-md sticky top-0 z-10">
+    <div class="flex items-center space-x-4">
+      <p
+        class="text-xl font-bold cursor-pointer hover:opacity-70"
+        routerLink="/"
+      >Accounting</p>
+    </div>
 
-  <div class="flex items-center space-x-4 ml-auto">
-    <app-instance-selector/>
+    <div class="flex items-center space-x-4 ml-auto">
+      <app-instance-selector/>
 
-    <app-profile-dropdown/>
-  </div>
-</header>
+      <app-profile-dropdown/>
+    </div>
+  </header>
 
-<main class="w-full h-full">
-  <router-outlet/>
-</main>
+  <main class="w-full h-full">
+    <router-outlet/>
+  </main>
+</div>

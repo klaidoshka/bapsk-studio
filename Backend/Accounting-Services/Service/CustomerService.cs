@@ -24,27 +24,15 @@ public class CustomerService : ICustomerService
         // Validate if instance exists (HIGHER LEVEL)
         // Validate if requester can access the instance (HIGHER LEVEL)
         // Validate properties
-        
+
         _customerValidator
             .ValidateCustomer(request.Customer)
             .AssertValid();
 
         var customer = (await _database.Customers.AddAsync(
-            new Customer
-            {
-                Birthdate = request.Customer.Birthdate,
-                FirstName = request.Customer.FirstName,
-                IdentityDocumentIssuedBy = request.Customer.IdentityDocument.IssuedBy,
-                IdentityDocumentNumber = request.Customer.IdentityDocument.Number,
-                IdentityDocumentType = request.Customer.IdentityDocument.Type,
-                IdentityDocumentValue = request.Customer.IdentityDocument.Value,
-                InstanceId = request.InstanceId,
-                LastName = request.Customer.LastName,
-                OtherDocuments = request.Customer.OtherDocuments
-                    .Select(it => it.ToEntity())
-                    .ToList(),
-                ResidenceCountry = request.Customer.ResidenceCountry
-            }
+            request.Customer
+                .ToEntity()
+                .Also(it => it.InstanceId = request.InstanceId)
         )).Entity;
 
         await _database.SaveChangesAsync();
@@ -57,7 +45,7 @@ public class CustomerService : ICustomerService
         // Validate if customer exists
         // Validate if instance exists (HIGHER LEVEL)
         // Validate if requester can access the instance (HIGHER LEVEL)
-        
+
         (await _customerValidator.ValidateDeleteRequestAsync(request.CustomerId)).AssertValid();
 
         var customer = await _database.Customers.FirstAsync(it => it.Id == request.CustomerId);
@@ -73,7 +61,7 @@ public class CustomerService : ICustomerService
         // Validate if requester can access the instance (HIGHER LEVEL)
         // Validate if customer exists
         // Validate properties
-        
+
         (await _customerValidator.ValidateEditRequestAsync(request.Customer)).AssertValid();
 
         var customer = await _database.Customers
@@ -81,6 +69,7 @@ public class CustomerService : ICustomerService
             .FirstAsync(it => it.Id == request.Customer.Id);
 
         customer.Birthdate = request.Customer.Birthdate;
+        customer.Email = request.Customer.Email;
         customer.FirstName = request.Customer.FirstName;
         customer.IdentityDocumentNumber = request.Customer.IdentityDocument.Number;
         customer.IdentityDocumentIssuedBy = request.Customer.IdentityDocument.IssuedBy;
@@ -136,7 +125,7 @@ public class CustomerService : ICustomerService
     {
         // Validate if instance exists
         // Validate if requester can access the instance (HIGHER LEVEL)
-        
+
         (await _customerValidator.ValidateGetRequestAsync(request.InstanceId)).AssertValid();
 
         return await _database.Customers
@@ -149,11 +138,11 @@ public class CustomerService : ICustomerService
     {
         // Validate if customer exists
         // Validate if requester can access the instance (HIGHER LEVEL)
-        
+
         (await _customerValidator.ValidateGetByIdRequestAsync(id)).AssertValid();
-        
+
         return await _database.Customers
-                   .Include(it => it.OtherDocuments)
-                   .FirstAsync(it => it.Id == id && !it.IsDeleted);
+            .Include(it => it.OtherDocuments)
+            .FirstAsync(it => it.Id == id && !it.IsDeleted);
     }
 }

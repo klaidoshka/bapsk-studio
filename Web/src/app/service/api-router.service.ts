@@ -92,4 +92,7 @@ export class ApiRouter {
 
   public readonly vatReturnSubmit = () => `${this.accountingUrl}/sti/vat-return`;
   public readonly vatReturnGet = (saleId: number) => `${this.accountingUrl}/sti/vat-return/${saleId}`;
+  public readonly vatReturnGetByPreviewCode = (code: string) => `${this.accountingUrl}/sti/vat-return?${this.toParameters({
+    code: code
+  })}`;
 }

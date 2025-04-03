@@ -78,11 +78,9 @@ public class StiVatReturnClientService : IStiVatReturnClientService, IAsyncDispo
         Logging logging
     )
     {
-        if (stiVatReturn.CertificateSerialNumber is null || stiVatReturn.Endpoint is null)
+        if (stiVatReturn.Endpoint is null)
         {
-            throw new InvalidOperationException(
-                "STI VAT Refund certificate serial number or endpoint is not configured"
-            );
+            throw new InvalidOperationException("STI VAT return endpoint is not configured");
         }
 
         var client = new VATRefundforForeignTravelerTRPortClient(

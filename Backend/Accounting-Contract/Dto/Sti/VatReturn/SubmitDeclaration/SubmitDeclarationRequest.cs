@@ -126,7 +126,7 @@ public static class SubmitDeclarationRequestExtensions
                     it => new SubmitDeclarationGoods
                     {
                         Description = it.Description,
-                        Quantity = Math.Truncate(it.Quantity),
+                        Quantity = it.Quantity,
                         SequenceNo = it.SequenceNo,
                         TaxableAmount = Math.Round(it.TaxableAmount, 2),
                         TotalAmount = Math.Round(it.TotalAmount, 2),
@@ -157,16 +157,16 @@ public static class SubmitDeclarationRequestExtensions
                 },
                 Intermediary = new SubmitDeclarationIntermediary
                 {
-                    Id = vatReturnConfiguration.Intermediary.Id,
-                    Name = vatReturnConfiguration.Intermediary.Name
+                    Id = vatReturnConfiguration.Sender.Id,
+                    Name = vatReturnConfiguration.Sender.Name
                 },
                 Salesman = salesman,
                 SalesDocuments = [sale]
             },
             RequestId = requestId,
-            SenderId = vatReturnConfiguration.Intermediary.Id,
+            SenderId = vatReturnConfiguration.Sender.Id,
             Situation = 1,
-            TimeStamp = nowNoMillis,
+            TimeStamp = nowNoMillis
         };
     }
 }

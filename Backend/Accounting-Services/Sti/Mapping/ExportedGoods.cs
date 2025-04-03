@@ -26,7 +26,7 @@ public static class ExportedGoods
         return new ExportedGoodsResponse
         {
             Errors = response.getInfoOnExportedGoodsResponse.Item is Errors_Type errors
-                ? errors.Error.ToInternalType()
+                ? errors.Error?.ToInternalType() ?? []
                 : null,
             Info =
                 response.getInfoOnExportedGoodsResponse.Item is InfoOnExportedGoods_Type goods

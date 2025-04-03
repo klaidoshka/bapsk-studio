@@ -39,5 +39,15 @@ public static class VatReturnEndpoints
             .RequireAuthorization(
                 o => o.AddRequirements(new VatReturnRequirement(VatReturnRequirement.CrudOperation.GetBySaleId))
             );
+
+        builder
+            .MapGet(
+                String.Empty,
+                async (
+                    string code,
+                    IVatReturnService vatReturnService
+                ) => Results.Json((await vatReturnService.GetByPreviewCodeAsync(code))?.ToDtoWithSale())
+            )
+            .AllowAnonymous();
     }
 }

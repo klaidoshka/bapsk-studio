@@ -152,6 +152,7 @@ public class SaleService : ISaleService
                 .Include(it => it.Salesman)
                 .Include(it => it.SoldGoods)
                 .Where(it => !it.IsDeleted && it.InstanceId == request.InstanceId)
+                .AsSplitQuery()
                 .ToListAsync())
             .Also(
                 sales => sales.ForEach(
@@ -172,6 +173,7 @@ public class SaleService : ISaleService
                 .Include(it => it.Customer)
                 .Include(it => it.Salesman)
                 .Include(it => it.SoldGoods)
+                .AsSplitQuery()
                 .FirstAsync(it => it.Id == id && !it.IsDeleted))
             .Also(
                 s => s.SoldGoods = s.SoldGoods

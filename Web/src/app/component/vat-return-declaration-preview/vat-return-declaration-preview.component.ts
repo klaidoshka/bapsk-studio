@@ -1,4 +1,4 @@
-import {Component, effect, input, OnInit, Signal, signal, viewChild} from '@angular/core';
+import {Component, effect, input, Signal, signal, viewChild} from '@angular/core';
 import {
   getSubmitDeclarationStateLabel,
   SubmitDeclarationState,
@@ -34,7 +34,7 @@ import {RoundPipe} from '../../pipe/round.pipe';
   templateUrl: './vat-return-declaration-preview.component.html',
   styles: ``
 })
-export class VatReturnDeclarationPreviewComponent implements OnInit {
+export class VatReturnDeclarationPreviewComponent {
   protected readonly SubmitDeclarationState = SubmitDeclarationState;
   protected readonly getSubmitDeclarationStateLabel = getSubmitDeclarationStateLabel;
   protected readonly toCustomerFullName = toCustomerFullName;
@@ -43,7 +43,6 @@ export class VatReturnDeclarationPreviewComponent implements OnInit {
   declaration!: Signal<VatReturnDeclarationWithDeclarer | undefined>;
   instanceId = input.required<number>();
   isShown = signal<boolean>(false);
-  isShownInitially = input<boolean>(false);
   sale = signal<SaleWithVatReturnDeclaration | undefined>(undefined);
   showQrCodes = signal<boolean>(false);
   submissionForm = viewChild(VatReturnDeclarationSubmissionComponent);
@@ -56,12 +55,8 @@ export class VatReturnDeclarationPreviewComponent implements OnInit {
         return;
       }
 
-      this.declaration = this.vatReturnService.getBySaleIdAsSignal(this.instanceId(), saleId);
+      this.declaration = this.vatReturnService.getWithDeclarerBySaleIdAsSignal(this.instanceId(), saleId);
     });
-  }
-
-  ngOnInit() {
-    this.isShown.set(this.isShownInitially());
   }
 
   readonly getVATToReturn = (sale: SaleWithVatReturnDeclaration): number => {

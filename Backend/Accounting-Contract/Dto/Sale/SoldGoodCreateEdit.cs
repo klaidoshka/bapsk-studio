@@ -7,6 +7,7 @@ public class SoldGoodCreateEdit
     public string Description { get; set; }
     public int? Id { get; set; }
     public decimal Quantity { get; set; }
+    public decimal TotalPriceAdjusted => Math.Round(Quantity * UnitPrice, 2);
     public string UnitOfMeasure { get; set; }
     public UnitOfMeasureType UnitOfMeasureType { get; set; }
     public decimal UnitPrice { get; set; }

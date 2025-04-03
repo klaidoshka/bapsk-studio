@@ -22,6 +22,25 @@ namespace Accounting.Contract.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
+            modelBuilder.Entity("Accounting.Contract.Entity.ButentaTrade", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("DeclarationId")
+                        .IsRequired()
+                        .HasColumnType("varchar(34)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeclarationId");
+
+                    b.ToTable("ButentaTrades");
+                });
+
             modelBuilder.Entity("Accounting.Contract.Entity.Customer", b =>
                 {
                     b.Property<int>("Id")
@@ -32,6 +51,9 @@ namespace Accounting.Contract.Migrations
 
                     b.Property<DateTime>("Birthdate")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -467,7 +489,7 @@ namespace Accounting.Contract.Migrations
                     b.Property<int>("SaleId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("State")
+                    b.Property<int>("State")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("SubmitDate")
@@ -554,6 +576,17 @@ namespace Accounting.Contract.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.ButentaTrade", b =>
+                {
+                    b.HasOne("Accounting.Contract.Entity.StiVatReturnDeclaration", "Declaration")
+                        .WithMany()
+                        .HasForeignKey("DeclarationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Declaration");
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.Customer", b =>

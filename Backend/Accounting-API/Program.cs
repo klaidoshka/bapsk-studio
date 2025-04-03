@@ -13,6 +13,8 @@ using Accounting.Services.Validator;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configuration
+builder.AddConfiguration<Butenta>("Butenta");
+builder.AddConfiguration<Email>("Email");
 builder.AddConfiguration<JwtSettings>("JwtSettings");
 builder.AddConfiguration<Logging>("Logging");
 builder.AddConfiguration<StiVatReturn>("StiVatReturn");
@@ -51,12 +53,15 @@ builder.Services.AddScoped<Dictionary<FieldType, FieldHandler>>(
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthValidator, AuthValidator>();
+builder.Services.AddScoped<IButentaService, ButentaService>();
+builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ICustomerValidator, CustomerValidator>();
 builder.Services.AddScoped<IDataEntryService, DataEntryService>();
 builder.Services.AddScoped<IDataEntryValidator, DataEntryValidator>();
 builder.Services.AddScoped<IDataTypeService, DataTypeService>();
 builder.Services.AddScoped<IDataTypeValidator, DataTypeValidator>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IFieldTypeService, FieldTypeService>();
 builder.Services.AddScoped<IFieldTypeValidator, FieldTypeValidator>();
 builder.Services.AddScoped<IHashService, HashService>();

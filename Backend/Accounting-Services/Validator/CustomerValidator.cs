@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Accounting.Contract;
 using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.Sti;
@@ -28,6 +29,11 @@ public class CustomerValidator : ICustomerValidator
         if (String.IsNullOrWhiteSpace(customer.FirstName) && String.IsNullOrWhiteSpace(customer.LastName))
         {
             failures.Add("Customer's first or last name must be provided.");
+        }
+
+        if (!String.IsNullOrWhiteSpace(customer.Email) && !new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$").IsMatch(customer.Email))
+        {
+            failures.Add("Customer's email is invalid.");
         }
 
         if (String.IsNullOrWhiteSpace(customer.IdentityDocument.Number))
@@ -100,7 +106,7 @@ public class CustomerValidator : ICustomerValidator
         {
             failures.Add("Customer's ID number must be between 1 and 50 characters.");
         }
-        
+
         if (customer.ResidenceCountry.ConvertToEnumOrNull<NonEuCountryCode>() == null)
         {
             failures.Add("Customer's residence country must be a non-EU country.");

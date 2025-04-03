@@ -11,6 +11,7 @@ import {WorkspacePageComponent} from './page/workspace-page/workspace-page.compo
 import {DataTypePageComponent} from './page/data-type-page/data-type-page.component';
 import {InstancePageComponent} from './page/instance-page/instance-page.component';
 import {UserPageComponent} from './page/user-page/user-page.component';
+import {DeclarationPreviewPageComponent} from './page/declaration-preview-page/declaration-preview-page.component';
 
 export const routes: Routes = [
   {
@@ -61,6 +62,10 @@ export const routes: Routes = [
         loadComponent: () => RegisterComponent
       }
     ]
+  },
+  {
+    path: "declaration",
+    loadComponent: () => DeclarationPreviewPageComponent
   },
   {
     path: "**",

@@ -5,6 +5,7 @@ namespace Accounting.Contract.Dto.Customer;
 public class Customer
 {
     public DateTime Birthdate { get; set; } = DateTime.UtcNow;
+    public string? Email { get; set; }
     public string FirstName { get; set; } = String.Empty;
     public int? Id { get; set; }
     public CustomerIdentityDocument IdentityDocument { get; set; } = new();
@@ -20,6 +21,7 @@ public static class CustomerExtensions
         return new Customer
         {
             Birthdate = customer.Birthdate,
+            Email = customer.Email,
             FirstName = customer.FirstName,
             Id = customer.Id,
             IdentityDocument = new CustomerIdentityDocument
@@ -42,13 +44,18 @@ public static class CustomerExtensions
         return new Entity.Customer
         {
             Birthdate = customer.Birthdate,
+            Email = customer.Email,
             FirstName = customer.FirstName,
             Id = customer.Id ?? 0,
             IdentityDocumentIssuedBy = customer.IdentityDocument.IssuedBy,
             IdentityDocumentNumber = customer.IdentityDocument.Number,
             IdentityDocumentType = customer.IdentityDocument.Type,
             IdentityDocumentValue = customer.IdentityDocument.Value,
-            LastName = customer.LastName
+            LastName = customer.LastName,
+            OtherDocuments = customer.OtherDocuments
+                .Select(it => it.ToEntity())
+                .ToList(),
+            ResidenceCountry = customer.ResidenceCountry
         };
     }
 }

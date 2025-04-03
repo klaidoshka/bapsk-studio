@@ -17,7 +17,11 @@ function initAuthService(authService: AuthService, router: Router): Promise<void
     authService.renewAccess().subscribe({
       next: (response) => {
         authService.acceptAuthResponse(response);
-        router.navigate(["/"]);
+
+        if (router.url.includes("/auth/login")) {
+          router.navigate(["/"]);
+        }
+
         resolve();
       },
       error: (response) => {
