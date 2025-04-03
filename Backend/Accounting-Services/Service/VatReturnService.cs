@@ -250,9 +250,11 @@ public class VatReturnService : IVatReturnService
         return qrCodes;
     }
 
-    public Task<StiVatReturnDeclaration?> GetByIdAsync(string id)
+    public async Task<StiVatReturnDeclaration?> GetByPreviewCodeAsync(string code)
     {
-        return _database.StiVatReturnDeclarations
+        var values = ReadPreviewCodeValues(code);
+
+        var declaration = await _database.StiVatReturnDeclarations
             .Include(it => it.QrCodes)
             .Include(it => it.Sale)
             .ThenInclude(it => it.Customer)
@@ -262,7 +264,19 @@ public class VatReturnService : IVatReturnService
             .Include(it => it.Sale)
             .ThenInclude(it => it.SoldGoods)
             .AsSplitQuery()
-            .FirstOrDefaultAsync(d => d.Id == id);
+            .FirstOrDefaultAsync(d => d.Id == values.DeclarationId);
+
+        if (
+            declaration is null ||
+            declaration.Sale.CustomerId != values.CustomerId ||
+            declaration.SaleId != values.SaleId ||
+            declaration.Sale.SalesmanId != values.SalesmanId
+        )
+        {
+            throw new ValidationException("Invalid declaration preview code.");
+        }
+
+        return declaration;
     }
 
     public async Task<StiVatReturnDeclaration?> GetBySaleIdAsync(int saleId)
@@ -297,7 +311,7 @@ public class VatReturnService : IVatReturnService
         return trade.ToEntity(customerCountry, salesmanCountry);
     }
 
-    public string ReadDeclarationIdFromPreviewCode(string code)
+    public PreviewCodeValues ReadPreviewCodeValues(string code)
     {
         var decoded = Encoding.ASCII.GetString(Convert.FromBase64String(code));
         var parts = decoded.Split('$');
@@ -307,7 +321,24 @@ public class VatReturnService : IVatReturnService
             throw new ValidationException("Invalid declaration preview code.");
         }
 
-        return parts[3];
+        var failed = false;
+
+        failed |= !Int32.TryParse(parts[1], out var saleId);
+        failed |= !Int32.TryParse(parts[2], out var customerId);
+        failed |= !Int32.TryParse(parts[4], out var salesmanId);
+
+        if (failed)
+        {
+            throw new ValidationException("Invalid declaration preview code.");
+        }
+
+        return new PreviewCodeValues
+        {
+            CustomerId = customerId,
+            DeclarationId = parts[3],
+            SaleId = saleId,
+            SalesmanId = salesmanId
+        };
     }
 
     public async Task<StiVatReturnDeclaration> SubmitAsync(
@@ -375,7 +406,7 @@ public class VatReturnService : IVatReturnService
 
         if (saleCurrent is null)
         {
-            throw new ValidationException("Trade is not submitted yet");
+            throw new ValidationException("Trade is not submitted yet.");
         }
 
         var saleUpdated = await MapButentaTradeToSaleAsync(tradeId);

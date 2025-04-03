@@ -12,13 +12,13 @@ public interface IVatReturnService
 
     public IEnumerable<string> GenerateQrCodes(StiVatReturnDeclaration declaration);
 
-    public Task<StiVatReturnDeclaration?> GetByIdAsync(string id);
+    public Task<StiVatReturnDeclaration?> GetByPreviewCodeAsync(string code);
 
     public Task<StiVatReturnDeclaration?> GetBySaleIdAsync(int saleId);
     
     public Task<Sale> MapButentaTradeToSaleAsync(int tradeId);
 
-    public string ReadDeclarationIdFromPreviewCode(string code);
+    public PreviewCodeValues ReadPreviewCodeValues(string code);
 
     public Task<StiVatReturnDeclaration> SubmitAsync(StiVatReturnDeclarationSubmitRequest request);
 

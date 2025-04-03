@@ -57,14 +57,15 @@ export class DeclarationPreviewPageComponent {
   protected readonly toCustomerFullName = toCustomerFullName;
 
   readonly loadDeclaration = (code: string, callback?: () => void) => {
-    this.vatReturnService.getWithSaleByPreviewCode(code).pipe(first()).subscribe(declaration => {
-      if (declaration) {
-        this.declaration.set(declaration);
-      } else if (this.declaration()) {
-        this.declaration.set(undefined);
-      }
-
-      callback?.();
+    this.vatReturnService.getWithSaleByPreviewCode(code).pipe(first()).subscribe({
+      next: declaration => {
+        if (declaration) {
+          this.declaration.set(declaration);
+        } else if (this.declaration()) {
+          this.declaration.set(undefined);
+        }
+      },
+      complete: () => callback?.()
     });
   }
 
