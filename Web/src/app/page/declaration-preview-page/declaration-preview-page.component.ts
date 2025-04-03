@@ -9,6 +9,9 @@ import {toCustomerFullName} from '../../model/customer.model';
 import {RoundPipe} from '../../pipe/round.pipe';
 import {SaleWithVatReturnDeclaration} from '../../model/sale.model';
 import {Button} from 'primeng/button';
+import {
+  DeclarationPreviewPageSkeletonComponent
+} from './declaration-preview-page-skeleton/declaration-preview-page-skeleton.component';
 
 @Component({
   selector: 'app-declaration-preview-page',
@@ -20,15 +23,18 @@ import {Button} from 'primeng/button';
     RoundPipe,
     NgForOf,
     NgClass,
-    Button
+    Button,
+    DeclarationPreviewPageSkeletonComponent
   ],
   templateUrl: './declaration-preview-page.component.html',
   styles: ``
 })
 export class DeclarationPreviewPageComponent {
-  declaration = signal<VatReturnDeclarationWithSale | undefined>(undefined);
   declarationPreviewCode = signal<string | undefined>(undefined);
+  declaration = signal<VatReturnDeclarationWithSale | undefined>(undefined);
   showQrCodes = signal<boolean>(false);
+  isLoading = signal<boolean>(true);
+  isRefreshing = signal<boolean>(false);
 
   constructor(
     route: ActivatedRoute,
@@ -42,20 +48,23 @@ export class DeclarationPreviewPageComponent {
       }
 
       this.declarationPreviewCode.set(previewCode);
-      this.loadDeclaration(previewCode);
+
+      this.loadDeclaration(previewCode, () => this.isLoading.set(false));
     });
   }
 
   protected readonly getSubmitDeclarationStateLabel = getSubmitDeclarationStateLabel;
   protected readonly toCustomerFullName = toCustomerFullName;
 
-  readonly loadDeclaration = (code: string) => {
+  readonly loadDeclaration = (code: string, callback?: () => void) => {
     this.vatReturnService.getWithSaleByPreviewCode(code).pipe(first()).subscribe(declaration => {
       if (declaration) {
         this.declaration.set(declaration);
       } else if (this.declaration()) {
         this.declaration.set(undefined);
       }
+
+      callback?.();
     });
   }
 
@@ -72,6 +81,8 @@ export class DeclarationPreviewPageComponent {
       return;
     }
 
-    this.loadDeclaration(code);
+    this.isRefreshing.set(true);
+
+    this.loadDeclaration(code, () => this.isRefreshing.set(false));
   }
 }
