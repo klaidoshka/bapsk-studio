@@ -20,14 +20,14 @@
       <div>
         <label
           for="name"
-          class="block text-sm font-medium text-gray-700"
+          class="block text-sm font-medium"
         >Name</label>
         <input
           formControlName="name"
           pInputText
           type="text"
           id="name"
-          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
         />
         @if (getErrorMessage("name"); as error) {
           <div class="text-xs text-red-500 mt-1">{{ error }}</div>
@@ -37,13 +37,13 @@
       <div>
         <label
           for="description"
-          class="block text-sm font-medium text-gray-700"
+          class="block text-sm font-medium"
         >Description</label>
         <textarea
           formControlName="description"
           pTextarea
           id="description"
-          class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          class="mt-1 p-2 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
         ></textarea>
         @if (getErrorMessage("description"); as error) {
           <div class="text-xs text-red-500 mt-1">{{ error }}</div>
@@ -53,7 +53,7 @@
       <div>
         <label
           for="users"
-          class="block text-l font-bold text-gray-700"
+          class="block text-l font-bold"
         >Users</label>
 
         <p-table
@@ -96,7 +96,7 @@
             pInputText
             type="email"
             id="email"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
           />
           @if (getUserEmailErrorMessage(); as error) {
             <div class="text-xs text-red-500 mt-1">{{ error }}</div>

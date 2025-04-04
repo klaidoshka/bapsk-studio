@@ -14,13 +14,13 @@
     <div [formGroup]="form" class="flex flex-col gap-4">
       <div class="flex flex-col md:flex-row gap-4">
         <div class="flex-1">
-          <label for="firstName" class="block text-sm font-medium text-gray-700">First Name</label>
+          <label for="firstName" class="block text-sm font-medium">First Name</label>
           <input
             formControlName="firstName"
             pInputText
             type="text"
             id="firstName"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
           />
           @if (getErrorMessage("firstName"); as error) {
             <div class="text-xs text-red-500 mt-1">{{ error }}</div>
@@ -28,13 +28,13 @@
         </div>
 
         <div class="flex-1">
-          <label for="lastName" class="block text-sm font-medium text-gray-700">Last Name</label>
+          <label for="lastName" class="block text-sm font-medium">Last Name</label>
           <input
             formControlName="lastName"
             pInputText
             type="text"
             id="lastName"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
           />
           @if (getErrorMessage("lastName"); as error) {
             <div class="text-xs text-red-500 mt-1">{{ error }}</div>
@@ -44,14 +44,14 @@
 
       <div class="flex flex-col md:flex-row gap-4">
         <div class="flex-1">
-          <label for="birthdate" class="block text-sm font-medium text-gray-700">Birthdate</label>
+          <label for="birthdate" class="block text-sm font-medium">Birthdate</label>
           <p-datepicker
             inputId="birthdate"
             formControlName="birthdate"
             [showIcon]="true"
             variant="filled"
             inputStyleClass="p-2 rounded-md"
-            class="mt-1 block w-fit border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="mt-1 block w-fit border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             required
             appendTo="body"
           ></p-datepicker>
@@ -61,26 +61,26 @@
         </div>
 
         <div class="flex-1">
-          <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+          <label for="email" class="block text-sm font-medium">Email</label>
           <input
             type="email"
             id="email"
             formControlName="email"
             pInputText
-            class="bg-surface-50 mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="bg-surface-50 mt-1 block w-full p-2 border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             required
           />
         </div>
 
         <div class="flex-1">
-          <label for="residenceCountry" class="block text-sm font-medium text-gray-700">Residence Country</label>
+          <label for="residenceCountry" class="block text-sm font-medium">Residence Country</label>
           <p-select
             inputId="residenceCountry"
             formControlName="residenceCountry"
             [options]="IsoCountries"
             optionLabel="name"
             optionValue="code"
-            class="bg-surface-50 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="bg-surface-50 mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             appendTo="body"
           ></p-select>
           @if (getErrorMessage("residenceCountry"); as error) {
@@ -92,14 +92,14 @@
       <div formGroupName="identityDocument">
         <div class="flex flex-col md:flex-row gap-4">
           <div class="flex-1">
-            <label for="identityDocumentType" class="block text-sm font-medium text-gray-700">ID Type</label>
+            <label for="identityDocumentType" class="block text-sm font-medium">ID Type</label>
             <p-select
               formControlName="type"
               [options]="identityDocumentTypes"
               optionValue="value"
               optionLabel="label"
               id="identityDocumentType"
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             ></p-select>
             @if (getErrorMessage("identityDocument.type"); as error) {
               <div class="text-xs text-red-500 mt-1">{{ error }}</div>
@@ -107,14 +107,14 @@
           </div>
 
           <div class="flex-1">
-            <label for="identityDocumentIssuedBy" class="block text-sm font-medium text-gray-700">ID Issued By</label>
+            <label for="identityDocumentIssuedBy" class="block text-sm font-medium">ID Issued By</label>
             <p-select
               inputId="issuedBy"
               formControlName="issuedBy"
               [options]="IsoCountries"
               optionLabel="name"
               optionValue="code"
-              class="bg-surface-50 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              class="bg-surface-50 mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               appendTo="body"
             ></p-select>
             @if (getErrorMessage("identityDocument.issuedBy"); as error) {
@@ -125,13 +125,13 @@
 
         <div class="flex flex-col mt-2 md:flex-row gap-4">
           <div class="flex-1">
-            <label for="identityDocumentNumber" class="block text-sm font-medium text-gray-700">ID Number</label>
+            <label for="identityDocumentNumber" class="block text-sm font-medium">ID Number</label>
             <input
               formControlName="number"
               pInputText
               type="text"
               id="identityDocumentNumber"
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
             @if (getErrorMessage("identityDocument.number"); as error) {
               <div class="text-xs text-red-500 mt-1">{{ error }}</div>
@@ -139,13 +139,13 @@
           </div>
 
           <div class="flex-1">
-            <label for="identityDocumentValue" class="block text-sm font-medium text-gray-700">ID Value (Personal Code)</label>
+            <label for="identityDocumentValue" class="block text-sm font-medium">ID Value (Personal Code)</label>
             <input
               formControlName="value"
               pInputText
               type="text"
               id="identityDocumentValue"
-              class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             />
             @if (getErrorMessage("identityDocument.value"); as error) {
               <div class="text-xs text-red-500 mt-1">{{ error }}</div>
@@ -155,21 +155,21 @@
       </div>
 
       <div formArrayName="otherDocuments" class="flex flex-col gap-4">
-        <label class="block text-sm font-medium text-gray-700">Other Documents</label>
+        <label class="block text-sm font-medium">Other Documents</label>
         <div
           *ngFor="let _ of otherDocuments().controls; let i = index"
           [formGroupName]="i"
-          class="border border-gray-300 p-4 rounded-md shadow-md bg-white"
+          class="border border-surface-300 p-4 rounded-md shadow-md bg-surface"
         >
           <div class="flex flex-wrap gap-4">
             <div class="flex-1 min-w-[150px]">
-              <label for="issuedBy" class="block text-sm font-medium text-gray-700">Issued By</label>
+              <label for="issuedBy" class="block text-sm font-medium">Issued By</label>
               <p-select
                 formControlName="issuedBy"
                 [options]="IsoCountries"
                 optionLabel="name"
                 optionValue="code"
-                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                 appendTo="body"
               ></p-select>
               <div *ngIf="getOtherDocumentErrorMessage(i, 'issuedBy')" class="text-xs text-red-500 mt-1">
@@ -178,13 +178,13 @@
             </div>
 
             <div class="flex-1 min-w-[150px]">
-              <label for="type" class="block text-sm font-medium text-gray-700">Type</label>
+              <label for="type" class="block text-sm font-medium">Type</label>
               <input
                 formControlName="type"
                 pInputText
                 type="text"
                 id="type"
-                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               />
               <div *ngIf="getOtherDocumentErrorMessage(i, 'type')" class="text-xs text-red-500 mt-1">
                 {{ getOtherDocumentErrorMessage(i, 'type') }}
@@ -192,13 +192,13 @@
             </div>
 
             <div class="flex-1 min-w-[150px]">
-              <label for="value" class="block text-sm font-medium text-gray-700">Value</label>
+              <label for="value" class="block text-sm font-medium">Value</label>
               <input
                 formControlName="value"
                 pInputText
                 type="text"
                 id="value"
-                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               />
               <div *ngIf="getOtherDocumentErrorMessage(i, 'value')" class="text-xs text-red-500 mt-1">
                 {{ getOtherDocumentErrorMessage(i, 'value') }}

@@ -20,14 +20,14 @@
         <div class="form-field">
           <label
             for="firstName"
-            class="block text-sm font-medium text-gray-700"
+            class="block text-sm font-medium"
           >First Name</label>
           <input
             type="text"
             id="firstName"
             formControlName="firstName"
             pInputText
-            class="bg-surface-50 mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="bg-surface-50 mt-1 block w-full p-2 border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             required
           />
           @if (getErrorMessage('firstName'); as firstNameInvalid) {
@@ -41,14 +41,14 @@
         <div class="form-field">
           <label
             for="lastName"
-            class="block text-sm font-medium text-gray-700"
+            class="block text-sm font-medium"
           >Last Name</label>
           <input
             type="text"
             id="lastName"
             formControlName="lastName"
             pInputText
-            class="bg-surface-50 mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="bg-surface-50 mt-1 block w-full p-2 border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             required
           />
           @if (getErrorMessage('lastName'); as lastNameInvalid) {
@@ -62,7 +62,7 @@
         <div class="form-field">
           <label
             for="birthDate"
-            class="block text-sm font-medium text-gray-700"
+            class="block text-sm font-medium"
           >Birthdate</label>
           <p-datepicker
             inputId="birthDate"
@@ -70,7 +70,7 @@
             [showIcon]="true"
             variant="filled"
             inputStyleClass="p-2 rounded-md"
-            class="bg-surface-50 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="bg-surface-50 mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             required
             appendTo="body"
           ></p-datepicker>
@@ -85,14 +85,14 @@
         <div class="form-field">
           <label
             for="email"
-            class="block text-sm font-medium text-gray-700"
+            class="block text-sm font-medium"
           >Email</label>
           <input
             type="email"
             id="email"
             formControlName="email"
             pInputText
-            class="bg-surface-50 mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="bg-surface-50 mt-1 block w-full p-2 border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             required
           />
           @if (getErrorMessage('email'); as emailInvalid) {
@@ -107,14 +107,14 @@
           <div class="form-field">
             <label
               for="password"
-              class="block text-sm font-medium text-gray-700"
+              class="block text-sm font-medium"
             >Password</label>
             <input
               type="password"
               id="password"
               formControlName="password"
               pInputText
-              class="bg-surface-50 mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              class="bg-surface-50 mt-1 block w-full p-2 border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               required
             />
             @if (getErrorMessage('password'); as passwordInvalid) {
@@ -129,7 +129,7 @@
         <div class="form-field">
           <label
             for="country"
-            class="block text-sm font-medium text-gray-700"
+            class="block text-sm font-medium"
           >Country</label>
           <p-autocomplete
             inputId="country"
@@ -139,7 +139,7 @@
             [dropdown]="true"
             [suggestions]="filteredCountries"
             (completeMethod)="filterCountries($event)"
-            class="bg-surface-50 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="bg-surface-50 mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             required
             appendTo="body"
           ></p-autocomplete>

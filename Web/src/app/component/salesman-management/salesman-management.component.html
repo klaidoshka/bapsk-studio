@@ -18,14 +18,14 @@
       <div>
         <label
           for="name"
-          class="block text-sm font-medium text-gray-700"
+          class="block text-sm font-medium"
         >Name</label>
         <input
           formControlName="name"
           pInputText
           type="text"
           id="name"
-          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
         />
         @if (getErrorMessage("name"); as error) {
           <div class="text-xs text-red-500 mt-1">{{ error }}</div>
@@ -36,14 +36,14 @@
         <div>
           <label
             for="vatPayerCodeValue"
-            class="block text-sm font-medium text-gray-700"
+            class="block text-sm font-medium"
           >Vat Payer Code</label>
           <input
             formControlName="value"
             pInputText
             type="text"
             id="vatPayerCodeValue"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
           />
           @if (getErrorMessage("vatPayerCode.value"); as error) {
             <div class="text-xs text-red-500 mt-1">{{ error }}</div>
@@ -53,7 +53,7 @@
         <div>
           <label
             for="vatPayerCodeIssuedBy"
-            class="block text-sm font-medium text-gray-700"
+            class="block text-sm font-medium"
           >Vat Payer Code Issued By</label>
           <p-select
             inputId="issuedBy"
@@ -61,7 +61,7 @@
             [options]="IsoCountries"
             optionLabel="name"
             optionValue="code"
-            class="bg-surface-50 mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="bg-surface-50 mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
             appendTo="body"
           ></p-select>
           @if (getErrorMessage("vatPayerCode.issuedBy"); as error) {

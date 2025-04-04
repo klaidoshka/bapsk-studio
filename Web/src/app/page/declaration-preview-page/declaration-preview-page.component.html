@@ -7,7 +7,7 @@
     <div class="w-fit mx-auto my-4">
       <div class="flex flex-wrap gap-4">
         <!-- Left Column -->
-        <div class="flex-1 min-w-[250px] bg-white p-4 rounded-lg shadow-md relative">
+        <div class="flex-1 min-w-[250px] bg-surface p-4 rounded-lg shadow-md relative">
           <p class="text-lg">
             <strong>Declaration Id:</strong>
             {{ declaration()!.id }}
@@ -35,7 +35,7 @@
         </div>
 
         <!-- Right Column -->
-        <div class="flex-1 min-w-[250px] bg-white p-4 rounded-lg shadow-md">
+        <div class="flex-1 min-w-[250px] bg-surface p-4 rounded-lg shadow-md">
           <p class="text-lg">
             <strong>Customer:</strong>
             {{ toCustomerFullName(declaration()!.sale!.customer) }}
@@ -56,8 +56,8 @@
       </div>
 
       <div *ngIf="declaration()!.qrCodes.length" class="mt-4">
-        <div class="border border-gray-300 rounded-lg shadow-md">
-          <div class="bg-white p-4 cursor-pointer flex justify-between items-center" (click)="showQrCodes.set(!showQrCodes())">
+        <div class="border border-surface-300 rounded-lg shadow-md">
+          <div class="bg-surface p-4 cursor-pointer flex justify-between items-center" (click)="showQrCodes.set(!showQrCodes())">
             <p class="font-bold text-lg">QR Codes</p>
             <svg class="w-6 h-6 transform transition-transform" [ngClass]="{'rotate-180': showQrCodes()}"
                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -81,7 +81,7 @@
         </div>
       </div>
 
-      <div class="card mt-4 bg-white p-4 rounded-lg shadow-md">
+      <div class="card mt-4 bg-surface p-4 rounded-lg shadow-md">
         <p-table [value]="declaration()!.sale.soldGoods">
           <ng-template #header>
             <tr>
