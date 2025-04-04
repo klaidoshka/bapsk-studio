@@ -6,7 +6,7 @@ import ErrorResponse, {ErrorResponseDetails} from '../model/error-response.model
   providedIn: 'root'
 })
 export class LocalizationService {
-  private defaultErrorMessage = 'Extremely rare error occurred, please try again later.';
+  private readonly defaultErrorMessage = 'Extremely rare error occurred, please try again later.';
 
   constructor() {
   }

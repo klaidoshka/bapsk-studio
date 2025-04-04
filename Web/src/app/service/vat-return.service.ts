@@ -19,7 +19,7 @@ import {SaleService} from './sale.service';
 })
 export class VatReturnService {
   // Key: InstanceId
-  private store = new Map<number, WritableSignal<VatReturnDeclaration[]>>();
+  private readonly store = new Map<number, WritableSignal<VatReturnDeclaration[]>>();
 
   constructor(
     private apiRouter: ApiRouter,

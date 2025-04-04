@@ -12,7 +12,7 @@ import {FieldType} from '../model/data-type-field.model';
 })
 export class DataTypeService {
   // Key: InstanceId
-  private store = new Map<number, WritableSignal<DataType[]>>();
+  private readonly store = new Map<number, WritableSignal<DataType[]>>();
 
   constructor(
     private apiRouter: ApiRouter,

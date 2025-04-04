@@ -85,8 +85,8 @@
   </div>
 
   <div *ngIf="sale() != null && declaration()?.qrCodes?.length">
-    <div class="border border-gray-300 rounded my-2 w-fit">
-      <div class="bg-gray-100 p-2 cursor-pointer" (click)="showQrCodes.set(!showQrCodes())">
+    <div class="border border-surface-300 rounded my-2 w-fit">
+      <div class="bg-surface-100 p-2 cursor-pointer" (click)="showQrCodes.set(!showQrCodes())">
         <p class="font-bold text-md">QR Codes</p>
       </div>
       <div class="p-4" *ngIf="showQrCodes()">

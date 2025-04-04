@@ -10,8 +10,8 @@ import {DateUtil} from '../util/date.util';
   providedIn: 'root'
 })
 export class InstanceService {
-  private activeInstance = signal<Instance | undefined>(undefined);
-  private store = signal<Instance[]>([]);
+  private readonly activeInstance = signal<Instance | undefined>(undefined);
+  private readonly store = signal<Instance[]>([]);
 
   constructor(
     private apiRouter: ApiRouter,

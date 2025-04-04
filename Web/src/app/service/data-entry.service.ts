@@ -10,7 +10,7 @@ import {DateUtil} from '../util/date.util';
 })
 export class DataEntryService {
   // Key: DataTypeId
-  private store = new Map<number, WritableSignal<DataEntry[]>>();
+  private readonly store = new Map<number, WritableSignal<DataEntry[]>>();
 
   constructor(
     private apiRouter: ApiRouter,

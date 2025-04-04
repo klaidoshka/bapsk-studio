@@ -17,11 +17,6 @@ function initAuthService(authService: AuthService, router: Router): Promise<void
     authService.renewAccess().subscribe({
       next: (response) => {
         authService.acceptAuthResponse(response);
-
-        if (router.url.includes("/auth/login")) {
-          router.navigate(["/"]);
-        }
-
         resolve();
       },
       error: (response) => {
@@ -41,7 +36,6 @@ export const appConfig: ApplicationConfig = {
       initAuthService(inject(AuthService), inject(Router));
     }),
     provideExperimentalZonelessChangeDetection(),
-    // provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(routes),
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     provideAnimationsAsync(),

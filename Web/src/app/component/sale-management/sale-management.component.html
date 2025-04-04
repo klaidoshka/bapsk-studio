@@ -18,7 +18,7 @@
       <div class="flex-1 min-w-[100px]">
         <label
           for="customerId"
-          class="block text-sm font-medium text-gray-700"
+          class="block text-sm font-medium"
         >Customer</label>
         <p-select
           formControlName="customerId"
@@ -26,7 +26,7 @@
           [options]="customersLabeled()"
           optionValue="value"
           optionLabel="label"
-          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
         ></p-select>
         <div
           *ngIf="getErrorMessage('customerId')"
@@ -39,7 +39,7 @@
       <div class="flex-1 min-w-[100px]">
         <label
           for="salesmanId"
-          class="block text-sm font-medium text-gray-700"
+          class="block text-sm font-medium"
         >Salesman</label>
         <p-select
           formControlName="salesmanId"
@@ -47,7 +47,7 @@
           [options]="salesmenLabeled()"
           optionValue="value"
           optionLabel="label"
-          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
         ></p-select>
         <div
           *ngIf="getErrorMessage('salesmanId')"
@@ -62,7 +62,7 @@
       <div class="flex-1 min-w-[100px]">
         <label
           for="date"
-          class="block text-sm font-medium text-gray-700"
+          class="block text-sm font-medium"
         >Date</label>
         <p-datepicker
           inputId="date"
@@ -72,7 +72,7 @@
           variant="filled"
           inputStyleClass="p-2 rounded-md"
           styleClass="w-full"
-          class="mt-1 block border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          class="mt-1 block border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
           required
           appendTo="body"
         ></p-datepicker>
@@ -87,7 +87,7 @@
       <div class="flex-1 min-w-[100px] w-fit">
         <label
           for="saleReceiptType"
-          class="block text-sm font-medium text-gray-700"
+          class="block text-sm font-medium"
         >Sale Receipt Type</label
         >
         <p-select
@@ -97,7 +97,7 @@
           [options]="saleReceiptTypes"
           optionValue="value"
           optionLabel="label"
-          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
         ></p-select>
       </div>
     </div>
@@ -109,7 +109,7 @@
       >
         <label
           for="invoiceNo"
-          class="block text-sm font-medium text-gray-700"
+          class="block text-sm font-medium"
         >Invoice No</label
         >
         <input
@@ -117,7 +117,7 @@
           pInputText
           type="text"
           id="invoiceNo"
-          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
         />
         <div
           *ngIf="getErrorMessage('invoiceNo')"
@@ -135,7 +135,7 @@
         <div class="flex-1 min-w-[100px]">
           <label
             for="cashRegisterNo"
-            class="block text-sm font-medium text-gray-700"
+            class="block text-sm font-medium"
           >Cash Register No</label
           >
           <input
@@ -143,14 +143,14 @@
             pInputText
             type="text"
             id="cashRegisterNo"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
 
         <div class="flex-1 min-w-[100px]">
           <label
             for="receiptNo"
-            class="block text-sm font-medium text-gray-700"
+            class="block text-sm font-medium"
           >Receipt No</label
           >
           <input
@@ -158,7 +158,7 @@
             pInputText
             type="text"
             id="receiptNo"
-            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
       </div>
@@ -166,7 +166,7 @@
 
     <!-- Sold Goods Section -->
     <div class="mt-4">
-      <label class="block text-sm font-medium text-gray-700">Sold Goods</label>
+      <label class="block text-sm font-medium">Sold Goods</label>
       <div
         formArrayName="soldGoods"
         class="flex flex-col gap-4"
@@ -174,16 +174,16 @@
         <div
           *ngFor="let soldGood of soldGoods().controls; let i = index"
           [formGroupName]="i"
-          class="border border-gray-300 p-4 rounded-md shadow-md bg-white"
+          class="border border-surface-300 p-4 rounded-md shadow-md bg-surface"
         >
           <div class="flex flex-wrap gap-4">
             <div class="min-w-[250px]">
-              <label class="block text-sm font-medium text-gray-700">Description</label>
+              <label class="block text-sm font-medium">Description</label>
               <input
                 formControlName="description"
                 pInputText
                 type="text"
-                class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               />
               <div
                 *ngIf="getSoldGoodErrorMessage(i, 'description')"
@@ -194,12 +194,12 @@
             </div>
 
             <div class="max-w-[100px]">
-              <label class="block text-sm font-medium text-gray-700">Quantity</label>
+              <label class="block text-sm font-medium">Quantity</label>
               <input
                 formControlName="quantity"
                 pInputText
                 type="number"
-                class="mt-1 block w-[100px] border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                class="mt-1 block w-[100px] border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               />
               <div
                 *ngIf="getSoldGoodErrorMessage(i, 'quantity')"
@@ -210,12 +210,12 @@
             </div>
 
             <div class="max-w-[150px]">
-              <label class="block text-sm font-medium text-gray-700">Unit Price</label>
+              <label class="block text-sm font-medium">Unit Price</label>
               <input
                 formControlName="unitPrice"
                 pInputText
                 type="number"
-                class="mt-1 block w-[150px] border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                class="mt-1 block w-[150px] border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               />
               <div
                 *ngIf="getSoldGoodErrorMessage(i, 'unitPrice')"
@@ -226,7 +226,7 @@
             </div>
 
             <div class="max-w-[150px]">
-              <label class="block text-sm font-medium text-gray-700">Measure Type</label>
+              <label class="block text-sm font-medium">Measure Type</label>
               <p-select
                 styleClass="mt-1 w-[150px]"
                 formControlName="unitOfMeasureType"
@@ -244,13 +244,13 @@
             </div>
 
             <div class="max-w-[120px]">
-              <label class="block text-sm font-medium text-gray-700">Measure Unit</label>
+              <label class="block text-sm font-medium">Measure Unit</label>
               @if (getMeasurementUnit(i) == UnitOfMeasureType.UnitOfMeasureOther) {
                 <input
                   formControlName="unitOfMeasure"
                   pInputText
                   type="text"
-                  class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                 />
               } @else {
                 <p-select
@@ -259,7 +259,7 @@
                   optionValue="code"
                   optionLabel="label"
                   styleClass="min-w-[120px]"
-                  class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                   appendTo="body"
                 />
               }
@@ -272,7 +272,7 @@
             </div>
 
             <div class="max-w-[80px]">
-              <label class="block text-sm font-medium text-gray-700">VAT Rate (%)</label>
+              <label class="block text-sm font-medium">VAT Rate (%)</label>
               <input
                 formControlName="vatRate"
                 pInputText
@@ -280,7 +280,7 @@
                 [min]="0"
                 [max]="100"
                 [step]="1"
-                class="mt-1 block w-[80px] border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                class="mt-1 block w-[80px] border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
               />
               <div
                 *ngIf="getSoldGoodErrorMessage(i, 'vatRate')"

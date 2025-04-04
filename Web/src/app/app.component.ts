@@ -6,10 +6,11 @@ import {ConfirmDialogModule} from "primeng/confirmdialog";
 import {ToastModule} from "primeng/toast";
 import {ProfileDropdownComponent} from './component/profile-dropdown/profile-dropdown.component';
 import {InstanceSelectorComponent} from './component/instance-selector/instance-selector.component';
+import {ThemeSelectorComponent} from './component/theme-selector/theme-selector.component';
 
 @Component({
   selector: "app-root",
-  imports: [RouterModule, ConfirmDialogModule, ButtonModule, ToastModule, ProfileDropdownComponent, InstanceSelectorComponent],
+  imports: [RouterModule, ConfirmDialogModule, ButtonModule, ToastModule, ProfileDropdownComponent, InstanceSelectorComponent, ThemeSelectorComponent],
   templateUrl: "./app.component.html",
   providers: [ConfirmationService, MessageService]
 })
