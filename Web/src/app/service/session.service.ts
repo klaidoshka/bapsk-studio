@@ -11,7 +11,7 @@ import {DateUtil} from '../util/date.util';
   providedIn: 'root'
 })
 export class SessionService {
-  private store = signal<Session[]>([]);
+  private readonly store = signal<Session[]>([]);
 
   constructor(
     private apiRouter: ApiRouter,

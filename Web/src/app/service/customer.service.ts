@@ -13,7 +13,7 @@ import {DateUtil} from '../util/date.util';
 })
 export class CustomerService {
   // Key: InstanceId
-  private store = new Map<number, WritableSignal<Customer[]>>();
+  private readonly store = new Map<number, WritableSignal<Customer[]>>();
 
   constructor(
     private apiRouter: ApiRouter,

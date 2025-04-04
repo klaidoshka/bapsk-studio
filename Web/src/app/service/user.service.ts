@@ -12,8 +12,8 @@ import {DateUtil} from '../util/date.util';
   providedIn: 'root'
 })
 export class UserService {
-  private storeUsers = signal<User[]>([]);
-  private storeIdentities = signal<UserIdentity[]>([]);
+  private readonly storeUsers = signal<User[]>([]);
+  private readonly storeIdentities = signal<UserIdentity[]>([]);
 
   constructor(
     private apiRouter: ApiRouter,

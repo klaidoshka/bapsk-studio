@@ -11,7 +11,7 @@ import {IsoCountryCode} from '../model/iso-country.model';
 })
 export class SalesmanService {
   // Key: InstanceId
-  private store = new Map<number, WritableSignal<Salesman[]>>();
+  private readonly store = new Map<number, WritableSignal<Salesman[]>>();
 
   constructor(
     private apiRouter: ApiRouter,
