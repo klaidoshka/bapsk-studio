@@ -43,9 +43,9 @@ import {NgIf} from '@angular/common';
 })
 export class DataTypeManagementComponent {
   dataType = signal<DataType | undefined>(undefined);
-  displayFields = signal<Option<number | undefined>[]>([{
+  displayFields = signal<Option<number | null>[]>([{
     label: 'Id',
-    value: undefined
+    value: null
   }]);
   FieldType = FieldType;
   fieldTypes = fieldTypes;
@@ -73,16 +73,12 @@ export class DataTypeManagementComponent {
   private readonly createForm = (dataType?: DataType) => {
     this.displayFields.set(this.displayFields().slice(0, 1));
 
-    let displayFieldIndex = dataType?.fields.findIndex(it => it.id == dataType?.displayFieldId);
-
-    if (displayFieldIndex === -1) {
-      displayFieldIndex = undefined;
-    }
+    const displayFieldIndex = dataType?.fields.findIndex(it => it.id == dataType?.displayFieldId) || -1;
 
     return this.formBuilder.group({
       name: [dataType?.name || '', Validators.required],
       description: [dataType?.description || 'No description set.'],
-      displayField: [displayFieldIndex],
+      displayField: [displayFieldIndex === -1 ? null : displayFieldIndex],
       fields: this.formBuilder.array([], {
         validators: (controls: AbstractControl<any, any>) => {
           const fields = controls.value as FormGroup[];
