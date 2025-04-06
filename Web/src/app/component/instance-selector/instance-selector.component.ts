@@ -1,7 +1,6 @@
-import {Component, effect, Signal, viewChild, WritableSignal} from '@angular/core';
+import {Component, effect, Signal, viewChild, ViewEncapsulation, WritableSignal} from '@angular/core';
 import {DropdownModule} from "primeng/dropdown";
 import Instance from '../../model/instance.model';
-import {AuthService} from '../../service/auth.service';
 import {InstanceService} from '../../service/instance.service';
 import {Button} from 'primeng/button';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -19,19 +18,17 @@ import {Select} from 'primeng/select';
     Select
   ],
   templateUrl: './instance-selector.component.html',
-  styles: ``
+  styleUrl: `./instance-selector.component.scss`,
+  encapsulation: ViewEncapsulation.None
 })
 export class InstanceSelectorComponent {
   instances!: Signal<Instance[]>;
-  isAuthenticated!: Signal<boolean>;
   managementMenu = viewChild.required(InstanceManagementComponent);
   selectedInstance!: WritableSignal<Instance | undefined>;
 
   constructor(
-    private authService: AuthService,
     private instanceService: InstanceService
   ) {
-    this.isAuthenticated = this.authService.isAuthenticated();
     this.instances = this.instanceService.getAsSignal();
     this.selectedInstance = this.instanceService.getActiveInstance();
 

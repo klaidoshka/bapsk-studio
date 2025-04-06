@@ -26,7 +26,6 @@ export class ProfileDropdownComponent {
   confirmationComponent = viewChild.required(ConfirmationComponent);
   displayName!: Signal<string>;
   entries = signal<MenuItem[]>([]);
-  isAuthenticated!: Signal<boolean>;
 
   constructor(
     private authService: AuthService,
@@ -39,7 +38,6 @@ export class ProfileDropdownComponent {
     });
 
     this.entries.set(this.getEmptyEntries());
-    this.isAuthenticated = this.authService.isAuthenticated();
 
     effect(() => {
       const user = this.authService.getUser()();

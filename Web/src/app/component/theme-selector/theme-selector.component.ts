@@ -1,13 +1,13 @@
 import {Component, Signal} from '@angular/core';
 import {ThemeService} from '../../service/theme.service';
-import {InputSwitch} from 'primeng/inputswitch';
 import {FormsModule} from '@angular/forms';
+import {Button} from 'primeng/button';
 
 @Component({
   selector: 'app-theme-selector',
   imports: [
-    InputSwitch,
-    FormsModule
+    FormsModule,
+    Button
   ],
   templateUrl: './theme-selector.component.html'
 })

@@ -1,18 +1,14 @@
-<div class="flex flex-row gap-2 items-center justify-center">
-  <span class="h-10 w-6 flex mt-3 justify-end">
+<p-button
+  variant="text"
+  styleClass="h-6 w-6"
+  class="rounded"
+  (click)="toggleTheme()"
+>
+  <span class="text-xl">
     @if (!isDarkTheme()) {
       🌞
-    }
-  </span>
-
-  <p-inputSwitch
-    [ngModel]="isDarkTheme()"
-    (ngModelChange)="toggleTheme()"
-  />
-
-  <span class="h-10 w-6 flex mt-3 justify-start">
-    @if (isDarkTheme()) {
+    } @else {
       🌚
     }
   </span>
-</div>
+</p-button>

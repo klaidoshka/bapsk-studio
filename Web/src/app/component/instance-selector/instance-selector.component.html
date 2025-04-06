@@ -1,26 +1,24 @@
-@if (isAuthenticated()) {
-  @switch (instances().length) {
-    @case (0) {
-      <app-instance-management />
+@switch (instances().length) {
+  @case (0) {
+    <app-instance-management />
 
-      <p-button
-        label="Create Instance"
-        icon="pi pi-plus"
-        class="block w-full"
-        (onClick)="showManagementMenu()"
-      ></p-button>
-    }
-    @default {
-        @if (selectedInstance() != null) {
-          <p-select
-            inputId="instance"
-            [(ngModel)]="selectedInstance"
-            [options]="instances()"
-            optionLabel="name"
-            placeholder="Select Instance"
-            class="bg-surface-50 block w-full rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-          ></p-select>
-        }
-    }
+    <p-button
+      label="Create Instance"
+      icon="pi pi-plus"
+      class="block w-full"
+      (onClick)="showManagementMenu()"
+    ></p-button>
+  }
+  @default {
+      @if (selectedInstance() != null) {
+        <p-select
+          id="instance-selector"
+          inputId="instance"
+          [(ngModel)]="selectedInstance"
+          [options]="instances()"
+          optionLabel="name"
+          placeholder="Select Instance"
+        ></p-select>
+      }
   }
 }
