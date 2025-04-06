@@ -12,27 +12,48 @@
     <app-messages-showcase [messages]="messages()"/>
 
     <div
-      class="grid grid-cols-1 gap-4"
+      class="flex flex-col gap-4"
       [formGroup]="form"
     >
-      <div>
-        <label
-          for="name"
-          class="block text-sm font-medium"
-        >Name</label>
-        <input
-          formControlName="name"
-          pInputText
-          type="text"
-          id="name"
-          class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-        />
-        @if (getErrorMessage("name"); as error) {
-          <div class="text-xs text-red-500 mt-1">{{ error }}</div>
-        }
+      <div class="flex flex-row gap-4">
+        <div class="flex flex-col w-full">
+          <label
+            for="name"
+            class="block text-sm font-medium"
+          >Name</label>
+          <input
+            formControlName="name"
+            pInputText
+            type="text"
+            id="name"
+            class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          />
+          @if (getErrorMessage("name"); as error) {
+            <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+          }
+        </div>
+
+        <div
+          *ngIf="dataType()"
+          class="flex flex-col w-full">
+          <label
+            for="displayField"
+            class="block text-sm font-medium"
+          >Display Field</label>
+          <p-select
+            formControlName="displayField"
+            [options]="displayFields()"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select a field"
+            appendTo="body"
+            styleClass="w-full"
+            class="mt-1"
+          ></p-select>
+        </div>
       </div>
 
-      <div>
+      <div class="flex flex-col">
         <label
           for="description"
           class="block text-sm font-medium"
@@ -48,7 +69,7 @@
         }
       </div>
 
-      <div>
+      <div class="flex flex-col">
         <label
           for="fields"
           class="block text-sm font-medium"
@@ -159,7 +180,7 @@
         <div class="mt-2">
           <p-button
             label="Add Field"
-            (onClick)="addField(null)"
+            (onClick)="addField()"
           ></p-button>
         </div>
       </div>
@@ -167,7 +188,7 @@
 
     <div class="flex justify-end mt-4">
       <p-button
-        [label]="dataType() == null ? 'Create' : 'Save'"
+        [label]="dataType() === undefined ? 'Create' : 'Save'"
         [disabled]="!form.valid || !form.dirty"
         (onClick)="save()"
       ></p-button>

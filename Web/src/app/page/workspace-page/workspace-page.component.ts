@@ -19,7 +19,7 @@ import {FormsModule} from '@angular/forms';
 import {SaleShowcaseComponent} from '../../component/sale-showcase/sale-showcase.component';
 import {Select} from 'primeng/select';
 import {VatReturnService} from '../../service/vat-return.service';
-import {DataEntryWithUsers} from '../../model/data-entry.model';
+import {DataEntryJoined} from '../../model/data-entry.model';
 import {DataEntryService} from '../../service/data-entry.service';
 import {UserService} from '../../service/user.service';
 
@@ -33,7 +33,7 @@ export class WorkspacePageComponent {
   protected readonly WorkspaceType = WorkspaceType;
 
   customers!: Signal<Customer[]>;
-  dataEntries!: Signal<DataEntryWithUsers[]>;
+  dataEntries!: Signal<DataEntryJoined[]>;
   dataTypes!: Signal<DataType[]>;
   instanceId!: Signal<number | undefined>;
   sales!: Signal<SaleWithVatReturnDeclaration[]>;
@@ -64,15 +64,7 @@ export class WorkspacePageComponent {
 
     this.dataEntries = computed(() => {
       const dataTypeId = this.selectedDataType()?.id;
-      const dataEntries = dataTypeId == null ? [] : dataEntryService.getAsSignal(dataTypeId)();
-
-      return dataEntries.map(dataEntry => {
-        return {
-          ...dataEntry,
-          createdBy: computed(() => userService.getIdentityByIdAsSignal(dataEntry.createdById)())()!,
-          modifiedBy: computed(() => userService.getIdentityByIdAsSignal(dataEntry.modifiedById)())()!
-        };
-      });
+      return dataTypeId == null ? [] : dataEntryService.getAsSignal(dataTypeId)();
     });
 
     this.dataTypes = computed(() => {

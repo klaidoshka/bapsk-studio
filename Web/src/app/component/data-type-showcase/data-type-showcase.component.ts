@@ -57,7 +57,7 @@ export class DataTypeShowcaseComponent {
     });
   }
 
-  readonly showManagement = (dataType: DataType | null) => {
+  readonly showManagement = (dataType?: DataType) => {
     this.managementMenu().show(dataType);
   }
 

@@ -1,9 +1,8 @@
-import {Injectable, Signal, signal, WritableSignal} from '@angular/core';
+import {computed, Injectable, Signal, signal, WritableSignal} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
 import {first, Observable, tap} from 'rxjs';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../model/data-type.model';
-import {DataEntryService} from './data-entry.service';
 import {EnumUtil} from '../util/enum.util';
 import {FieldType} from '../model/data-type-field.model';
 
@@ -16,7 +15,6 @@ export class DataTypeService {
 
   constructor(
     private apiRouter: ApiRouter,
-    private dataEntryService: DataEntryService,
     private httpClient: HttpClient
   ) {
   }
@@ -63,10 +61,7 @@ export class DataTypeService {
   readonly edit = (request: DataTypeEditRequest): Observable<void> => {
     return this.httpClient.put<void>(this.apiRouter.dataTypeEdit(request.dataTypeId), request).pipe(
       tap(() => {
-        this.getById(request.dataTypeId).pipe(first()).subscribe(() => {
-          // Refresh data entries, since the data type has changed, some fields may have been removed or added
-          this.dataEntryService.getAll(request.dataTypeId).pipe(first()).subscribe();
-        });
+        this.getById(request.dataTypeId).pipe(first()).subscribe();
       })
     );
   }
@@ -103,6 +98,22 @@ export class DataTypeService {
         }
       })
     );
+  }
+
+  readonly getByIdAsSignal = (id: number): Signal<DataType | undefined> => {
+    const instanceId = this.resolveInstanceId(id);
+
+    if (instanceId == null) {
+      const dataType = signal<DataType | undefined>(undefined);
+
+      this.getById(id).subscribe((value) => {
+        dataType.set(this.getByIdAsSignal(value.id)());
+      });
+
+      return dataType;
+    }
+
+    return computed(() => this.store.get(instanceId)!().find(dataType => dataType.id === id));
   }
 
   readonly getAsSignal = (instanceId: number): Signal<DataType[]> => {

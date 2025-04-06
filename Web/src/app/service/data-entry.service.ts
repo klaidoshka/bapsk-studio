@@ -1,9 +1,11 @@
-import {Injectable, Signal, signal, WritableSignal} from '@angular/core';
+import {computed, Injectable, Signal, signal, WritableSignal} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
 import {first, Observable, tap} from 'rxjs';
-import DataEntry, {DataEntryCreateRequest, DataEntryEditRequest} from '../model/data-entry.model';
+import DataEntry, {DataEntryCreateRequest, DataEntryEditRequest, DataEntryJoined} from '../model/data-entry.model';
 import {DateUtil} from '../util/date.util';
+import {UserService} from './user.service';
+import {DataTypeService} from './data-type.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +16,9 @@ export class DataEntryService {
 
   constructor(
     private apiRouter: ApiRouter,
-    private httpClient: HttpClient
+    private dataTypeService: DataTypeService,
+    private httpClient: HttpClient,
+    private userService: UserService
   ) {
   }
 
@@ -110,14 +114,37 @@ export class DataEntryService {
    *
    * @returns Readonly signal of data entries
    */
-  readonly getAsSignal = (dataTypeId: number): Signal<DataEntry[]> => {
+  readonly getAsSignal = (dataTypeId: number): Signal<DataEntryJoined[]> => {
     if (!this.store.has(dataTypeId)) {
       this.store.set(dataTypeId, signal([]));
 
       new Promise((resolve) => this.getAll(dataTypeId).pipe(first()).subscribe(resolve));
     }
 
-    return this.store.get(dataTypeId)!.asReadonly();
+    const dataEntries = this.store.get(dataTypeId)!;
+    const dataType = this.dataTypeService.getByIdAsSignal(dataTypeId);
+
+    return computed(() => dataEntries().map(dataEntry => {
+        return {
+          ...dataEntry,
+          createdBy: computed(() => this.userService.getIdentityByIdAsSignal(dataEntry.createdById)())()!,
+          display: () => {
+            if (!dataType()?.displayFieldId) {
+              return dataEntry.id.toString();
+            }
+
+            const displayFieldId = dataType()?.displayFieldId!;
+
+            return dataEntry.fields.find(field => field.dataTypeFieldId === displayFieldId)?.value || '';
+          },
+          // Ensure that latest data type fields are used
+          fields: dataEntry.fields.filter(field =>
+            dataType()?.fields?.find(dataTypeField => dataTypeField.id === field.dataTypeFieldId)
+          ),
+          modifiedBy: computed(() => this.userService.getIdentityByIdAsSignal(dataEntry.modifiedById)())()!
+        };
+      })
+    );
   }
 
   readonly updateProperties = (dataEntry: DataEntry): DataEntry => {

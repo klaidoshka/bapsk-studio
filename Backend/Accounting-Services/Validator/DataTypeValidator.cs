@@ -94,11 +94,6 @@ public class DataTypeValidator : IDataTypeValidator
             return new Validation("Data type not found.");
         }
 
-        // if (dataType.Type != DataTypeType.UserMade)
-        // {
-        //     return new Validation("Default data types cannot be deleted.");
-        // }
-
         return dataType.Instance.CreatedById != request.RequesterId
             ? new Validation("You are not allowed to delete this data type.")
             : new Validation();
@@ -140,6 +135,21 @@ public class DataTypeValidator : IDataTypeValidator
         )
         {
             return new Validation("Such data type name already exists.");
+        }
+
+        if (!request.Fields.Any())
+        {
+            return new Validation("At least one field is required in data type.");
+        }
+
+        if (request.DisplayFieldIndex != null && (
+                request.DisplayFieldIndex < 0 ||
+                request.DisplayFieldIndex >= dataType.Fields.Count
+            ))
+        {
+            return new Validation(
+                "Data type display field index must be between 0 and the number of fields."
+            );
         }
 
         var failures = new List<string>();

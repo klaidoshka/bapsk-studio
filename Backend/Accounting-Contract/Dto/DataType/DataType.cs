@@ -3,6 +3,7 @@ namespace Accounting.Contract.Dto.DataType;
 public class DataType
 {
     public string? Description { get; set; }
+    public int? DisplayFieldId { get; set; }
     public IEnumerable<DataTypeField> Fields { get; set; } = new List<DataTypeField>();
     public int Id { get; set; }
     public int InstanceId { get; set; }
@@ -16,6 +17,7 @@ public static class DataTypeExtensions
         return new DataType
         {
             Description = entity.Description,
+            DisplayFieldId = entity.DisplayFieldId,
             Fields = entity.Fields
                 .Select(x => x.ToDto())
                 .ToList(),

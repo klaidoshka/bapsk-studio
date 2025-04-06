@@ -9,6 +9,7 @@ export class ThemeService {
 
   constructor() {
     this.darkTheme = signal(this.isStoredDarkTheme());
+    this.toggleTheme(this.darkTheme());
   }
 
   private readonly isStoredDarkTheme = () => {
@@ -27,11 +28,14 @@ export class ThemeService {
 
   readonly isDarkTheme = () => this.darkTheme.asReadonly();
 
-  readonly toggleTheme = () => {
-    this.darkTheme.set(!this.darkTheme());
-
+  readonly toggleTheme = (value?: boolean) => {
+    this.darkTheme.set(value || !this.darkTheme());
     this.storeTheme(this.darkTheme());
 
-    document.querySelector('html')?.classList?.toggle('dark');
+    if (this.darkTheme()) {
+      document.querySelector('html')?.classList?.add('dark');
+    } else {
+      document.querySelector('html')?.classList?.remove('dark');
+    }
   }
 }

@@ -158,6 +158,10 @@ public class DataTypeService : IDataTypeService
             }
         }
 
+        dataType.DisplayFieldId = request.DisplayFieldIndex is not null
+            ? dataType.Fields.ElementAtOrDefault(request.DisplayFieldIndex.Value)?.Id
+            : null;
+
         await _database.SaveChangesAsync();
     }
 

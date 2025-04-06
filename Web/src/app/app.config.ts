@@ -1,39 +1,19 @@
 import {provideHttpClient, withFetch, withInterceptors} from "@angular/common/http";
 import {ApplicationConfig, inject, provideAppInitializer, provideExperimentalZonelessChangeDetection} from "@angular/core";
 import {provideAnimationsAsync} from "@angular/platform-browser/animations/async";
-import {provideRouter, Router} from "@angular/router";
+import {provideRouter} from "@angular/router";
 import {providePrimeNG} from "primeng/config";
 import {routes} from "./app.routes";
 import {authInterceptor} from "./interceptor/auth.interceptor";
 import {AuthService} from "./service/auth.service";
 import {ThemePreset} from './theme-preset';
-
-function initAuthService(authService: AuthService, router: Router): Promise<void> {
-  return new Promise((resolve, _) => {
-    if (!authService.isAuthenticated()()) {
-      return resolve();
-    }
-
-    authService.renewAccess().subscribe({
-      next: (response) => {
-        authService.acceptAuthResponse(response);
-        resolve();
-      },
-      error: (response) => {
-        if (response.status === 401) {
-          authService.cleanupCredentials();
-          router.navigate(["/auth/login"]);
-        }
-        resolve();
-      }
-    });
-  });
-}
+import {ThemeService} from './service/theme.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAppInitializer(() => {
-      initAuthService(inject(AuthService), inject(Router));
+      inject(ThemeService);
+      inject(AuthService);
     }),
     provideExperimentalZonelessChangeDetection(),
     provideRouter(routes),
