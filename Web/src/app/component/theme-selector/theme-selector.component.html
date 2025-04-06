@@ -1,14 +1,12 @@
-<p-button
-  variant="text"
-  styleClass="h-6 w-6"
-  class="rounded"
+<button
+  class="h-6 w-6 rounded cursor-pointer"
   (click)="toggleTheme()"
 >
-  <span class="text-xl">
+  <span class="text-xl hover:text-2xl">
     @if (!isDarkTheme()) {
       🌞
     } @else {
       🌚
     }
   </span>
-</p-button>
+</button>
