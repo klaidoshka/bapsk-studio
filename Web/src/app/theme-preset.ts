@@ -18,9 +18,6 @@ export const ThemePreset = definePreset(Aura, {
     },
     colorScheme: {
       light: {
-        formField: {
-          hoverBorderColor: '{primary.color}'
-        },
         primary: {
           color: '{zinc.950}',
           inverseColor: '#ffffff',
@@ -35,9 +32,6 @@ export const ThemePreset = definePreset(Aura, {
         }
       },
       dark: {
-        formField: {
-          hoverBorderColor: '{primary.color}'
-        },
         primary: {
           color: '{zinc.50}',
           inverseColor: '{zinc.950}',
