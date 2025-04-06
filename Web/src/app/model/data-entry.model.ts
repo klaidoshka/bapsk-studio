@@ -11,8 +11,9 @@ export default interface DataEntry {
   modifiedById: number;
 }
 
-export interface DataEntryWithUsers extends DataEntry {
+export interface DataEntryJoined extends DataEntry {
   createdBy: UserIdentity;
+  display: () => string;
   modifiedBy: UserIdentity;
 }
 

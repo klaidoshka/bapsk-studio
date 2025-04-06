@@ -24,6 +24,7 @@ public class CheckFieldHandler() : FieldHandler(FieldType.Check)
             {
                 JsonValueKind.True => true,
                 JsonValueKind.False => false,
+                JsonValueKind.String => ToBoolean(jsonElement.GetString()!),
                 _ => null
             },
             string stringValue => Boolean.TryParse(stringValue, out var candidate)

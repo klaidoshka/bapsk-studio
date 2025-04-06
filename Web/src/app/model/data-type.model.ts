@@ -2,6 +2,7 @@ import DataTypeField, {DataTypeFieldCreateRequest, DataTypeFieldEditRequest} fro
 
 export default interface DataType {
   description: string | null;
+  displayFieldId?: number;
   fields: DataTypeField[];
   id: number;
   instanceId: number;
@@ -18,6 +19,7 @@ export interface DataTypeCreateRequest {
 export interface DataTypeEditRequest {
   description: string | null;
   dataTypeId: number;
+  displayFieldIndex?: number;
   fields: DataTypeFieldEditRequest[];
   name: string;
 }

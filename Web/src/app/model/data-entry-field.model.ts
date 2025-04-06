@@ -2,7 +2,6 @@ export default interface DataEntryField {
   dataEntryId: number;
   dataTypeFieldId: number;
   id: number;
-  name: string;
   value: string;
 }
 

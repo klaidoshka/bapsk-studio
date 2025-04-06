@@ -1,4 +1,4 @@
-import {Component, input, OnInit, Signal, signal} from '@angular/core';
+import {Component, Signal, signal} from '@angular/core';
 import {AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {DataTypeService} from '../../service/data-type.service';
 import {TextService} from '../../service/text.service';
@@ -18,6 +18,9 @@ import {Select} from 'primeng/select';
 import {DatePicker} from 'primeng/datepicker';
 import {LocalizationService} from '../../service/localization.service';
 import {IsoCountryCode} from '../../model/iso-country.model';
+import {DataEntryService} from '../../service/data-entry.service';
+import Option from '../../model/options.model';
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'app-data-type-management',
@@ -32,22 +35,27 @@ import {IsoCountryCode} from '../../model/iso-country.model';
     Checkbox,
     Select,
     FormsModule,
-    DatePicker
+    DatePicker,
+    NgIf
   ],
   templateUrl: './data-type-management.component.html',
   styles: ``
 })
-export class DataTypeManagementComponent implements OnInit {
-  dataType = signal<DataType | null>(null);
+export class DataTypeManagementComponent {
+  dataType = signal<DataType | undefined>(undefined);
+  displayFields = signal<Option<number | undefined>[]>([{
+    label: 'Id',
+    value: undefined
+  }]);
   FieldType = FieldType;
   fieldTypes = fieldTypes;
   form!: FormGroup;
   instanceId!: Signal<number | undefined>;
   isShown = signal<boolean>(false);
-  isShownInitially = input<boolean>(false);
   messages = signal<Messages>({});
 
   constructor(
+    private dataEntryService: DataEntryService,
     private dataTypeService: DataTypeService,
     private localizationService: LocalizationService,
     private formBuilder: FormBuilder,
@@ -58,47 +66,44 @@ export class DataTypeManagementComponent implements OnInit {
     this.form = this.createForm();
   }
 
-  ngOnInit() {
-    this.isShown.set(this.isShownInitially());
-  }
-
   get formFields() {
     return this.form.get("fields") as FormArray<FormGroup>;
   }
 
-  private readonly createForm = () => {
+  private readonly createForm = (dataType?: DataType) => {
+    this.displayFields.set(this.displayFields().slice(0, 1));
+
+    let displayFieldIndex = dataType?.fields.findIndex(it => it.id == dataType?.displayFieldId);
+
+    if (displayFieldIndex === -1) {
+      displayFieldIndex = undefined;
+    }
+
     return this.formBuilder.group({
-      name: ["", Validators.required],
-      description: ["No description set."],
+      name: [dataType?.name || '', Validators.required],
+      description: [dataType?.description || 'No description set.'],
+      displayField: [displayFieldIndex],
       fields: this.formBuilder.array([], {
         validators: (controls: AbstractControl<any, any>) => {
           const fields = controls.value as FormGroup[];
-
-          if (fields.length === 0) {
-            return {noFields: true};
-          }
-
-          return null;
+          return fields.length === 0 ? {noFields: true} : null;
         }
       })
     });
   }
 
-  readonly addField = (field: DataTypeField | null) => {
-    if (field) {
-      this.formFields.push(this.formBuilder.group({
-        name: [field.name, Validators.required],
-        type: [field.type, Validators.required],
-        defaultValue: [field.defaultValue],
-        isRequired: [field.isRequired, Validators.required]
-      }));
-    } else {
-      this.formFields.push(this.formBuilder.group({
-        name: ["", Validators.required],
-        type: [FieldType.Text, Validators.required],
-        defaultValue: [""],
-        isRequired: [true, Validators.required]
-      }));
+  readonly addField = (field?: DataTypeField) => {
+    this.formFields.push(this.formBuilder.group({
+      name: [field?.name || '', Validators.required],
+      type: [field?.type || FieldType.Text, Validators.required],
+      defaultValue: [field?.defaultValue || ''],
+      isRequired: [field?.isRequired || true, Validators.required]
+    }));
+    if (this.dataType()) {
+      this.displayFields.set([...this.displayFields(), {
+        label: field?.name || `Field ${this.formFields.length}`,
+        value: this.formFields.length - 1
+      }]);
     }
     this.formFields.markAsTouched();
     this.formFields.markAsDirty();
@@ -132,23 +137,31 @@ export class DataTypeManagementComponent implements OnInit {
 
   readonly removeField = (index: number) => {
     this.formFields.removeAt(index);
+    if (this.dataType()) {
+      this.displayFields.set(this.displayFields().filter(it => it.value != index));
+    }
     this.formFields.markAsTouched();
     this.formFields.markAsDirty();
   }
 
   private readonly create = (request: DataTypeCreateRequest) => {
     this.dataTypeService.create(request).pipe(first()).subscribe({
-      next: () => this.messages.set({success: ["DataType has been created successfully."]}),
+      next: () => this.onSuccess("DataType has been created successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   private readonly edit = (request: DataTypeEditRequest) => {
     this.dataTypeService.edit(request).pipe(first()).subscribe({
-      next: () => this.messages.set({success: ["Instance has been edited successfully."]}),
+      next: () => {
+        this.onSuccess("DataType has been edited successfully.");
+        this.dataEntryService.getAll(request.dataTypeId).subscribe();
+      },
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
+
+  private readonly onSuccess = (message: string) => this.messages.set({success: [message]});
 
   readonly getErrorMessage = (field: string): string | null => {
     const control = this.form.get(field);
@@ -194,6 +207,7 @@ export class DataTypeManagementComponent implements OnInit {
       this.edit({
         name: this.form.value.name,
         description: this.form.value.description,
+        displayFieldIndex: this.form.value.displayField,
         dataTypeId: this.dataType()!.id!,
         fields: updatedFields
       });
@@ -207,18 +221,12 @@ export class DataTypeManagementComponent implements OnInit {
     }
   }
 
-  readonly show = (dataType: DataType | null) => {
-    this.form = this.createForm();
+  readonly show = (dataType?: DataType) => {
     this.dataType.set(dataType);
-
-    if (dataType) {
-      this.form.patchValue({...dataType});
-      dataType.fields?.forEach(field => {
-        this.addField(field);
-      });
-    }
-
-    this.dataType.set(dataType);
+    this.form = this.createForm(dataType);
+    dataType?.fields?.forEach(field => {
+      this.addField(field);
+    });
     this.isShown.set(true);
   }
 }

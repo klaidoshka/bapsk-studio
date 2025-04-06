@@ -5,6 +5,7 @@ import {AuthResponse, LoginRequest, RegisterRequest} from "../model/auth.model";
 import {User} from "../model/user.model";
 import {ApiRouter} from "./api-router.service";
 import {UserService} from './user.service';
+import {Router} from "@angular/router";
 
 @Injectable({
   providedIn: "root"
@@ -20,12 +21,29 @@ export class AuthService {
   constructor(
     private apiRouter: ApiRouter,
     private httpClient: HttpClient,
+    private router: Router,
     private userService: UserService
   ) {
     this.access = signal<AuthResponse | null>(this.getAccess());
     this.user = this.toUser();
     this.userAuthenticated = computed(() => this.access() !== null);
     this.userSessionId = computed(() => this.access()?.sessionId);
+
+    if (!this.isAuthenticated()()) {
+      return;
+    }
+
+    this.renewAccess().subscribe({
+      next: (response) => {
+        this.acceptAuthResponse(response);
+      },
+      error: (response) => {
+        if (response.status === 401) {
+          this.cleanupCredentials();
+          router.navigate(["/auth/login"]);
+        }
+      }
+    });
   }
 
   readonly acceptAuthResponse = (response: AuthResponse): void => {

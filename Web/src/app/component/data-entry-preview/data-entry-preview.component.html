@@ -1,5 +1,5 @@
 <p-dialog
-  *ngIf="dataEntry() != null"
+  *ngIf="dataTypeEntry() !== undefined"
   header="Data Entry Preview"
   closable="true"
   closeOnEscape="true"
@@ -12,27 +12,27 @@
   <div class="flex flex-wrap">
     <div class="w-1/2">
       <p class="font-bold">Created At</p>
-      <p>{{ dataEntry()!.createdAt | date:'short' }}</p>
+      <p>{{ dataTypeEntry()!.dataEntry!.createdAt | date:'short' }}</p>
     </div>
     <div class="w-1/2">
       <p class="font-bold">Created By</p>
-      <p>{{ toUserIdentityFullName(dataEntry()!.createdBy) }}</p>
+      <p>{{ toUserIdentityFullName(dataTypeEntry()!.dataEntry!.createdBy) }}</p>
     </div>
     <div class="w-1/2 mt-4">
       <p class="font-bold">Modified At</p>
-      <p>{{ dataEntry()!.modifiedAt | date:'short' }}</p>
+      <p>{{ dataTypeEntry()!.dataEntry!.modifiedAt | date:'short' }}</p>
     </div>
     <div class="w-1/2 mt-4">
       <p class="font-bold">Modified By</p>
-      <p>{{ toUserIdentityFullName(dataEntry()!.modifiedBy) }}</p>
+      <p>{{ toUserIdentityFullName(dataTypeEntry()!.dataEntry!.modifiedBy) }}</p>
     </div>
   </div>
 
   <p class="font-bold mt-4">Values</p>
 
   <p-table
-    [columns]="dataEntry()!.fields || []"
-    [value]="[dataEntry()]"
+    [columns]="dataTypeEntry()!.dataType!.fields || []"
+    [value]="[dataTypeEntry()!.dataEntry.fields]"
   >
     <ng-template
       #header
@@ -45,9 +45,12 @@
       </tr>
     </ng-template>
 
-    <ng-template #body>
+    <ng-template
+      #body
+      let-fields
+    >
       <tr>
-        @for (field of dataEntry()!.fields; track field.id) {
+        @for (field of fields; track field.id) {
           <td>{{ field.value }}</td>
         }
       </tr>

@@ -111,8 +111,7 @@ public class DataEntryService : IDataEntryService
         {
             if (requestFieldsById.TryGetValue(field.Id, out var requestField))
             {
-                field.Value =
-                    _fieldTypeService.Serialize(field.DataTypeField.Type, requestField.Value);
+                field.Value = _fieldTypeService.Serialize(field.DataTypeField.Type, requestField.Value);
             }
             else
             {
@@ -130,30 +129,12 @@ public class DataEntryService : IDataEntryService
     {
         (await _dataEntryValidator.ValidateDataEntryGetRequestAsync(request)).AssertValid();
 
-        var candidate = await _database.DataEntries
+        return await _database.DataEntries
             .Include(de => de.Fields)
             .ThenInclude(f => f.DataTypeField)
             .Include(de => de.DataType)
             .ThenInclude(dt => dt.Fields)
             .FirstAsync(de => de.Id == request.DataEntryId);
-
-        var fieldsById = candidate.Fields.ToDictionary(f => f.DataTypeFieldId);
-
-        foreach (var field in candidate.DataType.Fields)
-        {
-            if (!fieldsById.ContainsKey(field.Id))
-            {
-                candidate.Fields.Add(
-                    new DataEntryField
-                    {
-                        DataTypeField = field,
-                        Value = field.DefaultValue ?? String.Empty
-                    }
-                );
-            }
-        }
-
-        return candidate;
     }
 
     public async Task<IEnumerable<DataEntry>> GetByDataTypeIdAsync(

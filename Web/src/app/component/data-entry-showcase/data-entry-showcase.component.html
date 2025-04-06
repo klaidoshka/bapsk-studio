@@ -51,7 +51,7 @@
           }
           <td>{{ dataEntry.createdAt | date:'short' }}</td>
           <td>{{ dataEntry.modifiedAt | date:'short' }}</td>
-          <td>{{ dataEntry.modifiedBy && toUserIdentityFullName(dataEntry.modifiedBy) }}</td>
+          <td>{{ toUserIdentityFullName(dataEntry.modifiedBy) }}</td>
           <td class="flex flex-nowrap items-center">
             <p-button
               icon="pi pi-eye"

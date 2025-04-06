@@ -5,7 +5,7 @@ import {MessagesShowcaseComponent} from "../messages-showcase/messages-showcase.
 import {TableModule} from "primeng/table";
 import Messages from '../../model/messages.model';
 import {DataEntryPreviewComponent} from '../data-entry-preview/data-entry-preview.component';
-import DataEntry, {DataEntryWithUsers} from '../../model/data-entry.model';
+import DataEntry, {DataEntryJoined} from '../../model/data-entry.model';
 import {DataEntryService} from '../../service/data-entry.service';
 import {DataEntryManagementComponent} from '../data-entry-management/data-entry-management.component';
 import {first} from 'rxjs';
@@ -34,7 +34,7 @@ export class DataEntryShowcaseComponent {
   protected readonly toUserIdentityFullName = toUserIdentityFullName;
 
   confirmationComponent = viewChild.required(ConfirmationComponent);
-  dataEntries = input.required<DataEntryWithUsers[]>();
+  dataEntries = input.required<DataEntryJoined[]>();
   dataType = input.required<DataType>();
   managementMenu = viewChild.required(DataEntryManagementComponent);
   messages = signal<Messages>({});
@@ -50,8 +50,8 @@ export class DataEntryShowcaseComponent {
     this.managementMenu().show(dataEntry);
   }
 
-  readonly showPreview = (dataEntry: DataEntryWithUsers) => {
-    this.previewMenu().show(dataEntry);
+  readonly showPreview = (dataEntry: DataEntryJoined) => {
+    this.previewMenu().show(this.dataType(), dataEntry);
   }
 
   readonly delete = (dataEntry: DataEntry) => {

@@ -3,10 +3,7 @@ import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} fr
 import {DataEntryService} from '../../service/data-entry.service';
 import {InstanceService} from '../../service/instance.service';
 import {TextService} from '../../service/text.service';
-import DataEntry, {
-  DataEntryCreateRequest,
-  DataEntryEditRequest
-} from '../../model/data-entry.model';
+import DataEntry, {DataEntryCreateRequest, DataEntryEditRequest} from '../../model/data-entry.model';
 import Messages from '../../model/messages.model';
 import {first} from 'rxjs';
 import {Button} from 'primeng/button';
@@ -16,10 +13,7 @@ import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.
 import DataType from '../../model/data-type.model';
 import {FieldType} from '../../model/data-type-field.model';
 import {Checkbox} from 'primeng/checkbox';
-import {
-  DataEntryFieldCreateRequest,
-  DataEntryFieldEditRequest
-} from '../../model/data-entry-field.model';
+import {DataEntryFieldCreateRequest, DataEntryFieldEditRequest} from '../../model/data-entry-field.model';
 import {DatePicker} from 'primeng/datepicker';
 import {LocalizationService} from '../../service/localization.service';
 
@@ -65,14 +59,12 @@ export class DataEntryManagementComponent implements OnInit {
   private readonly createForm = (dataType: DataType, dataEntry: DataEntry | null = null): FormGroup => {
     const formGroup = this.formBuilder.group({});
 
-    dataType.fields?.forEach(field => {
+    dataType.fields?.forEach(tf => {
       formGroup.addControl(
-        field.name,
+        tf.name,
         this.formBuilder.control(
-          dataEntry?.fields?.find(f => f.name === field.name)?.value ||
-          field.defaultValue ||
-          '',
-          field.isRequired ? Validators.required : null
+          dataEntry?.fields?.find(ef => ef.dataTypeFieldId === tf.id)?.value || tf.defaultValue || '',
+          tf.isRequired ? Validators.required : null
         )
       );
     });
@@ -89,7 +81,7 @@ export class DataEntryManagementComponent implements OnInit {
 
   private readonly edit = (request: DataEntryEditRequest) => {
     this.dataEntryService.edit(request).pipe(first()).subscribe({
-      next: () => this.messages.set({success: ["Instance has been edited successfully."]}),
+      next: () => this.messages.set({success: ["DataEntry has been edited successfully."]}),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
@@ -97,11 +89,12 @@ export class DataEntryManagementComponent implements OnInit {
   get formFields() {
     return Object.keys(this.form.controls).map(key => {
         const control = this.form.get(key)!;
-        const type = this.dataType()?.fields?.find(f => f.name === key)?.type;
+        const dataTypeField = this.dataType()?.fields?.find(f => f.name === key);
         return {
           control: control as FormControl<any>,
           field: key,
-          type: type || FieldType.Text
+          dataTypeFieldId: dataTypeField?.id,
+          type: dataTypeField?.type || FieldType.Text
         };
       }
     );
@@ -133,13 +126,11 @@ export class DataEntryManagementComponent implements OnInit {
 
     if (this.dataEntry() != null) {
       const fields: DataEntryFieldEditRequest[] = this.formFields.map(field => {
-        const candidate = this.dataEntry()!!.fields?.find(f => f.name === field.field);
+        const candidate = this.dataEntry()!!.fields?.find(f => f.dataTypeFieldId === field.dataTypeFieldId);
 
         return {
           dataEntryFieldId: candidate!!.id!!,
-          value: field.control?.value ||
-            this.dataType()!!.fields?.find(f => f.name === field.field)?.defaultValue ||
-            ''
+          value: field.control?.value || this.dataType()!!.fields?.find(f => f.name === field.field)?.defaultValue || ''
         };
       });
 
@@ -152,9 +143,7 @@ export class DataEntryManagementComponent implements OnInit {
       const fields: DataEntryFieldCreateRequest[] = this.dataType()!!.fields?.map((field, _) => {
         return {
           dataTypeFieldId: field.id,
-          value: this.formFields.find(f => f.field === field.name)?.control?.value ||
-            field.defaultValue ||
-            ''
+          value: this.formFields.find(f => f.field === field.name)?.control?.value || field.defaultValue || ''
         };
       }) || [];
 
