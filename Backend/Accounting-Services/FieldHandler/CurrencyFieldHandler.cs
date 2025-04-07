@@ -5,7 +5,7 @@ using Accounting.Contract.Entity;
 
 namespace Accounting.Services.FieldHandler;
 
-public class NumberFieldHandler() : FieldHandler(FieldType.Number)
+public class CurrencyFieldHandler() : FieldHandler(FieldType.Currency)
 {
     public override object Deserialize(string value)
     {
@@ -32,9 +32,14 @@ public class NumberFieldHandler() : FieldHandler(FieldType.Number)
             _ => null
         };
 
-        return result ?? throw new InvalidOperationException(
-            $"Value {value} cannot be deserialized to a decimal."
-        );
+        if (result is null)
+        {
+            throw new InvalidOperationException(
+                $"Value {value} cannot be deserialized to a currency."
+            );
+        }
+        
+        return Math.Round(result.Value, 2);
     }
 
     public override Validation Validate(JsonElement value)
