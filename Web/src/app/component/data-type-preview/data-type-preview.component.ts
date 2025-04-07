@@ -1,45 +1,58 @@
-import {Component, input, OnInit, signal} from '@angular/core';
+import {Component, computed, Signal, signal} from '@angular/core';
 import DataType from '../../model/data-type.model';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {TableModule} from 'primeng/table';
-import {FieldType, fieldTypes} from '../../model/data-type-field.model';
+import DataTypeField, {FieldType, toFieldTypeLabel} from '../../model/data-type-field.model';
+import {DataTypeService} from '../../service/data-type.service';
+import {InstanceService} from '../../service/instance.service';
+import {NgClass, NgIf} from '@angular/common';
+import {DataTypeEntryFieldDisplayComponent} from '../data-type-entry-field-display/data-type-entry-field-display.component';
 
 @Component({
   selector: 'app-data-type-preview',
   imports: [
     Button,
     Dialog,
-    TableModule
+    TableModule,
+    NgClass,
+    DataTypeEntryFieldDisplayComponent,
+    NgIf
   ],
   templateUrl: './data-type-preview.component.html',
   styles: ``
 })
-export class DataTypePreviewComponent implements OnInit {
-  dataType = signal<DataType | null>(null);
-  isShown = signal<boolean>(false);
-  isShownInitially = input<boolean>(false);
+export class DataTypePreviewComponent {
+  protected readonly FieldType = FieldType;
 
-  ngOnInit() {
-    this.isShown.set(this.isShownInitially());
+  dataType = signal<DataType | undefined>(undefined);
+  dataTypes!: Signal<DataType[]>;
+  isShown = signal<boolean>(false);
+
+  constructor(
+    dataTypeService: DataTypeService,
+    instanceService: InstanceService
+  ) {
+    this.dataTypes = computed(() => {
+      const instanceId = instanceService.getActiveInstanceId()();
+      return instanceId ? dataTypeService.getAsSignal(instanceId)()! : [];
+    });
   }
 
-  readonly getFieldTypeLabel = (type: FieldType) => {
-    const enumKey = Object
-    .keys(FieldType)
-    .find(t => t.toString().toLowerCase() === type.toString().toLowerCase());
+  protected readonly toFieldTypeLabel = toFieldTypeLabel;
 
-    const enumValue = FieldType[enumKey as keyof typeof FieldType];
+  readonly getDisplayFieldName = () => this.dataType()?.fields?.find(it => it.id === this.dataType()?.displayFieldId)?.name || 'Id';
 
-    return fieldTypes.find(t => t.value === enumValue)?.label;
+  readonly getReferencedDataTypeName = (field: DataTypeField) => {
+    return this.dataTypes().find(it => it.id === field.referenceId)!.name;
   }
 
   readonly hide = () => {
     this.isShown.set(false);
-    this.dataType.set(null);
+    this.dataType.set(undefined);
   }
 
-  readonly show = (dataType: DataType | null) => {
+  readonly show = (dataType: DataType) => {
     this.dataType.set(dataType);
     this.isShown.set(true);
   }

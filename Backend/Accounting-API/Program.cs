@@ -28,26 +28,23 @@ builder.Services.AddDbContext(databaseOptions);
 builder.Services.AddSingleton<ExceptionHandlingMiddleware>();
 builder.Services.AddSingleton<UserIdExtractorMiddleware>();
 builder.Services.AddScoped<CheckFieldHandler>();
+builder.Services.AddScoped<CurrencyFieldHandler>();
 builder.Services.AddScoped<DateFieldHandler>();
-builder.Services.AddScoped<NumberFieldHandler>();
-builder.Services.AddScoped<TextFieldHandler>();
-builder.Services.AddScoped<ReferenceFieldHandler>();
 builder.Services.AddScoped<IsoCountryCodeFieldHandler>();
-builder.Services.AddScoped<IdentityDocumentTypeFieldHandler>();
-builder.Services.AddScoped<UnitOfMeasureTypeFieldHandler>();
+builder.Services.AddScoped<NumberFieldHandler>();
+builder.Services.AddScoped<ReferenceFieldHandler>();
+builder.Services.AddScoped<TextFieldHandler>();
 
 builder.Services.AddScoped<Dictionary<FieldType, FieldHandler>>(
     provider => new Dictionary<FieldType, FieldHandler>
     {
         [FieldType.Check] = provider.GetRequiredService<CheckFieldHandler>(),
+        [FieldType.Currency] = provider.GetRequiredService<CurrencyFieldHandler>(),
         [FieldType.Date] = provider.GetRequiredService<DateFieldHandler>(),
-        [FieldType.Number] = provider.GetRequiredService<NumberFieldHandler>(),
-        [FieldType.Text] = provider.GetRequiredService<TextFieldHandler>(),
-        [FieldType.Reference] = provider.GetRequiredService<ReferenceFieldHandler>(),
         [FieldType.IsoCountryCode] = provider.GetRequiredService<IsoCountryCodeFieldHandler>(),
-        [FieldType.IdentityDocumentType] = provider.GetRequiredService<
-            IdentityDocumentTypeFieldHandler>(),
-        [FieldType.UnitOfMeasureType] = provider.GetRequiredService<UnitOfMeasureTypeFieldHandler>()
+        [FieldType.Number] = provider.GetRequiredService<NumberFieldHandler>(),
+        [FieldType.Reference] = provider.GetRequiredService<ReferenceFieldHandler>(),
+        [FieldType.Text] = provider.GetRequiredService<TextFieldHandler>()
     }
 );
 

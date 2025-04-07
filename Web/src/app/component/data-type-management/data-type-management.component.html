@@ -92,81 +92,58 @@
 
           <tbody class="p-datatable-tbody">
             @for (field of formFields.controls; let i = $index; track i) {
+              @let fieldType = getFieldType(i);
+              @let isReference = fieldType === FieldType.Reference;
+
               <tr [formGroup]="field">
                 <td>
                   <input
-                    formControlName="name"
-                    pInputText
-                    type="text"
-                    class="w-full"
+                    formControlName="name" pInputText type="text"
+                    class="w-full" [class]="{'mt-7': isReference}"
                   />
                 </td>
 
                 <td>
                   <p-select
                     formControlName="type"
-                    [options]="fieldTypes"
-                    optionLabel="label"
-                    optionValue="value"
-                    placeholder="Select a type"
-                    appendTo="body"
-                    styleClass="w-full"
-                    (onChange)="updateDefaultValue(i, $event.value)"
-                  ></p-select>
+                    [options]="fieldTypes" optionLabel="label" optionValue="value"
+                    placeholder="Select a type" appendTo="body" styleClass="w-full"
+                    [class]="{'mt-7': isReference}"
+                  />
                 </td>
 
                 <td>
-                  @switch (getFieldType(i)) {
-                    @case (FieldType.Check) {
-                      <p-check-box
-                        formControlName="defaultValue"
-                        binary="true"
-                        class="w-full"
-                      ></p-check-box>
-                    }
-                    @case (FieldType.Date) {
-                      <p-datepicker
-                        formControlName="defaultValue"
-                        hideOnDateTimeSelect="true"
-                        styleClass="w-full"
-                        appendTo="body"
-                        [showTime]="true"
-                        [showIcon]="true"
-                      ></p-datepicker>
-                    }
-                    @case (FieldType.Number) {
-                      <input
-                        formControlName="defaultValue"
-                        pInputText
-                        type="number"
-                        class="w-full"
+                  @if (isReference) {
+                    <div class="flex flex-col">
+                      <label for="referencedType" class="font-semibold">Referenced Type</label>
+                      <p-select
+                        id="referencedType"
+                        placeholder="Select referenced type"
+                        formControlName="referencedType" [options]="dataTypes()"
+                        optionLabel="name" optionValue="id" appendTo="body"
+                        class="mt-1 w-full"
                       />
-                    }
-                    @default {
-                      <input
-                        formControlName="defaultValue"
-                        pInputText
-                        type="text"
-                        class="w-full"
-                      />
-                    }
+                    </div>
+                  } @else {
+                    <app-data-type-entry-field-input
+                      formControlName="defaultValue" [type]="fieldType"
+                    />
                   }
                 </td>
 
                 <td>
                   <p-checkbox
-                    formControlName="isRequired"
-                    binary="true"
-                  ></p-checkbox>
+                    formControlName="isRequired" binary
+                    [styleClass]="isReference ? 'mt-7' : ''"
+                  />
                 </td>
 
                 <td>
                   <p-button
-                    icon="pi pi-trash"
-                    type="button"
-                    variant="text"
-                    (onClick)="removeField(i)"
-                  ></p-button>
+                    icon="pi pi-trash" type="button"
+                    variant="text" (onClick)="removeField(i)"
+                    [styleClass]="isReference ? 'mt-7' : ''"
+                  />
                 </td>
               </tr>
             }
@@ -189,7 +166,7 @@
     <div class="flex justify-end mt-4">
       <p-button
         [label]="dataType() === undefined ? 'Create' : 'Save'"
-        [disabled]="!form.valid || !form.dirty"
+        [disabled]="form.invalid || !form.dirty"
         (onClick)="save()"
       ></p-button>
     </div>

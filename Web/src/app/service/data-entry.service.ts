@@ -6,6 +6,9 @@ import DataEntry, {DataEntryCreateRequest, DataEntryEditRequest, DataEntryJoined
 import {DateUtil} from '../util/date.util';
 import {UserService} from './user.service';
 import {DataTypeService} from './data-type.service';
+import DataEntryField from '../model/data-entry-field.model';
+import {FieldType} from '../model/data-type-field.model';
+import {FieldTypeUtil} from '../util/field-type.util';
 
 @Injectable({
   providedIn: 'root'
@@ -42,7 +45,23 @@ export class DataEntryService {
   }
 
   readonly create = (request: DataEntryCreateRequest): Observable<DataEntry> => {
-    return this.httpClient.post<DataEntry>(this.apiRouter.dataEntryCreate(), request).pipe(
+    const dataType = this.dataTypeService.getByIdAsSignal(request.dataTypeId)()!;
+
+    return this.httpClient.post<DataEntry>(this.apiRouter.dataEntryCreate(), ({
+      ...request,
+      fields: request.fields.map(it => {
+        const dataTypeField = dataType.fields.find(field => field.id === it.dataTypeFieldId)!;
+
+        if (dataTypeField.type === FieldType.Date) {
+          return {
+            ...it,
+            value: it.value.toISOString()
+          }
+        }
+
+        return it;
+      })
+    }) as DataEntryCreateRequest).pipe(
       tap(dataEntry => {
         const existingSignal = this.store.get(request.dataTypeId);
 
@@ -68,7 +87,23 @@ export class DataEntryService {
   }
 
   readonly edit = (request: DataEntryEditRequest): Observable<void> => {
-    return this.httpClient.put<void>(this.apiRouter.dataEntryEdit(request.dataEntryId), request).pipe(
+    const dataType = this.dataTypeService.getByIdAsSignal(request.dataTypeId)()!;
+
+    return this.httpClient.put<void>(this.apiRouter.dataEntryEdit(request.dataEntryId), ({
+      ...request,
+      fields: request.fields.map(it => {
+        const dataTypeField = dataType.fields.find(field => field.id === it.dataTypeFieldId)!;
+
+        if (dataTypeField.type === FieldType.Date) {
+          return {
+            ...it,
+            value: it.value.toISOString()
+          }
+        }
+
+        return it;
+      })
+    }) as DataEntryEditRequest).pipe(
       tap(() => this.get(request.dataEntryId).pipe(first()).subscribe())
     );
   }
@@ -152,6 +187,22 @@ export class DataEntryService {
       ...dataEntry,
       createdAt: DateUtil.adjustToLocalDate(dataEntry.createdAt),
       modifiedAt: DateUtil.adjustToLocalDate(dataEntry.modifiedAt),
+      fields: dataEntry.fields.map(it => this.updateFieldProperty(it, dataEntry.dataTypeId)),
+    }
+  }
+
+  readonly updateFieldProperty = (field: DataEntryField, dataTypeId: number): DataEntryField => {
+    const dataTypeField = this.dataTypeService
+    .getByIdAsSignal(dataTypeId)()?.fields
+    ?.find(it => it.id === field.dataTypeFieldId);
+
+    if (!dataTypeField) {
+      return field;
+    }
+
+    return {
+      ...field,
+      value: FieldTypeUtil.updateValue(field.value, dataTypeField.type)
     }
   }
 }

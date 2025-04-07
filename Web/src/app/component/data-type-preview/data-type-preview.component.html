@@ -1,4 +1,5 @@
 <p-dialog
+  *ngIf="dataType() !== undefined"
   header="Data Type Preview"
   closable="true"
   closeOnEscape="true"
@@ -9,13 +10,16 @@
   [(visible)]="isShown"
 >
   <p class="font-bold">Name</p>
-  <p>{{ dataType()?.name }}</p>
+  <p>{{ dataType()!.name }}</p>
+
+  <p class="font-bold mt-4">Display Field</p>
+  <p>{{ getDisplayFieldName() }}</p>
 
   <p class="font-bold mt-4">Description</p>
-  <p>{{ dataType()?.description }}</p>
+  <p>{{ dataType()!.description }}</p>
 
   <p class="font-bold mt-4">Fields</p>
-  <p-table [value]="dataType()?.fields || []">
+  <p-table [value]="dataType()!.fields || []">
     <ng-template pTemplate="header">
       <tr>
         <th>Name</th>
@@ -29,17 +33,31 @@
       pTemplate="body"
       let-field
     >
+      @let isReferenceField = field.type === FieldType.Reference;
+
       <tr>
-        <td>{{ field.name }}</td>
-        <td>{{ getFieldTypeLabel(field.type) }}</td>
+        <td><p [ngClass]="{'mt-7': isReferenceField}">{{ field.name }}</p></td>
+        <td><p [ngClass]="{'mt-7': isReferenceField}">{{ toFieldTypeLabel(field.type) }}</p></td>
         <td>
-          @if (field.isRequired) {
-            <p class="text-green-500">Yes</p>
+          <p
+            [ngClass]="{
+            'mt-7': isReferenceField,
+            'text-green-500': field.isRequired,
+            'text-red-500': !field.isRequired}"
+          >
+            {{ field.isRequired ? 'Yes' : 'No' }}
+          </p>
+        </td>
+        <td>
+          @if (isReferenceField) {
+            <div class="flex flex-col gap-1">
+              <label class="font-semibold">Referenced Type</label>
+              {{ getReferencedDataTypeName(field) }}
+            </div>
           } @else {
-            <p class="text-red-500">No</p>
+            <app-data-type-entry-field-display [dataType]="dataType()!" [value]="field.defaultValue" [dataTypeFieldId]="field.id"/>
           }
         </td>
-        <td>{{ field.defaultValue }}</td>
       </tr>
     </ng-template>
   </p-table>

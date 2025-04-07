@@ -1,5 +1,6 @@
 using Accounting.Contract;
 using Accounting.Contract.Dto.DataType;
+using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Accounting.Services.Util;
@@ -54,6 +55,7 @@ public class DataTypeService : IDataTypeService
                         : _fieldTypeService.Serialize(field.Type, field.DefaultValue),
                     IsRequired = field.IsRequired,
                     Name = field.Name,
+                    ReferenceId = field.Type == FieldType.Reference ? field.ReferenceId : null,
                     Type = field.Type
                 }
             );
@@ -116,6 +118,7 @@ public class DataTypeService : IDataTypeService
 
             field.Matched.IsRequired = field.New.IsRequired;
             field.Matched.Name = field.New.Name;
+            field.Matched.ReferenceId = field.New.Type == FieldType.Reference ? field.New.ReferenceId : null;
             field.Matched.Type = field.New.Type;
         }
 
@@ -141,6 +144,7 @@ public class DataTypeService : IDataTypeService
                     DefaultValue = value,
                     IsRequired = field.IsRequired,
                     Name = field.Name,
+                    ReferenceId = field.Type == FieldType.Reference ? field.ReferenceId : null,
                     Type = field.Type
                 }
             )).Entity;

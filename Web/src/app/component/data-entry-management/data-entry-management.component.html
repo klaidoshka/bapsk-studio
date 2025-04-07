@@ -16,39 +16,25 @@
       [formGroup]="form"
     >
       @for (field of formFields; track $index) {
-        <div>
+        @let isReferenceField = field.type === FieldType.Reference;
+
+        <div class="flex flex-col gap-1">
           <label
             [for]="field.field"
             class="block text-sm font-medium"
           >{{ field.field }}</label>
 
-          @switch (field.type) {
-            @case (FieldType.Check) {
-              <p-check-box
-                [formControl]="field.control"
-                [id]="field.field"
-                binary="true"
-                class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              ></p-check-box>
-            }
-            @case (FieldType.Date) {
-              <p-datePicker
-                [formControl]="field.control"
-                [id]="field.field"
-                class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                appendTo="body"
-              ></p-datePicker>
-            }
-            @default {
-              <input
-                [formControl]="field.control"
-                pInputText
-                [defaultValue]="field.type === FieldType.Number ? 0 : ''"
-                [type]="field.type"
-                [id]="field.field"
-                class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-              />
-            }
+          @if (isReferenceField) {
+            <p-select
+              placeholder="Select referenced entry" [options]="getDataEntries(field.referenceId)()"
+              optionLabel="label" optionValue="id" appendTo="body" [formControl]="field.control"
+              class="w-full" [required]="field.isRequired!"
+            />
+          }
+          @else {
+            <app-data-type-entry-field-input
+              [formControl]="field.control" [type]="field.type" [required]="field.isRequired!"
+            />
           }
 
           @if (getErrorMessage(field.field); as error) {
@@ -60,8 +46,8 @@
 
     <div class="flex justify-end mt-4">
       <p-button
-        [label]="dataEntry() == null ? 'Create' : 'Save'"
-        [disabled]="!form.valid || !form.dirty"
+        [label]="dataEntry() === undefined ? 'Create' : 'Save'"
+        [disabled]="form.invalid || !form.dirty"
         (onClick)="save()"
       ></p-button>
     </div>

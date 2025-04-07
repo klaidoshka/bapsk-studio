@@ -1,0 +1,67 @@
+@switch (type()) {
+  @case (FieldType.Check) {
+    <p-check-box
+      (input)="callOnChange()"
+      (blur)="markAsTouched()"
+      [(ngModel)]="value"
+      binary="true"
+    />
+  }
+  @case (FieldType.Currency) {
+    <p-input-number
+      (input)="callOnChange()"
+      (blur)="markAsTouched()"
+      [(ngModel)]="value"
+      currency="EUR"
+      mode="currency"
+      [min]="0"
+      [showButtons]="true"
+      [step]="0.05"
+      class="w-full"
+    />
+  }
+  @case (FieldType.Date) {
+    <p-datepicker
+      (input)="callOnChange()"
+      (blur)="markAsTouched()"
+      [(ngModel)]="value"
+      hideOnDateTimeSelect="true"
+      appendTo="body"
+      [showTime]="true"
+      [showIcon]="true"
+      [showClear]="true"
+      class="w-full"
+    />
+  }
+  @case (FieldType.IsoCountryCode) {
+    <p-select
+      (input)="callOnChange()"
+      (blur)="markAsTouched()"
+      [(ngModel)]="value"
+      [options]="IsoCountries"
+      optionLabel="name"
+      optionValue="code"
+      appendTo="body"
+      class="w-full"
+    />
+  }
+  @case (FieldType.Number) {
+    <p-input-number
+      (input)="callOnChange()"
+      (blur)="markAsTouched()"
+      [(ngModel)]="value"
+      class="w-full"
+      [showButtons]="true"
+    />
+  }
+  @default {
+    <input
+      (input)="callOnChange()"
+      (blur)="markAsTouched()"
+      [(ngModel)]="value"
+      pInputText
+      type="text"
+      class="w-full"
+    />
+  }
+}

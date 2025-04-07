@@ -14,9 +14,9 @@ public class FieldTypeValidator : IFieldTypeValidator
         _fieldHandlers = fieldHandlers;
     }
 
-    public Validation ValidateValue(DataTypeField field, JsonElement value)
+    public async Task<Validation> ValidateAsync(DataTypeField field, JsonElement value)
     {
-        var validation = ValidateValue(field.Type, value);
+        var validation = await ValidateAsync(field.Type, value);
 
         if (validation.IsValid)
         {
@@ -25,15 +25,15 @@ public class FieldTypeValidator : IFieldTypeValidator
 
         return new Validation(
             validation.FailureMessages
-                .Select(f => $"Field {field.Name}: {f}")
+                .Select(f => $"Field '{field.Name}': {f}")
                 .ToHashSet()
         );
     }
 
-    public Validation ValidateValue(FieldType type, JsonElement value)
+    public Task<Validation> ValidateAsync(FieldType type, JsonElement value)
     {
         return !_fieldHandlers.TryGetValue(type, out var handler)
-            ? new Validation($"Field type {type} is not supported.")
-            : handler.Validate(value);
+            ? Task.FromResult(new Validation($"Field type {type} is not supported."))
+            : handler.ValidateAsync(value);
     }
 }

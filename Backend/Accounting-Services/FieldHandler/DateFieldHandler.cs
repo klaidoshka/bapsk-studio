@@ -78,17 +78,17 @@ public class DateFieldHandler() : FieldHandler(FieldType.Date)
         );
     }
 
-    public override Validation Validate(JsonElement value)
+    public override Task<Validation> ValidateAsync(JsonElement value)
     {
         try
         {
             ToDateTime(value);
 
-            return new Validation();
+            return Task.FromResult(new Validation());
         }
         catch (InvalidOperationException e)
         {
-            return new Validation(e.Message);
+            return Task.FromResult(new Validation(e.Message));
         }
     }
 }

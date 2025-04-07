@@ -1,10 +1,10 @@
 export default interface DataTypeField {
   dataTypeId: number;
-  defaultValue: string | null;
+  defaultValue?: any;
   id: number;
   isRequired: boolean;
   name: string;
-  referenceId: number | null;
+  referenceId?: number;
   type: FieldType;
 }
 
@@ -15,8 +15,7 @@ export enum FieldType {
   Text = 4,
   Reference = 5,
   IsoCountryCode = 6,
-  IdentityDocumentType = 7,
-  UnitOfMeasureType = 8
+  Currency = 7
 }
 
 export const fieldTypes = [
@@ -26,14 +25,21 @@ export const fieldTypes = [
   {label: 'Text', value: FieldType.Text},
   {label: 'Reference', value: FieldType.Reference},
   {label: 'Country', value: FieldType.IsoCountryCode},
-  {label: 'ID Type', value: FieldType.IdentityDocumentType},
-  {label: 'Unit of Measure Type', value: FieldType.UnitOfMeasureType}
-];
+  {label: 'Currency', value: FieldType.Currency}
+].sort((a, b) => a.label.localeCompare(b.label));
+
+export const toFieldTypeLabel = (type: FieldType): string => {
+  const label = fieldTypes.find(it => it.value === type)?.label;
+
+  if (!label) {
+    throw new Error(`Field type ${type} not found while searching label`);
+  }
+
+  return label;
+}
 
 export interface DataTypeFieldCreateRequest {
-  dataTypeId: number;
   defaultValue: any;
-  instanceId: number;
   isRequired: boolean;
   name: string;
   type: FieldType;

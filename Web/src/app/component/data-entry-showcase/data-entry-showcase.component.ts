@@ -14,6 +14,7 @@ import DataType from '../../model/data-type.model';
 import {DatePipe} from '@angular/common';
 import {LocalizationService} from '../../service/localization.service';
 import {toUserIdentityFullName} from '../../model/user.model';
+import {DataTypeEntryFieldDisplayComponent} from '../data-type-entry-field-display/data-type-entry-field-display.component';
 
 @Component({
   selector: 'app-data-entry-showcase',
@@ -25,7 +26,8 @@ import {toUserIdentityFullName} from '../../model/user.model';
     DataEntryPreviewComponent,
     DataEntryManagementComponent,
     MessageModule,
-    DatePipe
+    DatePipe,
+    DataTypeEntryFieldDisplayComponent
   ],
   templateUrl: './data-entry-showcase.component.html',
   styles: ``
@@ -46,7 +48,7 @@ export class DataEntryShowcaseComponent {
   ) {
   }
 
-  readonly showManagement = (dataEntry: DataEntry | null) => {
+  readonly showManagement = (dataEntry?: DataEntry) => {
     this.managementMenu().show(dataEntry);
   }
 

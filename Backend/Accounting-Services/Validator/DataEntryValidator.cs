@@ -161,7 +161,7 @@ public class DataEntryValidator : IDataEntryValidator
         }
 
         return new Validation(
-            _fieldTypeValidator.ValidateValue(dataTypeField, request.Value).FailureMessages
+            (await _fieldTypeValidator.ValidateAsync(dataTypeField, request.Value)).FailureMessages
         );
     }
 
@@ -193,7 +193,7 @@ public class DataEntryValidator : IDataEntryValidator
         }
 
         return new Validation(
-            _fieldTypeValidator.ValidateValue(dataTypeField, request.Value).FailureMessages
+            (await _fieldTypeValidator.ValidateAsync(dataTypeField, request.Value)).FailureMessages
         );
     }
 }

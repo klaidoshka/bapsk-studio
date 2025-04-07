@@ -15,7 +15,7 @@ public interface IDataTypeValidator
 
     public Task<Validation> ValidateDataTypeGetByInstanceRequestAsync(DataTypeGetByInstanceRequest request);
 
-    public Validation ValidateDataTypeFieldCreateRequest(DataTypeFieldCreateRequest request);
+    public Task<Validation> ValidateDataTypeFieldCreateRequestAsync(DataTypeFieldCreateRequest request);
 
-    public Validation ValidateDataTypeFieldEditRequest(DataTypeFieldEditRequest request);
+    public Task<Validation> ValidateDataTypeFieldEditRequestAsync(DataTypeFieldEditRequest request);
 }
