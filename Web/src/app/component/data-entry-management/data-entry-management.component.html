@@ -22,31 +22,9 @@
             class="block text-sm font-medium"
           >{{ field.field }}</label>
 
-          @switch (field.type) {
-            @case (FieldType.Check) {
-              <p-check-box
-                [formControl]="field.control"
-                [id]="field.field"
-                binary="true"
-              />
-            }
-            @case (FieldType.Date) {
-              <p-datepicker
-                [formControl]="field.control"
-                [id]="field.field"
-                appendTo="body"
-              />
-            }
-            @default {
-              <input
-                [formControl]="field.control"
-                pInputText
-                [defaultValue]="field.type === FieldType.Number ? 0 : ''"
-                [type]="field.type"
-                [id]="field.field"
-              />
-            }
-          }
+          <app-data-type-entry-field-input
+            [formControl]="field.control" [type]="field.type"
+          />
 
           @if (getErrorMessage(field.field); as error) {
             <div class="text-xs text-red-500 mt-1">{{ error }}</div>

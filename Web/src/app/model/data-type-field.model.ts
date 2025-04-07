@@ -28,6 +28,16 @@ export const fieldTypes = [
   {label: 'Currency', value: FieldType.Currency}
 ].sort((a, b) => a.label.localeCompare(b.label));
 
+export const toFieldTypeLabel = (type: FieldType): string => {
+  const label = fieldTypes.find(it => it.value === type)?.label;
+
+  if (!label) {
+    throw new Error(`Field type ${type} not found while searching label`);
+  }
+
+  return label;
+}
+
 export interface DataTypeFieldCreateRequest {
   dataTypeId: number;
   defaultValue: any;

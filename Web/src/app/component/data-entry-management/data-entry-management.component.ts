@@ -1,5 +1,5 @@
 import {Component, computed, input, OnInit, Signal, signal} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {DataEntryService} from '../../service/data-entry.service';
 import {InstanceService} from '../../service/instance.service';
 import {TextService} from '../../service/text.service';
@@ -8,25 +8,22 @@ import Messages from '../../model/messages.model';
 import {first} from 'rxjs';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
-import {InputText} from 'primeng/inputtext';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import DataType from '../../model/data-type.model';
 import {FieldType} from '../../model/data-type-field.model';
-import {Checkbox} from 'primeng/checkbox';
 import {DataEntryFieldCreateRequest, DataEntryFieldEditRequest} from '../../model/data-entry-field.model';
-import {DatePicker} from 'primeng/datepicker';
 import {LocalizationService} from '../../service/localization.service';
+import {DataTypeEntryFieldInputComponent} from '../data-type-entry-field-input/data-type-entry-field-input.component';
 
 @Component({
   selector: 'app-data-entry-management',
   imports: [
     Button,
     Dialog,
-    InputText,
     MessagesShowcaseComponent,
     ReactiveFormsModule,
-    Checkbox,
-    DatePicker
+    DataTypeEntryFieldInputComponent,
+    FormsModule
   ],
   templateUrl: './data-entry-management.component.html',
   styles: ``

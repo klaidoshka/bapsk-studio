@@ -1,7 +1,7 @@
 @switch (type()) {
   @case (FieldType.Check) {
     <p-check-box
-      (onChange)="callOnChange()"
+      (input)="callOnChange()"
       (touchstart)="markAsTouched()"
       [(ngModel)]="value"
       binary="true"
@@ -9,7 +9,7 @@
   }
   @case (FieldType.Currency) {
     <p-input-number
-      (change)="callOnChange()"
+      (input)="callOnChange()"
       (touchstart)="markAsTouched()"
       [(ngModel)]="value"
       currency="EUR"
@@ -22,7 +22,7 @@
   }
   @case (FieldType.Date) {
     <p-datepicker
-      (change)="callOnChange()"
+      (input)="callOnChange()"
       (touchstart)="markAsTouched()"
       [(ngModel)]="value"
       hideOnDateTimeSelect="true"
@@ -34,7 +34,7 @@
   }
   @case (FieldType.IsoCountryCode) {
     <p-select
-      (change)="callOnChange()"
+      (input)="callOnChange()"
       (touchstart)="markAsTouched()"
       [(ngModel)]="value"
       [options]="IsoCountries"
@@ -46,7 +46,7 @@
   }
   @case (FieldType.Reference) {
     <p-select
-      (change)="callOnChange()"
+      (input)="callOnChange()"
       (touchstart)="markAsTouched()"
       [(ngModel)]="value"
       [options]="dataTypes()"
@@ -58,7 +58,7 @@
   }
   @case (FieldType.Number) {
     <p-input-number
-      (change)="callOnChange()"
+      (input)="callOnChange()"
       (touchstart)="markAsTouched()"
       [(ngModel)]="value"
       class="w-full"
@@ -67,7 +67,7 @@
   }
   @default {
     <input
-      (change)="callOnChange()"
+      (input)="callOnChange()"
       (touchstart)="markAsTouched()"
       [(ngModel)]="value"
       pInputText

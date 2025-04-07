@@ -1,9 +1,9 @@
-import {Component, input, OnInit, signal} from '@angular/core';
+import {Component, signal} from '@angular/core';
 import DataType from '../../model/data-type.model';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {TableModule} from 'primeng/table';
-import {FieldType, fieldTypes} from '../../model/data-type-field.model';
+import {toFieldTypeLabel} from '../../model/data-type-field.model';
 
 @Component({
   selector: 'app-data-type-preview',
@@ -15,24 +15,11 @@ import {FieldType, fieldTypes} from '../../model/data-type-field.model';
   templateUrl: './data-type-preview.component.html',
   styles: ``
 })
-export class DataTypePreviewComponent implements OnInit {
+export class DataTypePreviewComponent {
   dataType = signal<DataType | null>(null);
   isShown = signal<boolean>(false);
-  isShownInitially = input<boolean>(false);
 
-  ngOnInit() {
-    this.isShown.set(this.isShownInitially());
-  }
-
-  readonly getFieldTypeLabel = (type: FieldType) => {
-    const enumKey = Object
-    .keys(FieldType)
-    .find(t => t.toString().toLowerCase() === type.toString().toLowerCase());
-
-    const enumValue = FieldType[enumKey as keyof typeof FieldType];
-
-    return fieldTypes.find(t => t.value === enumValue)?.label;
-  }
+  protected readonly toFieldTypeLabel = toFieldTypeLabel;
 
   readonly hide = () => {
     this.isShown.set(false);

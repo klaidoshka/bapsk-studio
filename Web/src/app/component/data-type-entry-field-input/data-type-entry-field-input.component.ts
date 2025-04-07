@@ -1,4 +1,4 @@
-import {Component, computed, effect, input, OnInit, Signal, signal} from '@angular/core';
+import {Component, computed, effect, input, OnInit, Signal, signal, untracked} from '@angular/core';
 import {FieldType} from '../../model/data-type-field.model';
 import {Checkbox} from 'primeng/checkbox';
 import {DatePicker} from 'primeng/datepicker';
@@ -38,6 +38,8 @@ export class DataTypeEntryFieldInputComponent implements ControlValueAccessor, O
 
   dataTypes!: Signal<DataType[]>;
   type = input.required<FieldType>();
+  oldType = signal<FieldType | undefined>(undefined);
+
   onChange = signal<(value: string) => void>(() => {
   });
   onTouched = signal<() => void>(() => {
@@ -56,9 +58,15 @@ export class DataTypeEntryFieldInputComponent implements ControlValueAccessor, O
     });
 
     effect(() => {
-      this.type(); // Init dependency
-      this.value.set(this.defaultValue());
-      this.callOnChange();
+      const keepValue = untracked(() => this.oldType() === undefined || this.oldType() === this.type());
+      const value = untracked(() => this.value());
+
+      this.oldType.set(this.type());
+
+      if (!keepValue || value == null || value == '') {
+        this.value.set(this.resolveDefaultValue(this.type()));
+        this.callOnChange();
+      }
     });
   }
 
@@ -92,8 +100,8 @@ export class DataTypeEntryFieldInputComponent implements ControlValueAccessor, O
     this.value.set(value);
   }
 
-  readonly defaultValue = (): any => {
-    switch (this.type()) {
+  readonly resolveDefaultValue = (type: FieldType): any => {
+    switch (type) {
       case FieldType.Check:
         return false;
 

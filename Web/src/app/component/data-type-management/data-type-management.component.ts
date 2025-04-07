@@ -104,6 +104,10 @@ export class DataTypeManagementComponent {
     });
   }
 
+  readonly getFieldInitialDefaultValue = (id: number): any | undefined => {
+    return this.formFields.controls.at(id)?.value?.defaultValue;
+  }
+
   readonly getFieldType = (id: number): FieldType => {
     return this.formFields.controls.at(id)?.value?.type || FieldType.Text;
   }
@@ -119,7 +123,7 @@ export class DataTypeManagementComponent {
     }));
     if (this.dataType()) {
       this.displayFields.set([...this.displayFields(), {
-        label: field?.name || `Field ${this.formFields.length}`,
+        label: field?.name || `#${this.formFields.length} Field`,
         value: this.formFields.length - 1
       }]);
     }
