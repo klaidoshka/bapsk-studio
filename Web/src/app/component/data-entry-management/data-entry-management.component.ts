@@ -71,14 +71,14 @@ export class DataEntryManagementComponent implements OnInit {
 
   private readonly create = (request: DataEntryCreateRequest) => {
     this.dataEntryService.create(request).pipe(first()).subscribe({
-      next: () => this.messages.set({success: ["DataEntry has been created successfully."]}),
+      next: () => this.messages.set({success: ["Data entry has been created successfully."]}),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   private readonly edit = (request: DataEntryEditRequest) => {
     this.dataEntryService.edit(request).pipe(first()).subscribe({
-      next: () => this.messages.set({success: ["DataEntry has been edited successfully."]}),
+      next: () => this.messages.set({success: ["Data entry has been edited successfully."]}),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }

@@ -71,7 +71,7 @@ export class DataTypeManagementComponent {
 
   private readonly create = (request: DataTypeCreateRequest) => {
     this.dataTypeService.create(request).pipe(first()).subscribe({
-      next: () => this.onSuccess("DataType has been created successfully."),
+      next: () => this.onSuccess("Data type has been created successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
@@ -97,7 +97,7 @@ export class DataTypeManagementComponent {
   private readonly edit = (request: DataTypeEditRequest) => {
     this.dataTypeService.edit(request).pipe(first()).subscribe({
       next: () => {
-        this.onSuccess("DataType has been edited successfully.");
+        this.onSuccess("Data type has been edited successfully.");
         this.dataEntryService.getAll(request.dataTypeId).subscribe();
       },
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
