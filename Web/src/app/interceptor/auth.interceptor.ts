@@ -1,6 +1,6 @@
 import {HttpErrorResponse, HttpInterceptorFn} from "@angular/common/http";
 import {inject, signal} from "@angular/core";
-import {catchError, switchMap, throwError} from "rxjs";
+import {catchError, switchMap} from "rxjs";
 import {ApiRouter} from "../service/api-router.service";
 import {AuthService} from "../service/auth.service";
 
@@ -23,10 +23,20 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       if (
         !(error instanceof HttpErrorResponse) ||
         error.status !== 401 ||
-        renewingAccess() ||
         error.url?.includes(apiRouter.authRefresh())
       ) {
-        return throwError(() => error);
+        throw error;
+      }
+
+      if (renewingAccess()) {
+        return next(
+          req.clone({
+            setHeaders: {
+              Authorization: `Bearer ${accessToken}`
+            },
+            withCredentials: true
+          })
+        );
       }
 
       renewingAccess.set(true);
@@ -49,7 +59,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
           }
 
           // If no new access token, throw an error
-          return throwError(() => error);
+          throw error;
         })
       );
     })

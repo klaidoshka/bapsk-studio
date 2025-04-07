@@ -192,11 +192,10 @@ public class DataTypeValidator : IDataTypeValidator
         }
 
         // Validate field edits
-        failures.AddRange(
-            request.Fields.SelectMany(
-                f => ValidateDataTypeFieldEditRequest(f).FailureMessages
-            )
-        );
+        foreach (var field in request.Fields)
+        {
+            failures.AddRange((await ValidateDataTypeFieldEditRequestAsync(field)).FailureMessages);
+        }
 
         return new Validation(failures);
     }
@@ -252,7 +251,7 @@ public class DataTypeValidator : IDataTypeValidator
         return new Validation();
     }
 
-    public Validation ValidateDataTypeFieldEditRequest(DataTypeFieldEditRequest request)
+    public async Task<Validation> ValidateDataTypeFieldEditRequestAsync(DataTypeFieldEditRequest request)
     {
         if (!request.DefaultValue.IsNullOrEmpty())
         {
@@ -262,6 +261,26 @@ public class DataTypeValidator : IDataTypeValidator
             );
         }
 
-        return new Validation();
+        var field = await _database.DataTypeFields
+            .Include(it => it.DataType)
+            .ThenInclude(it => it.Entries)
+            .ThenInclude(it => it.Fields)
+            .FirstOrDefaultAsync(it => it.Id == request.DataTypeFieldId);
+
+        // Check if new type can be assigned
+        if (field is null || field.Type == request.Type)
+        {
+            return new Validation();
+        }
+
+        var validation = field.DataType.Entries
+            .Where(it => it.Fields.Any(f => f.DataTypeFieldId == field.Id))
+            .Select(it => it.Fields.First(f => f.DataTypeFieldId == field.Id))
+            .Select(entryField => _fieldTypeValidator.ValidateValue(request.Type, entryField.Value))
+            .FirstOrDefault(validation => !validation.IsValid);
+
+        return validation is null
+            ? new Validation()
+            : new Validation($"Field's {request.Name} existing values are not compatible with new type {request.Type}.");
     }
 }

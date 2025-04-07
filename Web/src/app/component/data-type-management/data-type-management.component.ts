@@ -1,4 +1,4 @@
-import {Component, Signal, signal} from '@angular/core';
+import {Component, computed, Signal, signal} from '@angular/core';
 import {AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {DataTypeService} from '../../service/data-type.service';
 import {TextService} from '../../service/text.service';
@@ -41,14 +41,16 @@ import {DataTypeEntryFieldInputComponent} from '../data-type-entry-field-input/d
   styles: ``
 })
 export class DataTypeManagementComponent {
+  FieldType = FieldType;
+  fieldTypes = fieldTypes;
+  form!: FormGroup;
+
   dataType = signal<DataType | undefined>(undefined);
+  dataTypes!: Signal<DataType[]>;
   displayFields = signal<Option<number | null>[]>([{
     label: 'Id',
     value: null
   }]);
-  FieldType = FieldType;
-  fieldTypes = fieldTypes;
-  form!: FormGroup;
   instanceId!: Signal<number | undefined>;
   isShown = signal<boolean>(false);
   messages = signal<Messages>({});
@@ -62,6 +64,7 @@ export class DataTypeManagementComponent {
     private textService: TextService
   ) {
     this.instanceId = this.instanceService.getActiveInstanceId();
+    this.dataTypes = computed(() => this.instanceId() ? this.dataTypeService.getAsSignal(this.instanceId()!)() : []);
     this.form = this.createForm();
   }
 
@@ -119,11 +122,20 @@ export class DataTypeManagementComponent {
   }
 
   readonly addField = (dataType?: DataType, field?: DataTypeField) => {
+    const isRequiredControl = this.formBuilder.control(field?.isRequired || true, Validators.required);
+    const isReference = field?.type === FieldType.Reference;
+
+    if (isReference) {
+      isRequiredControl.disable();
+    }
+
     this.formFields.push(this.formBuilder.group({
+      dataTypeFieldId: [field?.id],
+      defaultValue: [isReference ? field?.referenceId : (field?.defaultValue || '')],
+      isRequired: isRequiredControl,
       name: [field?.name || '', Validators.required],
-      type: [field?.type || FieldType.Text, Validators.required],
-      defaultValue: [field?.defaultValue || ''],
-      isRequired: [field?.isRequired || true, Validators.required]
+      referencedType: [field?.referenceId || null, isReference ? Validators.required : null],
+      type: [field?.type || FieldType.Text, Validators.required]
     }));
 
     if (dataType) {
@@ -174,30 +186,32 @@ export class DataTypeManagementComponent {
       return;
     }
 
-    if (this.dataType() != null) {
-      const updatedFields: DataTypeFieldEditRequest[] = this.formFields.value.map((field: any, index: number) => {
-        const candidate = this.dataType()!!.fields?.at(index) || null;
+    const request: DataTypeEditRequest = {
+      name: this.form.value.name,
+      description: this.form.value.description,
+      displayFieldIndex: this.form.value.displayField,
+      dataTypeId: this.dataType()!.id!,
+      fields: this.formFields.controls.map((field: FormGroup) => {
+        const fieldType = field.value.type;
+        const isReference = fieldType === FieldType.Reference;
 
         return {
-          ...candidate,
-          dataTypeFieldId: candidate?.id,
-          ...field
-        }
-      });
+          dataTypeFieldId: field.value.dataTypeFieldId,
+          name: field.value.name,
+          type: fieldType,
+          defaultValue: isReference ? null : field.value.defaultValue,
+          referenceId: isReference ? field.value.referencedType : null,
+          isRequired: isReference ? true : field.value.isRequired
+        } as DataTypeFieldEditRequest;
+      })
+    };
 
-      this.edit({
-        name: this.form.value.name,
-        description: this.form.value.description,
-        displayFieldIndex: this.form.value.displayField,
-        dataTypeId: this.dataType()!.id!,
-        fields: updatedFields
-      });
+    if (this.dataType() != null) {
+      this.edit(request);
     } else {
       this.create({
-        instanceId: this.instanceId()!,
-        name: this.form.value.name,
-        description: this.form.value.description,
-        fields: this.formFields.value
+        ...request,
+        instanceId: this.instanceId()!
       });
     }
   }

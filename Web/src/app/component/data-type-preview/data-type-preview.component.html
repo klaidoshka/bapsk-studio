@@ -32,17 +32,31 @@
       pTemplate="body"
       let-field
     >
+      @let isReferenceField = field.type === FieldType.Reference;
+
       <tr>
-        <td>{{ field.name }}</td>
-        <td>{{ toFieldTypeLabel(field.type) }}</td>
+        <td><p [ngClass]="{'mt-7': isReferenceField}">{{ field.name }}</p></td>
+        <td><p [ngClass]="{'mt-7': isReferenceField}">{{ toFieldTypeLabel(field.type) }}</p></td>
         <td>
-          @if (field.isRequired) {
-            <p class="text-green-500">Yes</p>
+          <p
+            [ngClass]="{
+            'mt-7': isReferenceField,
+            'text-green-500': field.isRequired,
+            'text-red-500': !field.isRequired}"
+          >
+            {{ field.isRequired ? 'Yes' : 'No' }}
+          </p>
+        </td>
+        <td>
+          @if (isReferenceField) {
+            <div class="flex flex-col gap-1">
+              <label class="font-semibold">Referenced Type</label>
+              {{ getReferencedDataTypeName(field) || 'Unset' }}
+            </div>
           } @else {
-            <p class="text-red-500">No</p>
+            {{ field.defaultValue }}
           }
         </td>
-        <td>{{ field.defaultValue }}</td>
       </tr>
     </ng-template>
   </p-table>

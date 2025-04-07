@@ -1,4 +1,4 @@
-import {Component, computed, effect, input, OnInit, Signal, signal, untracked} from '@angular/core';
+import {Component, effect, input, signal, untracked} from '@angular/core';
 import {FieldType} from '../../model/data-type-field.model';
 import {Checkbox} from 'primeng/checkbox';
 import {DatePicker} from 'primeng/datepicker';
@@ -6,9 +6,6 @@ import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModul
 import {InputText} from 'primeng/inputtext';
 import {InputNumber} from 'primeng/inputnumber';
 import {getDefaultIsoCountry, IsoCountries} from '../../model/iso-country.model';
-import {DataTypeService} from '../../service/data-type.service';
-import DataType from '../../model/data-type.model';
-import {InstanceService} from '../../service/instance.service';
 import {Select} from 'primeng/select';
 
 @Component({
@@ -32,11 +29,10 @@ import {Select} from 'primeng/select';
     }
   ]
 })
-export class DataTypeEntryFieldInputComponent implements ControlValueAccessor, OnInit {
+export class DataTypeEntryFieldInputComponent implements ControlValueAccessor {
   protected readonly FieldType = FieldType;
   protected readonly IsoCountries = IsoCountries;
 
-  dataTypes!: Signal<DataType[]>;
   type = input.required<FieldType>();
   oldType = signal<FieldType | undefined>(undefined);
 
@@ -48,15 +44,7 @@ export class DataTypeEntryFieldInputComponent implements ControlValueAccessor, O
   disabled = signal<boolean>(false);
   value = signal<any>(undefined);
 
-  constructor(
-    private dataTypeService: DataTypeService,
-    instanceService: InstanceService
-  ) {
-    this.dataTypes = computed(() => {
-      const instanceId = instanceService.getActiveInstanceId()();
-      return instanceId ? this.dataTypeService.getAsSignal(instanceId)() : [];
-    });
-
+  constructor() {
     effect(() => {
       const keepValue = untracked(() => this.oldType() === undefined || this.oldType() === this.type());
       const value = untracked(() => this.value());
@@ -68,9 +56,6 @@ export class DataTypeEntryFieldInputComponent implements ControlValueAccessor, O
         this.callOnChange();
       }
     });
-  }
-
-  ngOnInit() {
   }
 
   callOnChange() {
@@ -114,9 +99,6 @@ export class DataTypeEntryFieldInputComponent implements ControlValueAccessor, O
 
       case FieldType.IsoCountryCode:
         return getDefaultIsoCountry().code;
-
-      case FieldType.Reference:
-        return this.dataTypes().at(0)?.id;
 
       default:
         return '';

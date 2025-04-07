@@ -92,37 +92,58 @@
 
           <tbody class="p-datatable-tbody">
             @for (field of formFields.controls; let i = $index; track i) {
+              @let fieldType = getFieldType(i);
+              @let isReference = fieldType === FieldType.Reference;
+
               <tr [formGroup]="field">
-                <td><input formControlName="name" pInputText type="text" class="w-full"/></td>
+                <td>
+                  <input
+                    formControlName="name" pInputText type="text"
+                    class="w-full" [class]="{'mt-7': isReference}"
+                  />
+                </td>
 
                 <td>
                   <p-select
                     formControlName="type"
                     [options]="fieldTypes" optionLabel="label" optionValue="value"
                     placeholder="Select a type" appendTo="body" styleClass="w-full"
+                    [class]="{'mt-7': isReference}"
                   />
                 </td>
 
                 <td>
-                  <app-data-type-entry-field-input
-                    formControlName="defaultValue" [type]="getFieldType(i)"
-                  />
+                  @if (isReference) {
+                    <div class="flex flex-col">
+                      <label for="referencedType" class="font-semibold">Referenced Type</label>
+                      <p-select
+                        id="referencedType"
+                        placeholder="Select referenced type"
+                        formControlName="referencedType" [options]="dataTypes()"
+                        optionLabel="name" optionValue="id" appendTo="body"
+                        class="mt-1 w-full"
+                      />
+                    </div>
+                  } @else {
+                    <app-data-type-entry-field-input
+                      formControlName="defaultValue" [type]="fieldType"
+                    />
+                  }
                 </td>
 
                 <td>
                   <p-checkbox
-                    formControlName="isRequired"
-                    binary="true"
+                    formControlName="isRequired" binary
+                    [styleClass]="isReference ? 'mt-7' : ''"
                   />
                 </td>
 
                 <td>
                   <p-button
-                    icon="pi pi-trash"
-                    type="button"
-                    variant="text"
-                    (onClick)="removeField(i)"
-                  ></p-button>
+                    icon="pi pi-trash" type="button"
+                    variant="text" (onClick)="removeField(i)"
+                    [styleClass]="isReference ? 'mt-7' : ''"
+                  />
                 </td>
               </tr>
             }

@@ -39,9 +39,7 @@ export const toFieldTypeLabel = (type: FieldType): string => {
 }
 
 export interface DataTypeFieldCreateRequest {
-  dataTypeId: number;
   defaultValue: any;
-  instanceId: number;
   isRequired: boolean;
   name: string;
   type: FieldType;
