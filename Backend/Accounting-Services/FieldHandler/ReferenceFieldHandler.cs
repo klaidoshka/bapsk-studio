@@ -47,13 +47,13 @@ public class ReferenceFieldHandler() : FieldHandler(FieldType.Reference)
         );
     }
 
-    public override Validation Validate(JsonElement value)
+    public override async Task<Validation> ValidateAsync(JsonElement value)
     {
         try
         {
             var id = ToReferenceId(value);
 
-            return _database.DataTypes.Find(id) == null
+            return await _database.DataEntries.FindAsync(id) == null
                 ? new Validation($"Reference with id {id} does not exist.")
                 : new Validation();
         }

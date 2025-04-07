@@ -1,0 +1,23 @@
+@switch (fieldType()) {
+  @case (FieldType.Check) {
+    <p-badge
+      [value]="value() === true ? 'Yes' : 'No'"
+      [severity]="value() === true ? 'success' : 'danger'"
+    />
+  }
+  @case (FieldType.Currency) {
+    <p>{{ value() | currency: 'EUR':'symbol':'1.2-2' }}</p>
+  }
+  @case (FieldType.Date) {
+    <p>{{ value() | date: 'medium' }}</p>
+  }
+  @case (FieldType.IsoCountryCode) {
+    <p>{{ getIsoCountryLabel(value()) }}</p>
+  }
+  @case (FieldType.Reference) {
+    <p>{{ referencedDataEntry()?.display() }}</p>
+  }
+  @default {
+    <p>{{ value() }}</p>
+  }
+}

@@ -42,17 +42,17 @@ public class CurrencyFieldHandler() : FieldHandler(FieldType.Currency)
         return Math.Round(result.Value, 2);
     }
 
-    public override Validation Validate(JsonElement value)
+    public override Task<Validation> ValidateAsync(JsonElement value)
     {
         try
         {
             ToDouble(value);
 
-            return new Validation();
+            return Task.FromResult(new Validation());
         }
         catch (InvalidOperationException e)
         {
-            return new Validation(e.Message);
+            return Task.FromResult(new Validation(e.Message));
         }
     }
 }

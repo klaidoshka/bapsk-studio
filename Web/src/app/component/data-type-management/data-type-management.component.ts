@@ -1,5 +1,14 @@
 import {Component, computed, Signal, signal} from '@angular/core';
-import {AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators
+} from '@angular/forms';
 import {DataTypeService} from '../../service/data-type.service';
 import {TextService} from '../../service/text.service';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../../model/data-type.model';
@@ -92,12 +101,7 @@ export class DataTypeManagementComponent {
       name: [dataType?.name || '', Validators.required],
       description: [dataType?.description || 'No description set.'],
       displayField: [displayFieldIndex === -1 ? null : displayFieldIndex],
-      fields: this.formBuilder.array([], {
-        validators: (controls: AbstractControl<any, any>) => {
-          const fields = controls.value as FormGroup[];
-          return fields.length === 0 ? {noFields: true} : null;
-        }
-      })
+      fields: this.formBuilder.array([], [this.fieldsValidator])
     });
   }
 
@@ -111,14 +115,18 @@ export class DataTypeManagementComponent {
     });
   }
 
-  readonly getFieldType = (id: number): FieldType => {
-    return this.formFields.controls.at(id)?.value?.type || FieldType.Text;
-  }
+  private readonly fieldsValidator = (control: AbstractControl): ValidationErrors | null => {
+    return (control as FormArray).length === 0 ? { noFields: true } : null;
+  };
 
   private readonly onSuccess = (message: string) => {
     this.messages.set({success: [message]});
     this.form.markAsPristine();
     this.form.markAsUntouched();
+  }
+
+  readonly getFieldType = (id: number): FieldType => {
+    return this.formFields.controls.at(id)?.value?.type || FieldType.Text;
   }
 
   readonly addField = (dataType?: DataType, field?: DataTypeField) => {
@@ -131,7 +139,7 @@ export class DataTypeManagementComponent {
 
     this.formFields.push(this.formBuilder.group({
       dataTypeFieldId: [field?.id],
-      defaultValue: [isReference ? field?.referenceId : (field?.defaultValue || '')],
+      defaultValue: [isReference ? field?.referenceId : field?.defaultValue],
       isRequired: isRequiredControl,
       name: [field?.name || '', Validators.required],
       referencedType: [field?.referenceId || null, isReference ? Validators.required : null],
@@ -145,18 +153,22 @@ export class DataTypeManagementComponent {
       }]);
     }
 
-    this.form.markAsTouched();
     this.form.markAsDirty();
   }
 
   readonly removeField = (index: number) => {
     this.formFields.removeAt(index);
 
+    const displayFieldIndex = this.form.get('displayField')?.value;
+
+    if (displayFieldIndex === index) {
+      this.form.get('displayField')?.setValue(null);
+    }
+
     if (this.dataType()) {
       this.displayFields.set(this.displayFields().filter(it => it.value != index));
     }
 
-    this.form.markAsTouched();
     this.form.markAsDirty();
   }
 
@@ -217,14 +229,14 @@ export class DataTypeManagementComponent {
   }
 
   readonly show = (dataType?: DataType) => {
+    this.dataType.set(dataType);
     this.form = this.createForm(dataType);
 
     dataType?.fields?.forEach(field => {
       this.addField(dataType, field);
     });
 
-    this.form.markAsUntouched();
-    this.dataType.set(dataType);
+    this.form.markAsPristine();
     this.isShown.set(true);
   }
 }

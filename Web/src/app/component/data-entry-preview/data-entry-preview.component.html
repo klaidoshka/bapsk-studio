@@ -51,7 +51,12 @@
     >
       <tr>
         @for (field of fields; track field.id) {
-          <td>{{ field.value }}</td>
+          <td>
+            <app-data-type-entry-field-display
+              [dataTypeFieldId]="field.dataTypeFieldId" [dataType]="dataTypeEntry()!.dataType"
+              [value]="field.value"
+            />
+          </td>
         }
       </tr>
     </ng-template>

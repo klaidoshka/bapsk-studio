@@ -46,14 +46,18 @@ export class DataTypeEntryFieldInputComponent implements ControlValueAccessor {
 
   constructor() {
     effect(() => {
-      const keepValue = untracked(() => this.oldType() === undefined || this.oldType() === this.type());
+      const oldType = untracked(() => this.oldType());
+      const keepValue = untracked(() => oldType === undefined || oldType === this.type());
       const value = untracked(() => this.value());
 
       this.oldType.set(this.type());
 
       if (!keepValue || value == null || value == '') {
         this.value.set(this.resolveDefaultValue(this.type()));
-        this.callOnChange();
+
+        if (oldType !== undefined) {
+          this.callOnChange();
+        }
       }
     });
   }

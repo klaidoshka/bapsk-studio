@@ -1,4 +1,4 @@
-import {Component, input, OnInit, signal} from '@angular/core';
+import {Component, signal} from '@angular/core';
 import {DataEntryJoined} from '../../model/data-entry.model';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
@@ -7,6 +7,7 @@ import {DatePipe, NgIf} from '@angular/common';
 import {toUserIdentityFullName} from '../../model/user.model';
 import DataType from '../../model/data-type.model';
 import DataTypeEntryPair from './data-type-entry.pair';
+import {DataTypeEntryFieldDisplayComponent} from '../data-type-entry-field-display/data-type-entry-field-display.component';
 
 @Component({
   selector: 'app-data-entry-preview',
@@ -15,21 +16,17 @@ import DataTypeEntryPair from './data-type-entry.pair';
     Dialog,
     TableModule,
     DatePipe,
-    NgIf
+    NgIf,
+    DataTypeEntryFieldDisplayComponent
   ],
   templateUrl: './data-entry-preview.component.html',
   styles: ``
 })
-export class DataEntryPreviewComponent implements OnInit {
+export class DataEntryPreviewComponent {
   protected readonly toUserIdentityFullName = toUserIdentityFullName;
 
   dataTypeEntry = signal<DataTypeEntryPair | undefined>(undefined);
   isShown = signal<boolean>(false);
-  isShownInitially = input<boolean>(false);
-
-  ngOnInit() {
-    this.isShown.set(this.isShownInitially());
-  }
 
   readonly hide = () => {
     this.isShown.set(false);

@@ -37,17 +37,17 @@ public class NumberFieldHandler() : FieldHandler(FieldType.Number)
         );
     }
 
-    public override Validation Validate(JsonElement value)
+    public override Task<Validation> ValidateAsync(JsonElement value)
     {
         try
         {
             ToDouble(value);
 
-            return new Validation();
+            return Task.FromResult(new Validation());
         }
         catch (InvalidOperationException e)
         {
-            return new Validation(e.Message);
+            return Task.FromResult(new Validation(e.Message));
         }
     }
 }

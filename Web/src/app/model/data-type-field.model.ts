@@ -1,10 +1,10 @@
 export default interface DataTypeField {
   dataTypeId: number;
-  defaultValue: string | null;
+  defaultValue?: any;
   id: number;
   isRequired: boolean;
   name: string;
-  referenceId: number | null;
+  referenceId?: number;
   type: FieldType;
 }
 

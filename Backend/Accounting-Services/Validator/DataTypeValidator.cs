@@ -73,11 +73,10 @@ public class DataTypeValidator : IDataTypeValidator
             failures.Add($"Duplicate field names: {String.Join(", ", duplicates)}");
         }
 
-        failures.AddRange(
-            request.Fields.SelectMany(
-                f => ValidateDataTypeFieldCreateRequest(f).FailureMessages
-            )
-        );
+        foreach (var field in request.Fields)
+        {
+            failures.AddRange((await ValidateDataTypeFieldCreateRequestAsync(field)).FailureMessages);
+        }
 
         return new Validation(failures);
     }
@@ -238,13 +237,12 @@ public class DataTypeValidator : IDataTypeValidator
             : new Validation();
     }
 
-    public Validation ValidateDataTypeFieldCreateRequest(DataTypeFieldCreateRequest request)
+    public async Task<Validation> ValidateDataTypeFieldCreateRequestAsync(DataTypeFieldCreateRequest request)
     {
         if (!request.DefaultValue.IsNullOrEmpty())
         {
             return new Validation(
-                _fieldTypeValidator.ValidateValue(request.Type, request.DefaultValue)
-                    .FailureMessages
+                (await _fieldTypeValidator.ValidateAsync(request.Type, request.DefaultValue)).FailureMessages
             );
         }
 
@@ -255,10 +253,12 @@ public class DataTypeValidator : IDataTypeValidator
     {
         if (!request.DefaultValue.IsNullOrEmpty())
         {
-            return new Validation(
-                _fieldTypeValidator.ValidateValue(request.Type, request.DefaultValue)
-                    .FailureMessages
-            );
+            var validation = await _fieldTypeValidator.ValidateAsync(request.Type, request.DefaultValue);
+
+            if (!validation.IsValid)
+            {
+                return validation;
+            }
         }
 
         var field = await _database.DataTypeFields
@@ -273,14 +273,21 @@ public class DataTypeValidator : IDataTypeValidator
             return new Validation();
         }
 
-        var validation = field.DataType.Entries
+        var entryFields = field.DataType.Entries
             .Where(it => it.Fields.Any(f => f.DataTypeFieldId == field.Id))
             .Select(it => it.Fields.First(f => f.DataTypeFieldId == field.Id))
-            .Select(entryField => _fieldTypeValidator.ValidateValue(request.Type, entryField.Value))
-            .FirstOrDefault(validation => !validation.IsValid);
+            .ToList();
 
-        return validation is null
-            ? new Validation()
-            : new Validation($"Field's {request.Name} existing values are not compatible with new type {request.Type}.");
+        foreach (var entryField in entryFields)
+        {
+            var validation = await _fieldTypeValidator.ValidateAsync(request.Type, entryField.Value);
+
+            if (!validation.IsValid)
+            {
+                return new Validation($"Field '{request.Name}': Existing values are not compatible with the new type {request.Type}.");
+            }
+        }
+
+        return new Validation();
     }
 }

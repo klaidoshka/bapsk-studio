@@ -30,5 +30,5 @@ public abstract class FieldHandler(FieldType type)
     /// </summary>
     /// <param name="value">Value to validate</param>
     /// <returns>Validation result</returns>
-    public abstract Validation Validate(JsonElement value);
+    public abstract Task<Validation> ValidateAsync(JsonElement value);
 }

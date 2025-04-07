@@ -5,6 +5,7 @@ import {first, Observable, tap} from 'rxjs';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../model/data-type.model';
 import {EnumUtil} from '../util/enum.util';
 import {FieldType} from '../model/data-type-field.model';
+import {FieldTypeUtil} from '../util/field-type.util';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +34,15 @@ export class DataTypeService {
   }
 
   readonly create = (request: DataTypeCreateRequest): Observable<DataType> => {
-    return this.httpClient.post<DataType>(this.apiRouter.dataTypeCreate(), request).pipe(
+    return this.httpClient.post<DataType>(this.apiRouter.dataTypeCreate(), {
+      ...request,
+      fields: request.fields.map(it => ({
+        ...it,
+        defaultValue: it.type === FieldType.Date
+          ? it.defaultValue.toISOString()
+          : it.defaultValue
+      }))
+    } as DataTypeCreateRequest).pipe(
       tap(dataType => {
         const existingSignal = this.store.get(request.instanceId);
 
@@ -59,7 +68,15 @@ export class DataTypeService {
   }
 
   readonly edit = (request: DataTypeEditRequest): Observable<void> => {
-    return this.httpClient.put<void>(this.apiRouter.dataTypeEdit(request.dataTypeId), request).pipe(
+    return this.httpClient.put<void>(this.apiRouter.dataTypeEdit(request.dataTypeId), {
+      ...request,
+      fields: request.fields.map(it => ({
+        ...it,
+        defaultValue: it.type === FieldType.Date
+          ? it.defaultValue.toISOString()
+          : it.defaultValue
+      }))
+    } as DataTypeEditRequest).pipe(
       tap(() => {
         this.getById(request.dataTypeId).pipe(first()).subscribe();
       })
@@ -131,10 +148,14 @@ export class DataTypeService {
   readonly updateProperties = (dataType: DataType): DataType => {
     return {
       ...dataType,
-      fields: dataType.fields.map(it => ({
-        ...it,
-        type: EnumUtil.toEnumOrThrow(it.type, FieldType)
-      })),
+      fields: dataType.fields.map(it => {
+        const type = EnumUtil.toEnumOrThrow(it.type, FieldType);
+        return {
+          ...it,
+          type: type,
+          defaultValue: FieldTypeUtil.updateValue(it.defaultValue, type)
+        };
+      })
     }
   }
 }

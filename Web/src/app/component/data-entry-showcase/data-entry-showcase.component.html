@@ -14,7 +14,7 @@
     label="Create"
     icon="pi pi-plus"
     type="button"
-    (onClick)="showManagement(null)"
+    (onClick)="showManagement()"
   ></p-button>
 
   <div class="card mt-4">
@@ -47,7 +47,12 @@
       >
         <tr>
           @for (field of dataEntry.fields; track field.id) {
-            <td>{{ field.value }}</td>
+            <td>
+              <app-data-type-entry-field-display
+                [dataTypeFieldId]="field.dataTypeFieldId" [dataType]="dataType()"
+                [value]="field.value"
+              />
+            </td>
           }
           <td>{{ dataEntry.createdAt | date:'short' }}</td>
           <td>{{ dataEntry.modifiedAt | date:'short' }}</td>

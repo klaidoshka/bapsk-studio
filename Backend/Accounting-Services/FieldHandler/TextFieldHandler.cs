@@ -16,8 +16,8 @@ public class TextFieldHandler() : FieldHandler(FieldType.Text)
         return value.GetString() ?? String.Empty;
     }
 
-    public override Validation Validate(JsonElement value)
+    public override Task<Validation> ValidateAsync(JsonElement value)
     {
-        return new Validation();
+        return Task.FromResult(new Validation());
     }
 }
