@@ -79,7 +79,11 @@ export class DataTypeManagementComponent {
   private readonly createForm = (dataType?: DataType) => {
     this.displayFields.set(this.displayFields().slice(0, 1));
 
-    const displayFieldIndex = dataType?.fields.findIndex(it => it.id == dataType?.displayFieldId) || -1;
+    let displayFieldIndex = dataType?.fields.findIndex(it => it.id === dataType?.displayFieldId);
+
+    if (displayFieldIndex === undefined) {
+      displayFieldIndex = -1;
+    }
 
     return this.formBuilder.group({
       name: [dataType?.name || '', Validators.required],

@@ -21,6 +21,8 @@ export class DataTypePreviewComponent {
 
   protected readonly toFieldTypeLabel = toFieldTypeLabel;
 
+  readonly getDisplayFieldName = () => this.dataType()?.fields?.find(it => it.id === this.dataType()?.displayFieldId)?.name || 'Id';
+
   readonly hide = () => {
     this.isShown.set(false);
     this.dataType.set(null);
