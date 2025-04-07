@@ -145,7 +145,7 @@
     <div class="flex justify-end mt-4">
       <p-button
         [label]="dataType() === undefined ? 'Create' : 'Save'"
-        [disabled]="!form.valid || !form.dirty"
+        [disabled]="form.invalid || !form.dirty || form.untouched"
         (onClick)="save()"
       ></p-button>
     </div>

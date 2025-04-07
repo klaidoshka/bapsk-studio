@@ -104,40 +104,44 @@ export class DataTypeManagementComponent {
     });
   }
 
-  readonly getFieldInitialDefaultValue = (id: number): any | undefined => {
-    return this.formFields.controls.at(id)?.value?.defaultValue;
-  }
-
   readonly getFieldType = (id: number): FieldType => {
     return this.formFields.controls.at(id)?.value?.type || FieldType.Text;
   }
 
-  private readonly onSuccess = (message: string) => this.messages.set({success: [message]});
+  private readonly onSuccess = (message: string) => {
+    this.messages.set({success: [message]});
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
+  }
 
-  readonly addField = (field?: DataTypeField) => {
+  readonly addField = (dataType?: DataType, field?: DataTypeField) => {
     this.formFields.push(this.formBuilder.group({
       name: [field?.name || '', Validators.required],
       type: [field?.type || FieldType.Text, Validators.required],
       defaultValue: [field?.defaultValue || ''],
       isRequired: [field?.isRequired || true, Validators.required]
     }));
-    if (this.dataType()) {
+
+    if (dataType) {
       this.displayFields.set([...this.displayFields(), {
         label: field?.name || `#${this.formFields.length} Field`,
         value: this.formFields.length - 1
       }]);
     }
-    this.formFields.markAsTouched();
-    this.formFields.markAsDirty();
+
+    this.form.markAsTouched();
+    this.form.markAsDirty();
   }
 
   readonly removeField = (index: number) => {
     this.formFields.removeAt(index);
+
     if (this.dataType()) {
       this.displayFields.set(this.displayFields().filter(it => it.value != index));
     }
-    this.formFields.markAsTouched();
-    this.formFields.markAsDirty();
+
+    this.form.markAsTouched();
+    this.form.markAsDirty();
   }
 
   readonly getErrorMessage = (field: string): string | null => {
@@ -195,11 +199,14 @@ export class DataTypeManagementComponent {
   }
 
   readonly show = (dataType?: DataType) => {
-    this.dataType.set(dataType);
     this.form = this.createForm(dataType);
+
     dataType?.fields?.forEach(field => {
-      this.addField(field);
+      this.addField(dataType, field);
     });
+
+    this.form.markAsUntouched();
+    this.dataType.set(dataType);
     this.isShown.set(true);
   }
 }
