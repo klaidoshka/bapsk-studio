@@ -8,6 +8,5 @@ public enum FieldType
     Text = 4,
     Reference = 5,
     IsoCountryCode = 6,
-    IdentityDocumentType = 7,
-    UnitOfMeasureType = 8
+    Currency = 7
 }

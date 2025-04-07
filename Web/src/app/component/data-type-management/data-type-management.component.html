@@ -93,71 +93,27 @@
           <tbody class="p-datatable-tbody">
             @for (field of formFields.controls; let i = $index; track i) {
               <tr [formGroup]="field">
-                <td>
-                  <input
-                    formControlName="name"
-                    pInputText
-                    type="text"
-                    class="w-full"
-                  />
-                </td>
+                <td><input formControlName="name" pInputText type="text" class="w-full"/></td>
 
                 <td>
                   <p-select
                     formControlName="type"
-                    [options]="fieldTypes"
-                    optionLabel="label"
-                    optionValue="value"
-                    placeholder="Select a type"
-                    appendTo="body"
-                    styleClass="w-full"
-                    (onChange)="updateDefaultValue(i, $event.value)"
-                  ></p-select>
+                    [options]="fieldTypes" optionLabel="label" optionValue="value"
+                    placeholder="Select a type" appendTo="body" styleClass="w-full"
+                  />
                 </td>
 
                 <td>
-                  @switch (getFieldType(i)) {
-                    @case (FieldType.Check) {
-                      <p-check-box
-                        formControlName="defaultValue"
-                        binary="true"
-                        class="w-full"
-                      ></p-check-box>
-                    }
-                    @case (FieldType.Date) {
-                      <p-datepicker
-                        formControlName="defaultValue"
-                        hideOnDateTimeSelect="true"
-                        styleClass="w-full"
-                        appendTo="body"
-                        [showTime]="true"
-                        [showIcon]="true"
-                      ></p-datepicker>
-                    }
-                    @case (FieldType.Number) {
-                      <input
-                        formControlName="defaultValue"
-                        pInputText
-                        type="number"
-                        class="w-full"
-                      />
-                    }
-                    @default {
-                      <input
-                        formControlName="defaultValue"
-                        pInputText
-                        type="text"
-                        class="w-full"
-                      />
-                    }
-                  }
+                  <app-data-type-entry-field-input
+                    formControlName="defaultValue" [type]="getFieldType(i)"
+                  />
                 </td>
 
                 <td>
                   <p-checkbox
                     formControlName="isRequired"
                     binary="true"
-                  ></p-checkbox>
+                  />
                 </td>
 
                 <td>

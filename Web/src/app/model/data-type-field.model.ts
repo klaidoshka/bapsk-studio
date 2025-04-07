@@ -15,8 +15,7 @@ export enum FieldType {
   Text = 4,
   Reference = 5,
   IsoCountryCode = 6,
-  IdentityDocumentType = 7,
-  UnitOfMeasureType = 8
+  Currency = 7
 }
 
 export const fieldTypes = [
@@ -26,9 +25,8 @@ export const fieldTypes = [
   {label: 'Text', value: FieldType.Text},
   {label: 'Reference', value: FieldType.Reference},
   {label: 'Country', value: FieldType.IsoCountryCode},
-  {label: 'ID Type', value: FieldType.IdentityDocumentType},
-  {label: 'Unit of Measure Type', value: FieldType.UnitOfMeasureType}
-];
+  {label: 'Currency', value: FieldType.Currency}
+].sort((a, b) => a.label.localeCompare(b.label));
 
 export interface DataTypeFieldCreateRequest {
   dataTypeId: number;

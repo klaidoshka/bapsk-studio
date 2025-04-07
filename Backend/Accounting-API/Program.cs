@@ -33,8 +33,6 @@ builder.Services.AddScoped<NumberFieldHandler>();
 builder.Services.AddScoped<TextFieldHandler>();
 builder.Services.AddScoped<ReferenceFieldHandler>();
 builder.Services.AddScoped<IsoCountryCodeFieldHandler>();
-builder.Services.AddScoped<IdentityDocumentTypeFieldHandler>();
-builder.Services.AddScoped<UnitOfMeasureTypeFieldHandler>();
 
 builder.Services.AddScoped<Dictionary<FieldType, FieldHandler>>(
     provider => new Dictionary<FieldType, FieldHandler>
@@ -44,10 +42,7 @@ builder.Services.AddScoped<Dictionary<FieldType, FieldHandler>>(
         [FieldType.Number] = provider.GetRequiredService<NumberFieldHandler>(),
         [FieldType.Text] = provider.GetRequiredService<TextFieldHandler>(),
         [FieldType.Reference] = provider.GetRequiredService<ReferenceFieldHandler>(),
-        [FieldType.IsoCountryCode] = provider.GetRequiredService<IsoCountryCodeFieldHandler>(),
-        [FieldType.IdentityDocumentType] = provider.GetRequiredService<
-            IdentityDocumentTypeFieldHandler>(),
-        [FieldType.UnitOfMeasureType] = provider.GetRequiredService<UnitOfMeasureTypeFieldHandler>()
+        [FieldType.IsoCountryCode] = provider.GetRequiredService<IsoCountryCodeFieldHandler>()
     }
 );
 

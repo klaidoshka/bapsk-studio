@@ -15,12 +15,11 @@ import {TableModule} from 'primeng/table';
 import DataTypeField, {DataTypeFieldEditRequest, FieldType, fieldTypes} from '../../model/data-type-field.model';
 import {Checkbox} from 'primeng/checkbox';
 import {Select} from 'primeng/select';
-import {DatePicker} from 'primeng/datepicker';
 import {LocalizationService} from '../../service/localization.service';
-import {IsoCountryCode} from '../../model/iso-country.model';
 import {DataEntryService} from '../../service/data-entry.service';
 import Option from '../../model/options.model';
 import {NgIf} from '@angular/common';
+import {DataTypeEntryFieldInputComponent} from '../data-type-entry-field-input/data-type-entry-field-input.component';
 
 @Component({
   selector: 'app-data-type-management',
@@ -35,8 +34,8 @@ import {NgIf} from '@angular/common';
     Checkbox,
     Select,
     FormsModule,
-    DatePicker,
-    NgIf
+    NgIf,
+    DataTypeEntryFieldInputComponent
   ],
   templateUrl: './data-type-management.component.html',
   styles: ``
@@ -70,6 +69,13 @@ export class DataTypeManagementComponent {
     return this.form.get("fields") as FormArray<FormGroup>;
   }
 
+  private readonly create = (request: DataTypeCreateRequest) => {
+    this.dataTypeService.create(request).pipe(first()).subscribe({
+      next: () => this.onSuccess("DataType has been created successfully."),
+      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+    });
+  }
+
   private readonly createForm = (dataType?: DataType) => {
     this.displayFields.set(this.displayFields().slice(0, 1));
 
@@ -88,6 +94,22 @@ export class DataTypeManagementComponent {
     });
   }
 
+  private readonly edit = (request: DataTypeEditRequest) => {
+    this.dataTypeService.edit(request).pipe(first()).subscribe({
+      next: () => {
+        this.onSuccess("DataType has been edited successfully.");
+        this.dataEntryService.getAll(request.dataTypeId).subscribe();
+      },
+      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+    });
+  }
+
+  readonly getFieldType = (id: number): FieldType => {
+    return this.formFields.controls.at(id)?.value?.type || FieldType.Text;
+  }
+
+  private readonly onSuccess = (message: string) => this.messages.set({success: [message]});
+
   readonly addField = (field?: DataTypeField) => {
     this.formFields.push(this.formBuilder.group({
       name: [field?.name || '', Validators.required],
@@ -105,32 +127,6 @@ export class DataTypeManagementComponent {
     this.formFields.markAsDirty();
   }
 
-  readonly updateDefaultValue = (index: number, type: FieldType) => {
-    const field = this.formFields.at(index);
-
-    switch (type) {
-      case FieldType.Check:
-        field.patchValue({defaultValue: false});
-        break;
-
-      case FieldType.Date:
-        field.patchValue({defaultValue: new Date()});
-        break;
-
-      case FieldType.Number:
-        field.patchValue({defaultValue: 0});
-        break;
-
-      case FieldType.IsoCountryCode:
-        field.patchValue({defaultValue: IsoCountryCode.LT});
-        break;
-
-      default:
-        field.patchValue({defaultValue: ""});
-        break;
-    }
-  }
-
   readonly removeField = (index: number) => {
     this.formFields.removeAt(index);
     if (this.dataType()) {
@@ -139,25 +135,6 @@ export class DataTypeManagementComponent {
     this.formFields.markAsTouched();
     this.formFields.markAsDirty();
   }
-
-  private readonly create = (request: DataTypeCreateRequest) => {
-    this.dataTypeService.create(request).pipe(first()).subscribe({
-      next: () => this.onSuccess("DataType has been created successfully."),
-      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
-    });
-  }
-
-  private readonly edit = (request: DataTypeEditRequest) => {
-    this.dataTypeService.edit(request).pipe(first()).subscribe({
-      next: () => {
-        this.onSuccess("DataType has been edited successfully.");
-        this.dataEntryService.getAll(request.dataTypeId).subscribe();
-      },
-      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
-    });
-  }
-
-  private readonly onSuccess = (message: string) => this.messages.set({success: [message]});
 
   readonly getErrorMessage = (field: string): string | null => {
     const control = this.form.get(field);
@@ -171,10 +148,6 @@ export class DataTypeManagementComponent {
     }
 
     return null;
-  }
-
-  readonly getFieldType = (id: number): FieldType => {
-    return this.formFields.controls.at(id)?.value?.type || FieldType.Text;
   }
 
   readonly hide = () => {
