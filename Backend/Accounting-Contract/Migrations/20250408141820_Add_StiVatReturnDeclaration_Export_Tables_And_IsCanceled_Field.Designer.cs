@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Accounting.Contract.Migrations
 {
     [DbContext(typeof(AccountingDatabase))]
-    [Migration("20250408131146_Add_StiVatReturnDeclaration_Export_Tables_And_IsCanceled_Field")]
+    [Migration("20250408141820_Add_StiVatReturnDeclaration_Export_Tables_And_IsCanceled_Field")]
     partial class Add_StiVatReturnDeclaration_Export_Tables_And_IsCanceled_Field
     {
         /// <inheritdoc />
@@ -573,9 +573,6 @@ namespace Accounting.Contract.Migrations
 
                     b.Property<bool>("IsMet")
                         .HasColumnType("tinyint(1)");
-
-                    b.Property<decimal>("TotalAmountVerified")
-                        .HasColumnType("decimal(65,30)");
 
                     b.HasKey("Id");
 

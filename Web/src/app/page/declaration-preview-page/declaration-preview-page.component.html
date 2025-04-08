@@ -8,6 +8,8 @@
       <div class="flex flex-wrap gap-4">
         <!-- Left Column -->
         <div class="flex-1 min-w-42 bg-surface p-4 rounded-lg shadow-md relative">
+          <p class="font-bold text-lg mb-2">Declaration Information</p>
+
           <p class="text-lg">
             <strong>Declaration Id:</strong>
             {{ declaration()!.id }}
@@ -15,14 +17,14 @@
 
           <p class="text-lg">
             <strong>Submit Date:</strong>
-            {{ declaration()!.submitDate | date:'short' }}
+            {{ declaration()!.submitDate | date:'medium' }}
           </p>
 
           <p class="text-lg">
             <strong>State:</strong>
             <p-badge
               class="ml-1"
-              [value]="declaration()!.isCanceled ? 'Canceled' : getSubmitDeclarationStateLabel(declaration()!.state)"
+              [value]="declaration()!.isCanceled ? 'Canceled' : toSubmitDeclarationStateLabel(declaration()!.state)"
               [severity]="declaration()!.isCanceled || declaration()!.state === SubmitDeclarationState.REJECTED ? 'danger' : 'success'"
             />
           </p>
@@ -45,6 +47,8 @@
 
         <!-- Right Column -->
         <div class="flex-1 min-w-42 bg-surface p-4 rounded-lg shadow-md">
+          <p class="font-bold text-lg mb-2">Sale Information</p>
+
           <p class="text-lg">
             <strong>Customer:</strong>
             {{ toCustomerFullName(declaration()!.sale!.customer) }}
@@ -94,6 +98,8 @@
       </div>
 
       <div class="card mt-4 bg-surface p-4 rounded-lg shadow-md">
+        <p class="font-bold text-lg mb-4">Sold Goods</p>
+
         <p-table [value]="declaration()!.sale.soldGoods">
           <ng-template #header>
             <tr>
@@ -121,6 +127,76 @@
             </tr>
           </ng-template>
         </p-table>
+      </div>
+      <div class="card mt-4 bg-surface p-4 rounded-lg shadow-md" *ngIf="declaration?.()?.export">
+        <p class="font-bold text-lg mb-4">Export Information</p>
+
+        <div class="mb-4">
+          <p class="text-lg">
+            <strong>Assessment Date:</strong>
+            {{ declaration()!.export!.assessmentDate | date:'medium' }}
+          </p>
+          <p class="text-lg">
+            <strong>Assessed Declaration Correction No:</strong>
+            {{ declaration()!.export!.declarationCorrectionNo }}
+          </p>
+          <p class="text-lg" *ngIf="declaration()!.export!.correctionDate">
+            <strong>Correction Date:</strong>
+            {{ declaration()!.export!.correctionDate | date:'medium' }}
+          </p>
+          <p class="text-lg">
+            <strong>Customs Office Code:</strong>
+            {{ declaration()!.export!.customsOfficeCode }}
+          </p>
+          <p class="text-lg">
+            <strong>Verification Date:</strong>
+            {{ declaration()!.export!.verificationDate | date:'medium' }}
+          </p>
+          <p class="text-lg">
+            <strong>Verification Result:</strong>
+            {{ toExportResultLabel(declaration()!.export!.verificationResult) }}
+          </p>
+        </div>
+
+        <div class="mb-4">
+          <p class="font-bold text-lg mb-2">Assessment Conditions</p>
+          <ul class="list-disc pl-6">
+            <li *ngFor="let condition of declaration()!.export!.conditions">
+              <p>
+                <strong>{{ condition.code }}:</strong> {{ condition.description }}
+                <p-badge
+                  class="ml-1"
+                  [value]="condition.isMet ? 'Met' : 'Not Met'"
+                  [severity]="condition.isMet ? 'success' : 'danger'"
+                />
+              </p>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <p class="font-bold text-lg mb-2">Verified Sold Goods</p>
+          <p-table [value]="declaration()!.export!.verifiedSoldGoods">
+            <ng-template #header>
+              <tr>
+                <th class="text-left p-2">Sequence No</th>
+                <th class="text-left p-2">Quantity</th>
+                <th class="text-left p-2">Quantity Verified</th>
+                <th class="text-left p-2">Unit of Measure</th>
+                <th class="text-left p-2">Total Amount</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-verifiedGood>
+              <tr>
+                <td class="p-2">{{ verifiedGood.sequenceNo }}</td>
+                <td class="p-2">{{ verifiedGood.quantity }}</td>
+                <td class="p-2">{{ verifiedGood.quantityVerified }}</td>
+                <td class="p-2">{{ verifiedGood.unitOfMeasure }}</td>
+                <td class="p-2">{{ verifiedGood.totalAmount | currency:'EUR':'symbol':'1.2-2' }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
       </div>
     </div>
   </ng-container>

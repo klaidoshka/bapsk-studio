@@ -39,7 +39,6 @@ export interface VatReturnDeclarationExportAssessmentCondition {
   code: string;
   description: string;
   isMet: boolean;
-  totalAmountVerified: number;
 }
 
 export interface VatReturnDeclarationExportVerifiedSoldGoods {
@@ -78,7 +77,7 @@ export enum SubmitDeclarationState {
   REJECTED
 }
 
-export const getSubmitDeclarationStateLabel = (state?: SubmitDeclarationState | null): string => {
+export const toSubmitDeclarationStateLabel = (state?: SubmitDeclarationState | null): string => {
   switch (state) {
     case SubmitDeclarationState.ACCEPTED_CORRECT:
       return 'Accepted (Correct)';
@@ -86,6 +85,17 @@ export const getSubmitDeclarationStateLabel = (state?: SubmitDeclarationState | 
       return 'Accepted (Incorrect)';
     case SubmitDeclarationState.REJECTED:
       return 'Rejected';
+    default:
+      return '';
+  }
+}
+
+export const toExportResultLabel = (result?: VatReturnDeclarationExportVerificationResult | null): string => {
+  switch (result) {
+    case VatReturnDeclarationExportVerificationResult.A1:
+      return 'A1';
+    case VatReturnDeclarationExportVerificationResult.A4:
+      return 'A4';
     default:
       return '';
   }

@@ -34,13 +34,17 @@ public static class ExportedGoodsResponseExtensions
         return new StiVatReturnDeclarationExport
         {
             AssessmentDate = response.Info!.StiAssessmentResult.AssessmentDate,
-            Conditions = [],
+            Conditions = response.Info.StiAssessmentResult.Conditions
+                .Select(it => it.ToEntity())
+                .ToList(),
             CorrectionDate = response.Info.CustomsVerificationResult.CorrectionDate,
             CustomsOfficeCode = response.Info.CustomsVerificationResult.CustomsOfficeCode,
             DeclarationCorrectionNo = response.Info.CustomsVerificationResult.DocumentCorrectionNo,
             VerificationDate = response.Info.CustomsVerificationResult.VerificationDate,
             VerificationResult = response.Info.CustomsVerificationResult.VerificationResult,
-            VerifiedSoldGoods = []
+            VerifiedSoldGoods = response.Info.CustomsVerificationResult.VerifiedGoods
+                .Select(it => it.ToEntity())
+                .ToList()
         };
     }
 }

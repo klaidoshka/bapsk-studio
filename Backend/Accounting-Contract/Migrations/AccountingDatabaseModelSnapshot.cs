@@ -571,9 +571,6 @@ namespace Accounting.Contract.Migrations
                     b.Property<bool>("IsMet")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<decimal>("TotalAmountVerified")
-                        .HasColumnType("decimal(65,30)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ExportId");

@@ -1,7 +1,8 @@
 import {Component, effect, input, Signal, signal, viewChild} from '@angular/core';
 import {
-  getSubmitDeclarationStateLabel,
   SubmitDeclarationState,
+  toExportResultLabel,
+  toSubmitDeclarationStateLabel,
   VatReturnDeclarationWithDeclarer
 } from '../../model/vat-return.model';
 import {CurrencyPipe, DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
@@ -66,8 +67,9 @@ export class VatReturnDeclarationPreviewComponent {
     });
   }
 
-  protected readonly getSubmitDeclarationStateLabel = getSubmitDeclarationStateLabel;
   protected readonly toCustomerFullName = toCustomerFullName;
+  protected readonly toExportResultLabel = toExportResultLabel;
+  protected readonly toSubmitDeclarationStateLabel = toSubmitDeclarationStateLabel;
   protected readonly toUserIdentityFullName = toUserIdentityFullName;
 
   readonly cancel = () => {
@@ -75,7 +77,8 @@ export class VatReturnDeclarationPreviewComponent {
       this.isCanceling.set(true);
 
       this.vatReturnService.cancel(this.declaration()!.saleId).subscribe({
-        complete: () => this.isCanceling.set(false)
+        next: () => this.isCanceling.set(false),
+        error: () => this.isCanceling.set(false)
       });
     });
   }
@@ -95,7 +98,8 @@ export class VatReturnDeclarationPreviewComponent {
     this.isRefreshing.set(true);
 
     this.vatReturnService.update(this.declaration()!.saleId).subscribe({
-      complete: () => this.isRefreshing.set(false)
+      next: () => this.isRefreshing.set(false),
+      error: () => this.isRefreshing.set(false)
     });
   }
 

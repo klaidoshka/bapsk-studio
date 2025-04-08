@@ -57,4 +57,17 @@ public static class ExportedGoodsVerifiedGoodsExtensions
             UnitOfMeasureType = good.UnitOfMeasureType
         };
     }
+    
+    public static StiVatReturnDeclarationExportVerifiedGood ToEntity(this ExportedGoodsVerifiedGoods good)
+    {
+        return new StiVatReturnDeclarationExportVerifiedGood
+        {
+            Quantity = good.Quantity,
+            QuantityVerified = good.QuantityVerified,
+            SequenceNo = good.SequenceNo,
+            TotalAmount = good.TotalAmount,
+            UnitOfMeasure = good.UnitOfMeasure,
+            UnitOfMeasureType = good.UnitOfMeasureType
+        };
+    }
 }

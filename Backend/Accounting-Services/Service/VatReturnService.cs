@@ -218,7 +218,7 @@ public class VatReturnService : IVatReturnService
     public async Task CancelAsync(int saleId)
     {
         var declaration = await GetBySaleIdAsync(saleId);
-        
+
         if (declaration is null)
         {
             throw new ValidationException("Couldn't find declaration to cancel.");
@@ -228,7 +228,7 @@ public class VatReturnService : IVatReturnService
         {
             throw new ValidationException("Declaration is already canceled.");
         }
-        
+
         var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Vilnius");
 
         var clientRequest = new CancelDeclarationRequest
@@ -535,11 +535,10 @@ public class VatReturnService : IVatReturnService
             declaration.Export = null;
         }
 
-        var export = clientResponse.ToEntity();
+        declaration.Export = clientResponse.ToEntity();
 
-        export.Declaration = declaration;
-
-        await _database.StiVatReturnDeclarationExports.AddAsync(export);
+        _database.Update(declaration);
+        
         await _database.SaveChangesAsync();
     }
 }

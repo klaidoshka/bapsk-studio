@@ -33,8 +33,17 @@ public static class ExportedGoodsStiAssessmentResultConditionExtensions
         {
             Code = condition.Code,
             Description = condition.Description,
-            IsMet = condition.IsMet,
-            TotalAmountVerified = condition.TotalAmountVerified
+            IsMet = condition.IsMet
+        };
+    }
+    
+    public static StiVatReturnDeclarationExportAssessmentCondition ToEntity(this ExportedGoodsStiAssessmentResultCondition condition)
+    {
+        return new StiVatReturnDeclarationExportAssessmentCondition
+        {
+            Code = condition.Code,
+            Description = condition.Description,
+            IsMet = condition.IsMet
         };
     }
 }

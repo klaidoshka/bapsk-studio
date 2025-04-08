@@ -8,7 +8,7 @@ import VatReturnDeclaration, {
   VatReturnDeclarationWithDeclarer,
   VatReturnDeclarationWithSale
 } from '../model/vat-return.model';
-import {catchError, first, tap} from 'rxjs';
+import {catchError, first, map, tap} from 'rxjs';
 import {EnumUtil} from '../util/enum.util';
 import ErrorResponse from '../model/error-response.model';
 import {InternalFailure} from '../model/internal-failure-code.model';
@@ -58,16 +58,23 @@ export class VatReturnService {
   }
 
   readonly getWithSaleByPreviewCode = (id: string) => {
-    return this.httpClient.get<VatReturnDeclarationWithSale>(this.apiRouter.vatReturnGetByPreviewCode(id)).pipe(
+    return this.httpClient.get<VatReturnDeclarationWithSale | null>(this.apiRouter.vatReturnGetByPreviewCode(id)).pipe(
+      map(declaration => {
+        if (declaration) {
+          return this.updateProperties({
+              ...declaration,
+              sale: this.saleService.updateProperties(declaration.sale)
+            } as VatReturnDeclarationWithSale
+          ) as VatReturnDeclarationWithSale;
+        } else {
+          return declaration;
+        }
+      }),
       tap(declaration => {
         if (declaration != null) {
           this.updateSingleInStore(
             declaration.instanceId!,
-            this.updateProperties({
-                ...declaration,
-                sale: this.saleService.updateProperties(declaration.sale)
-              } as VatReturnDeclarationWithSale
-            )
+            declaration
           );
         }
       })
@@ -141,9 +148,9 @@ export class VatReturnService {
   }
 
   readonly update = (saleId: number) => {
-      return this.httpClient.post<void>(this.apiRouter.vatReturnUpdate(saleId), {}).pipe(
-        tap(() => this.getBySaleId(saleId).subscribe())
-      );
+    return this.httpClient.post<void>(this.apiRouter.vatReturnUpdate(saleId), {}).pipe(
+      tap(() => this.getBySaleId(saleId).subscribe())
+    );
   }
 
   readonly updateByPreviewCode = (code: string) => {

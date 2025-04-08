@@ -1,6 +1,11 @@
 import {Component, signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {getSubmitDeclarationStateLabel, SubmitDeclarationState, VatReturnDeclarationWithSale} from '../../model/vat-return.model';
+import {
+  SubmitDeclarationState,
+  toExportResultLabel,
+  toSubmitDeclarationStateLabel,
+  VatReturnDeclarationWithSale
+} from '../../model/vat-return.model';
 import {VatReturnService} from '../../service/vat-return.service';
 import {TableModule} from 'primeng/table';
 import {first} from 'rxjs';
@@ -33,6 +38,7 @@ import {Badge} from 'primeng/badge';
 })
 export class DeclarationPreviewPageComponent {
   protected readonly SubmitDeclarationState = SubmitDeclarationState;
+
   declarationPreviewCode = signal<string | undefined>(undefined);
   declaration = signal<VatReturnDeclarationWithSale | undefined>(undefined);
   showQrCodes = signal<boolean>(false);
@@ -56,8 +62,9 @@ export class DeclarationPreviewPageComponent {
     });
   }
 
-  protected readonly getSubmitDeclarationStateLabel = getSubmitDeclarationStateLabel;
   protected readonly toCustomerFullName = toCustomerFullName;
+  protected readonly toExportResultLabel = toExportResultLabel;
+  protected readonly toSubmitDeclarationStateLabel = toSubmitDeclarationStateLabel;
 
   readonly loadDeclaration = (code: string, callback?: () => void) => {
     this.vatReturnService.getWithSaleByPreviewCode(code).pipe(first()).subscribe({
@@ -67,8 +74,9 @@ export class DeclarationPreviewPageComponent {
         } else if (this.declaration()) {
           this.declaration.set(undefined);
         }
+        callback?.()
       },
-      complete: () => callback?.()
+      error: () => callback?.()
     });
   }
 

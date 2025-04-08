@@ -58,8 +58,7 @@ namespace Accounting.Contract.Migrations
                     Description = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ExportId = table.Column<int>(type: "int", nullable: false),
-                    IsMet = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    TotalAmountVerified = table.Column<decimal>(type: "decimal(65,30)", nullable: false)
+                    IsMet = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {

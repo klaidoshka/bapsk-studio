@@ -37,9 +37,4 @@ public class StiVatReturnDeclarationExportAssessmentCondition
     /// Result of the condition assessment. Is it met or unmet.
     /// </summary>
     public bool IsMet { get; set; }
-
-    /// <summary>
-    /// Total amount that was verified for the condition.
-    /// </summary>
-    public decimal TotalAmountVerified { get; set; }
 }
