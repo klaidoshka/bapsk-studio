@@ -29,6 +29,23 @@ public static class VatReturnEndpoints
             );
 
         builder
+            .MapPost(
+                "/{saleId:int}/cancel",
+                async (
+                    int saleId,
+                    IVatReturnService vatReturnService
+                ) =>
+                {
+                    await vatReturnService.CancelAsync(saleId);
+
+                    return Results.Ok();
+                }
+            )
+            .RequireAuthorization(
+                it => it.AddRequirements(new VatReturnRequirement(VatReturnRequirement.CrudOperation.Cancel))
+            );
+
+        builder
             .MapGet(
                 "{saleId:int}",
                 async (
@@ -41,12 +58,54 @@ public static class VatReturnEndpoints
             );
 
         builder
+            .MapPost(
+                "/{saleId:int}/update",
+                async (
+                    int saleId,
+                    IVatReturnService vatReturnService
+                ) =>
+                {
+                    await vatReturnService.UpdateInfoAsync(
+                        new StiVatReturnDeclarationUpdateInfoRequest
+                        {
+                            SaleId = saleId
+                        }
+                    );
+
+                    return Results.Ok();
+                }
+            )
+            .RequireAuthorization(
+                o => o.AddRequirements(new VatReturnRequirement(VatReturnRequirement.CrudOperation.UpdateInfo))
+            );
+
+        builder
             .MapGet(
                 String.Empty,
                 async (
                     string code,
                     IVatReturnService vatReturnService
                 ) => Results.Json((await vatReturnService.GetByPreviewCodeAsync(code))?.ToDtoWithSale())
+            )
+            .AllowAnonymous();
+
+        builder
+            .MapPost(
+                "/update",
+                async (
+                    string code,
+                    IVatReturnService vatReturnService
+                ) =>
+                {
+                    await vatReturnService.UpdateInfoAsync(
+                        new StiVatReturnDeclarationUpdateInfoRequest
+                        {
+                            PreviewCode = code
+                        }
+                    );
+
+                    return Results.Ok();
+                }
             )
             .AllowAnonymous();
     }

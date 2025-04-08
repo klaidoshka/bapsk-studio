@@ -35,7 +35,7 @@ public class DataEntry
     /// <summary>
     /// Navigation property for the fields of the data entry.
     /// </summary>
-    public virtual ICollection<DataEntryField> Fields { get; set; } = new List<DataEntryField>();
+    public ICollection<DataEntryField> Fields { get; set; } = new List<DataEntryField>();
 
     /// <summary>
     /// Unique identifier of the data entry.

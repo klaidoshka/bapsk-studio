@@ -1,10 +1,11 @@
 import {Component, effect, input, Signal, signal, viewChild} from '@angular/core';
 import {
-  getSubmitDeclarationStateLabel,
   SubmitDeclarationState,
+  toExportResultLabel,
+  toSubmitDeclarationStateLabel,
   VatReturnDeclarationWithDeclarer
 } from '../../model/vat-return.model';
-import {CurrencyPipe, DatePipe, NgForOf, NgIf} from '@angular/common';
+import {CurrencyPipe, DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {Dialog} from 'primeng/dialog';
 import {TableModule} from 'primeng/table';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -16,6 +17,9 @@ import {toUserIdentityFullName} from '../../model/user.model';
 import {toCustomerFullName} from '../../model/customer.model';
 import {VatReturnService} from '../../service/vat-return.service';
 import {RoundPipe} from '../../pipe/round.pipe';
+import {Badge} from 'primeng/badge';
+import {Button} from 'primeng/button';
+import {ConfirmationComponent} from '../confirmation/confirmation.component';
 
 @Component({
   selector: 'app-vat-return-declaration-preview',
@@ -29,19 +33,23 @@ import {RoundPipe} from '../../pipe/round.pipe';
     VatReturnDeclarationSubmissionComponent,
     CurrencyPipe,
     NgForOf,
-    RoundPipe
+    RoundPipe,
+    Badge,
+    Button,
+    NgClass,
+    ConfirmationComponent
   ],
   templateUrl: './vat-return-declaration-preview.component.html',
   styles: ``
 })
 export class VatReturnDeclarationPreviewComponent {
   protected readonly SubmitDeclarationState = SubmitDeclarationState;
-  protected readonly getSubmitDeclarationStateLabel = getSubmitDeclarationStateLabel;
-  protected readonly toCustomerFullName = toCustomerFullName;
-  protected readonly toUserIdentityFullName = toUserIdentityFullName;
 
+  cancelConfirmationComponent = viewChild(ConfirmationComponent);
   declaration!: Signal<VatReturnDeclarationWithDeclarer | undefined>;
   instanceId = input.required<number>();
+  isCanceling = signal<boolean>(false);
+  isRefreshing = signal<boolean>(false);
   isShown = signal<boolean>(false);
   sale = signal<SaleWithVatReturnDeclaration | undefined>(undefined);
   showQrCodes = signal<boolean>(false);
@@ -59,6 +67,22 @@ export class VatReturnDeclarationPreviewComponent {
     });
   }
 
+  protected readonly toCustomerFullName = toCustomerFullName;
+  protected readonly toExportResultLabel = toExportResultLabel;
+  protected readonly toSubmitDeclarationStateLabel = toSubmitDeclarationStateLabel;
+  protected readonly toUserIdentityFullName = toUserIdentityFullName;
+
+  readonly cancel = () => {
+    this.cancelConfirmationComponent()?.request(() => {
+      this.isCanceling.set(true);
+
+      this.vatReturnService.cancel(this.declaration()!.saleId).subscribe({
+        next: () => this.isCanceling.set(false),
+        error: () => this.isCanceling.set(false)
+      });
+    });
+  }
+
   readonly getVATToReturn = (sale: SaleWithVatReturnDeclaration): number => {
     return sale.soldGoods
     .map(it => it.vatAmount)
@@ -68,6 +92,15 @@ export class VatReturnDeclarationPreviewComponent {
   readonly hide = () => {
     this.isShown.set(false);
     this.sale.set(undefined);
+  }
+
+  readonly refresh = () => {
+    this.isRefreshing.set(true);
+
+    this.vatReturnService.update(this.declaration()!.saleId).subscribe({
+      next: () => this.isRefreshing.set(false),
+      error: () => this.isRefreshing.set(false)
+    });
   }
 
   readonly show = (sale: SaleWithVatReturnDeclaration) => {

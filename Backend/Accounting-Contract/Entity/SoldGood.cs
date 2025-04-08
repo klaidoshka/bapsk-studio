@@ -28,7 +28,7 @@ public class SoldGood
     public decimal Quantity { get; set; }
 
     /// <summary>
-    /// Navigational property to the sale that the good was sold in.
+    /// Navigation property to the sale that the good was sold in.
     /// </summary>
     [ForeignKey(nameof(SaleId))]
     public Sale Sale { get; set; }

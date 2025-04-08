@@ -11,6 +11,8 @@ using Accounting.Contract.Dto.Sale;
 using Accounting.Contract.Dto.Salesman;
 using Accounting.Contract.Dto.Sti;
 using Accounting.Contract.Dto.Sti.VatReturn;
+using Accounting.Contract.Dto.Sti.VatReturn.CancelDeclaration;
+using Accounting.Contract.Dto.Sti.VatReturn.ExportedGoods;
 using Accounting.Contract.Dto.Sti.VatReturn.Qr;
 using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
 using Accounting.Contract.Email;
@@ -207,10 +209,54 @@ public class VatReturnService : IVatReturnService
                 declaration.Sale.Customer.Email,
                 Emails.VatReturnDeclarationStatusChange(
                     declaration,
-                    GenerateDeclarationPreviewCode(declaration)
+                    GeneratePreviewCode(declaration)
                 )
             );
         }
+    }
+
+    public async Task CancelAsync(int saleId)
+    {
+        var declaration = await GetBySaleIdAsync(saleId);
+
+        if (declaration is null)
+        {
+            throw new ValidationException("Couldn't find declaration to cancel.");
+        }
+
+        if (declaration.IsCanceled)
+        {
+            throw new ValidationException("Declaration is already canceled.");
+        }
+
+        var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Vilnius");
+
+        var clientRequest = new CancelDeclarationRequest
+        {
+            DocumentId = declaration.Id,
+            RequestId = $"{Guid.NewGuid():N}",
+            SenderId = _stiVatReturn.Sender.Id,
+            TimeStamp = DateTime.Parse(
+                TimeZoneInfo
+                    .ConvertTimeFromUtc(DateTime.UtcNow, timeZone)
+                    .ToString("yyyy-MM-ddTHH:mm:ss")
+            )
+        };
+
+        var clientResponse = await _stiVatReturnClientService.CancelDeclarationAsync(clientRequest);
+
+        if (clientResponse.ResultStatus != ResultStatus.SUCCESS)
+        {
+            throw new ValidationException(
+                clientResponse.Errors!
+                    .Select(e => e.Description)
+                    .ToList()
+            );
+        }
+
+        declaration.IsCanceled = true;
+
+        await _database.SaveChangesAsync();
     }
 
     public async Task<string> GenerateDeclarationIdAsync()
@@ -220,7 +266,7 @@ public class VatReturnService : IVatReturnService
         return $"{_stiVatReturn.Sender.Id}/VAT.R/{nextId}";
     }
 
-    public string GenerateDeclarationPreviewCode(StiVatReturnDeclaration declaration)
+    public string GeneratePreviewCode(StiVatReturnDeclaration declaration)
     {
         var code = $"${declaration.SaleId}${declaration.Sale.CustomerId}${declaration.Id}${declaration.Sale.SalesmanId}";
 
@@ -256,18 +302,7 @@ public class VatReturnService : IVatReturnService
     public async Task<StiVatReturnDeclaration?> GetByPreviewCodeAsync(string code)
     {
         var values = ReadPreviewCodeValues(code);
-
-        var declaration = await _database.StiVatReturnDeclarations
-            .Include(it => it.QrCodes)
-            .Include(it => it.Sale)
-            .ThenInclude(it => it.Customer)
-            .ThenInclude(it => it.OtherDocuments)
-            .Include(it => it.Sale)
-            .ThenInclude(it => it.Salesman)
-            .Include(it => it.Sale)
-            .ThenInclude(it => it.SoldGoods)
-            .AsSplitQuery()
-            .FirstOrDefaultAsync(d => d.Id == values.DeclarationId);
+        var declaration = await GetBySaleIdAsync(values.SaleId);
 
         if (
             declaration is null ||
@@ -293,6 +328,10 @@ public class VatReturnService : IVatReturnService
             .ThenInclude(it => it.Salesman)
             .Include(it => it.Sale)
             .ThenInclude(it => it.SoldGoods)
+            .Include(it => it.Export)
+            .ThenInclude(it => it!.VerifiedSoldGoods)
+            .Include(it => it.Export)
+            .ThenInclude(it => it!.Conditions)
             .AsSplitQuery()
             .FirstOrDefaultAsync(d => d.SaleId == saleId);
     }
@@ -357,7 +396,7 @@ public class VatReturnService : IVatReturnService
 
         var clientRequest = declaration.ToSubmitDeclarationRequest(
             declaration.Sale.Customer.ResidenceCountry.ConvertToEnum<NonEuCountryCode>(),
-            $"{Guid.NewGuid():N}", // Request ID, unique for each request
+            $"{Guid.NewGuid():N}",
             _stiVatReturn
         );
 
@@ -387,7 +426,7 @@ public class VatReturnService : IVatReturnService
 
         var clientRequest = declaration.ToSubmitDeclarationRequest(
             declaration.Sale.Customer.ResidenceCountry.ConvertToEnum<NonEuCountryCode>(),
-            $"{Guid.NewGuid():N}", // Request ID, unique for each request
+            $"{Guid.NewGuid():N}",
             _stiVatReturn
         );
 
@@ -448,5 +487,58 @@ public class VatReturnService : IVatReturnService
 
             throw;
         }
+    }
+
+    public async Task UpdateInfoAsync(StiVatReturnDeclarationUpdateInfoRequest request)
+    {
+        if (request.PreviewCode is null && request.SaleId is null)
+        {
+            throw new ValidationException("Invalid declaration info update request.");
+        }
+
+        var declaration = request.PreviewCode is null
+            ? await GetBySaleIdAsync(request.SaleId!.Value)
+            : await GetByPreviewCodeAsync(request.PreviewCode);
+
+        if (declaration is null)
+        {
+            throw new ValidationException("Couldn't find declaration to update info for.");
+        }
+
+        var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Vilnius");
+
+        var now = DateTime.Parse(
+            TimeZoneInfo
+                .ConvertTimeFromUtc(DateTime.UtcNow, timeZone)
+                .ToString("yyyy-MM-ddTHH:mm:ss")
+        );
+
+        var clientRequest = new ExportedGoodsRequest
+        {
+            DocumentId = declaration.Id,
+            RequestId = $"{Guid.NewGuid():N}",
+            SenderId = _stiVatReturn.Sender.Id,
+            TimeStamp = now
+        };
+
+        var clientResponse = await _stiVatReturnClientService.GetInfoOnExportedGoodsAsync(clientRequest);
+
+        if (clientResponse.ResultStatus != ResultStatus.SUCCESS)
+        {
+            return;
+        }
+
+        if (declaration.Export is not null)
+        {
+            _database.StiVatReturnDeclarationExports.Remove(declaration.Export);
+
+            declaration.Export = null;
+        }
+
+        declaration.Export = clientResponse.ToEntity();
+
+        _database.Update(declaration);
+        
+        await _database.SaveChangesAsync();
     }
 }

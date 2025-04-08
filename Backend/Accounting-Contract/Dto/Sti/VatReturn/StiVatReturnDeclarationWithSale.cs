@@ -1,4 +1,5 @@
 using Accounting.Contract.Dto.Sale;
+using Accounting.Contract.Dto.Sti.VatReturn.ExportedGoods;
 
 namespace Accounting.Contract.Dto.Sti.VatReturn;
 
@@ -15,6 +16,7 @@ public static class StiVatReturnDeclarationWithSaleExtensions
         {
             Correction = declaration.Correction,
             DeclaredById = declaration.DeclaredById,
+            Export = declaration.Export?.ToDto(),
             Id = declaration.Id,
             InstanceId = declaration.InstanceId,
             QrCodes = declaration.QrCodes

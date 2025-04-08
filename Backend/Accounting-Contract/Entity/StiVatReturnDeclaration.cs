@@ -29,6 +29,12 @@ public class StiVatReturnDeclaration
     /// external requests.
     /// </summary>
     public int? DeclaredById { get; set; }
+    
+    /// <summary>
+    /// Navigation property to Export entity.
+    /// May not exist, if the declaration's goods are not yet assessed for export.
+    /// </summary>
+    public StiVatReturnDeclarationExport? Export { get; set; }
 
     /// <summary>
     /// Unique identifier of the declaration.
@@ -54,9 +60,14 @@ public class StiVatReturnDeclaration
     public int? InstanceId { get; set; }
 
     /// <summary>
+    /// Marks the declaration as canceled.
+    /// </summary>
+    public bool IsCanceled { get; set; }
+
+    /// <summary>
     /// Navigation property for the QR codes of this declaration.
     /// </summary>
-    public virtual ICollection<StiVatReturnDeclarationQrCode> QrCodes { get; set; } = new List<StiVatReturnDeclarationQrCode>();
+    public ICollection<StiVatReturnDeclarationQrCode> QrCodes { get; set; } = new List<StiVatReturnDeclarationQrCode>();
 
     /// <summary>
     /// Navigation property for the sale of the declaration.

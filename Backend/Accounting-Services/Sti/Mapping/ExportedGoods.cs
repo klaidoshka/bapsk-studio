@@ -57,11 +57,11 @@ public static class ExportedGoods
             CorrectionDate = results.CorrectionDate,
             DocumentId = results.DocId,
             CustomsOfficeCode = results.CustomsOfficeCode,
-            DocumentCorrectionNo = results.DocCorrNo,
+            DocumentCorrectionNo = Int32.Parse(results.DocCorrNo),
             VerificationDate = results.VerificationDate,
             VerifiedGoods = results.VerifiedGoods.ToInternalType(),
             VerificationResult = results.VerificationResult
-                .ConvertToEnum<ExportedGoodsCustomsVerificationResultType>()
+                .ConvertToEnum<StiVatReturnDeclarationExportVerificationResult>()
         };
     }
 
@@ -73,12 +73,11 @@ public static class ExportedGoods
             .Select(
                 g => new ExportedGoodsVerifiedGoods
                 {
-                    GrossValueVerified = g.GrossValueVerified,
                     UnitOfMeasure = g.Item,
                     UnitOfMeasureType = g.ItemElementName.ConvertToEnum<UnitOfMeasureType>(),
                     Quantity = g.Quantity,
                     QuantityVerified = g.QuantityVerified,
-                    SequenceNo = g.SequenceNo,
+                    SequenceNo = Int32.Parse(g.SequenceNo),
                     TotalAmount = g.TotalAmount
                 }
             )
@@ -106,7 +105,7 @@ public static class ExportedGoods
                 {
                     Code = c.Code,
                     Description = c.Description,
-                    Result = c.Result,
+                    IsMet = c.Result,
                     TotalAmountVerified = c.TotalAmountVerified
                 }
             )
