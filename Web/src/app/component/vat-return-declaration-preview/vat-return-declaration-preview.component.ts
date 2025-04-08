@@ -18,6 +18,7 @@ import {VatReturnService} from '../../service/vat-return.service';
 import {RoundPipe} from '../../pipe/round.pipe';
 import {Badge} from 'primeng/badge';
 import {Button} from 'primeng/button';
+import {ConfirmationComponent} from '../confirmation/confirmation.component';
 
 @Component({
   selector: 'app-vat-return-declaration-preview',
@@ -34,7 +35,8 @@ import {Button} from 'primeng/button';
     RoundPipe,
     Badge,
     Button,
-    NgClass
+    NgClass,
+    ConfirmationComponent
   ],
   templateUrl: './vat-return-declaration-preview.component.html',
   styles: ``
@@ -42,8 +44,10 @@ import {Button} from 'primeng/button';
 export class VatReturnDeclarationPreviewComponent {
   protected readonly SubmitDeclarationState = SubmitDeclarationState;
 
+  cancelConfirmationComponent = viewChild(ConfirmationComponent);
   declaration!: Signal<VatReturnDeclarationWithDeclarer | undefined>;
   instanceId = input.required<number>();
+  isCanceling = signal<boolean>(false);
   isRefreshing = signal<boolean>(false);
   isShown = signal<boolean>(false);
   sale = signal<SaleWithVatReturnDeclaration | undefined>(undefined);
@@ -66,6 +70,16 @@ export class VatReturnDeclarationPreviewComponent {
   protected readonly toCustomerFullName = toCustomerFullName;
   protected readonly toUserIdentityFullName = toUserIdentityFullName;
 
+  readonly cancel = () => {
+    this.cancelConfirmationComponent()?.request(() => {
+      this.isCanceling.set(true);
+
+      this.vatReturnService.cancel(this.declaration()!.saleId).subscribe({
+        complete: () => this.isCanceling.set(false)
+      });
+    });
+  }
+
   readonly getVATToReturn = (sale: SaleWithVatReturnDeclaration): number => {
     return sale.soldGoods
     .map(it => it.vatAmount)
@@ -79,7 +93,10 @@ export class VatReturnDeclarationPreviewComponent {
 
   readonly refresh = () => {
     this.isRefreshing.set(true);
-    this.vatReturnService.update(this.declaration()!.saleId).subscribe(() => this.isRefreshing.set(false));
+
+    this.vatReturnService.update(this.declaration()!.saleId).subscribe({
+      complete: () => this.isRefreshing.set(false)
+    });
   }
 
   readonly show = (sale: SaleWithVatReturnDeclaration) => {

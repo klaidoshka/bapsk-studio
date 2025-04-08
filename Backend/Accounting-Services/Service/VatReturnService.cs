@@ -228,13 +228,19 @@ public class VatReturnService : IVatReturnService
         {
             throw new ValidationException("Declaration is already canceled.");
         }
+        
+        var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Vilnius");
 
         var clientRequest = new CancelDeclarationRequest
         {
             DocumentId = declaration.Id,
             RequestId = $"{Guid.NewGuid():N}",
             SenderId = _stiVatReturn.Sender.Id,
-            TimeStamp = DateTime.UtcNow
+            TimeStamp = DateTime.Parse(
+                TimeZoneInfo
+                    .ConvertTimeFromUtc(DateTime.UtcNow, timeZone)
+                    .ToString("yyyy-MM-ddTHH:mm:ss")
+            )
         };
 
         var clientResponse = await _stiVatReturnClientService.CancelDeclarationAsync(clientRequest);

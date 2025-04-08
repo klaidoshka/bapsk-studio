@@ -33,12 +33,14 @@
           </p>
 
           <p-button
+            *ngIf="!declaration()!.isCanceled"
+            title="Refresh declaration"
             icon="pi pi-refresh"
             variant="text"
             class="absolute top-0 right-0 m-2"
             (click)="refresh()"
             [disabled]="isRefreshing()"
-          ></p-button>
+          />
         </div>
 
         <!-- Right Column -->

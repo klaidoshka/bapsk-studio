@@ -8,6 +8,8 @@
   (onHide)="hide()"
   [(visible)]="isShown"
 >
+  <app-confirmation key="cancel-confirmation" header="Are you sure about canceling this declaration?"/>
+
   <div class="flex flex-wrap gap-4" *ngIf="sale() !== undefined">
     <!-- Left Column -->
     <div class="flex-1 min-w-42 bg-surface p-4 rounded-lg shadow-md relative" *ngIf="declaration() != undefined">
@@ -41,11 +43,24 @@
       </p>
 
       <p-button
+        *ngIf="!declaration()!.isCanceled"
+        title="Refresh declaration"
         icon="pi pi-refresh"
         variant="text"
-        class="absolute top-0 right-0 m-2"
+        class="absolute top-0 right-10 m-2"
         (click)="refresh()"
         [disabled]="isRefreshing()"
+      ></p-button>
+
+      <p-button
+        *ngIf="!declaration()!.isCanceled"
+        title="Cancel declaration"
+        icon="pi pi-ban"
+        variant="text"
+        class="absolute top-0 right-0 m-2"
+        (click)="cancel()"
+        [disabled]="isCanceling()"
+        severity="danger"
       ></p-button>
     </div>
 
