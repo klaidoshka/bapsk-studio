@@ -72,7 +72,7 @@ public class Customer
     /// Navigation property to the other documents that the customer has associated.
     /// These documents help to identify the customer and prove that they live in the country they say they live in.
     /// </summary>
-    public virtual ICollection<CustomerOtherDocument> OtherDocuments { get; set; } = new List<CustomerOtherDocument>();
+    public ICollection<CustomerOtherDocument> OtherDocuments { get; set; } = new List<CustomerOtherDocument>();
 
     /// <summary>
     /// Country code of the country that the customer resides in
@@ -82,5 +82,5 @@ public class Customer
     /// <summary>
     /// Navigation property to the sales that the customer has made
     /// </summary>
-    public virtual ICollection<Sale> Sales { get; set; } = new List<Sale>();
+    public ICollection<Sale> Sales { get; set; } = new List<Sale>();
 }

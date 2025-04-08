@@ -7,7 +7,7 @@ namespace Accounting.Services.FieldHandler;
 
 public class ReferenceFieldHandler() : FieldHandler(FieldType.Reference)
 {
-    private readonly AccountingDatabase _database;
+    private readonly AccountingDatabase _database = null!;
 
     public ReferenceFieldHandler(AccountingDatabase database) : this()
     {

@@ -16,6 +16,7 @@ import {toUserIdentityFullName} from '../../model/user.model';
 import {toCustomerFullName} from '../../model/customer.model';
 import {VatReturnService} from '../../service/vat-return.service';
 import {RoundPipe} from '../../pipe/round.pipe';
+import {Badge} from 'primeng/badge';
 
 @Component({
   selector: 'app-vat-return-declaration-preview',
@@ -29,7 +30,8 @@ import {RoundPipe} from '../../pipe/round.pipe';
     VatReturnDeclarationSubmissionComponent,
     CurrencyPipe,
     NgForOf,
-    RoundPipe
+    RoundPipe,
+    Badge
   ],
   templateUrl: './vat-return-declaration-preview.component.html',
   styles: ``

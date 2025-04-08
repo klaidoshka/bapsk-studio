@@ -1,3 +1,5 @@
+using Accounting.Contract.Entity;
+
 namespace Accounting.Contract.Dto.Sti.VatReturn.ExportedGoods;
 
 public class ExportedGoodsCustomsVerificationResult
@@ -6,7 +8,7 @@ public class ExportedGoodsCustomsVerificationResult
     ///     Date-time of verification's correction if it was corrected, yyyy-MM-ddTHH:mm:ss.
     ///     Correction could happen if the verification happened not programmatically.
     /// </summary>
-    public DateTime CorrectionDate { get; set; }
+    public DateTime? CorrectionDate { get; set; }
 
     /// <summary>
     ///     Customs office code that performed the verification, 8 characters.
@@ -17,7 +19,7 @@ public class ExportedGoodsCustomsVerificationResult
     /// <summary>
     ///     Declaration's last correction number, 2 characters.
     /// </summary>
-    public required string DocumentCorrectionNo { get; set; }
+    public required int DocumentCorrectionNo { get; set; }
 
     /// <summary>
     ///     Unique declaration identifier, 34 characters.
@@ -32,7 +34,7 @@ public class ExportedGoodsCustomsVerificationResult
     /// <summary>
     ///     Final result of the verification at customs, 2 characters.
     /// </summary>
-    public required ExportedGoodsCustomsVerificationResultType VerificationResult { get; set; }
+    public required StiVatReturnDeclarationExportVerificationResult VerificationResult { get; set; }
 
     /// <summary>
     ///     Information regarding the goods that were verified.

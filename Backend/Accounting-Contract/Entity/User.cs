@@ -50,15 +50,15 @@ public class User
     public string FirstName { get; set; } = String.Empty;
 
     /// <summary>
-    /// Navigational property to instances that the user has created for accounting.
+    /// Navigation property to instances that the user has created for accounting.
     /// </summary>
-    public virtual ICollection<Instance> InstancesCreated { get; set; } = new List<Instance>();
+    public ICollection<Instance> InstancesCreated { get; set; } = new List<Instance>();
 
     /// <summary>
-    /// Navigational property to instances user metas associated with the user.
+    /// Navigation property to instances user metas associated with the user.
     /// These metas define which instances the user has access to.
     /// </summary>
-    public virtual ICollection<InstanceUserMeta> InstanceUserMetas { get; set; } = new List<InstanceUserMeta>();
+    public ICollection<InstanceUserMeta> InstanceUserMetas { get; set; } = new List<InstanceUserMeta>();
 
     /// <summary>
     /// Last name of the user.
@@ -73,5 +73,5 @@ public class User
     /// <summary>
     /// Navigation property for the sessions created by the user.
     /// </summary>
-    public virtual ICollection<Session> Sessions { get; set; } = new List<Session>();
+    public ICollection<Session> Sessions { get; set; } = new List<Session>();
 }

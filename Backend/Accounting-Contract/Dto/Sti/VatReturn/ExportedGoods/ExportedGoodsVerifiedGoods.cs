@@ -4,8 +4,6 @@ namespace Accounting.Contract.Dto.Sti.VatReturn.ExportedGoods;
 
 public class ExportedGoodsVerifiedGoods
 {
-    public decimal GrossValueVerified { get; set; }
-
     /// <summary>
     ///     Quantity of the goods.
     /// </summary>
@@ -20,7 +18,7 @@ public class ExportedGoodsVerifiedGoods
     /// <summary>
     ///     Unique identifier of the exported goods in the declaration.
     /// </summary>
-    public required string SequenceNo { get; set; }
+    public required int SequenceNo { get; set; }
 
     /// <summary>
     ///     Price of the goods (with VAT), Eur.
@@ -43,4 +41,20 @@ public class ExportedGoodsVerifiedGoods
     ///     by free text (copying it down from the goods label).
     /// </summary>
     public required UnitOfMeasureType UnitOfMeasureType { get; set; }
+}
+
+public static class ExportedGoodsVerifiedGoodsExtensions
+{
+    public static ExportedGoodsVerifiedGoods ToDto(this StiVatReturnDeclarationExportVerifiedGood good)
+    {
+        return new ExportedGoodsVerifiedGoods
+        {
+            Quantity = good.Quantity,
+            QuantityVerified = good.QuantityVerified,
+            SequenceNo = good.SequenceNo,
+            TotalAmount = good.TotalAmount,
+            UnitOfMeasure = good.UnitOfMeasure,
+            UnitOfMeasureType = good.UnitOfMeasureType
+        };
+    }
 }

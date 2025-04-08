@@ -52,5 +52,5 @@ public class Instance
     /// Navigation property for the user metas of the instance.
     /// Metas hold users and their data who can access the instance.
     /// </summary>
-    public virtual ICollection<InstanceUserMeta> UserMetas { get; set; } = new List<InstanceUserMeta>();
+    public ICollection<InstanceUserMeta> UserMetas { get; set; } = new List<InstanceUserMeta>();
 }

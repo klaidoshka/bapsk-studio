@@ -8,7 +8,9 @@ public class VatReturnRequirement(VatReturnRequirement.CrudOperation operation) 
 
     public enum CrudOperation
     {
+        Cancel,
         Create,
-        GetBySaleId
+        GetBySaleId,
+        UpdateInfo
     }
 }

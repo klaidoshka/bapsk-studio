@@ -3,6 +3,7 @@ import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
 import VatReturnDeclaration, {
   SubmitDeclarationState,
+  VatReturnDeclarationExportVerificationResult,
   VatReturnDeclarationSubmitRequest,
   VatReturnDeclarationWithDeclarer,
   VatReturnDeclarationWithSale
@@ -13,6 +14,7 @@ import ErrorResponse from '../model/error-response.model';
 import {InternalFailure} from '../model/internal-failure-code.model';
 import {UserService} from './user.service';
 import {SaleService} from './sale.service';
+import {UnitOfMeasureType} from '../model/unit-of-measure-type.model';
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +51,12 @@ export class VatReturnService {
     }
   }
 
+  readonly cancel = (saleId: number) => {
+    return this.httpClient.post<void>(this.apiRouter.vatReturnCancel(saleId), {}).pipe(
+      tap(() => this.getBySaleId(saleId).subscribe())
+    );
+  }
+
   readonly getWithSaleByPreviewCode = (id: string) => {
     return this.httpClient.get<VatReturnDeclarationWithSale>(this.apiRouter.vatReturnGetByPreviewCode(id)).pipe(
       tap(declaration => {
@@ -56,9 +64,10 @@ export class VatReturnService {
           this.updateSingleInStore(
             declaration.instanceId!,
             this.updateProperties({
-              ...declaration,
-              sale: this.saleService.updateProperties(declaration.sale)
-            } as VatReturnDeclarationWithSale)
+                ...declaration,
+                sale: this.saleService.updateProperties(declaration.sale)
+              } as VatReturnDeclarationWithSale
+            )
           );
         }
       })
@@ -131,10 +140,30 @@ export class VatReturnService {
     );
   }
 
+  readonly update = (saleId: number) => {
+      return this.httpClient.post<void>(this.apiRouter.vatReturnUpdate(saleId), {}).pipe(
+        tap(() => this.getBySaleId(saleId).subscribe())
+      );
+  }
+
+  readonly updateByPreviewCode = (code: string) => {
+    return this.httpClient.post<void>(this.apiRouter.vatReturnUpdateByPreviewCode(code), {}).pipe(
+      tap(() => this.getWithSaleByPreviewCode(code).subscribe())
+    );
+  }
+
   readonly updateProperties = (declaration: VatReturnDeclaration): VatReturnDeclaration => {
     return {
       ...declaration,
       state: EnumUtil.toEnumOrThrow(declaration.state, SubmitDeclarationState),
-    }
+      export: declaration.export && {
+        ...declaration.export,
+        verificationResult: EnumUtil.toEnumOrThrow(declaration.export.verificationResult, VatReturnDeclarationExportVerificationResult),
+        verifiedSoldGoods: declaration.export.verifiedSoldGoods.map(it => ({
+          ...it,
+          unitOfMeasureType: EnumUtil.toEnumOrThrow(it.unitOfMeasureType, UnitOfMeasureType),
+        }))
+      } || undefined
+    };
   }
 }

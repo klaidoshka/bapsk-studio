@@ -75,5 +75,5 @@ public class Sale
     /// <summary>
     /// Navigation property to the goods that were sold in this sale
     /// </summary>
-    public virtual ICollection<SoldGood> SoldGoods { get; set; } = new List<SoldGood>();
+    public ICollection<SoldGood> SoldGoods { get; set; } = new List<SoldGood>();
 }

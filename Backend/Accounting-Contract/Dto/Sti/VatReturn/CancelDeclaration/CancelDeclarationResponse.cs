@@ -6,7 +6,7 @@ public class CancelDeclarationResponse
     ///     Errors that occurred during the operation. Only exists
     ///     if the operation's result is not successful.
     /// </summary>
-    public IReadOnlyList<StiError> Errors { get; set; }
+    public IReadOnlyList<StiError>? Errors { get; set; }
 
     /// <summary>
     ///     Response date-time, yyyy-MM-ddTHH:mm:ss.

@@ -31,6 +31,11 @@
         <strong>Corrected Times:</strong>
         {{ declaration()!.correction }}
       </p>
+      <p-badge
+        *ngIf="declaration()?.isCanceled"
+        value="Canceled"
+        severity="danger"
+      />
     </div>
 
     <!-- Right Column -->
@@ -94,7 +99,8 @@
           class="flex flex-wrap gap-4 max-w-152"
           *ngFor="let qrCode of declaration()!.qrCodes; let i = index"
         >
-          <img [src]="'data:image/png;base64,' + qrCode" [alt]="'Declaration\'s #' + (i + 1) + ' QR code chunk'" class="w-48 h-48"/>
+          <img [src]="'data:image/png;base64,' + qrCode" [alt]="'Declaration\'s #' + (i + 1) + ' QR code chunk'"
+               class="w-48 h-48"/>
         </div>
       </div>
     </div>

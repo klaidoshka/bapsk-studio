@@ -31,7 +31,7 @@ public class MessageLoggingBehavior : IEndpointBehavior
             Console.WriteLine("-------- Response --------\n" + reply);
         }
 
-        public object BeforeSendRequest(ref Message request, IClientChannel channel)
+        public object? BeforeSendRequest(ref Message request, IClientChannel channel)
         {
             Console.WriteLine("-------- Request  --------\n" + request);
 

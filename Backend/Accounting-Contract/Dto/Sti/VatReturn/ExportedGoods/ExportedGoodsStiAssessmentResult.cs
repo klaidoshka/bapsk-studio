@@ -10,9 +10,5 @@ public class ExportedGoodsStiAssessmentResult
     /// <summary>
     ///     Conditions that were assessed.
     /// </summary>
-    public required IReadOnlyList<ExportedGoodsStiAssessmentResultCondition> Conditions
-    {
-        get;
-        set;
-    }
+    public required IReadOnlyList<ExportedGoodsStiAssessmentResultCondition> Conditions { get; set; }
 }

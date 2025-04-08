@@ -36,7 +36,7 @@ public class Salesman
     /// <summary>
     /// Navigation property to the sales that the salesman has made
     /// </summary>
-    public virtual ICollection<Sale> Sales { get; set; } = new List<Sale>();
+    public ICollection<Sale> Sales { get; set; } = new List<Sale>();
 
     /// <summary>
     /// VAT payer code of the salesman
