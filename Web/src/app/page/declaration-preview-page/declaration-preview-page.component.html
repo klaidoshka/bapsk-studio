@@ -7,19 +7,26 @@
     <div class="w-fit mx-auto my-4">
       <div class="flex flex-wrap gap-4">
         <!-- Left Column -->
-        <div class="flex-1 min-w-[250px] bg-surface p-4 rounded-lg shadow-md relative">
+        <div class="flex-1 min-w-42 bg-surface p-4 rounded-lg shadow-md relative">
           <p class="text-lg">
             <strong>Declaration Id:</strong>
             {{ declaration()!.id }}
           </p>
+
           <p class="text-lg">
             <strong>Submit Date:</strong>
             {{ declaration()!.submitDate | date:'short' }}
           </p>
+
           <p class="text-lg">
             <strong>State:</strong>
-            {{ getSubmitDeclarationStateLabel(declaration()!.state) }}
+            <p-badge
+              class="ml-1"
+              [value]="declaration()!.isCanceled ? 'Canceled' : getSubmitDeclarationStateLabel(declaration()!.state)"
+              [severity]="declaration()!.isCanceled || declaration()!.state === SubmitDeclarationState.REJECTED ? 'danger' : 'success'"
+            />
           </p>
+
           <p *ngIf="declaration()!.correction > 1" class="text-lg">
             <strong>Corrected Times:</strong>
             {{ declaration()!.correction }}
@@ -35,19 +42,22 @@
         </div>
 
         <!-- Right Column -->
-        <div class="flex-1 min-w-[250px] bg-surface p-4 rounded-lg shadow-md">
+        <div class="flex-1 min-w-42 bg-surface p-4 rounded-lg shadow-md">
           <p class="text-lg">
             <strong>Customer:</strong>
             {{ toCustomerFullName(declaration()!.sale!.customer) }}
           </p>
+
           <p class="text-lg">
             <strong>Salesman:</strong>
             {{ declaration()!.sale.salesman.name }}
           </p>
+
           <p class="text-lg">
             <strong>Sold Goods:</strong>
             {{ declaration()!.sale.soldGoods.length }} good(s)
           </p>
+
           <p class="text-lg">
             <strong>VAT to return:</strong>
             {{ getVATToReturn(declaration()!.sale) | currency:'EUR':'symbol':'1.2-2' }}

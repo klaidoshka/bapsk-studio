@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Accounting.Contract.Migrations
 {
     [DbContext(typeof(AccountingDatabase))]
-    [Migration("20250408111219_Add_StiVatReturnDeclaration_Export_Tables_And_IsCanceled_Field")]
+    [Migration("20250408131146_Add_StiVatReturnDeclaration_Export_Tables_And_IsCanceled_Field")]
     partial class Add_StiVatReturnDeclaration_Export_Tables_And_IsCanceled_Field
     {
         /// <inheritdoc />
@@ -531,9 +531,8 @@ namespace Accounting.Contract.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("DeclarationCorrectionNo")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("DeclarationCorrectionNo")
+                        .HasColumnType("int");
 
                     b.Property<string>("DeclarationId")
                         .IsRequired()

@@ -528,9 +528,8 @@ namespace Accounting.Contract.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("DeclarationCorrectionNo")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("DeclarationCorrectionNo")
+                        .HasColumnType("int");
 
                     b.Property<string>("DeclarationId")
                         .IsRequired()

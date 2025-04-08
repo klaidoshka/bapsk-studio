@@ -1,6 +1,6 @@
 import {Component, signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
-import {getSubmitDeclarationStateLabel, VatReturnDeclarationWithSale} from '../../model/vat-return.model';
+import {getSubmitDeclarationStateLabel, SubmitDeclarationState, VatReturnDeclarationWithSale} from '../../model/vat-return.model';
 import {VatReturnService} from '../../service/vat-return.service';
 import {TableModule} from 'primeng/table';
 import {first} from 'rxjs';
@@ -12,6 +12,7 @@ import {Button} from 'primeng/button';
 import {
   DeclarationPreviewPageSkeletonComponent
 } from './declaration-preview-page-skeleton/declaration-preview-page-skeleton.component';
+import {Badge} from 'primeng/badge';
 
 @Component({
   selector: 'app-declaration-preview-page',
@@ -24,12 +25,14 @@ import {
     NgForOf,
     NgClass,
     Button,
-    DeclarationPreviewPageSkeletonComponent
+    DeclarationPreviewPageSkeletonComponent,
+    Badge
   ],
   templateUrl: './declaration-preview-page.component.html',
   styles: ``
 })
 export class DeclarationPreviewPageComponent {
+  protected readonly SubmitDeclarationState = SubmitDeclarationState;
   declarationPreviewCode = signal<string | undefined>(undefined);
   declaration = signal<VatReturnDeclarationWithSale | undefined>(undefined);
   showQrCodes = signal<boolean>(false);

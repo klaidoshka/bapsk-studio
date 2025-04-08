@@ -4,7 +4,7 @@ import {
   SubmitDeclarationState,
   VatReturnDeclarationWithDeclarer
 } from '../../model/vat-return.model';
-import {CurrencyPipe, DatePipe, NgForOf, NgIf} from '@angular/common';
+import {CurrencyPipe, DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
 import {Dialog} from 'primeng/dialog';
 import {TableModule} from 'primeng/table';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -17,6 +17,7 @@ import {toCustomerFullName} from '../../model/customer.model';
 import {VatReturnService} from '../../service/vat-return.service';
 import {RoundPipe} from '../../pipe/round.pipe';
 import {Badge} from 'primeng/badge';
+import {Button} from 'primeng/button';
 
 @Component({
   selector: 'app-vat-return-declaration-preview',
@@ -31,19 +32,19 @@ import {Badge} from 'primeng/badge';
     CurrencyPipe,
     NgForOf,
     RoundPipe,
-    Badge
+    Badge,
+    Button,
+    NgClass
   ],
   templateUrl: './vat-return-declaration-preview.component.html',
   styles: ``
 })
 export class VatReturnDeclarationPreviewComponent {
   protected readonly SubmitDeclarationState = SubmitDeclarationState;
-  protected readonly getSubmitDeclarationStateLabel = getSubmitDeclarationStateLabel;
-  protected readonly toCustomerFullName = toCustomerFullName;
-  protected readonly toUserIdentityFullName = toUserIdentityFullName;
 
   declaration!: Signal<VatReturnDeclarationWithDeclarer | undefined>;
   instanceId = input.required<number>();
+  isRefreshing = signal<boolean>(false);
   isShown = signal<boolean>(false);
   sale = signal<SaleWithVatReturnDeclaration | undefined>(undefined);
   showQrCodes = signal<boolean>(false);
@@ -61,6 +62,10 @@ export class VatReturnDeclarationPreviewComponent {
     });
   }
 
+  protected readonly getSubmitDeclarationStateLabel = getSubmitDeclarationStateLabel;
+  protected readonly toCustomerFullName = toCustomerFullName;
+  protected readonly toUserIdentityFullName = toUserIdentityFullName;
+
   readonly getVATToReturn = (sale: SaleWithVatReturnDeclaration): number => {
     return sale.soldGoods
     .map(it => it.vatAmount)
@@ -70,6 +75,11 @@ export class VatReturnDeclarationPreviewComponent {
   readonly hide = () => {
     this.isShown.set(false);
     this.sale.set(undefined);
+  }
+
+  readonly refresh = () => {
+    this.isRefreshing.set(true);
+    this.vatReturnService.update(this.declaration()!.saleId).subscribe(() => this.isRefreshing.set(false));
   }
 
   readonly show = (sale: SaleWithVatReturnDeclaration) => {

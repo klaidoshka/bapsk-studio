@@ -519,11 +519,7 @@ public class VatReturnService : IVatReturnService
 
         if (clientResponse.ResultStatus != ResultStatus.SUCCESS)
         {
-            throw new ValidationException(
-                clientResponse.Errors!
-                    .Select(e => e.Description)
-                    .ToList()
-            );
+            return;
         }
 
         if (declaration.Export is not null)
