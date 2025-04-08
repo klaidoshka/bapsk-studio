@@ -15,7 +15,7 @@ export class ThemeService {
   private readonly isStoredDarkTheme = () => {
     const theme = localStorage.getItem(this.themeKey);
 
-    if (theme === null) {
+    if (theme == null) {
       return window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
 
@@ -29,7 +29,7 @@ export class ThemeService {
   readonly isDarkTheme = () => this.darkTheme.asReadonly();
 
   readonly toggleTheme = (value?: boolean) => {
-    this.darkTheme.set(value || !this.darkTheme());
+    this.darkTheme.set(value != null ? value : !this.darkTheme());
     this.storeTheme(this.darkTheme());
 
     if (this.darkTheme()) {
