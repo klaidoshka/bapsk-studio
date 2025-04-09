@@ -1,0 +1,69 @@
+<div>
+  <salesman-preview/>
+
+  <salesman-management [instanceId]="instanceId()"/>
+
+  <confirmation
+    [key]='"salesman-delete-confirmation"'
+    [header]='"Are you sure about deleting this salesman?"'
+  />
+
+  <messages-showcase [messages]="messages()"/>
+
+  <p-button
+    label="Create"
+    icon="pi pi-plus"
+    type="button"
+    (onClick)="showManagement(null)"
+  ></p-button>
+
+  <div class="card mt-4">
+    <p-table
+      styleClass="w-fit"
+      [value]="salesmen()"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[10, 20, 50]"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Name</th>
+          <th>Vat Payer Code</th>
+          <th>Vat Payer Code Issued By</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template
+        #body
+        let-salesman
+      >
+        <tr>
+          <td>{{ salesman.name }}</td>
+          <td>{{ salesman.vatPayerCode.value }}</td>
+          <td>{{ getCountryLabel(salesman.vatPayerCode.issuedBy) }}</td>
+          <td class="flex flex-nowrap items-center">
+            <p-button
+              icon="pi pi-eye"
+              type="button"
+              variant="text"
+              (onClick)="showPreview(salesman)"
+            ></p-button>
+            <p-button
+              icon="pi pi-pencil"
+              type="button"
+              variant="text"
+              (onClick)="showManagement(salesman)"
+            ></p-button>
+            <p-button
+              icon="pi pi-trash"
+              type="button"
+              variant="text"
+              (onClick)="delete(salesman)"
+            ></p-button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

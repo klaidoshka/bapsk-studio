@@ -1,0 +1,39 @@
+<confirmation key="session-revokation" header="Are you sure about revoking this session?"/>
+
+<p-toast key="session-revokation"/>
+
+<p-table
+  styleClass="w-fit"
+  [value]="sessions()"
+>
+  <ng-template #header>
+    <tr>
+      <th>Agent</th>
+      <th>Created At</th>
+      <th>IP Address</th>
+      <th>Location</th>
+      <th>Actions</th>
+    </tr>
+  </ng-template>
+
+  <ng-template
+    #body
+    let-session
+  >
+    <tr>
+      <td class="max-w-64">{{ session.agent }}</td>
+      <td>{{ session.createdAt | date: 'medium' }}</td>
+      <td>{{ session.ipAddress }}</td>
+      <td>{{ session.location }}</td>
+      <td>
+        <p-button
+          [disabled]="session.id === currentSessionId()"
+          icon="pi pi-ban"
+          type="button"
+          variant="text"
+          (onClick)="revoke(session)"
+        ></p-button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
