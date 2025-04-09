@@ -32,10 +32,21 @@
             ></p-select>
           </div>
         </div>
+
+        <div class="mt-2 p-2 border rounded shadow">
+          <label for="htmlFileInput" class="block text-sm font-medium text-primary-950">Upload HTML</label>
+          <input
+            id="htmlFileInput"
+            type="file"
+            accept=".html"
+            (change)="selectFile($event)"
+            class="mt-2 block w-full text-primary-950 text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border file:text-sm file:font-semibold"
+          />
+        </div>
       </div>
 
       <!-- Main Content -->
-      <div class="flex-grow p-6">
+      <div class="flex-grow flex-col p-6">
         <ng-container *ngIf="selectedWorkspace() === WorkspaceType.DataType">
           <h1 class="text-xl font-bold">{{ selectedDataType()?.name }}</h1>
 

@@ -18,7 +18,9 @@ application.post(`${apiPrefix}/misc/beautify-html`, (req, res) => {
     return;
   }
 
-  const result = HtmlService.beautifyHtml(html);
+  let result = HtmlService.beautifyHtml(html);
+
+  result = result && HtmlService.insertTailwind(result);
 
   if (result === undefined) {
     res.status(500).send("Couldn't beautify HTML.");
@@ -29,4 +31,4 @@ application.post(`${apiPrefix}/misc/beautify-html`, (req, res) => {
   res.send(result);
 });
 
-application.listen(apiPort, () => console.log(`Server running at port :${apiPort}`));
+application.listen(apiPort, () => console.log(`Server running at port http://localhost:${apiPort}`));

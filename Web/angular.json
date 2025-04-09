@@ -28,7 +28,7 @@
             "outputPath": "dist/web",
             "index": "src/client/index.html",
             "browser": "src/client/main.ts",
-            "tsConfig": "tsconfig.app.json",
+            "tsConfig": "tsconfig.client.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               {

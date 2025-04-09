@@ -22,6 +22,7 @@ import {VatReturnService} from '../../service/vat-return.service';
 import {DataEntryJoined} from '../../model/data-entry.model';
 import {DataEntryService} from '../../service/data-entry.service';
 import {UserService} from '../../service/user.service';
+import {HttpClient} from '@angular/common/http';
 
 @Component({
   selector: 'workspace-page',
@@ -46,6 +47,8 @@ export class WorkspacePageComponent {
   ];
 
   constructor(
+    private httpClient: HttpClient,
+
     customerService: CustomerService,
     dataEntryService: DataEntryService,
     dataTypeService: DataTypeService,
@@ -135,6 +138,52 @@ export class WorkspacePageComponent {
     if (dataType != null && this.selectedDataType() !== dataType) {
       this.selectedDataType.set(dataType);
     }
+  }
+
+  readonly selectFile = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    const file = input.files[0];
+
+    if (file.type !== 'text/html') {
+      alert('Please upload a valid HTML file.');
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      this.httpClient
+      .post(`http://localhost:4000/api/v1/misc/beautify-html`, reader.result, {
+        headers: {
+          'Content-Type': 'text/html'
+        },
+        responseType: 'text'
+      })
+      .subscribe((result) => {
+        const blob = new Blob([result as string], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+
+        a.href = url;
+        a.download = 'beautified.html';
+        a.style.display = 'none';
+
+        document.body.appendChild(a);
+
+        a.click();
+
+        document.body.removeChild(a);
+
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    reader.readAsText(file);
   }
 
   selectWorkspace(workspace: WorkspaceType) {
