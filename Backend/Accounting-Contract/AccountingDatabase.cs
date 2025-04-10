@@ -12,6 +12,8 @@ public class AccountingDatabase : DbContext
     public DbSet<DataEntryField> DataEntryFields { get; set; }
     public DbSet<DataType> DataTypes { get; set; }
     public DbSet<DataTypeField> DataTypeFields { get; set; }
+    public DbSet<ImportConfiguration> ImportConfigurations { get; set; }
+    public DbSet<ImportConfigurationField> ImportConfigurationFields { get; set; }
     public DbSet<Instance> Instances { get; set; }
     public DbSet<InstanceUserMeta> InstanceUserMetas { get; set; }
     public DbSet<Sale> Sales { get; set; }
