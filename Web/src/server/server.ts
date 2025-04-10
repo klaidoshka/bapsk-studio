@@ -10,25 +10,29 @@ application.use(cors());
 application.use(express.json());
 application.use(express.text({type: "text/html"}));
 
-application.post(`${apiPrefix}/misc/beautify-html`, (req, res) => {
+application.post(`${apiPrefix}/misc/beautify-html-table`, (req, res) => {
   const html = req.body;
 
   if (!html) {
-    res.status(400).send("No HTML provided.");
+    res.status(400).send("No html provided.");
     return;
   }
 
-  let result = HtmlService.beautifyHtml(html);
+  try {
+    let result = HtmlService.beautifyTable(html);
 
-  result = result && HtmlService.insertTailwind(result);
+    result = result && HtmlService.insertTailwind(result);
 
-  if (result === undefined) {
-    res.status(500).send("Couldn't beautify HTML.");
-    return;
+    if (result === undefined) {
+      res.status(400).send("Couldn't beautify table for html.");
+      return;
+    }
+
+    res.set("Content-Type", "text/html");
+    res.send(result);
+  } catch (e: Error | any) {
+    res.status(400).send(e?.message || e);
   }
-
-  res.set("Content-Type", "text/html");
-  res.send(result);
 });
 
 application.listen(apiPort, () => console.log(`Server running at port http://localhost:${apiPort}`));
