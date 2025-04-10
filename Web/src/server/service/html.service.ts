@@ -32,7 +32,12 @@ export class HtmlService {
     $("tr").addClass("bg-white hover:bg-zinc-100 rounded-md")
     $("tr:first").addClass("border-zinc-300 border-b-2");
 
-    $("th").addClass("w-fit px-4 py-2 text-left text-zinc-700 font-semibold hover:bg-zinc-200");
+    $("th").addClass("w-fit px-4 py-2 text-left text-zinc-700 font-semibold hover:bg-zinc-200 hover:cursor-pointer");
+
+    $("th").each((i, e) => {
+      $(e).attr("data-col", i + '').addClass("cursor-pointer relative");
+      $(e).append(`<div class="filter-index absolute top-0 right-0 text-xs text-zinc-700 font-bold"></div>`);
+    });
 
     $("td")
       .addClass("px-4 py-2 text-zinc-700 hover:bg-zinc-200")
@@ -43,6 +48,10 @@ export class HtmlService {
           $(td).addClass("text-right");
         }
       });
+
+    const filterScript = fs.readFileSync('src/server/resource/filter-beautified-table.js', 'utf8')
+
+    $("body").append(`<script>(function(){${filterScript}})()</script>`);
 
     return $.html();
   }
