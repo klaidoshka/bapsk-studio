@@ -13,5 +13,5 @@ public interface IDataEntryService
 
     public Task<DataEntry> GetAsync(DataEntryGetRequest request);
 
-    public Task<IEnumerable<DataEntry>> GetByDataTypeIdAsync(DataEntryGetByDataTypeRequest request);
+    public Task<IList<DataEntry>> GetByDataTypeIdAsync(DataEntryGetByDataTypeRequest request);
 }

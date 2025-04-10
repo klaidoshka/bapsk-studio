@@ -121,7 +121,7 @@ public class CustomerService : ICustomerService
         await _database.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<Customer>> GetAsync(CustomerGetRequest request)
+    public async Task<IList<Customer>> GetAsync(CustomerGetRequest request)
     {
         // Validate if instance exists
         // Validate if requester can access the instance (HIGHER LEVEL)

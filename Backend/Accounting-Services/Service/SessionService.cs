@@ -36,7 +36,7 @@ public class SessionService : ISessionService
         return (await _database.Sessions.FindAsync(request.SessionId))!;
     }
 
-    public async Task<IEnumerable<Session>> GetByUserIdAsync(SessionGetByUserRequest request)
+    public async Task<IList<Session>> GetByUserIdAsync(SessionGetByUserRequest request)
     {
         return await _database.Sessions
             .Where(s => s.UserId == request.RequesterId)

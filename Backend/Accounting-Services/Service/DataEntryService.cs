@@ -137,7 +137,7 @@ public class DataEntryService : IDataEntryService
             .FirstAsync(de => de.Id == request.DataEntryId);
     }
 
-    public async Task<IEnumerable<DataEntry>> GetByDataTypeIdAsync(
+    public async Task<IList<DataEntry>> GetByDataTypeIdAsync(
         DataEntryGetByDataTypeRequest request
     )
     {

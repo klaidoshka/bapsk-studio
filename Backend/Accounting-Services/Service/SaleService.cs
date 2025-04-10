@@ -141,7 +141,7 @@ public class SaleService : ISaleService
         await _database.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<Sale>> GetAsync(SaleGetRequest request)
+    public async Task<IList<Sale>> GetAsync(SaleGetRequest request)
     {
         // Validate if instance exists (HIGHER LEVEL)
         // Validate if requester can access the instance (HIGHER LEVEL)

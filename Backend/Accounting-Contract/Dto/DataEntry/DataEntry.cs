@@ -5,7 +5,7 @@ public class DataEntry
     public DateTime CreatedAt { get; set; }
     public int CreatedById { get; set; }
     public int DataTypeId { get; set; }
-    public IEnumerable<DataEntryField> Fields { get; set; }
+    public IList<DataEntryField> Fields { get; set; }
     public int Id { get; set; }
     public DateTime? ModifiedAt { get; set; }
     public int? ModifiedById { get; set; }

@@ -72,7 +72,7 @@ public class UserService : IUserService
         await _database.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<User>> GetAsync(UserGetRequest request)
+    public async Task<IList<User>> GetAsync(UserGetRequest request)
     {
         var requester = (await _database.Users.FirstOrDefaultAsync(u => u.Id == request.RequesterId))!;
 

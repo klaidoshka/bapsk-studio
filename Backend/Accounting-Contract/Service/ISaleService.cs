@@ -11,7 +11,7 @@ public interface ISaleService
 
     public Task EditAsync(SaleEditRequest request);
 
-    public Task<IEnumerable<Sale>> GetAsync(SaleGetRequest request);
+    public Task<IList<Sale>> GetAsync(SaleGetRequest request);
 
     public Task<Sale> GetByIdAsync(int id);
 }

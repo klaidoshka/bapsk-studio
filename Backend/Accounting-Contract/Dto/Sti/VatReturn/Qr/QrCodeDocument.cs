@@ -6,7 +6,7 @@ public class QrCodeDocument
 {
     public QrCodeDocumentHeader DocHeader { get; set; } = null!;
     public QrCodeCustomer Customer { get; set; } = null!;
-    public IEnumerable<QrCodeSoldGood> Goods { get; set; } = new List<QrCodeSoldGood>();
+    public IList<QrCodeSoldGood> Goods { get; set; } = new List<QrCodeSoldGood>();
 }
 
 public static class QrCodeDocumentExtensions

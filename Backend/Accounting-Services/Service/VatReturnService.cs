@@ -273,7 +273,7 @@ public class VatReturnService : IVatReturnService
         return Convert.ToBase64String(Encoding.ASCII.GetBytes(code));
     }
 
-    public IEnumerable<string> GenerateQrCodes(StiVatReturnDeclaration declaration)
+    public IList<string> GenerateQrCodes(StiVatReturnDeclaration declaration)
     {
         var qrCodeDeclaration = declaration.ToQrCodeDocument();
 

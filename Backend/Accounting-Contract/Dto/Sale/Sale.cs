@@ -11,7 +11,7 @@ public class Sale
     public int? Id { get; set; }
     public string? InvoiceNo { get; set; }
     public Salesman.Salesman Salesman { get; set; } = new();
-    public IEnumerable<SoldGood> SoldGoods { get; set; } = new List<SoldGood>();
+    public IList<SoldGood> SoldGoods { get; set; } = new List<SoldGood>();
 }
 
 public static class SaleExtensions

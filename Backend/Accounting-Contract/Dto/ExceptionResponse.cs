@@ -3,7 +3,7 @@ using Accounting.Contract.Configuration;
 
 namespace Accounting.Contract.Dto;
 
-public class ExceptionResponse(HttpStatusCode code, IEnumerable<string> messages, InternalFailure? internalFailure = null)
+public class ExceptionResponse(HttpStatusCode code, ICollection<string> messages, InternalFailure? internalFailure = null)
 {
     /// <summary>
     /// Code of the failure within the application. Used for specific use-case handling.
@@ -14,7 +14,7 @@ public class ExceptionResponse(HttpStatusCode code, IEnumerable<string> messages
     /// <summary>
     /// Messages to be returned to the client in case of failure.
     /// </summary>
-    public IEnumerable<string> Messages { get; set; } = messages;
+    public ICollection<string> Messages { get; set; } = messages;
 
     /// <summary>
     /// Status code to be returned to the client in case of failure.
@@ -23,7 +23,7 @@ public class ExceptionResponse(HttpStatusCode code, IEnumerable<string> messages
 
     public ExceptionResponse(HttpStatusCode code, string message, InternalFailure? internalFailure = null) : this(
         code,
-        new List<string> { message },
+        new HashSet<string> { message },
         internalFailure
     ) { }
 }

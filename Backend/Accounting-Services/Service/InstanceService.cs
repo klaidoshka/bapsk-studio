@@ -123,7 +123,7 @@ public class InstanceService : IInstanceService
             .FirstAsync(it => it.Id == request.InstanceId && !it.IsDeleted);
     }
 
-    public async Task<IEnumerable<Instance>> GetByUserIdAsync(InstanceGetByUserRequest request)
+    public async Task<IList<Instance>> GetByUserIdAsync(InstanceGetByUserRequest request)
     {
         return await _database.Instances
             .Include(i => i.UserMetas)

@@ -8,5 +8,5 @@ public class SaleCreateEdit
     public int? Id { get; set; }
     public string? InvoiceNo { get; set; }
     public int SalesmanId { get; set; }
-    public IEnumerable<SoldGoodCreateEdit> SoldGoods { get; set; } = new List<SoldGoodCreateEdit>();
+    public IList<SoldGoodCreateEdit> SoldGoods { get; set; } = new List<SoldGoodCreateEdit>();
 }

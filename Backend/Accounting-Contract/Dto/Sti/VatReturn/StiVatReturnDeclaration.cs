@@ -11,7 +11,7 @@ public class StiVatReturnDeclaration
     public string Id { get; set; }
     public int? InstanceId { get; set; }
     public bool IsCanceled { get; set; }
-    public IEnumerable<string> QrCodes { get; set; }
+    public IList<string> QrCodes { get; set; }
     public int SaleId { get; set; }
     public SubmitDeclarationState? State { get; set; }
     public DateTime SubmitDate { get; set; }

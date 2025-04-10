@@ -178,7 +178,7 @@ public class DataTypeService : IDataTypeService
             .FirstAsync(dt => dt.Id == request.DataTypeId);
     }
 
-    public async Task<IEnumerable<DataType>> GetByInstanceIdAsync(
+    public async Task<IList<DataType>> GetByInstanceIdAsync(
         DataTypeGetByInstanceRequest request
     )
     {

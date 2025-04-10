@@ -11,7 +11,7 @@ public interface ICustomerService
 
     public Task EditAsync(CustomerEditRequest request);
 
-    public Task<IEnumerable<Customer>> GetAsync(CustomerGetRequest request);
+    public Task<IList<Customer>> GetAsync(CustomerGetRequest request);
 
     public Task<Customer> GetByIdAsync(int id);
 }

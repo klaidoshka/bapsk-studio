@@ -13,5 +13,5 @@ public interface IDataTypeService
 
     public Task<DataType> GetAsync(DataTypeGetRequest request);
 
-    public Task<IEnumerable<DataType>> GetByInstanceIdAsync(DataTypeGetByInstanceRequest request);
+    public Task<IList<DataType>> GetByInstanceIdAsync(DataTypeGetByInstanceRequest request);
 }
