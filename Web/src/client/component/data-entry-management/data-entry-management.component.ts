@@ -1,4 +1,4 @@
-import {Component, computed, input, Signal, signal} from '@angular/core';
+import {Component, computed, effect, input, Signal, signal} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {DataEntryService} from '../../service/data-entry.service';
 import {InstanceService} from '../../service/instance.service';
@@ -14,6 +14,7 @@ import {FieldType} from '../../model/data-type-field.model';
 import {LocalizationService} from '../../service/localization.service';
 import {DataTypeEntryFieldInputComponent} from '../data-type-entry-field-input/data-type-entry-field-input.component';
 import {Select} from 'primeng/select';
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'data-entry-management',
@@ -24,7 +25,8 @@ import {Select} from 'primeng/select';
     ReactiveFormsModule,
     DataTypeEntryFieldInputComponent,
     FormsModule,
-    Select
+    Select,
+    NgIf
   ],
   templateUrl: './data-entry-management.component.html',
   styles: ``
@@ -46,7 +48,11 @@ export class DataEntryManagementComponent {
     private textService: TextService
   ) {
     this.instanceId = this.instanceService.getActiveInstanceId();
-    this.form = this.createForm();
+
+    effect(() => {
+      this.dataType(); // Init dependency
+      this.form = this.createForm();
+    });
   }
 
   private readonly createForm = (dataType?: DataType, dataEntry?: DataEntry): FormGroup => {
