@@ -158,7 +158,7 @@ export class WorkspacePageComponent {
 
     reader.onload = () => {
       this.httpClient
-      .post(`http://localhost:4000/api/v1/misc/beautify-html`, reader.result, {
+      .post(`http://localhost:4000/api/v1/misc/beautify-html-table`, reader.result, {
         headers: {
           'Content-Type': 'text/html'
         },
