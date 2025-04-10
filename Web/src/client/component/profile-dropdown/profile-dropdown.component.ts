@@ -78,28 +78,33 @@ export class ProfileDropdownComponent {
           {
             label: 'Profile',
             icon: 'pi pi-user-edit',
-            routerLink: "/profile"
+            routerLink: "/home/profile"
           },
           {
             label: 'Instances',
             icon: 'pi pi-server',
-            routerLink: "/instances",
+            routerLink: "/home/instance"
           },
           {
             label: 'Data Types',
             icon: 'pi pi-table',
-            routerLink: "/data/types",
+            routerLink: "/home/data-type"
+          },
+          {
+            label: 'Import Configurations',
+            icon: 'pi pi-file-import',
+            routerLink: "/home/import-configuration"
           },
           {
             label: 'Workspace',
             icon: 'pi pi-desktop',
-            routerLink: "/workspace",
+            routerLink: "/home/workspace"
           },
           {
             visible: this.authService.getUser()()?.role == Role.Admin,
             label: 'Users',
             icon: 'pi pi-users',
-            routerLink: "/users",
+            routerLink: "/home/user"
           },
           {
             label: 'Logout',
