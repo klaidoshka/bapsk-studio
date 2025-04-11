@@ -5,7 +5,6 @@ using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Accounting.Services.Util;
 using Microsoft.EntityFrameworkCore;
-using DataEntryField = Accounting.Contract.Entity.DataEntryField;
 using DataType = Accounting.Contract.Entity.DataType;
 using DataTypeField = Accounting.Contract.Entity.DataTypeField;
 
@@ -14,18 +13,24 @@ namespace Accounting.Services.Service;
 public class DataTypeService : IDataTypeService
 {
     private readonly AccountingDatabase _database;
+    private readonly IDataEntryService _dataEntryService;
     private readonly IDataTypeValidator _dataTypeValidator;
     private readonly IFieldTypeService _fieldTypeService;
+    private readonly IImportConfigurationService _importConfigurationService;
 
     public DataTypeService(
         AccountingDatabase database,
+        IDataEntryService dataEntryService,
         IDataTypeValidator dataTypeValidator,
-        IFieldTypeService fieldTypeService
+        IFieldTypeService fieldTypeService,
+        IImportConfigurationService importConfigurationService
     )
     {
         _database = database;
+        _dataEntryService = dataEntryService;
         _dataTypeValidator = dataTypeValidator;
         _fieldTypeService = fieldTypeService;
+        _importConfigurationService = importConfigurationService;
     }
 
     public async Task<DataType> CreateAsync(DataTypeCreateRequest request)
@@ -128,7 +133,7 @@ public class DataTypeService : IDataTypeService
             .ToList()
             .ForEach(f => _database.DataTypeFields.Remove(f));
 
-        // Add new fields and assign default value to current entries
+        // Add new fields
         var newFields = request.Fields
             .Where(rf => !matchedFields.ContainsKey(rf.DataTypeFieldId ?? -1))
             .ToList();
@@ -137,7 +142,7 @@ public class DataTypeService : IDataTypeService
         {
             var value = _fieldTypeService.Serialize(field.Type, field.DefaultValue);
 
-            var fieldNew = (await _database.DataTypeFields.AddAsync(
+            await _database.DataTypeFields.AddAsync(
                 new DataTypeField
                 {
                     DataTypeId = dataType.Id,
@@ -147,19 +152,13 @@ public class DataTypeService : IDataTypeService
                     ReferenceId = field.Type == FieldType.Reference ? field.ReferenceId : null,
                     Type = field.Type
                 }
-            )).Entity;
+            );
+        }
 
-            foreach (var dataEntry in dataType.Entries)
-            {
-                dataEntry.Fields.Add(
-                    new DataEntryField
-                    {
-                        DataEntry = dataEntry,
-                        DataTypeField = fieldNew,
-                        Value = value
-                    }
-                );
-            }
+        if (newFields.Count > 0)
+        {
+            await _dataEntryService.AddMissingDataTypeFieldsWithoutSaveAsync(dataType.Id);
+            await _importConfigurationService.AddMissingDataTypeFieldsWithoutSaveAsync(dataType.Id);
         }
 
         dataType.DisplayFieldId = request.DisplayFieldIndex is not null

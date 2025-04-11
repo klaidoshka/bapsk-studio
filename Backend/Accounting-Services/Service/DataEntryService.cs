@@ -25,6 +25,41 @@ public class DataEntryService : IDataEntryService
         _fieldTypeService = fieldTypeService;
     }
 
+    public async Task AddMissingDataTypeFieldsWithoutSaveAsync(int dataTypeId)
+    {
+        var dataType = await _database.DataTypes
+            .Include(it => it.Fields)
+            .Include(it => it.Entries)
+            .ThenInclude(it => it.Fields)
+            .FirstOrDefaultAsync(it => it.Id == dataTypeId);
+        
+        if (dataType is null)
+        {
+            return;
+        }
+        
+        foreach (var dataEntry in dataType.Entries)
+        {
+            var missingFields = dataType.Fields
+                .Select(it => it.Id)
+                .Except(dataEntry.Fields.Select(it => it.Id))
+                .Select(fieldId => dataType.Fields.First(it => it.Id == fieldId))
+                .ToList();
+
+            foreach (var field in missingFields)
+            {
+                dataEntry.Fields.Add(
+                    new DataEntryField
+                    {
+                        DataEntry = dataEntry,
+                        DataTypeField = field,
+                        Value = field.DefaultValue!
+                    }
+                );
+            }
+        }
+    }
+
     public async Task<DataEntry> CreateAsync(DataEntryCreateRequest request)
     {
         (await _dataEntryValidator.ValidateDataEntryCreateRequestAsync(request)).AssertValid();

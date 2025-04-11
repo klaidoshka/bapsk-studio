@@ -5,6 +5,8 @@ namespace Accounting.Contract.Service;
 
 public interface IImportConfigurationService
 {
+    public Task AddMissingDataTypeFieldsWithoutSaveAsync(int dataTypeId);
+    
     public Task<ImportConfiguration> CreateAsync(ImportConfigurationCreateRequest request);
 
     public Task DeleteAsync(ImportConfigurationDeleteRequest request);
