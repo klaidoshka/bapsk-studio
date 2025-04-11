@@ -48,6 +48,15 @@ export class ApiRouter {
       instanceId: instanceId
     })}`;
 
+  public readonly importConfigurationCreate = () => `${this.accountingUrl}/import-configuration`;
+  public readonly importConfigurationDelete = (id: number) => `${this.accountingUrl}/import-configuration/${id}`;
+  public readonly importConfigurationEdit = (id: number) => `${this.accountingUrl}/import-configuration/${id}`;
+  public readonly importConfigurationGetById = (id: number) => `${this.accountingUrl}/import-configuration/${id}`;
+  public readonly importConfigurationGetByInstanceId = (instanceId: number) =>
+    `${this.accountingUrl}/import-configuration?${this.toParameters({
+      instanceId: instanceId
+    })}`;
+
   public readonly instanceCreate = () => `${this.accountingUrl}/instance`;
   public readonly instanceDelete = (id: number) => `${this.accountingUrl}/instance/${id}`;
   public readonly instanceEdit = (id: number) => `${this.accountingUrl}/instance/${id}`;
