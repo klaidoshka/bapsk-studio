@@ -197,6 +197,10 @@ public static class ProgramExtensions
             .MapDataTypeEndpoints();
 
         accountingRouteGroup
+            .MapGroup("/import-configuration")
+            .MapImportConfigurationEndpoints();
+
+        accountingRouteGroup
             .MapGroup("/instance")
             .MapInstanceEndpoints();
 
