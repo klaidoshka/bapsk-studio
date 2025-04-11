@@ -20,19 +20,6 @@ export class DataTypeService {
   ) {
   }
 
-  private readonly resolveInstanceId = (dataTypeId: number) => {
-    let instanceId: number | null = null;
-
-    for (const [key, value] of this.store) {
-      if (value().some(dataType => dataType.id === dataTypeId)) {
-        instanceId = key;
-        break;
-      }
-    }
-
-    return instanceId;
-  }
-
   readonly create = (request: DataTypeCreateRequest): Observable<DataType> => {
     return this.httpClient.post<DataType>(this.apiRouter.dataTypeCreate(), {
       ...request,
@@ -143,6 +130,19 @@ export class DataTypeService {
     }
 
     return this.store.get(instanceId)!.asReadonly();
+  }
+
+  readonly resolveInstanceId = (dataTypeId: number) => {
+    let instanceId: number | null = null;
+
+    for (const [key, value] of this.store) {
+      if (value().some(dataType => dataType.id === dataTypeId)) {
+        instanceId = key;
+        break;
+      }
+    }
+
+    return instanceId;
   }
 
   readonly updateProperties = (dataType: DataType): DataType => {
