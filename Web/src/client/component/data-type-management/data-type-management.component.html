@@ -119,7 +119,7 @@
                       <p-select
                         id="referencedType"
                         placeholder="Select referenced type"
-                        formControlName="referencedType" [options]="dataTypes()"
+                        formControlName="referencedType" [options]="dataTypes.value() || []"
                         optionLabel="name" optionValue="id" appendTo="body"
                         class="mt-1 w-full"
                       />

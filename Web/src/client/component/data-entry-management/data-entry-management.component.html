@@ -27,7 +27,7 @@
 
           @if (isReferenceField) {
             <p-select
-              placeholder="Select referenced entry" [options]="getDataEntries(field.referenceId)()"
+              placeholder="Select referenced entry" [options]="field.referenceId ? getDataEntries(field.referenceId) : []"
               optionLabel="label" optionValue="id" appendTo="body" [formControl]="field.control"
               class="w-full" [required]="field.isRequired!"
             />

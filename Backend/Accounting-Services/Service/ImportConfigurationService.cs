@@ -11,10 +11,15 @@ namespace Accounting.Services.Service;
 public class ImportConfigurationService : IImportConfigurationService
 {
     private readonly AccountingDatabase _database;
+    private readonly IFieldTypeService _fieldTypeService;
 
-    public ImportConfigurationService(AccountingDatabase database)
+    public ImportConfigurationService(
+        AccountingDatabase database,
+        IFieldTypeService fieldTypeService
+    )
     {
         _database = database;
+        _fieldTypeService = fieldTypeService;
     }
 
     public async Task AddMissingDataTypeFieldsWithoutSaveAsync(int dataTypeId)
@@ -47,12 +52,14 @@ public class ImportConfigurationService : IImportConfigurationService
 
             foreach (var missingFieldId in missingFieldIds)
             {
-                configuration.Fields.Add(new ImportConfigurationField
-                {
-                    DataTypeFieldId = missingFieldId,
-                    DefaultValue = defaultValues[missingFieldId],
-                    Order = configuration.Fields.Count
-                });
+                configuration.Fields.Add(
+                    new ImportConfigurationField
+                    {
+                        DataTypeFieldId = missingFieldId,
+                        DefaultValue = defaultValues[missingFieldId],
+                        Order = configuration.Fields.Count
+                    }
+                );
             }
         }
     }
@@ -108,8 +115,6 @@ public class ImportConfigurationService : IImportConfigurationService
             );
         }
 
-        var configuration = request.ImportConfiguration.ToEntity();
-
         if (await _database.ImportConfigurations.AnyAsync(
                 it => it.Name.Equals(
                     request.ImportConfiguration.Name,
@@ -120,7 +125,27 @@ public class ImportConfigurationService : IImportConfigurationService
             throw new ValidationException("Import configuration with such name already exists.");
         }
 
-        configuration = (await _database.ImportConfigurations.AddAsync(configuration)).Entity;
+        var configuration = (await _database.ImportConfigurations.AddAsync(
+            new ImportConfiguration
+            {
+                DataTypeId = request.ImportConfiguration.DataTypeId,
+                Id = request.ImportConfiguration.Id ?? 0,
+                Name = request.ImportConfiguration.Name,
+                Fields = request.ImportConfiguration.Fields
+                    .Select(
+                        it => new ImportConfigurationField
+                        {
+                            DataTypeFieldId = it.DataTypeFieldId,
+                            DefaultValue = it.DefaultValue is not null
+                                ? _fieldTypeService.Serialize(dataTypeFields[it.DataTypeFieldId].Type, it.DefaultValue!.Value)
+                                : null,
+                            Id = it.Id ?? 0,
+                            Order = it.Order
+                        }
+                    )
+                    .ToList()
+            }
+        )).Entity;
 
         await _database.SaveChangesAsync();
 
@@ -214,6 +239,10 @@ public class ImportConfigurationService : IImportConfigurationService
             {
                 throw new ValidationException($"Data type field '{field.DataTypeFieldId}' was not found.");
             }
+
+            existingField.DefaultValue = field.DefaultValue is not null
+                ? _fieldTypeService.Serialize(dataTypeFields[field.DataTypeFieldId].Type, field.DefaultValue!.Value)
+                : null;
 
             existingField.Order = field.Order;
         }

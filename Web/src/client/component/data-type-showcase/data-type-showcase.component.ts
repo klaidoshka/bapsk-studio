@@ -1,4 +1,4 @@
-import {Component, computed, Signal, signal, viewChild} from '@angular/core';
+import {Component, inject, signal, viewChild} from '@angular/core';
 import {Button} from "primeng/button";
 import {ConfirmationComponent} from "../confirmation/confirmation.component";
 import {MessagesShowcaseComponent} from "../messages-showcase/messages-showcase.component";
@@ -8,10 +8,11 @@ import {DataTypePreviewComponent} from '../data-type-preview/data-type-preview.c
 import DataType from '../../model/data-type.model';
 import {DataTypeService} from '../../service/data-type.service';
 import {DataTypeManagementComponent} from '../data-type-management/data-type-management.component';
-import {first} from 'rxjs';
+import {first, of} from 'rxjs';
 import {InstanceService} from '../../service/instance.service';
 import {MessageModule} from 'primeng/message';
 import {LocalizationService} from '../../service/localization.service';
+import {rxResource} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'data-type-showcase',
@@ -28,25 +29,25 @@ import {LocalizationService} from '../../service/localization.service';
   styles: ``
 })
 export class DataTypeShowcaseComponent {
-  dataTypes!: Signal<DataType[]>;
+  private dataTypeService = inject(DataTypeService);
+  private localizationService = inject(LocalizationService);
+  private instanceService = inject(InstanceService);
+
   confirmationComponent = viewChild.required(ConfirmationComponent);
-  instanceId!: Signal<number | undefined>;
+
+  dataTypes = rxResource({
+    request: () => ({
+      instanceId: this.instanceId()
+    }),
+    loader: ({request}) => request.instanceId
+      ? this.dataTypeService.getAllByInstanceId(request.instanceId)
+      : of([])
+  });
+
+  instanceId = this.instanceService.getActiveInstanceId();
   managementMenu = viewChild.required(DataTypeManagementComponent);
   messages = signal<Messages>({});
   previewMenu = viewChild.required(DataTypePreviewComponent);
-
-  constructor(
-    private dataTypeService: DataTypeService,
-    private localizationService: LocalizationService,
-    private instanceService: InstanceService
-  ) {
-    this.instanceId = this.instanceService.getActiveInstanceId();
-
-    this.dataTypes = computed(() => {
-      const instanceId = this.instanceId();
-      return instanceId != null ? this.dataTypeService.getAsSignal(instanceId)() : [];
-    })
-  }
 
   readonly delete = (dataType: DataType) => {
     this.confirmationComponent().request(() => {

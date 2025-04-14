@@ -1,6 +1,8 @@
+import DataType from "./data-type.model";
+
 export default interface ImportConfiguration {
   dataTypeId: number;
-  id: number;
+  id?: number;
   name: string;
   fields: ImportConfigurationField[];
 }
@@ -8,16 +10,18 @@ export default interface ImportConfiguration {
 export interface ImportConfigurationField {
   dataTypeFieldId: number;
   defaultValue?: any;
-  id: number;
+  id?: number;
   order: number;
+}
+
+export interface ImportConfigurationJoined extends ImportConfiguration {
+  dataType: DataType;
 }
 
 export interface ImportConfigurationCreateRequest {
   importConfiguration: ImportConfiguration;
-  requesterId: number;
 }
 
 export interface ImportConfigurationEditRequest {
   importConfiguration: ImportConfiguration;
-  requesterId: number;
 }

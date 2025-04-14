@@ -1,27 +1,26 @@
-import {computed, Injectable, Signal, signal, WritableSignal} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
-import {first, Observable, tap} from 'rxjs';
+import {first, Observable, switchMap, tap} from 'rxjs';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../model/data-type.model';
 import {EnumUtil} from '../util/enum.util';
 import {FieldType} from '../model/data-type-field.model';
 import {FieldTypeUtil} from '../util/field-type.util';
+import {CacheService} from './cache.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataTypeService {
-  // Key: InstanceId
-  private readonly store = new Map<number, WritableSignal<DataType[]>>();
+  private apiRouter = inject(ApiRouter);
+  private httpClient = inject(HttpClient);
 
-  constructor(
-    private apiRouter: ApiRouter,
-    private httpClient: HttpClient
-  ) {
-  }
+  private readonly cacheService = new CacheService<number, DataType>(it => it.id, this.updateProperties);
 
-  readonly create = (request: DataTypeCreateRequest): Observable<DataType> => {
-    return this.httpClient.post<DataType>(this.apiRouter.dataTypeCreate(), {
+  private readonly instancesFetched = new Set<number>();
+
+  private adjustDateToISO<T extends DataTypeCreateRequest | DataTypeEditRequest>(request: T): T {
+    return {
       ...request,
       fields: request.fields.map(it => ({
         ...it,
@@ -29,123 +28,85 @@ export class DataTypeService {
           ? it.defaultValue.toISOString()
           : it.defaultValue
       }))
-    } as DataTypeCreateRequest).pipe(
-      tap(dataType => {
-        const existingSignal = this.store.get(request.instanceId);
-
-        if (existingSignal != null) {
-          existingSignal.update(old => [...old, this.updateProperties(dataType)]);
-        } else {
-          this.store.set(request.instanceId, signal([this.updateProperties(dataType)]));
-        }
-      })
-    );
+    };
   }
 
-  readonly delete = (id: number): Observable<void> => {
-    return this.httpClient.delete<void>(this.apiRouter.dataTypeDelete(id)).pipe(
-      tap(() => {
-        const instanceId = this.resolveInstanceId(id);
-
-        if (instanceId != null) {
-          this.store.get(instanceId)!!.update(old => old.filter(dataType => dataType.id !== id));
-        }
-      })
-    );
+  create(request: DataTypeCreateRequest): Observable<DataType> {
+    return this.httpClient
+      .post<DataType>(this.apiRouter.dataTypeCreate(), this.adjustDateToISO(request))
+      .pipe(
+        tap(this.cacheService.set),
+        switchMap(it => this.cacheService.get(it.id))
+      );
   }
 
-  readonly edit = (request: DataTypeEditRequest): Observable<void> => {
-    return this.httpClient.put<void>(this.apiRouter.dataTypeEdit(request.dataTypeId), {
-      ...request,
-      fields: request.fields.map(it => ({
-        ...it,
-        defaultValue: it.type === FieldType.Date
-          ? it.defaultValue.toISOString()
-          : it.defaultValue
-      }))
-    } as DataTypeEditRequest).pipe(
-      tap(() => {
-        this.getById(request.dataTypeId).pipe(first()).subscribe();
-      })
-    );
+  delete(id: number): Observable<void> {
+    return this.httpClient
+      .delete<void>(this.apiRouter.dataTypeDelete(id))
+      .pipe(
+        tap(() => this.cacheService.delete(id))
+      );
   }
 
-  readonly getById = (id: number): Observable<DataType> => {
-    return this.httpClient.get<DataType>(this.apiRouter.dataTypeGetById(id)).pipe(
-      tap(dataType => {
-        const existingSignal = this.store.get(dataType.instanceId);
+  edit(request: DataTypeEditRequest): Observable<void> {
+    return this.httpClient
+      .put<void>(this.apiRouter.dataTypeEdit(request.dataTypeId), this.adjustDateToISO(request))
+      .pipe(
+        tap(() =>  {
+            this.cacheService.invalidate(request.dataTypeId);
 
-        if (existingSignal != null) {
-          existingSignal.update(old => {
-            const index = old.findIndex(it => it.id === id);
-
-            return index === -1
-              ? [...old, this.updateProperties(dataType)]
-              : [...old.slice(0, index), this.updateProperties(dataType), ...old.slice(index + 1)];
-          });
-        } else {
-          this.store.set(dataType.instanceId, signal([this.updateProperties(dataType)]));
-        }
-      })
-    );
+            this
+              .getById(request.dataTypeId)
+              .pipe(first())
+              .subscribe();
+          }
+        )
+      );
   }
 
-  readonly getAllByInstanceId = (instanceId: number): Observable<DataType[]> => {
-    return this.httpClient.get<DataType[]>(this.apiRouter.dataTypeGetByInstanceId(instanceId)).pipe(
-      tap(dataTypes => {
-        const existingSignal = this.store.get(instanceId);
-
-        if (existingSignal != null) {
-          existingSignal.update(() => dataTypes.map(this.updateProperties));
-        } else {
-          this.store.set(instanceId, signal(dataTypes.map(this.updateProperties)));
-        }
-      })
-    );
-  }
-
-  readonly getByIdAsSignal = (id: number): Signal<DataType | undefined> => {
-    const instanceId = this.resolveInstanceId(id);
-
-    if (instanceId == null) {
-      const dataType = signal<DataType | undefined>(undefined);
-
-      this.getById(id).subscribe((value) => {
-        dataType.set(this.getByIdAsSignal(value.id)());
-      });
-
-      return dataType;
+  getById(id: number): Observable<DataType> {
+    if (this.cacheService.has(id)) {
+      return this.cacheService.get(id);
     }
 
-    return computed(() => this.store.get(instanceId)!().find(dataType => dataType.id === id));
+    return this.httpClient
+      .get<DataType>(this.apiRouter.dataTypeGetById(id))
+      .pipe(
+        tap(it => this.cacheService.set(it)),
+        switchMap(it => this.cacheService.get(it.id))
+      );
   }
 
-  readonly getAsSignal = (instanceId: number): Signal<DataType[]> => {
-    const existingSignal = this.store.get(instanceId);
-
-    if (existingSignal == null) {
-      this.store.set(instanceId, signal<DataType[]>([]));
-
-      new Promise(resolve => this.getAllByInstanceId(instanceId).pipe(first()).subscribe(resolve));
+  getAllByInstanceId(instanceId: number): Observable<DataType[]> {
+    if (this.instancesFetched.has(instanceId)) {
+      return this.cacheService.getAllWhere(it => it.instanceId === instanceId);
     }
 
-    return this.store.get(instanceId)!.asReadonly();
+    return this.httpClient
+      .get<DataType[]>(this.apiRouter.dataTypeGetByInstanceId(instanceId))
+      .pipe(
+        tap(it => {
+          this.instancesFetched.add(instanceId);
+
+          this.cacheService.update(
+            it,
+            it => it.instanceId === instanceId
+          );
+        }),
+        switchMap(_ => this.cacheService.getAllWhere(it => it.instanceId === instanceId))
+      );
   }
 
-  readonly resolveInstanceId = (dataTypeId: number) => {
-    let instanceId: number | null = null;
+  resolveInstanceId(id: number): number | null {
+    const instanceId = this.cacheService.execute(it => Array
+      .from(it.values())
+      .find(it => it.id === id)?.instanceId
+    );
 
-    for (const [key, value] of this.store) {
-      if (value().some(dataType => dataType.id === dataTypeId)) {
-        instanceId = key;
-        break;
-      }
-    }
-
-    return instanceId;
+    return instanceId !== undefined ? instanceId : null;
   }
 
-  readonly updateProperties = (dataType: DataType): DataType => {
+  updateProperties(dataType: DataType): DataType {
     return {
       ...dataType,
       fields: dataType.fields.map(it => {

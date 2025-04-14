@@ -13,6 +13,12 @@ import {InstancePageComponent} from "../page/instance-page/instance-page.compone
 import {UserPageComponent} from "../page/user-page/user-page.component";
 import {DeclarationPreviewPageComponent} from "../page/declaration-preview-page/declaration-preview-page.component";
 import {ImportConfigurationPageComponent} from '../page/import-configuration-page/import-configuration-page.component';
+import {
+  ImportConfigurationPreviewPageComponent
+} from '../page/import-configuration-preview-page/import-configuration-preview-page.component';
+import {
+  ImportConfigurationManagementPageComponent
+} from '../page/import-configuration-management-page/import-configuration-management-page.component';
 
 export const routes: Routes = [
   {
@@ -27,7 +33,25 @@ export const routes: Routes = [
       },
       {
         path: "import-configuration",
-        loadComponent: () => ImportConfigurationPageComponent
+        loadChildren: () => [
+          {
+            path: "",
+            pathMatch: "full",
+            loadComponent: () => ImportConfigurationPageComponent
+          },
+          {
+            path: "create",
+            loadComponent: () => ImportConfigurationManagementPageComponent
+          },
+          {
+            path: ":configurationId/edit",
+            loadComponent: () => ImportConfigurationManagementPageComponent
+          },
+          {
+            path: ":configurationId",
+            loadComponent: () => ImportConfigurationPreviewPageComponent
+          }
+        ]
       },
       {
         path: "instance",

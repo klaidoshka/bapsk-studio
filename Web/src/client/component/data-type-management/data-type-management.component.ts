@@ -1,4 +1,4 @@
-import {Component, computed, Signal, signal} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -13,7 +13,7 @@ import {DataTypeService} from '../../service/data-type.service';
 import {TextService} from '../../service/text.service';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../../model/data-type.model';
 import Messages from '../../model/messages.model';
-import {first} from 'rxjs';
+import {first, of} from 'rxjs';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {InputText} from 'primeng/inputtext';
@@ -21,14 +21,21 @@ import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.
 import {Textarea} from 'primeng/textarea';
 import {InstanceService} from '../../service/instance.service';
 import {TableModule} from 'primeng/table';
-import DataTypeField, {DataTypeFieldEditRequest, FieldType, fieldTypes} from '../../model/data-type-field.model';
+import DataTypeField, {
+  DataTypeFieldEditRequest,
+  FieldType,
+  fieldTypes
+} from '../../model/data-type-field.model';
 import {Checkbox} from 'primeng/checkbox';
 import {Select} from 'primeng/select';
 import {LocalizationService} from '../../service/localization.service';
 import {DataEntryService} from '../../service/data-entry.service';
 import Option from '../../model/options.model';
 import {NgIf} from '@angular/common';
-import {DataTypeEntryFieldInputComponent} from '../data-type-entry-field-input/data-type-entry-field-input.component';
+import {
+  DataTypeEntryFieldInputComponent
+} from '../data-type-entry-field-input/data-type-entry-field-input.component';
+import {rxResource} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'data-type-management',
@@ -52,30 +59,33 @@ import {DataTypeEntryFieldInputComponent} from '../data-type-entry-field-input/d
 export class DataTypeManagementComponent {
   FieldType = FieldType;
   fieldTypes = fieldTypes;
-  form!: FormGroup;
+  private dataEntryService = inject(DataEntryService);
+  private dataTypeService = inject(DataTypeService);
+  private localizationService = inject(LocalizationService);
+  private formBuilder = inject(FormBuilder);
+  private instanceService = inject(InstanceService);
+  private textService = inject(TextService);
 
   dataType = signal<DataType | undefined>(undefined);
-  dataTypes!: Signal<DataType[]>;
+
+  dataTypes = rxResource({
+    request: () => ({
+      instanceId: this.instanceId()
+    }),
+    loader: ({request}) => request.instanceId
+      ? this.dataTypeService.getAllByInstanceId(request.instanceId)
+      : of([])
+  });
+
   displayFields = signal<Option<number | null>[]>([{
     label: 'Id',
     value: null
   }]);
-  instanceId!: Signal<number | undefined>;
+
+  form = this.createForm();
+  instanceId = this.instanceService.getActiveInstanceId();
   isShown = signal<boolean>(false);
   messages = signal<Messages>({});
-
-  constructor(
-    private dataEntryService: DataEntryService,
-    private dataTypeService: DataTypeService,
-    private localizationService: LocalizationService,
-    private formBuilder: FormBuilder,
-    private instanceService: InstanceService,
-    private textService: TextService
-  ) {
-    this.instanceId = this.instanceService.getActiveInstanceId();
-    this.dataTypes = computed(() => this.instanceId() ? this.dataTypeService.getAsSignal(this.instanceId()!)() : []);
-    this.form = this.createForm();
-  }
 
   get formFields() {
     return this.form.get("fields") as FormArray<FormGroup>;
@@ -88,7 +98,7 @@ export class DataTypeManagementComponent {
     });
   }
 
-  private readonly createForm = (dataType?: DataType) => {
+  private createForm(dataType?: DataType) {
     this.displayFields.set(this.displayFields().slice(0, 1));
 
     let displayFieldIndex = dataType?.fields.findIndex(it => it.id === dataType?.displayFieldId);
@@ -109,14 +119,14 @@ export class DataTypeManagementComponent {
     this.dataTypeService.edit(request).pipe(first()).subscribe({
       next: () => {
         this.onSuccess("Data type has been edited successfully.");
-        this.dataEntryService.getAll(request.dataTypeId).subscribe();
+        this.dataEntryService.getAllByDataTypeId(request.dataTypeId).subscribe();
       },
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   private readonly fieldsValidator = (control: AbstractControl): ValidationErrors | null => {
-    return (control as FormArray).length === 0 ? { noFields: true } : null;
+    return (control as FormArray).length === 0 ? {noFields: true} : null;
   };
 
   private readonly onSuccess = (message: string) => {
@@ -175,9 +185,13 @@ export class DataTypeManagementComponent {
   readonly getErrorMessage = (field: string): string | null => {
     const control = this.form.get(field);
 
-    if (!control || !control.touched || !control.invalid) return "";
+    if (!control || !control.touched || !control.invalid) {
+      return "";
+    }
 
-    if (control.errors?.["noFields"]) return "At least one field is required.";
+    if (control.errors?.["noFields"]) {
+      return "At least one field is required.";
+    }
 
     if (control.errors?.["required"]) {
       return `${this.textService.capitalize(field)} is required.`;
@@ -199,9 +213,9 @@ export class DataTypeManagementComponent {
     }
 
     const request: DataTypeEditRequest = {
-      name: this.form.value.name,
-      description: this.form.value.description,
-      displayFieldIndex: this.form.value.displayField,
+      name: this.form.value.name || '',
+      description: this.form.value.description || null,
+      displayFieldIndex: this.form.value.displayField === null ? undefined : this.form.value.displayField,
       dataTypeId: this.dataType()!.id!,
       fields: this.formFields.controls.map((field: FormGroup) => {
         const fieldType = field.value.type;

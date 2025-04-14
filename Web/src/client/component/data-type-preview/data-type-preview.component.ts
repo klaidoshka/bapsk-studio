@@ -1,4 +1,4 @@
-import {Component, computed, Signal, signal} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import DataType from '../../model/data-type.model';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
@@ -7,7 +7,11 @@ import DataTypeField, {FieldType, toFieldTypeLabel} from '../../model/data-type-
 import {DataTypeService} from '../../service/data-type.service';
 import {InstanceService} from '../../service/instance.service';
 import {NgClass, NgIf} from '@angular/common';
-import {DataTypeEntryFieldDisplayComponent} from '../data-type-entry-field-display/data-type-entry-field-display.component';
+import {
+  DataTypeEntryFieldDisplayComponent
+} from '../data-type-entry-field-display/data-type-entry-field-display.component';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {of} from 'rxjs';
 
 @Component({
   selector: 'data-type-preview',
@@ -24,27 +28,31 @@ import {DataTypeEntryFieldDisplayComponent} from '../data-type-entry-field-displ
 })
 export class DataTypePreviewComponent {
   protected readonly FieldType = FieldType;
+  private dataTypeService = inject(DataTypeService);
+  private instanceService = inject(InstanceService);
 
   dataType = signal<DataType | undefined>(undefined);
-  dataTypes!: Signal<DataType[]>;
-  isShown = signal<boolean>(false);
 
-  constructor(
-    dataTypeService: DataTypeService,
-    instanceService: InstanceService
-  ) {
-    this.dataTypes = computed(() => {
-      const instanceId = instanceService.getActiveInstanceId()();
-      return instanceId ? dataTypeService.getAsSignal(instanceId)()! : [];
-    });
-  }
+  dataTypes = rxResource({
+    request: () => ({
+      instanceId: this.instanceId()
+    }),
+    loader: ({request}) => request.instanceId
+      ? this.dataTypeService.getAllByInstanceId(request.instanceId)
+      : of([])
+  });
+
+  instanceId = this.instanceService.getActiveInstanceId();
+  isShown = signal<boolean>(false);
 
   protected readonly toFieldTypeLabel = toFieldTypeLabel;
 
-  readonly getDisplayFieldName = () => this.dataType()?.fields?.find(it => it.id === this.dataType()?.displayFieldId)?.name || 'Id';
+  readonly getDisplayFieldName = () => this.dataType()
+    ?.fields
+    ?.find(it => it.id === this.dataType()?.displayFieldId)?.name || 'Id';
 
   readonly getReferencedDataTypeName = (field: DataTypeField) => {
-    return this.dataTypes().find(it => it.id === field.referenceId)!.name;
+    return this.dataTypes.value()!.find(it => it.id === field.referenceId)!.name;
   }
 
   readonly hide = () => {

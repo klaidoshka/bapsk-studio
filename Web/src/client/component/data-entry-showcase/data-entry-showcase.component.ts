@@ -1,4 +1,4 @@
-import {Component, input, signal, viewChild} from '@angular/core';
+import {Component, inject, input, signal, viewChild} from '@angular/core';
 import {Button} from "primeng/button";
 import {ConfirmationComponent} from "../confirmation/confirmation.component";
 import {MessagesShowcaseComponent} from "../messages-showcase/messages-showcase.component";
@@ -34,6 +34,8 @@ import {DataTypeEntryFieldDisplayComponent} from '../data-type-entry-field-displ
 })
 export class DataEntryShowcaseComponent {
   protected readonly toUserIdentityFullName = toUserIdentityFullName;
+  private dataEntryService = inject(DataEntryService);
+  private localizationService = inject(LocalizationService);
 
   confirmationComponent = viewChild.required(ConfirmationComponent);
   dataEntries = input.required<DataEntryJoined[]>();
@@ -41,12 +43,6 @@ export class DataEntryShowcaseComponent {
   managementMenu = viewChild.required(DataEntryManagementComponent);
   messages = signal<Messages>({});
   previewMenu = viewChild.required(DataEntryPreviewComponent);
-
-  constructor(
-    private dataEntryService: DataEntryService,
-    private localizationService: LocalizationService
-  ) {
-  }
 
   readonly showManagement = (dataEntry?: DataEntry) => {
     this.managementMenu().show(dataEntry);

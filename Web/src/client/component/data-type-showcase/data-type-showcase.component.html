@@ -24,7 +24,7 @@
   <div class="card mt-4">
     <p-table
       styleClass="w-fit"
-      [value]="dataTypes()"
+      [value]="dataTypes.value() || []"
       [paginator]="true"
       [rows]="10"
       [rowsPerPageOptions]="[10, 20, 50]"

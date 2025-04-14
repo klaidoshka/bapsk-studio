@@ -15,7 +15,7 @@
     <p>{{ getIsoCountryLabel(value()) }}</p>
   }
   @case (FieldType.Reference) {
-    <p>{{ referencedDataEntry()?.display() }}</p>
+    <p>{{ referencedDataEntry.value()?.display() }}</p>
   }
   @default {
     <p>{{ value() }}</p>
