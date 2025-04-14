@@ -1,10 +1,13 @@
-import {ChangeDetectorRef, Component, signal} from '@angular/core';
-import Instance, {InstanceCreateRequest, InstanceEditRequest, InstanceWithUsers} from '../../model/instance.model';
+import {ChangeDetectorRef, Component, inject, signal} from '@angular/core';
+import Instance, {
+  InstanceCreateRequest,
+  InstanceEditRequest,
+  InstanceWithUsers
+} from '../../model/instance.model';
 import {Dialog} from 'primeng/dialog';
 import {
   FormArray,
   FormBuilder,
-  FormGroup,
   FormsModule,
   ReactiveFormsModule,
   ValidationErrors,
@@ -41,53 +44,49 @@ import {TableModule} from 'primeng/table';
   styles: ``
 })
 export class InstanceManagementComponent {
-  form!: FormGroup;
-  formUser!: FormGroup;
+  private readonly authService = inject(AuthService);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly instanceService = inject(InstanceService);
+  private readonly localizationService = inject(LocalizationService);
+  private readonly textService = inject(TextService);
+  private readonly userService = inject(UserService);
+
+  form = this.formBuilder.group({
+    name: ["", Validators.required],
+    description: ["No description set."],
+    userMetas: this.formBuilder.array([])
+  });
+
+  formUser = this.formBuilder.group({
+    email: ["", [Validators.required, Validators.email, this.validateEmailExists(this.formUsers())]]
+  });
+
   instance = signal<Instance | undefined>(undefined);
   isShown = signal<boolean>(false);
   messages = signal<Messages>({});
   messagesUserMetas = signal<Messages>({});
 
-  constructor(
-    private authService: AuthService,
-    private formBuilder: FormBuilder,
-    private instanceService: InstanceService,
-    private localizationService: LocalizationService,
-    private textService: TextService,
-    private userService: UserService,
-    private cdr: ChangeDetectorRef
-  ) {
-    this.form = this.formBuilder.group({
-      name: ["", Validators.required],
-      description: ["No description set."],
-      userMetas: this.formBuilder.array([])
-    });
-
-    this.formUser = this.formBuilder.group({
-      email: ["", [Validators.required, Validators.email, this.validateEmailExists(this.formUsers())]]
-    });
-  }
-
-  private readonly create = (request: InstanceCreateRequest) => {
+  private create(request: InstanceCreateRequest) {
     this.instanceService.create(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Instance has been created successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
-  private readonly edit = (request: InstanceEditRequest) => {
+  private edit(request: InstanceEditRequest) {
     this.instanceService.edit(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Instance has been edited successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
-  private readonly onSuccess = (message: string) => {
+  private onSuccess(message: string) {
     this.messages.set({success: [message]});
     this.form.markAsPristine();
   }
 
-  private readonly validateEmailExists = (formArray: FormArray): ValidatorFn => {
+  private validateEmailExists(formArray: FormArray): ValidatorFn {
     return (control): ValidationErrors | null => {
       const email = control.value?.trim()?.toLowerCase();
 
@@ -103,9 +102,9 @@ export class InstanceManagementComponent {
     };
   }
 
-  readonly addUser = (email?: string) => {
+  addUser(email?: string) {
     if (!email) {
-      email = this.formUser.value.email.trim();
+      email = this.formUser.value.email?.trim();
     }
 
     this.formUser.reset();
@@ -130,14 +129,16 @@ export class InstanceManagementComponent {
     });
   }
 
-  readonly formUsers = () => {
+  formUsers() {
     return this.form.controls["userMetas"] as FormArray;
   }
 
-  readonly getErrorMessage = (field: string): string | null => {
+  getErrorMessage(field: string): string | null {
     const control = this.form.get(field);
 
-    if (!control || !control.touched || !control.invalid) return "";
+    if (!control || !control.touched || !control.invalid) {
+      return "";
+    }
 
     if (control.errors?.["required"]) {
       return `${this.textService.capitalize(field)} is required.`;
@@ -146,10 +147,12 @@ export class InstanceManagementComponent {
     return null;
   }
 
-  readonly getUserEmailErrorMessage = (): string | null => {
+  getUserEmailErrorMessage(): string | null {
     const control = this.formUser.get("email");
 
-    if (!control || !control.touched || !control.invalid) return "";
+    if (!control || !control.touched || !control.invalid) {
+      return "";
+    }
 
     if (control.errors?.["email"]) {
       return "Invalid email.";
@@ -162,7 +165,7 @@ export class InstanceManagementComponent {
     return null;
   }
 
-  readonly hide = () => {
+  hide() {
     this.messages.set({});
     this.isShown.set(false);
     this.form.reset();
@@ -170,24 +173,24 @@ export class InstanceManagementComponent {
     this.formUsers().clear();
   }
 
-  readonly removeUser = (index: number) => {
+  removeUser(index: number) {
     this.formUsers().removeAt(index);
 
     this.form.markAsDirty();
   }
 
-  readonly save = () => {
+  save() {
     if (!this.form.valid) {
       this.messages.set({error: ["Please fill out the form."]});
       return;
     }
 
     const request: InstanceCreateRequest = {
-      name: this.form.value.name,
-      description: this.form.value.description,
-      userMetas: this.form.value.userMetas.map((um: any) => ({
+      name: this.form.value.name!,
+      description: this.form.value.description || null,
+      userMetas: this.form.value.userMetas?.map((um: any) => ({
         userId: um.id
-      }))
+      })) || []
     }
 
     if (this.instance() != null) {
@@ -200,7 +203,7 @@ export class InstanceManagementComponent {
     }
   }
 
-  readonly show = (instance?: InstanceWithUsers) => {
+  show(instance?: InstanceWithUsers) {
     this.instance.set(instance);
     this.form.reset({description: "No description set."});
 

@@ -57,14 +57,14 @@ import {rxResource} from '@angular/core/rxjs-interop';
   styles: ``
 })
 export class DataTypeManagementComponent {
-  FieldType = FieldType;
-  fieldTypes = fieldTypes;
-  private dataEntryService = inject(DataEntryService);
-  private dataTypeService = inject(DataTypeService);
-  private localizationService = inject(LocalizationService);
-  private formBuilder = inject(FormBuilder);
-  private instanceService = inject(InstanceService);
-  private textService = inject(TextService);
+  protected readonly FieldType = FieldType;
+  protected readonly fieldTypes = fieldTypes;
+  private readonly dataEntryService = inject(DataEntryService);
+  private readonly dataTypeService = inject(DataTypeService);
+  private readonly localizationService = inject(LocalizationService);
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly instanceService = inject(InstanceService);
+  private readonly textService = inject(TextService);
 
   dataType = signal<DataType | undefined>(undefined);
 
@@ -91,7 +91,7 @@ export class DataTypeManagementComponent {
     return this.form.get("fields") as FormArray<FormGroup>;
   }
 
-  private readonly create = (request: DataTypeCreateRequest) => {
+  private create(request: DataTypeCreateRequest) {
     this.dataTypeService.create(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Data type has been created successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
@@ -115,7 +115,7 @@ export class DataTypeManagementComponent {
     });
   }
 
-  private readonly edit = (request: DataTypeEditRequest) => {
+  private edit(request: DataTypeEditRequest) {
     this.dataTypeService.edit(request).pipe(first()).subscribe({
       next: () => {
         this.onSuccess("Data type has been edited successfully.");
@@ -125,21 +125,21 @@ export class DataTypeManagementComponent {
     });
   }
 
-  private readonly fieldsValidator = (control: AbstractControl): ValidationErrors | null => {
+  private fieldsValidator(control: AbstractControl): ValidationErrors | null {
     return (control as FormArray).length === 0 ? {noFields: true} : null;
   };
 
-  private readonly onSuccess = (message: string) => {
+  private onSuccess(message: string) {
     this.messages.set({success: [message]});
     this.form.markAsPristine();
     this.form.markAsUntouched();
   }
 
-  readonly getFieldType = (id: number): FieldType => {
+  getFieldType(id: number): FieldType {
     return this.formFields.controls.at(id)?.value?.type || FieldType.Text;
   }
 
-  readonly addField = (dataType?: DataType, field?: DataTypeField) => {
+  addField(dataType?: DataType, field?: DataTypeField) {
     const isRequiredControl = this.formBuilder.control(field?.isRequired || true, Validators.required);
     const isReference = field?.type === FieldType.Reference;
 
@@ -166,7 +166,7 @@ export class DataTypeManagementComponent {
     this.form.markAsDirty();
   }
 
-  readonly removeField = (index: number) => {
+  removeField(index: number) {
     this.formFields.removeAt(index);
 
     const displayFieldIndex = this.form.get('displayField')?.value;
@@ -182,7 +182,7 @@ export class DataTypeManagementComponent {
     this.form.markAsDirty();
   }
 
-  readonly getErrorMessage = (field: string): string | null => {
+  getErrorMessage(field: string): string | null {
     const control = this.form.get(field);
 
     if (!control || !control.touched || !control.invalid) {
@@ -200,13 +200,13 @@ export class DataTypeManagementComponent {
     return null;
   }
 
-  readonly hide = () => {
+  hide() {
     this.messages.set({});
     this.isShown.set(false);
     this.form.reset();
   }
 
-  readonly save = () => {
+  save() {
     if (!this.form.valid) {
       this.messages.set({error: ["Please fill out the form."]});
       return;
@@ -242,7 +242,7 @@ export class DataTypeManagementComponent {
     }
   }
 
-  readonly show = (dataType?: DataType) => {
+  show(dataType?: DataType) {
     this.dataType.set(dataType);
     this.form = this.createForm(dataType);
 

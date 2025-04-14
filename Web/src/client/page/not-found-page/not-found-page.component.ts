@@ -9,6 +9,7 @@ import {Subscription} from 'rxjs';
 })
 export class NotFoundPageComponent implements OnInit, OnDestroy {
   private router = inject(Router);
+
   private interval!: NodeJS.Timeout;
   private defaultValue = 5;
   private routerSubscription!: Subscription;

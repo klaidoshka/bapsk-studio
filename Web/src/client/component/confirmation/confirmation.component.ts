@@ -1,4 +1,4 @@
-import {Component, input} from '@angular/core';
+import {Component, inject, input} from '@angular/core';
 import {ConfirmDialog} from 'primeng/confirmdialog';
 import {ConfirmationService} from 'primeng/api';
 
@@ -11,18 +11,14 @@ import {ConfirmationService} from 'primeng/api';
   styles: ``
 })
 export class ConfirmationComponent {
+  private readonly confirmationService = inject(ConfirmationService);
+
   key = input.required<string>();
   header = input<string>("Are you sure about this action?");
 
-  constructor(
-    private confirmationService: ConfirmationService
-  ) {
-  }
-
   request(
     accept: () => void,
-    reject: () => void = () => {
-    }
+    reject: () => void = () => {}
   ) {
     this.confirmationService.confirm({
       key: this.key(),

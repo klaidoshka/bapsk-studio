@@ -3,7 +3,8 @@
 <p-toast key="session-revokation"/>
 
 <p-table
-  styleClass="w-fit"
+  styleClass="w-fit shadow-lg mt-2 dark:bg-primary-950! bg-primary-50!"
+        paginatorStyleClass="dark:bg-primary-950! bg-primary-50!"
   [value]="sessions()"
 >
   <ng-template #header>
@@ -32,7 +33,7 @@
           type="button"
           variant="text"
           (onClick)="revoke(session)"
-        ></p-button>
+        />
       </td>
     </tr>
   </ng-template>

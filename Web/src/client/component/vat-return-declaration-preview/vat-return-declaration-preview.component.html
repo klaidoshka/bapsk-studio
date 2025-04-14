@@ -52,7 +52,7 @@
         class="absolute top-0 right-10 m-2"
         (click)="refresh()"
         [disabled]="isRefreshing()"
-      ></p-button>
+      />
 
       <p-button
         *ngIf="!declaration()!.isCanceled"
@@ -63,7 +63,7 @@
         (click)="cancel()"
         [disabled]="isCanceling()"
         severity="danger"
-      ></p-button>
+      />
     </div>
 
     <!-- Right Column -->
@@ -223,7 +223,7 @@
     </div>
   </div>
 
-  <div *ngIf="sale() !== undefined">
+  <div *ngIf="sale() !== undefined && !declaration()?.isCanceled">
     <p class="font-bold text-lg my-2" *ngIf="declaration() === undefined">
       This sale does not have a submitted VAT return declaration.
     </p>

@@ -8,7 +8,7 @@ export class ApiRouter {
   private readonly baseServerUrl = 'http://localhost:5125/api/v1';
   private readonly accountingUrl = this.baseServerUrl + '/accounting';
 
-  public readonly toParameters = (parameters: { [key: string]: string | number | boolean }) => {
+  public toParameters(parameters: { [key: string]: string | number | boolean }) {
     let params = new HttpParams();
 
     Object.keys(parameters).forEach(key => {
@@ -43,19 +43,17 @@ export class ApiRouter {
   public readonly dataTypeDelete = (id: number) => `${this.accountingUrl}/data-type/${id}`;
   public readonly dataTypeEdit = (id: number) => `${this.accountingUrl}/data-type/${id}`;
   public readonly dataTypeGetById = (id: number) => `${this.accountingUrl}/data-type/${id}`;
-  public readonly dataTypeGetByInstanceId = (instanceId: number) =>
-    `${this.accountingUrl}/data-type?${this.toParameters({
-      instanceId: instanceId
-    })}`;
+  public readonly dataTypeGetByInstanceId = (instanceId: number) => `${this.accountingUrl}/data-type?${this.toParameters({
+    instanceId: instanceId
+  })}`;
 
   public readonly importConfigurationCreate = () => `${this.accountingUrl}/import-configuration`;
   public readonly importConfigurationDelete = (id: number) => `${this.accountingUrl}/import-configuration/${id}`;
   public readonly importConfigurationEdit = (id: number) => `${this.accountingUrl}/import-configuration/${id}`;
   public readonly importConfigurationGetById = (id: number) => `${this.accountingUrl}/import-configuration/${id}`;
-  public readonly importConfigurationGetByInstanceId = (instanceId: number) =>
-    `${this.accountingUrl}/import-configuration?${this.toParameters({
-      instanceId: instanceId
-    })}`;
+  public readonly importConfigurationGetByInstanceId = (instanceId: number) => `${this.accountingUrl}/import-configuration?${this.toParameters({
+    instanceId: instanceId
+  })}`;
 
   public readonly instanceCreate = () => `${this.accountingUrl}/instance`;
   public readonly instanceDelete = (id: number) => `${this.accountingUrl}/instance/${id}`;
@@ -85,19 +83,16 @@ export class ApiRouter {
   public readonly userCreate = () => `${this.baseServerUrl}/user`;
   public readonly userDelete = (id: number) => `${this.baseServerUrl}/user/${id}`;
   public readonly userEdit = (id: number) => `${this.baseServerUrl}/user/${id}`;
-  public readonly userGet = (returnIdentityOnly: boolean = false) =>
-    `${this.baseServerUrl}/user?${this.toParameters({
-      returnIdentityOnly: returnIdentityOnly
-    })}`
-  public readonly userGetById = (id: number, returnIdentityOnly: boolean = false) =>
-    `${this.baseServerUrl}/user/${id}?${this.toParameters({
-      returnIdentityOnly: returnIdentityOnly
-    })}`
-  public readonly userGetByEmail = (email: string, returnIdentityOnly: boolean = false) =>
-    `${this.baseServerUrl}/user?${this.toParameters({
-      email: email,
-      returnIdentityOnly: returnIdentityOnly
-    })}`
+  public readonly userGet = (returnIdentityOnly: boolean = false) => `${this.baseServerUrl}/user?${this.toParameters({
+    returnIdentityOnly: returnIdentityOnly
+  })}`
+  public readonly userGetById = (id: number, returnIdentityOnly: boolean = false) => `${this.baseServerUrl}/user/${id}?${this.toParameters({
+    returnIdentityOnly: returnIdentityOnly
+  })}`
+  public readonly userGetByEmail = (email: string, returnIdentityOnly: boolean = false) => `${this.baseServerUrl}/user?${this.toParameters({
+    email: email,
+    returnIdentityOnly: returnIdentityOnly
+  })}`
 
   public readonly vatReturnCancel = (saleId: number) => `${this.accountingUrl}/sti/vat-return/${saleId}/cancel`;
   public readonly vatReturnSubmit = () => `${this.accountingUrl}/sti/vat-return`;

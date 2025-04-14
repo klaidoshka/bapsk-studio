@@ -29,9 +29,9 @@ import {rxResource} from '@angular/core/rxjs-interop';
   styles: ``
 })
 export class DataTypeShowcaseComponent {
-  private dataTypeService = inject(DataTypeService);
-  private localizationService = inject(LocalizationService);
-  private instanceService = inject(InstanceService);
+  private readonly dataTypeService = inject(DataTypeService);
+  private readonly localizationService = inject(LocalizationService);
+  private readonly instanceService = inject(InstanceService);
 
   confirmationComponent = viewChild.required(ConfirmationComponent);
 
@@ -49,7 +49,7 @@ export class DataTypeShowcaseComponent {
   messages = signal<Messages>({});
   previewMenu = viewChild.required(DataTypePreviewComponent);
 
-  readonly delete = (dataType: DataType) => {
+  delete(dataType: DataType) {
     this.confirmationComponent().request(() => {
       this.dataTypeService.delete(dataType.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['Data type deleted successfully']}),
@@ -58,11 +58,11 @@ export class DataTypeShowcaseComponent {
     });
   }
 
-  readonly showManagement = (dataType?: DataType) => {
+  showManagement(dataType?: DataType) {
     this.managementMenu().show(dataType);
   }
 
-  readonly showPreview = (dataType: DataType) => {
+  showPreview(dataType: DataType) {
     this.previewMenu().show(dataType);
   }
 }

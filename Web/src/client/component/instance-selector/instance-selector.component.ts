@@ -1,4 +1,12 @@
-import {Component, effect, Signal, viewChild, ViewEncapsulation, WritableSignal} from '@angular/core';
+import {
+  Component,
+  effect,
+  inject,
+  Signal,
+  viewChild,
+  ViewEncapsulation,
+  WritableSignal
+} from '@angular/core';
 import {DropdownModule} from "primeng/dropdown";
 import Instance from '../../model/instance.model';
 import {InstanceService} from '../../service/instance.service';
@@ -22,16 +30,13 @@ import {Select} from 'primeng/select';
   encapsulation: ViewEncapsulation.None
 })
 export class InstanceSelectorComponent {
-  instances!: Signal<Instance[]>;
+  private readonly instanceService = inject(InstanceService);
+
+  instances = this.instanceService.getAsSignal();
   managementMenu = viewChild.required(InstanceManagementComponent);
-  selectedInstance!: WritableSignal<Instance | undefined>;
+  selectedInstance = this.instanceService.getActiveInstance();
 
-  constructor(
-    private instanceService: InstanceService
-  ) {
-    this.instances = this.instanceService.getAsSignal();
-    this.selectedInstance = this.instanceService.getActiveInstance();
-
+  constructor() {
     effect(() => {
       if (this.instances().length == 1) {
         this.selectInstance(this.instances()[0]);
@@ -39,13 +44,13 @@ export class InstanceSelectorComponent {
     });
   }
 
-  readonly selectInstance = (instance: Instance | null) => {
+  selectInstance(instance: Instance | null) {
     if (this.selectedInstance() !== instance && instance !== null) {
       this.instanceService.setActiveInstance(instance);
     }
   }
 
-  readonly showManagementMenu = () => {
+  showManagementMenu() {
     this.managementMenu().show();
   }
 }

@@ -1,6 +1,13 @@
-import {Component, computed, input, OnInit, signal} from '@angular/core';
+import {Component, computed, inject, input, signal} from '@angular/core';
 import Sale, {SaleCreateRequest, SaleEditRequest, SoldGood} from '../../model/sale.model';
-import {AbstractControl, FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 import Messages from '../../model/messages.model';
 import {SaleService} from '../../service/sale.service';
 import {LocalizationService} from '../../service/localization.service';
@@ -37,80 +44,79 @@ import {NumberUtil} from '../../util/number.util';
   templateUrl: './sale-management.component.html',
   styles: ``
 })
-export class SaleManagementComponent implements OnInit {
+export class SaleManagementComponent {
   protected readonly SaleReceiptType = SaleReceiptType;
   protected readonly UnitOfMeasureType = UnitOfMeasureType;
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly localizationService = inject(LocalizationService);
+  private readonly saleService = inject(SaleService);
+  private readonly textService = inject(TextService);
+
   customers = input.required<Customer[]>();
+
   customersLabeled = computed(() => this.customers().map((customer) => ({
     label: `${customer.firstName} ${customer.lastName} (${customer.identityDocument.number})`,
     value: customer.id
   })));
-  form!: FormGroup;
+
+  form = this.formBuilder.group({
+    cashRegister: this.formBuilder.group({
+      cashRegisterNo: ["", [Validators.maxLength(50)]],
+      receiptNo: ["", [Validators.maxLength(70)]]
+    }),
+    customerId: [-1, [Validators.required]],
+    date: [new Date(), [Validators.required]],
+    invoiceNo: ["", [Validators.maxLength(70)]],
+    salesmanId: [-1, [Validators.required]],
+    soldGoods: this.formBuilder.array([])
+  });
+
   instanceId = input.required<number>();
-  isShownInitially = input<boolean>(false);
   isShown = signal<boolean>(false);
+
   measurementUnits = [
     {label: 'Code (Standard)', value: UnitOfMeasureType.UnitOfMeasureCode},
     {label: 'Other', value: UnitOfMeasureType.UnitOfMeasureOther}
   ]
+
   messages = signal<Messages>({});
   sale = signal<Sale | null>(null);
   salesmen = input.required<Salesman[]>();
+
   salesmenLabeled = computed(() => this.salesmen().map((salesman) => ({
     label: `${salesman.name} (${salesman.vatPayerCode.value})`,
     value: salesman.id
   })));
+
   saleReceiptTypes = [
     {label: 'Invoice', value: SaleReceiptType.Invoice},
     {label: 'Receipt', value: SaleReceiptType.CashRegister}
   ]
+
   selectedSaleReceiptType = signal<SaleReceiptType>(SaleReceiptType.Invoice);
   standardMeasurements = StandardMeasurements
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private saleService: SaleService,
-    private localizationService: LocalizationService,
-    private textService: TextService
-  ) {
-    this.form = this.formBuilder.group({
-      cashRegister: this.formBuilder.group({
-        cashRegisterNo: [null, [Validators.maxLength(50)]],
-        receiptNo: [null, [Validators.maxLength(70)]]
-      }),
-      customerId: [null, [Validators.required]],
-      date: [new Date(), [Validators.required]],
-      invoiceNo: [null, [Validators.maxLength(70)]],
-      salesmanId: [null, [Validators.required]],
-      soldGoods: this.formBuilder.array([])
-    });
-  }
-
-  ngOnInit() {
-    this.isShown.set(this.isShownInitially());
-  }
-
-  private readonly onSuccess = (message: string) => {
+  private onSuccess(message: string) {
     this.messages.set({success: [message]});
     this.form.markAsUntouched();
     this.form.markAsPristine();
   }
 
-  private readonly create = (request: SaleCreateRequest) => {
+  private create(request: SaleCreateRequest) {
     this.saleService.create(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Sale has been created successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
-  private readonly edit = (request: SaleEditRequest) => {
+  private edit(request: SaleEditRequest) {
     this.saleService.edit(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Sale has been edited successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
-  private readonly updateForm = (sale?: Sale | null) => {
+  private updateForm(sale?: Sale | null) {
     this.form.reset();
     this.soldGoods().clear();
 
@@ -137,7 +143,7 @@ export class SaleManagementComponent implements OnInit {
     }
   }
 
-  readonly addSoldGood = (soldGood?: SoldGood | null) => {
+  addSoldGood(soldGood?: SoldGood | null) {
     this.soldGoods().push(this.formBuilder.group({
       description: [soldGood?.description || "...", [Validators.required, Validators.maxLength(500)]],
       id: [soldGood?.id || null],
@@ -150,7 +156,7 @@ export class SaleManagementComponent implements OnInit {
     this.soldGoods().markAsDirty();
   }
 
-  readonly clearMeasurement = (index: number, type: UnitOfMeasureType) => {
+  clearMeasurement(index: number, type: UnitOfMeasureType) {
     if (type == UnitOfMeasureType.UnitOfMeasureCode) {
       this.soldGoods().at(index).get("unitOfMeasure")?.setValue(defaultStandardMeasurement);
     } else {
@@ -158,7 +164,7 @@ export class SaleManagementComponent implements OnInit {
     }
   }
 
-  readonly getErrorMessage = (field: string): string | null => {
+  getErrorMessage(field: string): string | null {
     const parts = field.split(".");
     let control: AbstractControl<any, any> | null = null;
 
@@ -166,7 +172,9 @@ export class SaleManagementComponent implements OnInit {
       control = control ? control.get(part) : this.form.get(part);
     }
 
-    if (!control || !control.touched || !control.invalid) return "";
+    if (!control || !control.touched || !control.invalid) {
+      return "";
+    }
 
     const name = this.textService.capitalize(field);
 
@@ -181,14 +189,18 @@ export class SaleManagementComponent implements OnInit {
     return null;
   }
 
-  readonly getMeasurementUnit = (index: number): UnitOfMeasureType => {
-    return this.soldGoods().at(index).get("unitOfMeasureType")?.value || UnitOfMeasureType.UnitOfMeasureCode;
+  getMeasurementUnit(index: number): UnitOfMeasureType {
+    return this.soldGoods()
+      .at(index)
+      .get("unitOfMeasureType")?.value || UnitOfMeasureType.UnitOfMeasureCode;
   }
 
-  readonly getSoldGoodErrorMessage = (index: number, field: string): string | null => {
+  getSoldGoodErrorMessage(index: number, field: string): string | null {
     const control = this.soldGoods().at(index).get(field);
 
-    if (!control || !control.touched || !control.invalid) return "";
+    if (!control || !control.touched || !control.invalid) {
+      return "";
+    }
 
     const name = this.textService.capitalize(field);
 
@@ -215,18 +227,18 @@ export class SaleManagementComponent implements OnInit {
     return null;
   }
 
-  readonly hide = () => {
+  hide() {
     this.messages.set({});
     this.isShown.set(false);
     this.form.reset();
   }
 
-  readonly removeSoldGood = (index: number) => {
+  removeSoldGood(index: number) {
     this.soldGoods().removeAt(index);
     this.soldGoods().markAsDirty();
   }
 
-  readonly save = () => {
+  save() {
     if (!this.form.valid) {
       this.messages.set({error: ["Please fill out the form."]});
       return;
@@ -234,18 +246,18 @@ export class SaleManagementComponent implements OnInit {
 
     const request: SaleEditRequest = {
       sale: {
-        cashRegister: this.form.value.cashRegister,
-        customerId: this.form.value.customerId,
-        date: this.form.value.date,
-        invoiceNo: this.form.value.invoiceNo,
+        cashRegister: this.form.value.cashRegister as any,
+        customerId: this.form.value.customerId!,
+        date: this.form.value.date!,
+        invoiceNo: this.form.value.invoiceNo || undefined,
         id: this.sale()?.id,
-        salesmanId: this.form.value.salesmanId,
-        soldGoods: this.form.value.soldGoods.map((soldGood: any) => ({
+        salesmanId: this.form.value.salesmanId!,
+        soldGoods: this.form.value.soldGoods?.map((soldGood: any) => ({
           ...soldGood,
           quantity: +soldGood.quantity,
           unitPrice: +soldGood.unitPrice,
           vatRate: +soldGood.vatRate
-        }))
+        })) || []
       },
       instanceId: this.instanceId()
     };
@@ -257,11 +269,13 @@ export class SaleManagementComponent implements OnInit {
     }
   }
 
-  readonly show = (sale: Sale | null) => {
+  show(sale: Sale | null) {
     this.updateForm(sale);
     this.sale.set(sale);
     this.isShown.set(true);
   }
 
-  readonly soldGoods = () => this.form.controls["soldGoods"] as FormArray;
+  soldGoods() {
+    return this.form.controls["soldGoods"] as FormArray;
+  }
 }

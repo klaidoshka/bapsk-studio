@@ -1,4 +1,4 @@
-import {Component, Signal, signal, viewChild} from '@angular/core';
+import {Component, inject, signal, viewChild} from '@angular/core';
 import {UserManagementComponent} from '../user-management/user-management.component';
 import {UserPreviewComponent} from '../user-preview/user-preview.component';
 import {TableModule} from 'primeng/table';
@@ -28,20 +28,18 @@ import {DatePipe} from '@angular/common';
   styles: ``
 })
 export class UserShowcaseComponent {
+  private readonly localizationService = inject(LocalizationService);
+  private readonly userService = inject(UserService);
+
   confirmationComponent = viewChild.required(ConfirmationComponent);
   managementMenu = viewChild.required(UserManagementComponent);
   messages = signal<Messages>({});
   previewMenu = viewChild.required(UserPreviewComponent);
-  users!: Signal<User[]>;
+  users = this.userService.getAsSignal();
 
-  constructor(
-    private localizationService: LocalizationService,
-    private userService: UserService
-  ) {
-    this.users = this.userService.getAsSignal();
-  }
+  protected readonly getCountryName = getUserIsoCountryLabel;
 
-  readonly delete = (user: User) => {
+  delete(user: User) {
     this.confirmationComponent().request(() => {
       this.userService.delete(user.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['User deleted successfully']}),
@@ -50,13 +48,11 @@ export class UserShowcaseComponent {
     });
   }
 
-  readonly showManagement = (user?: User) => {
+  showManagement(user?: User) {
     this.managementMenu().show(user);
   }
 
-  readonly showPreview = (user: User) => {
+  showPreview(user: User) {
     this.previewMenu().show(user);
   }
-
-  protected readonly getCountryName = getUserIsoCountryLabel;
 }

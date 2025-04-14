@@ -22,7 +22,7 @@
             pInputText
             type="text"
             id="name"
-            class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="mt-1 block w-full"
           />
 
           @if (getErrorMessage("name"); as error) {
@@ -48,7 +48,7 @@
             appendTo="body"
             styleClass="w-full"
             class="mt-1"
-            (onChange)="changeFields($event.value)"
+            (onChange)="changeFormFields($event.value)"
           />
 
           @if (getErrorMessage("dataType"); as error) {
@@ -63,66 +63,66 @@
           class="block text-sm font-medium"
         >Fields</label>
 
-        <table
-          class="p-datatable-table"
+        <p-table
+          styleClass="w-full mt-2 dark:bg-primary-950! bg-primary-50!"
+          paginatorStyleClass="dark:bg-primary-950! bg-primary-50!"
           id="fields"
           formArrayName="fields"
+          [value]="formFields().controls"
         >
-          <thead class="p-datatable-thead">
-          <tr>
-            <th>Order</th>
-            <th>Name</th>
-            <th>Default Value</th>
-            <th>Actions</th>
-          </tr>
-          </thead>
+          <ng-template #header>
+            <tr>
+              <th>Order</th>
+              <th>Name</th>
+              <th>Default Value</th>
+              <th>Actions</th>
+            </tr>
+          </ng-template>
 
-          <tbody class="p-datatable-tbody">
-            @for (field of fields().controls; let i = $index; track i) {
-              <tr [formGroup]="field">
-                <td>{{ i + 1 }}</td>
-                <td>{{ getFieldName(i) }}</td>
+          <ng-template #body let-formField let-i="rowIndex">
+            <tr [formGroup]="formField">
+              <td>{{ i + 1 }}</td>
+              <td>{{ getFieldName(i) }}</td>
 
-                <td>
-                  @let fieldType = getFieldType(i);
+              <td>
+                @let fieldType = getFieldType(i);
 
-                  @if (fieldType === FieldType.Reference) {
-                    <p-select
-                      placeholder="Select referenced entry"
-                      [options]="getDataEntries(i)()"
-                      optionLabel="label"
-                      optionValue="id"
-                      appendTo="body"
-                      formControlName="defaultValue"
-                      class="w-full"
-                    />
-                  } @else {
-                    <data-type-entry-field-input
-                      formControlName="defaultValue"
-                      [type]="fieldType"
-                    />
-                  }
-                </td>
-
-                <td>
-                  <p-button
-                    icon="pi pi-chevron-up"
-                    type="button"
-                    variant="text"
-                    (onClick)="moveField(i,  -1)"
+                @if (fieldType === FieldType.Reference) {
+                  <p-select
+                    placeholder="Select referenced entry"
+                    [options]="getDataEntries(i)()"
+                    optionLabel="label"
+                    optionValue="id"
+                    appendTo="body"
+                    formControlName="defaultValue"
+                    class="w-full"
                   />
-
-                  <p-button
-                    icon="pi pi-chevron-down"
-                    type="button"
-                    variant="text"
-                    (onClick)="moveField(i,  1)"
+                } @else {
+                  <data-type-entry-field-input
+                    formControlName="defaultValue"
+                    [type]="fieldType"
                   />
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
+                }
+              </td>
+
+              <td>
+                <p-button
+                  icon="pi pi-chevron-up"
+                  type="button"
+                  variant="text"
+                  (onClick)="moveField(i,  -1)"
+                />
+
+                <p-button
+                  icon="pi pi-chevron-down"
+                  type="button"
+                  variant="text"
+                  (onClick)="moveField(i,  1)"
+                />
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
       </div>
     </div>
 

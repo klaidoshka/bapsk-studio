@@ -1,4 +1,13 @@
-import {Component, computed, effect, signal, Signal, untracked, viewChild, ViewEncapsulation} from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+  viewChild,
+  ViewEncapsulation
+} from '@angular/core';
 import {ButtonModule} from 'primeng/button';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {AuthService} from '../../service/auth.service';
@@ -23,22 +32,20 @@ import {Role} from '../../model/role.model';
   encapsulation: ViewEncapsulation.None
 })
 export class ProfileDropdownComponent {
+  private readonly authService = inject(AuthService);
+  private readonly messageService = inject(MessageService);
+  private readonly router = inject(Router);
+
   confirmationComponent = viewChild.required(ConfirmationComponent);
-  displayName!: Signal<string>;
-  entries = signal<MenuItem[]>([]);
 
-  constructor(
-    private authService: AuthService,
-    private messageService: MessageService,
-    private router: Router
-  ) {
-    this.displayName = computed(() => {
-      const user = this.authService.getUser()();
-      return user != null ? user.firstName + ' ' + user.lastName : 'Profile';
-    });
+  displayName = computed(() => {
+    const user = this.authService.getUser()();
+    return user != null ? user.firstName + ' ' + user.lastName : 'Profile';
+  });
 
-    this.entries.set(this.getEmptyEntries());
+  entries = signal<MenuItem[]>(this.getEmptyEntries());
 
+  constructor() {
     effect(() => {
       const user = this.authService.getUser()();
 
@@ -53,7 +60,7 @@ export class ProfileDropdownComponent {
     });
   }
 
-  private readonly getEmptyEntries = (): MenuItem[] => {
+  private getEmptyEntries(): MenuItem[] {
     return [
       {
         label: 'Profile',
@@ -69,7 +76,7 @@ export class ProfileDropdownComponent {
     ]
   }
 
-  private readonly getEntries = (): MenuItem[] => {
+  private getEntries(): MenuItem[] {
     return [
       {
         label: this.displayName(),
@@ -116,7 +123,7 @@ export class ProfileDropdownComponent {
     ]
   }
 
-  readonly logout = () => {
+  logout() {
     this.confirmationComponent().request(() => {
       this.authService.logout().subscribe({
         next: () => {

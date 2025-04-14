@@ -20,21 +20,16 @@ import {RoundPipe} from '../../pipe/round.pipe';
   templateUrl: './sale-preview.component.html',
   styles: ``
 })
-export class SalePreviewComponent implements OnInit {
+export class SalePreviewComponent {
   sale = signal<Sale | null>(null);
   isShown = signal<boolean>(false);
-  isShownInitially = input<boolean>(false);
 
-  ngOnInit() {
-    this.isShown.set(this.isShownInitially());
-  }
-
-  readonly hide = () => {
+  hide() {
     this.isShown.set(false);
     this.sale.set(null);
   }
 
-  readonly show = (sale: Sale | null) => {
+  show(sale: Sale | null) {
     this.sale.set(sale);
     this.isShown.set(true);
   }

@@ -1,4 +1,4 @@
-import {Component, signal} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {
   SubmitDeclarationState,
@@ -38,6 +38,8 @@ import {Badge} from 'primeng/badge';
 })
 export class DeclarationPreviewPageComponent {
   protected readonly SubmitDeclarationState = SubmitDeclarationState;
+  private readonly route = inject(ActivatedRoute);
+  private readonly vatReturnService = inject(VatReturnService);
 
   declarationPreviewCode = signal<string | undefined>(undefined);
   declaration = signal<VatReturnDeclarationWithSale | undefined>(undefined);
@@ -45,11 +47,8 @@ export class DeclarationPreviewPageComponent {
   isLoading = signal<boolean>(true);
   isRefreshing = signal<boolean>(false);
 
-  constructor(
-    route: ActivatedRoute,
-    private vatReturnService: VatReturnService
-  ) {
-    route.queryParams.subscribe(params => {
+  constructor() {
+    this.route.queryParams.subscribe(params => {
       const previewCode = params['code'];
 
       if (!previewCode) {
@@ -66,7 +65,7 @@ export class DeclarationPreviewPageComponent {
   protected readonly toExportResultLabel = toExportResultLabel;
   protected readonly toSubmitDeclarationStateLabel = toSubmitDeclarationStateLabel;
 
-  readonly loadDeclaration = (code: string, callback?: () => void) => {
+  loadDeclaration(code: string, callback?: () => void) {
     this.vatReturnService.getWithSaleByPreviewCode(code).pipe(first()).subscribe({
       next: declaration => {
         if (declaration) {
@@ -80,13 +79,13 @@ export class DeclarationPreviewPageComponent {
     });
   }
 
-  readonly getVATToReturn = (sale: SaleWithVatReturnDeclaration): number => {
+  getVATToReturn(sale: SaleWithVatReturnDeclaration): number {
     return sale.soldGoods
-    .map(it => it.vatAmount)
-    .reduce((a, b) => a + b);
+      .map(it => it.vatAmount)
+      .reduce((a, b) => a + b);
   }
 
-  readonly refresh = () => {
+  refresh() {
     const code = this.declarationPreviewCode();
 
     if (!code) {
@@ -95,6 +94,8 @@ export class DeclarationPreviewPageComponent {
 
     this.isRefreshing.set(true);
 
-    this.loadDeclaration(code, () => this.isRefreshing.set(false));
+    this.vatReturnService.updateByPreviewCode(code).pipe(first()).subscribe(() =>
+      this.loadDeclaration(code, () => this.isRefreshing.set(false))
+    );
   }
 }

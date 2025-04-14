@@ -8,6 +8,7 @@ import {
   DataTypeEntryFieldDisplayComponent
 } from '../../component/data-type-entry-field-display/data-type-entry-field-display.component';
 import {rxResource} from '@angular/core/rxjs-interop';
+import {FieldType} from '../../model/data-type-field.model';
 
 @Component({
   selector: 'import-configuration-preview-page',
@@ -32,9 +33,38 @@ export class ImportConfigurationPreviewPageComponent {
 
   configurationId = input.required<string>();
 
-  readonly resolveDataTypeField = (field: ImportConfigurationField) => {
-    return this.configuration
-      .value()!.dataType.fields
-      .find((dataTypeField) => dataTypeField.id === field.dataTypeFieldId)!;
+  getExampleCSV() {
+    const fields = this.configuration
+      .value()!.fields
+      .sort((a, b) => a.order > b.order ? 1 : -1)
+      .map(field => {
+        const dataTypeField = this.resolveDataTypeField(field);
+        return {
+          field: field,
+          dataTypeField: dataTypeField
+        };
+      });
+
+    const header = fields
+      .map(value => value.dataTypeField.name)
+      .join(",");
+
+    const values = fields
+      .map(value => value.dataTypeField.type === FieldType.Date
+        ? value.field.defaultValue.toISOString()
+        : value.field.defaultValue
+      )
+      .join(",");
+
+    return {
+      header,
+      values
+    };
+  }
+
+  resolveDataTypeField(field: ImportConfigurationField) {
+    return this.configuration.value()!.dataType.fields.find(dataTypeField =>
+      dataTypeField.id === field.dataTypeFieldId
+    )!;
   }
 }

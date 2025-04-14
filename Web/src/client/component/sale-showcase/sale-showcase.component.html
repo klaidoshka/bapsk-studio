@@ -21,11 +21,12 @@
     icon="pi pi-plus"
     type="button"
     (onClick)="showManagement(null)"
-  ></p-button>
+  />
 
   <div class="card mt-4">
     <p-table
-      styleClass="w-fit"
+      styleClass="w-fit shadow-lg mt-2 dark:bg-primary-950! bg-primary-50!"
+        paginatorStyleClass="dark:bg-primary-950! bg-primary-50!"
       [value]="sales()"
       [paginator]="true"
       [rows]="10"
@@ -58,25 +59,25 @@
               type="button"
               variant="text"
               (onClick)="showSale(sale)"
-            ></p-button>
+            />
             <p-button
               icon="pi pi-book"
               type="button"
               variant="text"
               (onClick)="showVatReturnDeclaration(sale)"
-            ></p-button>
+            />
             <p-button
               icon="pi pi-pencil"
               type="button"
               variant="text"
               (onClick)="showManagement(sale)"
-            ></p-button>
+            />
             <p-button
               icon="pi pi-trash"
               type="button"
               variant="text"
               (onClick)="delete(sale)"
-            ></p-button>
+            />
           </td>
         </tr>
       </ng-template>

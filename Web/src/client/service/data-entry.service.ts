@@ -20,34 +20,28 @@ import DataType from '../model/data-type.model';
   providedIn: 'root'
 })
 export class DataEntryService {
-  private apiRouter = inject(ApiRouter);
-  private dataTypeService = inject(DataTypeService);
-  private httpClient = inject(HttpClient);
-  private userService = inject(UserService);
+  private readonly apiRouter = inject(ApiRouter);
+  private readonly dataTypeService = inject(DataTypeService);
+  private readonly httpClient = inject(HttpClient);
+  private readonly userService = inject(UserService);
 
-  private readonly cacheService = new CacheService<number, DataEntryJoined>(it => it.id);
-
+  private readonly cacheService = new CacheService<number, DataEntryJoined>(dataEntry => dataEntry.id);
   private readonly dataTypesFetched = new Set<number>();
-
-  constructor() {
-    this.updateProperties = this.updateProperties.bind(this);
-    this.joinOntoDataEntry = this.joinOntoDataEntry.bind(this);
-  }
 
   private adjustDateToISO<T extends DataEntryCreateRequest | DataEntryEditRequest>(request: T, dataType: DataType): T {
     return {
       ...request,
-      fields: request.fields.map(it => {
-        const dataTypeField = dataType.fields.find(field => field.id === it.dataTypeFieldId)!;
+      fields: request.fields.map(request => {
+        const dataTypeField = dataType.fields.find(field => field.id === request.dataTypeFieldId)!;
 
         if (dataTypeField.type === FieldType.Date) {
           return {
-            ...it,
-            value: it.value.toISOString()
+            ...request,
+            value: request.value.toISOString()
           }
         }
 
-        return it;
+        return request;
       })
     };
   }
@@ -85,16 +79,16 @@ export class DataEntryService {
     return this.dataTypeService
       .getById(request.dataTypeId)
       .pipe(
-        switchMap(it =>
+        switchMap(dataType =>
           this.httpClient.post<DataEntry>(
             this.apiRouter.dataEntryCreate(),
-            this.adjustDateToISO(request, it)
+            this.adjustDateToISO(request, dataType)
           )
         ),
-        switchMap(this.updateProperties),
-        switchMap(this.joinOntoDataEntry),
-        tap(it => this.cacheService.set(it)),
-        switchMap(it => this.cacheService.get(it.id))
+        switchMap(dataEntry => this.updateProperties(dataEntry)),
+        switchMap(dataEntry => this.joinOntoDataEntry(dataEntry)),
+        tap(dataEntry => this.cacheService.set(dataEntry)),
+        switchMap(dataEntry => this.cacheService.get(dataEntry.id))
       );
   }
 
@@ -110,10 +104,10 @@ export class DataEntryService {
     return this.dataTypeService
       .getById(request.dataTypeId)
       .pipe(
-        switchMap(it =>
+        switchMap(dataType =>
           this.httpClient.put<void>(
             this.apiRouter.dataEntryEdit(request.dataEntryId),
-            this.adjustDateToISO(request, it)
+            this.adjustDateToISO(request, dataType)
           )
         ),
         tap(() => {
@@ -136,45 +130,45 @@ export class DataEntryService {
     return this.httpClient
       .get<DataEntry>(this.apiRouter.dataEntryGetById(id))
       .pipe(
-        switchMap(this.updateProperties),
-        switchMap(this.joinOntoDataEntry),
-        tap(it => this.cacheService.set(it)),
-        switchMap(it => this.cacheService.get(it.id))
+        switchMap(dataEntry => this.updateProperties(dataEntry)),
+        switchMap(dataEntry => this.joinOntoDataEntry(dataEntry)),
+        tap(dataEntry => this.cacheService.set(dataEntry)),
+        switchMap(dataEntry => this.cacheService.get(dataEntry.id))
       );
   }
 
   getAllByDataTypeId(dataTypeId: number): Observable<DataEntryJoined[]> {
     if (this.dataTypesFetched.has(dataTypeId)) {
-      return this.cacheService.getAllWhere(it => it.dataTypeId === dataTypeId);
+      return this.cacheService.getAllWhere(dataEntry => dataEntry.dataTypeId === dataTypeId);
     }
 
     return this.httpClient
       .get<DataEntry[]>(this.apiRouter.dataEntryGetByDataTypeId(dataTypeId))
       .pipe(
-        switchMap(it => combineLatest(it.map(this.updateProperties))),
-        switchMap(it => combineLatest(it.map(this.joinOntoDataEntry))),
-        tap(it => {
+        switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.updateProperties(dataEntry)))),
+        switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.joinOntoDataEntry(dataEntry)))),
+        tap(dataEntries => {
           this.dataTypesFetched.add(dataTypeId);
 
           this.cacheService.update(
-            it,
-            it => it.dataTypeId === dataTypeId
+            dataEntries,
+            dataEntry => dataEntry.dataTypeId === dataTypeId
           );
         }),
-        switchMap(_ => this.cacheService.getAllWhere(it => it.dataTypeId === dataTypeId))
+        switchMap(_ => this.cacheService.getAllWhere(dataEntry => dataEntry.dataTypeId === dataTypeId))
       );
   }
 
   updateProperties(dataEntry: DataEntry): Observable<DataEntry> {
     return combineLatest(
-      dataEntry.fields.map(it => this.updateFieldProperty(it, dataEntry.dataTypeId))
+      dataEntry.fields.map(field => this.updateFieldProperty(field, dataEntry.dataTypeId))
     )
       .pipe(
-        map(it => ({
+        map(fields => ({
           ...dataEntry,
           createdAt: DateUtil.adjustToLocalDate(dataEntry.createdAt),
           modifiedAt: DateUtil.adjustToLocalDate(dataEntry.modifiedAt),
-          fields: it
+          fields: fields
         }))
       );
   }
@@ -183,10 +177,10 @@ export class DataEntryService {
     return this.dataTypeService
       .getById(dataTypeId)
       .pipe(
-        map(it => it.fields.find(it => it.id === field.dataTypeFieldId)),
-        map(it => ({
+        map(dataType => dataType.fields.find(dataTypeField => dataTypeField.id === field.dataTypeFieldId)),
+        map(dataTypeField => ({
           ...field,
-          value: FieldTypeUtil.updateValue(field.value, it?.type || FieldType.Text)
+          value: FieldTypeUtil.updateValue(field.value, dataTypeField?.type || FieldType.Text)
         }))
       );
   }

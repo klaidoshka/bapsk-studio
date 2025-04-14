@@ -1,4 +1,4 @@
-import {Component, computed, Signal, signal, viewChild} from '@angular/core';
+import {Component, computed, inject, signal, viewChild} from '@angular/core';
 import {InstanceManagementComponent} from '../instance-management/instance-management.component';
 import {ButtonModule} from 'primeng/button';
 import {InstanceWithUsers} from '../../model/instance.model';
@@ -28,19 +28,14 @@ import {UserService} from '../../service/user.service';
   styles: ``
 })
 export class InstanceShowcaseComponent {
-  confirmationComponent = viewChild.required(ConfirmationComponent);
-  instances!: Signal<InstanceWithUsers[]>
-  managementMenu = viewChild.required(InstanceManagementComponent);
-  messages = signal<Messages>({});
-  previewMenu = viewChild.required(InstancePreviewComponent);
+  private readonly instanceService = inject(InstanceService);
+  private readonly localizationService = inject(LocalizationService);
+  private readonly userService = inject(UserService);
 
-  constructor(
-    private instanceService: InstanceService,
-    private localizationService: LocalizationService,
-    private userService: UserService
-  ) {
-    this.instances = computed(() =>
-      this.instanceService
+  confirmationComponent = viewChild.required(ConfirmationComponent);
+
+  instances = computed(() =>
+    this.instanceService
       .getAsSignal()()
       .map(it => ({
         ...it,
@@ -49,10 +44,13 @@ export class InstanceShowcaseComponent {
           user: this.userService.getByIdAsSignal(it.userId)()!
         }))
       }))
-    );
-  }
+  );
 
-  readonly delete = (instance: InstanceWithUsers) => {
+  managementMenu = viewChild.required(InstanceManagementComponent);
+  messages = signal<Messages>({});
+  previewMenu = viewChild.required(InstancePreviewComponent);
+
+  delete(instance: InstanceWithUsers) {
     this.confirmationComponent().request(() => {
       this.instanceService.delete(instance.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['Instance deleted successfully']}),
@@ -61,11 +59,11 @@ export class InstanceShowcaseComponent {
     });
   }
 
-  readonly showManagement = (instance?: InstanceWithUsers) => {
+  showManagement(instance?: InstanceWithUsers) {
     this.managementMenu().show(instance);
   }
 
-  readonly showPreview = (instance: InstanceWithUsers) => {
+  showPreview(instance: InstanceWithUsers) {
     this.previewMenu().show(instance);
   }
 }

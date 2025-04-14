@@ -15,11 +15,12 @@
     icon="pi pi-plus"
     type="button"
     (onClick)="showManagement(null)"
-  ></p-button>
+  />
 
   <div class="card mt-4">
     <p-table
-      styleClass="w-fit"
+      styleClass="w-fit shadow-lg mt-2 dark:bg-primary-950! bg-primary-50!"
+        paginatorStyleClass="dark:bg-primary-950! bg-primary-50!"
       [value]="customers()"
       [paginator]="true"
       [rows]="10"
@@ -56,19 +57,19 @@
               type="button"
               variant="text"
               (onClick)="showPreview(customer)"
-            ></p-button>
+            />
             <p-button
               icon="pi pi-pencil"
               type="button"
               variant="text"
               (onClick)="showManagement(customer)"
-            ></p-button>
+            />
             <p-button
               icon="pi pi-trash"
               type="button"
               variant="text"
               (onClick)="delete(customer)"
-            ></p-button>
+            />
           </td>
         </tr>
       </ng-template>

@@ -27,7 +27,7 @@
           pInputText
           type="text"
           id="name"
-          class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          class="mt-1 block w-full"
         />
         @if (getErrorMessage("name"); as error) {
           <div class="text-xs text-red-500 mt-1">{{ error }}</div>
@@ -43,7 +43,7 @@
           formControlName="description"
           pTextarea
           id="description"
-          class="mt-1 p-2 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          class="mt-1 p-2 block w-full"
         ></textarea>
         @if (getErrorMessage("description"); as error) {
           <div class="text-xs text-red-500 mt-1">{{ error }}</div>
@@ -76,7 +76,7 @@
                   variant="text"
                   icon="pi pi-trash"
                   (onClick)="removeUser(i)"
-                ></p-button>
+                />
               </td>
             </tr>
           </ng-template>
@@ -96,7 +96,7 @@
             pInputText
             type="email"
             id="email"
-            class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="mt-1 block w-full"
           />
           @if (getUserEmailErrorMessage(); as error) {
             <div class="text-xs text-red-500 mt-1">{{ error }}</div>
@@ -108,7 +108,7 @@
           label="Add user"
           [disabled]="formUser.invalid"
           (onClick)="addUser()"
-        ></p-button>
+        />
       </div>
     </div>
 
@@ -117,7 +117,7 @@
         [label]="instance() == null ? 'Create' : 'Save'"
         [disabled]="form.invalid || !form.dirty"
         (onClick)="save()"
-      ></p-button>
+      />
     </div>
   </div>
 </p-dialog>

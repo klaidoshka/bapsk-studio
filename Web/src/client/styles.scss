@@ -4,3 +4,9 @@
 @plugin "tailwindcss-primeui";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+p-table .p-datatable-table {
+  th, tr {
+    background-color: inherit !important;
+  }
+}

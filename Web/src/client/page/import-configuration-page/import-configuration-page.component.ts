@@ -42,21 +42,25 @@ export class ImportConfigurationPageComponent {
   instanceId = this.instanceService.getActiveInstanceId();
   messages = signal<Messages>({});
 
-  private readonly changeMessages = (message: string, success: boolean = true) => {
+  private changeMessages(message: string, success: boolean = true) {
     this.messages.set(success ? {success: [message]} : {error: [message]});
   }
 
-  readonly delete = (configuration: ImportConfigurationJoined) => {
-    this.confirmationComponent()
-      .request(() => {
-        this.importConfigurationService.delete(configuration.id!)
-          .subscribe(() => this.changeMessages("Import configuration deleted successfully"));
-      });
+  delete(configuration: ImportConfigurationJoined) {
+    this.confirmationComponent().request(() => {
+      this.importConfigurationService.delete(configuration.id!).subscribe(() =>
+        this.changeMessages("Import configuration deleted successfully")
+      );
+    });
   }
 
-  readonly manage = (configuration?: ImportConfigurationJoined) => this.router.navigate(
-    ['home/import-configuration/' + (configuration ? `${configuration.id}/edit` : 'create')]
-  );
+  manage(configuration?: ImportConfigurationJoined) {
+    this.router.navigate(
+      ['home/import-configuration/' + (configuration ? `${configuration.id}/edit` : 'create')]
+    );
+  }
 
-  readonly preview = (configuration: ImportConfigurationJoined) => this.router.navigate([`home/import-configuration/${configuration.id}`]);
+  preview(configuration: ImportConfigurationJoined) {
+    this.router.navigate([`home/import-configuration/${configuration.id}`]);
+  }
 }

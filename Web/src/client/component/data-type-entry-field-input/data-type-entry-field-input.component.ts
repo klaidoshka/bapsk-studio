@@ -89,7 +89,7 @@ export class DataTypeEntryFieldInputComponent implements ControlValueAccessor {
     this.value.set(value);
   }
 
-  readonly resolveDefaultValue = (type: FieldType): any => {
+  resolveDefaultValue(type: FieldType): any {
     switch (type) {
       case FieldType.Check:
         return false;

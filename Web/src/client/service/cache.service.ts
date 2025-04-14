@@ -5,7 +5,6 @@ type CachedValue<V> = V & {
 };
 
 export class CacheService<K, V> {
-
   private readonly store = new BehaviorSubject<Map<K, CachedValue<V>>>(new Map());
 
   constructor(

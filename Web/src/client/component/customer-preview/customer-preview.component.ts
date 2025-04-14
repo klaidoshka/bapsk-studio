@@ -25,15 +25,16 @@ export class CustomerPreviewComponent {
   protected readonly getCountryName = getIsoCountryLabel;
   protected readonly getIdentityDocumentTypeLabel = getIdentityDocumentTypeLabel;
   protected readonly getIsoCountryLabel = getIsoCountryLabel;
+  
   customer = signal<Customer | null>(null);
   isShown = signal<boolean>(false);
 
-  readonly hide = () => {
+  hide() {
     this.isShown.set(false);
     this.customer.set(null);
   }
 
-  readonly show = (customer: Customer | null) => {
+  show(customer: Customer | null) {
     this.customer.set(customer);
     this.isShown.set(true);
   }

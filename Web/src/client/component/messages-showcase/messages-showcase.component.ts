@@ -14,5 +14,7 @@ import {NgClass, NgIf} from '@angular/common';
 export class MessagesShowcaseComponent {
   messages = input.required<Messages>();
 
-  readonly containsMessage = () => this.messages().error || this.messages().success || this.messages().warning;
+  containsMessage() {
+    return this.messages().error || this.messages().success || this.messages().warning;
+  }
 }

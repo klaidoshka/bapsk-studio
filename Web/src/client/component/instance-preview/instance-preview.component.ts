@@ -19,16 +19,17 @@ import {toUserFullName} from '../../model/user.model';
   styles: ``
 })
 export class InstancePreviewComponent {
-  protected readonly toUserFullName = toUserFullName;
   instance = signal<InstanceWithUsers | undefined>(undefined);
   isShown = signal<boolean>(false);
+  
+  protected readonly toUserFullName = toUserFullName;
 
-  readonly hide = () => {
+  hide() {
     this.isShown.set(false);
     this.instance.set(undefined);
   }
 
-  readonly show = (instance: InstanceWithUsers) => {
+  show(instance: InstanceWithUsers) {
     this.instance.set(instance);
     this.isShown.set(true);
   }

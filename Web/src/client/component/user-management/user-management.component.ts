@@ -1,4 +1,4 @@
-import {Component, signal} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -9,7 +9,12 @@ import {TextService} from '../../service/text.service';
 import {first} from 'rxjs';
 import {User, UserCreateRequest, UserEditRequest} from '../../model/user.model';
 import {UserService} from '../../service/user.service';
-import {getDefaultIsoCountry, getIsoCountryByCode, IsoCountries, IsoCountry} from '../../model/iso-country.model';
+import {
+  getDefaultIsoCountry,
+  getIsoCountryByCode,
+  IsoCountries,
+  IsoCountry
+} from '../../model/iso-country.model';
 import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
 import {DatePicker} from 'primeng/datepicker';
 import {LocalizationService} from '../../service/localization.service';
@@ -30,6 +35,11 @@ import {LocalizationService} from '../../service/localization.service';
   styles: ``
 })
 export class UserManagementComponent {
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly localizationService = inject(LocalizationService);
+  private readonly textService = inject(TextService);
+  private readonly userService = inject(UserService);
+
   filteredCountries: IsoCountry[] = [];
   form!: FormGroup;
   isFormSet = signal<boolean>(false);
@@ -37,15 +47,7 @@ export class UserManagementComponent {
   messages = signal<Messages>({});
   user = signal<User | undefined>(undefined);
 
-  constructor(
-    private localizationService: LocalizationService,
-    private formBuilder: FormBuilder,
-    private textService: TextService,
-    private userService: UserService
-  ) {
-  }
-
-  private readonly createForm = (user: User | null): FormGroup => {
+  private createForm(user: User | null): FormGroup {
     return this.formBuilder.group({
       birthDate: [new Date(), Validators.required],
       country: [getDefaultIsoCountry(), Validators.required],
@@ -56,27 +58,27 @@ export class UserManagementComponent {
     });
   }
 
-  private readonly onSuccess = (message: string) => {
+  private onSuccess(message: string) {
     this.messages.set({success: [message]});
     this.form.markAsUntouched();
     this.form.markAsPristine();
   }
 
-  private readonly create = (request: UserCreateRequest) => {
+  private create(request: UserCreateRequest) {
     this.userService.create(request).pipe(first()).subscribe({
       next: () => this.onSuccess("User has been created successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
-  private readonly edit = (request: UserEditRequest) => {
+  private edit(request: UserEditRequest) {
     this.userService.edit(request).pipe(first()).subscribe({
       next: () => this.onSuccess("User has been edited successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
-  readonly filterCountries = (event: AutoCompleteCompleteEvent) => {
+  filterCountries(event: AutoCompleteCompleteEvent) {
     const query = event.query.toLowerCase();
 
     this.filteredCountries = IsoCountries.filter((country) =>
@@ -84,27 +86,33 @@ export class UserManagementComponent {
     );
   }
 
-  readonly getErrorMessage = (field: string): string | null => {
+  getErrorMessage(field: string): string | null {
     const control = this.form.get(field);
 
-    if (!control || !control.touched || !control.invalid) return "";
-    if (control.errors?.["required"])
+    if (!control || !control.touched || !control.invalid) {
+      return "";
+    }
+    if (control.errors?.["required"]) {
       return `${this.textService.capitalize(field)} is required.`;
-    if (control.errors?.["email"]) return "Please enter a valid email address.";
-    if (control.errors?.["minlength"])
+    }
+    if (control.errors?.["email"]) {
+      return "Please enter a valid email address.";
+    }
+    if (control.errors?.["minlength"]) {
       return "Password must be at least 8 characters long.";
+    }
 
     return null;
   }
 
-  readonly hide = () => {
+  hide() {
     this.messages.set({});
     this.isShown.set(false);
     this.isFormSet.set(false);
     this.form.reset();
   }
 
-  readonly save = () => {
+  save() {
     if (!this.form.valid) {
       this.messages.set({error: ["Please fill out the form."]});
       return;
@@ -129,7 +137,7 @@ export class UserManagementComponent {
     }
   }
 
-  readonly show = (user?: User) => {
+  show(user?: User) {
     if (user) {
       this.form = this.createForm(user);
       this.form.patchValue({

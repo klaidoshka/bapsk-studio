@@ -1,3 +1,5 @@
+import {IsoCountryCode} from './iso-country.model';
+
 export interface AuthResponse {
   accessToken: string;
   sessionId: string;
@@ -11,7 +13,7 @@ export interface LoginRequest {
 
 export interface RegisterRequest {
   birthDate: Date;
-  country: string;
+  country: IsoCountryCode;
   email: string;
   firstName: string;
   lastName: string;

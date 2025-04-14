@@ -34,8 +34,8 @@ import {DataTypeEntryFieldDisplayComponent} from '../data-type-entry-field-displ
 })
 export class DataEntryShowcaseComponent {
   protected readonly toUserIdentityFullName = toUserIdentityFullName;
-  private dataEntryService = inject(DataEntryService);
-  private localizationService = inject(LocalizationService);
+  private readonly dataEntryService = inject(DataEntryService);
+  private readonly localizationService = inject(LocalizationService);
 
   confirmationComponent = viewChild.required(ConfirmationComponent);
   dataEntries = input.required<DataEntryJoined[]>();
@@ -44,15 +44,15 @@ export class DataEntryShowcaseComponent {
   messages = signal<Messages>({});
   previewMenu = viewChild.required(DataEntryPreviewComponent);
 
-  readonly showManagement = (dataEntry?: DataEntry) => {
+  showManagement(dataEntry?: DataEntry) {
     this.managementMenu().show(dataEntry);
   }
 
-  readonly showPreview = (dataEntry: DataEntryJoined) => {
+  showPreview(dataEntry: DataEntryJoined) {
     this.previewMenu().show(this.dataType(), dataEntry);
   }
 
-  readonly delete = (dataEntry: DataEntry) => {
+  delete(dataEntry: DataEntry) {
     this.confirmationComponent().request(() => {
       this.dataEntryService.delete(dataEntry.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['Data entry deleted successfully']}),

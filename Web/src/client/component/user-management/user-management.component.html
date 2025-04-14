@@ -27,7 +27,7 @@
             id="firstName"
             formControlName="firstName"
             pInputText
-            class="bg-surface-50 mt-1 block w-full p-2 border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="bg-surface-50 mt-1 block w-full p-2"
             required
           />
           @if (getErrorMessage('firstName'); as firstNameInvalid) {
@@ -48,7 +48,7 @@
             id="lastName"
             formControlName="lastName"
             pInputText
-            class="bg-surface-50 mt-1 block w-full p-2 border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="bg-surface-50 mt-1 block w-full p-2"
             required
           />
           @if (getErrorMessage('lastName'); as lastNameInvalid) {
@@ -70,7 +70,7 @@
             [showIcon]="true"
             variant="filled"
             inputStyleClass="p-2 rounded-md"
-            class="bg-surface-50 mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="bg-surface-50 mt-1 block w-full"
             required
             appendTo="body"
           ></p-datepicker>
@@ -92,7 +92,7 @@
             id="email"
             formControlName="email"
             pInputText
-            class="bg-surface-50 mt-1 block w-full p-2 border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="bg-surface-50 mt-1 block w-full p-2"
             required
           />
           @if (getErrorMessage('email'); as emailInvalid) {
@@ -114,7 +114,7 @@
               id="password"
               formControlName="password"
               pInputText
-              class="bg-surface-50 mt-1 block w-full p-2 border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              class="bg-surface-50 mt-1 block w-full p-2"
               required
             />
             @if (getErrorMessage('password'); as passwordInvalid) {
@@ -139,7 +139,7 @@
             [dropdown]="true"
             [suggestions]="filteredCountries"
             (completeMethod)="filterCountries($event)"
-            class="bg-surface-50 mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="bg-surface-50 mt-1 block w-full"
             required
             appendTo="body"
           ></p-autocomplete>
@@ -156,7 +156,7 @@
           [label]="user() == null ? 'Create' : 'Save'"
           [disabled]="!form.valid || !form.dirty"
           (onClick)="save()"
-        ></p-button>
+        />
       </div>
     }
   </div>

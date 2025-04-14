@@ -22,7 +22,8 @@
       }
 
       <p-table
-        styleClass="w-fit"
+        styleClass="w-fit shadow-lg mt-2 dark:bg-primary-950! bg-primary-50!"
+        paginatorStyleClass="dark:bg-primary-950! bg-primary-50!"
         [value]="configurations.hasValue() ? configurations.value()! : []"
         [paginator]="true"
         [rows]="10"
@@ -51,19 +52,19 @@
                 type="button"
                 variant="text"
                 (onClick)="preview(configuration)"
-              ></p-button>
+              />
               <p-button
                 icon="pi pi-pencil"
                 type="button"
                 variant="text"
                 (onClick)="manage(configuration)"
-              ></p-button>
+              />
               <p-button
                 icon="pi pi-trash"
                 type="button"
                 variant="text"
                 (onClick)="delete(configuration)"
-              ></p-button>
+              />
             </td>
           </tr>
         </ng-template>

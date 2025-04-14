@@ -46,12 +46,12 @@ import {rxResource} from '@angular/core/rxjs-interop';
 })
 export class DataEntryManagementComponent {
   protected readonly FieldType = FieldType;
-  private dataEntryService = inject(DataEntryService);
-  private formBuilder = inject(FormBuilder);
-  private injector = inject(Injector);
-  private instanceService = inject(InstanceService);
-  private localizationService = inject(LocalizationService);
-  private textService = inject(TextService);
+  private readonly dataEntryService = inject(DataEntryService);
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly injector = inject(Injector);
+  private readonly instanceService = inject(InstanceService);
+  private readonly localizationService = inject(LocalizationService);
+  private readonly textService = inject(TextService);
 
   dataEntry = signal<DataEntry | undefined>(undefined);
 
@@ -106,7 +106,7 @@ export class DataEntryManagementComponent {
     });
   }
 
-  private readonly createForm = (dataType?: DataType, dataEntry?: DataEntry): FormGroup => {
+  private createForm(dataType?: DataType, dataEntry?: DataEntry): FormGroup {
     const formGroup = this.formBuilder.group({});
 
     dataType?.fields?.forEach(tf => {
@@ -124,21 +124,21 @@ export class DataEntryManagementComponent {
     return formGroup;
   }
 
-  private readonly create = (request: DataEntryCreateRequest) => {
+  private create(request: DataEntryCreateRequest) {
     this.dataEntryService.create(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Data entry has been created successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
-  private readonly edit = (request: DataEntryEditRequest) => {
+  private edit(request: DataEntryEditRequest) {
     this.dataEntryService.edit(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Data entry has been edited successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
-  private readonly onSuccess = (message: string) => {
+  private onSuccess(message: string) {
     this.messages.set({success: [message]});
     this.form.markAsPristine();
     this.form.markAsUntouched();
@@ -164,7 +164,7 @@ export class DataEntryManagementComponent {
     return this.dataEntries.value()?.get(dataTypeId);
   }
 
-  readonly getErrorMessage = (field: string): string | null => {
+  getErrorMessage(field: string): string | null {
     const control = this.form.get(field);
 
     if (!control || !control.touched || !control.invalid) {
@@ -178,13 +178,13 @@ export class DataEntryManagementComponent {
     return null;
   }
 
-  readonly hide = () => {
+  hide() {
     this.messages.set({});
     this.isShown.set(false);
     this.form.reset();
   }
 
-  readonly save = () => {
+  save() {
     if (!this.form.valid) {
       this.messages.set({error: ["Please fill out the form."]});
       return;
@@ -217,7 +217,7 @@ export class DataEntryManagementComponent {
     }
   }
 
-  readonly show = (dataEntry?: DataEntry) => {
+  show(dataEntry?: DataEntry) {
     this.dataEntry.set(dataEntry);
     this.form = this.createForm(this.dataType(), dataEntry);
     this.isShown.set(true);

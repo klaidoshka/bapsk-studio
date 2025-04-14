@@ -1,4 +1,4 @@
-import {Injectable, signal, WritableSignal} from '@angular/core';
+import {inject, Injectable, signal, WritableSignal} from '@angular/core';
 import Sale, {SaleCreateRequest, SaleEditRequest} from '../model/sale.model';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
@@ -13,18 +13,15 @@ import {DateUtil} from '../util/date.util';
   providedIn: 'root'
 })
 export class SaleService {
+  private readonly apiRouter = inject(ApiRouter);
+  private readonly customerService = inject(CustomerService);
+  private readonly httpClient = inject(HttpClient);
+  private readonly salesmanService = inject(SalesmanService);
+
   // Key: InstanceId
   private readonly store = new Map<number, WritableSignal<Sale[]>>();
 
-  constructor(
-    private apiRouter: ApiRouter,
-    private customerService: CustomerService,
-    private httpClient: HttpClient,
-    private salesmanService: SalesmanService
-  ) {
-  }
-
-  private readonly updateSingleInStore = (instanceId: number, sale: Sale) => {
+  private updateSingleInStore(instanceId: number, sale: Sale) {
     const existingSignal = this.store.get(instanceId);
 
     if (existingSignal != null) {
@@ -40,7 +37,7 @@ export class SaleService {
     }
   }
 
-  readonly create = (request: SaleCreateRequest) => {
+  create(request: SaleCreateRequest) {
     return this.httpClient.post<Sale>(this.apiRouter.saleCreate(), {
       ...request,
       sale: {
@@ -52,7 +49,7 @@ export class SaleService {
     );
   }
 
-  readonly delete = (instanceId: number, id: number) => {
+  delete(instanceId: number, id: number) {
     return this.httpClient.delete<void>(this.apiRouter.saleDelete(id)).pipe(
       tap(() => {
         const existingSignal = this.store.get(instanceId);
@@ -66,7 +63,7 @@ export class SaleService {
     );
   }
 
-  readonly edit = (request: SaleEditRequest) => {
+  edit(request: SaleEditRequest) {
     return this.httpClient.put<void>(this.apiRouter.saleEdit(request.sale.id!), {
       ...request,
       sale: {
@@ -78,21 +75,21 @@ export class SaleService {
     );
   }
 
-  readonly get = (instanceId: number) => {
+  get(instanceId: number) {
     return this.httpClient.get<Sale[]>(this.apiRouter.saleGet(instanceId)).pipe(
       tap(sales => {
         const existingSignal = this.store.get(instanceId);
 
         if (existingSignal != null) {
-          existingSignal.update(() => sales.map(this.updateProperties));
+          existingSignal.update(() => sales.map(sale => this.updateProperties(sale)));
         } else {
-          this.store.set(instanceId, signal(sales.map(this.updateProperties)));
+          this.store.set(instanceId, signal(sales.map(sale => this.updateProperties(sale))));
         }
       })
     );
   }
 
-  readonly getById = (instanceId: number, id: number) => {
+  getById(instanceId: number, id: number) {
     return this.httpClient.get<Sale>(this.apiRouter.saleGetById(id)).pipe(
       tap(sale => this.updateSingleInStore(instanceId, this.updateProperties(sale)))
     );
@@ -106,7 +103,7 @@ export class SaleService {
    *
    * @returns Readonly signal of sales
    */
-  readonly getAsSignal = (instanceId: number) => {
+  getAsSignal(instanceId: number) {
     if (!this.store.has(instanceId)) {
       this.store.set(instanceId, signal([]));
 
@@ -116,7 +113,7 @@ export class SaleService {
     return this.store.get(instanceId)!.asReadonly();
   }
 
-  readonly updateProperties = (sale: Sale): Sale => {
+  updateProperties(sale: Sale): Sale {
     return {
       ...sale,
       date: DateUtil.adjustToLocalDate(sale.date),

@@ -1,4 +1,4 @@
-import {Component, computed, inject, input, signal} from '@angular/core';
+import {Component, computed, effect, inject, input, signal} from '@angular/core';
 import {
   ImportConfigurationCreateRequest,
   ImportConfigurationEditRequest,
@@ -18,13 +18,14 @@ import {DataTypeService} from '../../service/data-type.service';
 import DataTypeField, {FieldType} from '../../model/data-type-field.model';
 import {TextService} from '../../service/text.service';
 import Messages from '../../model/messages.model';
-import {first, of} from 'rxjs';
+import {combineLatest, first, map, of} from 'rxjs';
 import {LocalizationService} from '../../service/localization.service';
 import {DataEntryService} from '../../service/data-entry.service';
 import {
   MessagesShowcaseComponent
 } from '../../component/messages-showcase/messages-showcase.component';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {TableModule} from 'primeng/table';
 
 @Component({
   selector: 'import-configuration-management-page',
@@ -35,7 +36,8 @@ import {rxResource, toSignal} from '@angular/core/rxjs-interop';
     DataTypeEntryFieldInputComponent,
     Button,
     NgIf,
-    MessagesShowcaseComponent
+    MessagesShowcaseComponent,
+    TableModule
   ],
   templateUrl: './import-configuration-management-page.component.html',
   styles: ``
@@ -61,6 +63,48 @@ export class ImportConfigurationManagementPageComponent {
 
   configurationId = input<string>();
 
+  dataEntries = rxResource({
+    request: () => {
+      let dataTypeIds = this.configuration
+        .value()?.dataType.fields
+        .map(field => field.referenceId)
+        .filter(id => id != null);
+
+      if (!dataTypeIds) {
+        dataTypeIds = this.dataTypes.value()?.map(dataType => dataType.id);
+      }
+
+      return {dataTypeIds: dataTypeIds || []};
+    },
+    loader: ({request}) => request.dataTypeIds.length > 0
+      ? combineLatest(request.dataTypeIds.map(id =>
+        this.dataEntryService
+          .getAllByDataTypeId(id)
+          .pipe(
+            map(dataEntries => ({
+              dataTypeId: id,
+              values: dataEntries
+            }))
+          )
+      ))
+        .pipe(map(groupedEntries => {
+          const map = new Map<number, { id: number, label: string }[]>();
+
+          groupedEntries.forEach(dataEntries => {
+            map.set(
+              dataEntries.dataTypeId,
+              dataEntries.values.map(entry => ({
+                id: entry.id,
+                label: entry.display()
+              }))
+            );
+          });
+
+          return map;
+        }))
+      : of(undefined)
+  });
+
   dataTypes = rxResource({
     request: () => ({
       instanceId: this.instanceId()
@@ -70,39 +114,54 @@ export class ImportConfigurationManagementPageComponent {
       : of([])
   });
 
-  form!: FormGroup;
+  form = this.formBuilder.group({
+    dataTypeId: [this.configuration.value()?.dataTypeId, [Validators.required]],
+    fields: this.formBuilder.array([]),
+    id: [this.configuration.value()?.id],
+    name: [this.configuration.value()?.name, [Validators.required]]
+  });
+
   instanceId = this.instanceService.getActiveInstanceId();
   messages = signal<Messages>({});
 
   constructor() {
-    this.form = this.formBuilder.group({
-      dataTypeId: [this.configuration.value()?.dataTypeId, [Validators.required]],
-      fields: this.formBuilder.array([]),
-      id: [this.configuration.value()?.id],
-      name: [this.configuration.value()?.name, [Validators.required]]
+    const effectRef = effect(() => {
+      const configuration = this.configuration.value();
+
+      if (!configuration) {
+        return;
+      }
+
+      this.form.patchValue({
+        dataTypeId: configuration!.dataTypeId,
+        id: configuration!.id,
+        name: configuration!.name
+      });
+
+      this.changeFormFields(this.configuration.value()!.dataTypeId);
+
+      effectRef.destroy();
     });
-
-    if (this.configuration.value()?.dataTypeId) {
-      this.changeFields(this.configuration.value()!.dataTypeId);
-    }
   }
 
-  private readonly addField = (dataTypeField: DataTypeField, configurationField?: ImportConfigurationField) => {
-    this.fields().push(
-      this.formBuilder.group({
-        dataTypeFieldId: [dataTypeField.id, [Validators.required]],
-        defaultValue: [configurationField?.defaultValue || dataTypeField.defaultValue],
-        id: [configurationField?.id],
-        type: [dataTypeField.type, [Validators.required]]
-      })
-    );
+  private addFormField(dataTypeField: DataTypeField, configurationField?: ImportConfigurationField) {
+    this.formFields().push(this.createFormField(dataTypeField, configurationField));
   }
 
-  private readonly changeMessages = (message: string, success: boolean = true) => {
+  private createFormField(dataTypeField: DataTypeField, configurationField?: ImportConfigurationField) {
+    return this.formBuilder.group({
+      dataTypeFieldId: [dataTypeField.id, [Validators.required]],
+      defaultValue: [configurationField?.defaultValue || dataTypeField.defaultValue],
+      id: [configurationField?.id],
+      type: [dataTypeField.type, [Validators.required]]
+    });
+  }
+
+  private changeMessages(message: string, success: boolean = true) {
     this.messages.set(success ? {success: [message]} : {error: [message]});
   }
 
-  private readonly create = (request: ImportConfigurationCreateRequest) => {
+  private create(request: ImportConfigurationCreateRequest) {
     this.importConfigurationService.create(request)
       .pipe(first())
       .subscribe({
@@ -111,7 +170,7 @@ export class ImportConfigurationManagementPageComponent {
       });
   }
 
-  private readonly edit = (request: ImportConfigurationEditRequest) => {
+  private edit(request: ImportConfigurationEditRequest) {
     this.importConfigurationService.edit(request)
       .pipe(first())
       .subscribe({
@@ -120,24 +179,26 @@ export class ImportConfigurationManagementPageComponent {
       });
   }
 
-  readonly fields = () => {
-    return this.form.get('fields') as FormArray<FormGroup>;
-  }
+  changeFormFields(dataTypeId: number) {
+    this.formFields().clear();
 
-  readonly changeFields = (dataTypeId: number) => {
-    this.fields().clear();
-
-    const dataType = this.dataTypes.value()!.find(dt => dt.id === dataTypeId)!;
+    const dataType = this.configuration.value()?.dataType || this.dataTypes
+      .value()!
+      .find(dt => dt.id === dataTypeId)!;
 
     dataType.fields.forEach(field => {
-      this.addField(
+      this.addFormField(
         field,
         this.configuration.value()?.fields.find(cf => cf.dataTypeFieldId === field.id)
       );
     });
   }
 
-  readonly getErrorMessage = (field: string) => {
+  formFields() {
+    return this.form.get('fields') as FormArray<FormGroup>;
+  }
+
+  getErrorMessage(field: string) {
     const control = this.form.get(field);
 
     if (!control || !control.touched || !control.invalid) {
@@ -151,28 +212,44 @@ export class ImportConfigurationManagementPageComponent {
     return null;
   }
 
-  readonly getDataEntries = (index: number) => {
-    const dataTypeFieldId = this.fields().at(index).get('dataTypeFieldId')!.value as number;
-    const dataTypeId = this.form.get('dataTypeId')!.value as number;
-    const dataType = this.dataTypes.value()!.find(dt => dt.id === dataTypeId)!;
-    const dataTypeField = dataType.fields.find(df => df.id === dataTypeFieldId);
+  getDataEntries(index: number) {
+    return computed(() => {
+      const dataTypeId = this.form.value.dataTypeId;
+      let dataType = this.configuration.value()?.dataType;
 
-    return computed(() => toSignal(this.dataEntryService.getAllByDataTypeId(dataTypeField!.referenceId!))()!
-      .map(it => ({
-        label: it.display(),
-        id: it.id
-      })));
+      if (dataType?.id !== dataTypeId) {
+        dataType = this.dataTypes.value()?.find(dataType => dataType.id === dataTypeId);
+      }
+
+      const dataTypeFieldId = this
+        .formFields()
+        .at(index)?.value?.dataTypeFieldId as number | undefined;
+
+      if (!dataTypeFieldId) {
+        return [];
+      }
+
+      const dataTypeField = dataType?.fields?.find(field =>
+        field.id === dataTypeFieldId
+      );
+
+      if (dataTypeField?.referenceId) {
+        return this.dataEntries.value()?.get(dataTypeField.referenceId);
+      }
+
+      return [];
+    });
   }
 
-  readonly getFieldType = (index: number) => {
+  getFieldType(index: number) {
     return this
-      .fields()
+      .formFields()
       .at(index)
       .get('type')!.value as FieldType;
   }
 
-  readonly getFieldName = (index: number) => {
-    const field = this.fields()
+  getFieldName(index: number) {
+    const field = this.formFields()
       .at(index)
       .get('dataTypeFieldId')!.value;
 
@@ -183,8 +260,8 @@ export class ImportConfigurationManagementPageComponent {
     return dataType.fields.find(df => df.id === field)?.name || "";
   }
 
-  readonly moveField = (index: number, value: number) => {
-    const fields = this.fields();
+  moveField(index: number, value: number) {
+    const fields = this.formFields();
     const field = fields.at(index);
 
     if (index + value < 0 || index + value >= fields.length) {
@@ -193,24 +270,25 @@ export class ImportConfigurationManagementPageComponent {
 
     fields.removeAt(index);
     fields.insert(index + value, field);
+    fields.markAsDirty();
   }
 
-  readonly save = () => {
+  save() {
     if (!this.form.valid) {
       this.changeMessages("Please fill out the form.", false);
     }
 
     const request: ImportConfigurationEditRequest = {
       importConfiguration: {
-        dataTypeId: this.form.value.dataTypeId,
-        fields: this.fields().value.map((it, index) => ({
+        dataTypeId: this.form.value.dataTypeId!,
+        fields: this.formFields().value.map((it, index) => ({
           dataTypeFieldId: it.dataTypeFieldId,
           defaultValue: it.defaultValue,
           id: it.id,
           order: index
         })),
-        id: this.form.value.id,
-        name: this.form.value.name
+        id: this.form.value.id || undefined,
+        name: this.form.value.name!
       }
     };
 

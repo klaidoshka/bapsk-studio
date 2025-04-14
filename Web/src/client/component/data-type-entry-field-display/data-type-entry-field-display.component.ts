@@ -20,7 +20,7 @@ import {map, of} from 'rxjs';
 })
 export class DataTypeEntryFieldDisplayComponent {
   protected readonly FieldType = FieldType;
-  private dataEntryService = inject(DataEntryService);
+  private readonly dataEntryService = inject(DataEntryService);
 
   dataType = input.required<DataType>();
 

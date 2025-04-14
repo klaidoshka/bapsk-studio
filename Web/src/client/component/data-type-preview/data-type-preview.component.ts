@@ -28,8 +28,8 @@ import {of} from 'rxjs';
 })
 export class DataTypePreviewComponent {
   protected readonly FieldType = FieldType;
-  private dataTypeService = inject(DataTypeService);
-  private instanceService = inject(InstanceService);
+  private readonly dataTypeService = inject(DataTypeService);
+  private readonly instanceService = inject(InstanceService);
 
   dataType = signal<DataType | undefined>(undefined);
 
@@ -47,20 +47,22 @@ export class DataTypePreviewComponent {
 
   protected readonly toFieldTypeLabel = toFieldTypeLabel;
 
-  readonly getDisplayFieldName = () => this.dataType()
-    ?.fields
-    ?.find(it => it.id === this.dataType()?.displayFieldId)?.name || 'Id';
+  getDisplayFieldName() {
+    return this.dataType()
+      ?.fields
+      ?.find(it => it.id === this.dataType()?.displayFieldId)?.name || 'Id';
+  }
 
-  readonly getReferencedDataTypeName = (field: DataTypeField) => {
+  getReferencedDataTypeName(field: DataTypeField) {
     return this.dataTypes.value()!.find(it => it.id === field.referenceId)!.name;
   }
 
-  readonly hide = () => {
+  hide() {
     this.isShown.set(false);
     this.dataType.set(undefined);
   }
 
-  readonly show = (dataType: DataType) => {
+  show(dataType: DataType) {
     this.dataType.set(dataType);
     this.isShown.set(true);
   }

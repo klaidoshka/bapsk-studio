@@ -12,7 +12,7 @@ export class ThemeService {
     this.toggleTheme(this.darkTheme());
   }
 
-  private readonly isStoredDarkTheme = () => {
+  private isStoredDarkTheme() {
     const theme = localStorage.getItem(this.themeKey);
 
     if (theme == null) {
@@ -22,13 +22,15 @@ export class ThemeService {
     return theme === 'true';
   }
 
-  private readonly storeTheme = (theme: boolean) => {
+  private storeTheme(theme: boolean) {
     localStorage.setItem(this.themeKey, theme.toString());
   }
 
-  readonly isDarkTheme = () => this.darkTheme.asReadonly();
+  isDarkTheme() {
+    return this.darkTheme.asReadonly();
+  }
 
-  readonly toggleTheme = (value?: boolean) => {
+  toggleTheme(value?: boolean) {
     this.darkTheme.set(value != null ? value : !this.darkTheme());
     this.storeTheme(this.darkTheme());
 

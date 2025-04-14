@@ -1,5 +1,5 @@
-import {Component, signal} from "@angular/core";
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
+import {Component, inject, signal} from "@angular/core";
+import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Router, RouterLink} from "@angular/router";
 import {Button} from "primeng/button";
 import {LoginRequest} from "../../model/auth.model";
@@ -16,22 +16,20 @@ import {InputText} from "primeng/inputtext";
   providers: [MessageService]
 })
 export class LoginComponent {
-  isSubmitting = signal<boolean>(false);
-  loginForm!: FormGroup;
-  messages = signal<string[]>([]);
+  private readonly authService = inject(AuthService);
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly messageService = inject(MessageService);
+  private readonly router = inject(Router);
+  private readonly textService = inject(TextService);
 
-  constructor(
-    private authService: AuthService,
-    private formBuilder: FormBuilder,
-    private messageService: MessageService,
-    private router: Router,
-    private textService: TextService
-  ) {
-    this.loginForm = this.formBuilder.group({
-      email: ["", [Validators.required, Validators.email]],
-      password: ["", [Validators.required, Validators.minLength(8)]]
-    });
-  }
+  isSubmitting = signal<boolean>(false);
+
+  loginForm = this.formBuilder.group({
+    email: ["", [Validators.required, Validators.email]],
+    password: ["", [Validators.required, Validators.minLength(8)]]
+  });
+
+  messages = signal<string[]>([]);
 
   getErrorMessage(field: string): string | null {
     const control = this.loginForm.get(field);
@@ -54,8 +52,8 @@ export class LoginComponent {
     this.isSubmitting.set(true);
 
     const request: LoginRequest = {
-      email: this.loginForm.value.email,
-      password: this.loginForm.value.password
+      email: this.loginForm.value.email ?? "",
+      password: this.loginForm.value.password ?? ""
     };
 
     this.authService.login(request).subscribe({
