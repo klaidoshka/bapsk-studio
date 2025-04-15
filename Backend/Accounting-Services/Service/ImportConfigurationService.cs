@@ -12,14 +12,17 @@ public class ImportConfigurationService : IImportConfigurationService
 {
     private readonly AccountingDatabase _database;
     private readonly IFieldTypeService _fieldTypeService;
+    private readonly IInstanceAuthorizationService _instanceAuthorizationService;
 
     public ImportConfigurationService(
         AccountingDatabase database,
-        IFieldTypeService fieldTypeService
+        IFieldTypeService fieldTypeService,
+        IInstanceAuthorizationService instanceAuthorizationService
     )
     {
         _database = database;
         _fieldTypeService = fieldTypeService;
+        _instanceAuthorizationService = instanceAuthorizationService;
     }
 
     public async Task AddMissingDataTypeFieldsWithoutSaveAsync(int dataTypeId)
@@ -76,7 +79,7 @@ public class ImportConfigurationService : IImportConfigurationService
             throw new ValidationException("Data type was not found.");
         }
 
-        if (dataType.Instance.CreatedById != request.RequesterId)
+        if (!await _instanceAuthorizationService.IsMemberAsync(dataType.InstanceId, request.RequesterId))
         {
             throw new ValidationException("You are not allowed to create import configurations.");
         }
@@ -164,7 +167,7 @@ public class ImportConfigurationService : IImportConfigurationService
             throw new ValidationException("Import configuration was not found.");
         }
 
-        if (configuration.DataType.Instance.CreatedById != request.RequesterId)
+        if (!await _instanceAuthorizationService.IsMemberAsync(configuration.DataType.InstanceId, request.RequesterId))
         {
             throw new ValidationException("You are not allowed to delete import configurations.");
         }
@@ -189,7 +192,7 @@ public class ImportConfigurationService : IImportConfigurationService
             throw new ValidationException("Import configuration was not found.");
         }
 
-        if (configuration.DataType.Instance.CreatedById != request.RequesterId)
+        if (!await _instanceAuthorizationService.IsMemberAsync(configuration.DataType.InstanceId, request.RequesterId))
         {
             throw new ValidationException("You are not allowed to edit import configurations.");
         }
@@ -263,7 +266,7 @@ public class ImportConfigurationService : IImportConfigurationService
             throw new ValidationException("Import configuration was not found.");
         }
 
-        if (configuration.DataType.Instance.CreatedById != request.RequesterId)
+        if (!await _instanceAuthorizationService.IsMemberAsync(configuration.DataType.InstanceId, request.RequesterId))
         {
             throw new ValidationException("You are not allowed to get import configurations.");
         }
@@ -271,23 +274,48 @@ public class ImportConfigurationService : IImportConfigurationService
         return configuration;
     }
 
-    public async Task<IList<ImportConfiguration>> GetAsync(ImportConfigurationGetByInstanceRequest request)
+    public async Task<IList<ImportConfiguration>> GetAsync(ImportConfigurationGetBySomeIdRequest request)
     {
         var instance = await _database.Instances.FirstOrDefaultAsync(it => it.Id == request.InstanceId);
+        var configurations = new List<ImportConfiguration>();
 
-        if (instance is null || instance.IsDeleted)
+        if (instance is not null && !instance.IsDeleted)
         {
-            throw new KeyNotFoundException("Instance was not found.");
+            if (!await _instanceAuthorizationService.IsMemberAsync(instance.Id, request.RequesterId))
+            {
+                throw new ValidationException("You are not allowed to get import configurations.");
+            }
+
+            configurations.AddRange(
+                await _database.ImportConfigurations
+                    .Include(it => it.Fields)
+                    .Where(it => it.DataType.InstanceId == request.InstanceId)
+                    .ToListAsync()
+            );
         }
 
-        if (instance.CreatedById != request.RequesterId)
+        var dataType = await _database.DataTypes
+            .Include(it => it.Instance)
+            .ThenInclude(it => it.UserMetas)
+            .FirstOrDefaultAsync(it => it.Id == request.DataTypeId);
+
+        if (dataType is null || dataType.IsDeleted || dataType.Instance.IsDeleted)
+        {
+            return configurations;
+        }
+
+        if (!await _instanceAuthorizationService.IsMemberAsync(dataType.InstanceId, request.RequesterId))
         {
             throw new ValidationException("You are not allowed to get import configurations.");
         }
 
-        return await _database.ImportConfigurations
-            .Include(it => it.Fields)
-            .Where(it => it.DataType.InstanceId == request.InstanceId)
-            .ToListAsync();
+        configurations.AddRange(
+            await _database.ImportConfigurations
+                .Include(it => it.Fields)
+                .Where(it => it.DataTypeId == request.DataTypeId)
+                .ToListAsync()
+        );
+
+        return configurations;
     }
 }

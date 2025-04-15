@@ -2,7 +2,6 @@ using Accounting.API.Util;
 using Accounting.Contract.Dto.DataEntry;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
-using DataEntryImportRequest = Accounting.API.Dto.DataEntryImportRequest;
 
 namespace Accounting.API.Endpoint;
 
@@ -27,21 +26,36 @@ public static class DataEntryEndpoints
         builder.MapPost(
             "import",
             async (
-                [FromBody] DataEntryImportRequest request,
+                [FromForm] IFormFile file,
+                [FromForm] int importConfigurationId,
+                [FromForm] bool skipHeader,
                 IDataEntryService dataEntryService,
                 HttpContext httpContext
             ) =>
             {
-                await using var fileStream = request.File.OpenReadStream();
-                
-                return Results.Json(await dataEntryService.ImportAsync(new Contract.Dto.DataEntry.DataEntryImportRequest
+                if (file == null || file.Length == 0)
                 {
-                    DataTypeId = request.DataTypeId,
-                    FileName = request.File.FileName,
-                    FileStream = fileStream,
-                    ImportConfigurationId = request.ImportConfigurationId,
-                    RequesterId = httpContext.GetUserIdOrThrow()
-                }));
+                    return Results.BadRequest("Data entries import file is required.");
+                }
+                
+                await using var fileStream = file.OpenReadStream();
+
+                return Results.Json(
+                    (await dataEntryService.ImportAsync(
+                        new DataEntryImportRequest
+                        {
+                            FileExtension = "." + file.FileName
+                                .Split(".")
+                                .Last(),
+                            FileStream = fileStream,
+                            ImportConfigurationId = importConfigurationId,
+                            RequesterId = httpContext.GetUserIdOrThrow(),
+                            SkipHeader = skipHeader
+                        }
+                    ))
+                    .Select(i => i.ToDto())
+                    .ToList()
+                );
             }
         );
 

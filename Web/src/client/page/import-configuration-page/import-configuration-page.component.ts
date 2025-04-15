@@ -1,11 +1,9 @@
-import {Component, inject, signal, viewChild} from '@angular/core';
+import {Component, inject, input, signal, viewChild} from '@angular/core';
 import {ImportConfigurationService} from '../../service/import-configuration.service';
 import {ImportConfigurationJoined} from '../../model/import-configuration.model';
 import {InstanceService} from '../../service/instance.service';
 import {Button} from 'primeng/button';
-import {
-  MessagesShowcaseComponent
-} from '../../component/messages-showcase/messages-showcase.component';
+import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
 import {TableModule} from 'primeng/table';
 import Messages from '../../model/messages.model';
 import {ConfirmationComponent} from '../../component/confirmation/confirmation.component';
@@ -29,21 +27,30 @@ export class ImportConfigurationPageComponent {
   private instanceService = inject(InstanceService);
   private router = inject(Router);
 
-  configurations = rxResource({
-    request: () => ({
-      instanceId: this.instanceId() === undefined ? undefined : +this.instanceId()!
-    }),
-    loader: ({request}) => request.instanceId
-      ? this.importConfigurationService.getAllByInstanceId(request.instanceId)
-      : of([])
-  });
-
   confirmationComponent = viewChild.required(ConfirmationComponent);
-  instanceId = this.instanceService.getActiveInstanceId();
+  dataTypeId = input<string>();
   messages = signal<Messages>({});
 
+  configurations = rxResource({
+    request: () => ({
+      dataTypeId: this.dataTypeId() === undefined ? undefined : +this.dataTypeId()!,
+      instanceId: this.instanceId() === undefined ? undefined : +this.instanceId()!
+    }),
+    loader: ({ request }) => {
+      if (request.dataTypeId) {
+        return this.importConfigurationService.getAllByDataTypeId(request.dataTypeId);
+      }
+
+      return request.instanceId
+        ? this.importConfigurationService.getAllByInstanceId(request.instanceId)
+        : of([])
+    }
+  });
+
+  instanceId = this.instanceService.getActiveInstanceId();
+
   private changeMessages(message: string, success: boolean = true) {
-    this.messages.set(success ? {success: [message]} : {error: [message]});
+    this.messages.set(success ? { success: [message] } : { error: [message] });
   }
 
   delete(configuration: ImportConfigurationJoined) {

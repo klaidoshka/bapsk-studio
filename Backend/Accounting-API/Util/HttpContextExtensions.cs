@@ -58,13 +58,6 @@ public static class HttpContextExtensions
         };
     }
 
-    /// <summary>
-    /// Finds a property from the route data.
-    /// </summary>
-    /// <param name="context">Context of HTTP call</param>
-    /// <param name="key">Key to look property with</param>
-    /// <typeparam name="T">Result type</typeparam>
-    /// <returns>Value mapped into requested type T or null if we couldn't find or map into the type. Very generic types are supported only.</returns>
     public static T? FindProperty<T>(this HttpContext context, string key)
     {
         if (context.GetRouteData().Values.TryGetValue(key, out var routeValue))
@@ -80,11 +73,6 @@ public static class HttpContextExtensions
         return default;
     }
 
-    /// <summary>
-    /// Resolves user ID from the HTTP request.
-    /// </summary>
-    /// <returns>User id</returns>
-    /// <exception cref="UnauthorizedAccessException">Thrown if resolved id is null</exception>
     public static async Task<int> GetUserIdAsync(this HttpRequest request, IJwtService jwtService)
     {
         var accessToken = request.ToAccessToken()!;
@@ -98,10 +86,6 @@ public static class HttpContextExtensions
         return session.UserId;
     }
 
-    /// <summary>
-    /// Resolves user ID from the HTTP context.
-    /// </summary>
-    /// <returns>User id or null if it was not possible to resolve</returns>
     public static int? GetUserId(this HttpContext httpContext)
     {
         return httpContext.Items.TryGetValue(UserIdExtractorMiddleware.UserIdKey, out var userId)
@@ -109,11 +93,6 @@ public static class HttpContextExtensions
             : null;
     }
 
-    /// <summary>
-    /// Resolves user ID from the HTTP context.
-    /// </summary>
-    /// <returns>User id</returns>
-    /// <exception cref="UnauthorizedAccessException">Thrown if user cannot be resolved</exception>
     public static int GetUserIdOrThrow(this HttpContext httpContext)
     {
         return httpContext.GetUserId() ?? throw new UnauthorizedAccessException();

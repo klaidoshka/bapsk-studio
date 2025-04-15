@@ -27,6 +27,17 @@ public class ExceptionHandlingMiddleware : IMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
+        if (context.Response.HasStarted)
+        {
+            _logger.LogError(
+                exception,
+                "The response has already started, the exception handling middleware will not modify the response"
+            );
+
+            return;
+        }
+
+        context.Response.Clear();
         context.Response.ContentType = "application/json";
 
         if (exception is not ValidationException)
@@ -50,7 +61,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
             ),
             KeyNotFoundException => new ExceptionResponse(
                 HttpStatusCode.NotFound,
-                "The requested resource was not found."
+                "Required resource or resources were not found."
             ),
             UnauthorizedAccessException => new ExceptionResponse(
                 HttpStatusCode.Unauthorized,

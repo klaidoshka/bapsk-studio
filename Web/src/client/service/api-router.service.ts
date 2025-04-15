@@ -52,6 +52,9 @@ export class ApiRouter {
   public readonly importConfigurationDelete = (id: number) => `${this.accountingUrl}/import-configuration/${id}`;
   public readonly importConfigurationEdit = (id: number) => `${this.accountingUrl}/import-configuration/${id}`;
   public readonly importConfigurationGetById = (id: number) => `${this.accountingUrl}/import-configuration/${id}`;
+  public readonly importConfigurationGetByDataTypeId = (dataTypeId: number) => `${this.accountingUrl}/import-configuration?${this.toParameters({
+    dataTypeId: dataTypeId
+  })}`;
   public readonly importConfigurationGetByInstanceId = (instanceId: number) => `${this.accountingUrl}/import-configuration?${this.toParameters({
     instanceId: instanceId
   })}`;

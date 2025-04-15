@@ -21,6 +21,7 @@ export class ImportConfigurationService {
   private readonly httpClient = inject(HttpClient);
 
   private readonly cacheService = new CacheService<number, ImportConfigurationJoined>(configuration => configuration.id!);
+  private readonly dataTypesFetched = new Set<number>();
   private readonly instancesFetched = new Set<number>();
 
   private adjustRequestDateToISO<T extends ImportConfigurationCreateRequest | ImportConfigurationEditRequest>(request: T, fieldTypes: Map<number, FieldType>): T {
@@ -125,6 +126,44 @@ export class ImportConfigurationService {
         ),
         tap(configuration => this.cacheService.set(configuration)),
         switchMap(configuration => this.cacheService.get(configuration.id!))
+      );
+  }
+
+  getAllByDataTypeId(dataTypeId: number): Observable<ImportConfigurationJoined[]> {
+    if (this.dataTypesFetched.has(dataTypeId)) {
+      return this.cacheService.getAllWhere(configuration =>
+        configuration.dataTypeId === dataTypeId
+      );
+    }
+
+    return this.httpClient
+      .get<ImportConfiguration[]>(this.apiRouter.importConfigurationGetByDataTypeId(dataTypeId))
+      .pipe(
+        switchMap(configurations => combineLatest(configurations.map(configuration => this
+          .updateProperties(configuration)
+          .pipe(
+            switchMap(configuration => this.dataTypeService
+              .getById(configuration.dataTypeId)
+              .pipe(
+                map(dataType => ({
+                  ...configuration,
+                  dataType: dataType
+                }) as ImportConfigurationJoined)
+              )
+            )
+          )
+        ))),
+        tap(configurations => {
+          this.dataTypesFetched.add(dataTypeId);
+
+          this.cacheService.update(
+            configurations,
+            configuration => configuration.dataTypeId === dataTypeId
+          );
+        }),
+        switchMap(_ => this.cacheService.getAllWhere(configuration =>
+          configuration.dataTypeId === dataTypeId
+        ))
       );
   }
 

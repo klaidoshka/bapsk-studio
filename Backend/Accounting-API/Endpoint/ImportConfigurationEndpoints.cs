@@ -85,14 +85,16 @@ public static class ImportConfigurationEndpoints
         builder.MapGet(
             String.Empty,
             async (
-                int instanceId,
+                int? instanceId,
+                int? dataTypeId,
                 IImportConfigurationService importConfigurationService,
                 HttpRequest httpRequest,
                 IJwtService jwtService
             ) => Results.Json(
                 (await importConfigurationService.GetAsync(
-                    new ImportConfigurationGetByInstanceRequest
+                    new ImportConfigurationGetBySomeIdRequest
                     {
+                        DataTypeId = dataTypeId,
                         InstanceId = instanceId,
                         RequesterId = await httpRequest.GetUserIdAsync(jwtService)
                     }

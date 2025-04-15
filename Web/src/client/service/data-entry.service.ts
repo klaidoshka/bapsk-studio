@@ -186,10 +186,16 @@ export class DataEntryService {
   }
 
   import(request: DataEntryImportRequest): Observable<DataEntryJoined[]> {
+    const data = new FormData();
+
+    data.append('file', request.file);
+    data.append('importConfigurationId', request.importConfigurationId + '');
+    data.append('skipHeader', request.skipHeader + '');
+
     return this.httpClient
       .post<DataEntry[]>(
         this.apiRouter.dataEntryImport(),
-        request
+        data
       )
       .pipe(
         switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.updateProperties(dataEntry)))),

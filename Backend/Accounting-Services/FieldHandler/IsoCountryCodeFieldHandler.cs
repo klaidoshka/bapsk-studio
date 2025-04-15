@@ -20,19 +20,21 @@ public class IsoCountryCodeFieldHandler() : FieldHandler(FieldType.IsoCountryCod
     {
         IsoCountryCode? result = value switch
         {
-            JsonElement jsonElement => Enum.TryParse<IsoCountryCode>(
-                jsonElement.GetString(),
-                true,
-                out var candidate
-            )
-                ? candidate
-                : null,
+            JsonElement jsonElement => jsonElement.ValueKind switch
+            {
+                JsonValueKind.String => ToCountry(jsonElement.GetString()!),
+                JsonValueKind.Number => ToCountry(jsonElement.GetDouble()),
+                _ => null
+            },
             string stringValue => Enum.TryParse<IsoCountryCode>(
                 stringValue,
                 true,
                 out var candidate
             )
                 ? candidate
+                : null,
+            int intValue => Enum.IsDefined(typeof(IsoCountryCode), intValue)
+                ? (IsoCountryCode)intValue
                 : null,
             _ => null
         };

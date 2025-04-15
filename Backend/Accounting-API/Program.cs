@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Accounting.API.Middleware;
@@ -52,6 +53,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthValidator, AuthValidator>();
 builder.Services.AddScoped<IButentaService, ButentaService>();
 builder.Services.AddScoped<ICountryService, CountryService>();
+builder.Services.AddScoped<ICsvService, CsvService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<ICustomerValidator, CustomerValidator>();
 builder.Services.AddScoped<IDataEntryService, DataEntryService>();
@@ -63,6 +65,7 @@ builder.Services.AddScoped<IFieldTypeService, FieldTypeService>();
 builder.Services.AddScoped<IFieldTypeValidator, FieldTypeValidator>();
 builder.Services.AddScoped<IHashService, HashService>();
 builder.Services.AddScoped<IImportConfigurationService, ImportConfigurationService>();
+builder.Services.AddScoped<IInstanceAuthorizationService, InstanceAuthorizationService>();
 builder.Services.AddScoped<IInstanceService, InstanceService>();
 builder.Services.AddScoped<IInstanceValidator, InstanceValidator>();
 builder.Services.AddScoped<IJwtService, JwtService>();
@@ -95,6 +98,8 @@ builder.Services.ConfigureHttpJsonOptions(
 );
 
 var application = builder.Build();
+
+Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 application.UseMiddleware<UserIdExtractorMiddleware>();
 application.UseAuthentication();

@@ -3,6 +3,22 @@
 
   <data-entry-management [dataType]="dataType()"/>
 
+  <p-dialog
+    header="Data Entry Import"
+    closeOnEscape="true"
+    modal="true"
+    styleClass="min-w-128"
+    closable="true"
+    [(visible)]="showImporting"
+    (onHide)="showImporting.set(false)"
+    (close)="showImporting.set(false)"
+  >
+    <data-entry-import-form
+      [clearImportedValues]="showImporting()"
+      [dataType]="dataType()"
+    />
+  </p-dialog>
+
   <confirmation
     [key]='"data-entry-delete-confirmation"'
     [header]='"Are you sure about deleting this data entry?"'
@@ -10,76 +26,39 @@
 
   <messages-showcase [messages]="messages()"/>
 
-  <p-button
-    label="Create"
-    icon="pi pi-plus"
-    type="button"
-    (onClick)="showManagement()"
-  />
+  <div class="mt-4">
+    <p-button
+      label="Create"
+      icon="pi pi-plus"
+      type="button"
+      (onClick)="manage()"
+    />
+
+    <p-button
+      class="ml-1"
+      label="Import"
+      icon="pi pi-file-import"
+      type="button"
+      (onClick)="showImporting.set(true)"
+    />
+
+    <p-button
+      class="ml-1"
+      label="Import Configurations"
+      icon="pi pi-eye"
+      type="button"
+      routerLink="../import-configuration"
+      [queryParams]="{dataTypeId: dataType().id}"
+    />
+  </div>
 
   <div class="card mt-4">
-    <p-table
-      styleClass="w-fit shadow-lg mt-2 dark:bg-primary-950! bg-primary-50!"
-        paginatorStyleClass="dark:bg-primary-950! bg-primary-50!"
-      [columns]="dataType().fields || []"
-      [value]="dataEntries()"
-      [paginator]="true"
-      [rows]="10"
-      [rowsPerPageOptions]="[10, 20, 50]"
-    >
-      <ng-template
-        #header
-        let-columns
-      >
-        <tr>
-          @for (fields of columns; track fields.id) {
-            <th>{{ fields.name }}</th>
-          }
-          <th>Created</th>
-          <th>Modified</th>
-          <th>Modified By</th>
-          <th>Actions</th>
-        </tr>
-      </ng-template>
-
-      <ng-template
-        #body
-        let-dataEntry
-      >
-        <tr>
-          @for (field of dataEntry.fields; track field.id) {
-            <td>
-              <data-type-entry-field-display
-                [dataTypeFieldId]="field.dataTypeFieldId" [dataType]="dataType()"
-                [value]="field.value"
-              />
-            </td>
-          }
-          <td>{{ dataEntry.createdAt | date:'short' }}</td>
-          <td>{{ dataEntry.modifiedAt | date:'short' }}</td>
-          <td>{{ toUserIdentityFullName(dataEntry.modifiedBy) }}</td>
-          <td class="flex flex-nowrap items-center">
-            <p-button
-              icon="pi pi-eye"
-              type="button"
-              variant="text"
-              (onClick)="showPreview(dataEntry)"
-            />
-            <p-button
-              icon="pi pi-pencil"
-              type="button"
-              variant="text"
-              (onClick)="showManagement(dataEntry)"
-            />
-            <p-button
-              icon="pi pi-trash"
-              type="button"
-              variant="text"
-              (onClick)="delete(dataEntry)"
-            />
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
+    <data-entry-table
+      [dataEntries]="dataEntries()"
+      [dataType]="dataType()"
+      [delete]="onDelete"
+      [manage]="onManage"
+      [preview]="onPreview"
+    />
   </div>
 </div>
