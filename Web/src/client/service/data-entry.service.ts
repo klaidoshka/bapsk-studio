@@ -29,7 +29,7 @@ export class DataEntryService {
   private readonly cacheService = new CacheService<number, DataEntryJoined>(dataEntry => dataEntry.id);
   private readonly dataTypesFetched = new Set<number>();
 
-  private adjustDateToISO<T extends DataEntryCreateRequest | DataEntryEditRequest>(request: T, dataType: DataType): T {
+  private adjustRequestDateToISO<T extends DataEntryCreateRequest | DataEntryEditRequest>(request: T, dataType: DataType): T {
     return {
       ...request,
       fields: request.fields.map(request => {
@@ -83,7 +83,7 @@ export class DataEntryService {
         switchMap(dataType =>
           this.httpClient.post<DataEntry>(
             this.apiRouter.dataEntryCreate(),
-            this.adjustDateToISO(request, dataType)
+            this.adjustRequestDateToISO(request, dataType)
           )
         ),
         switchMap(dataEntry => this.updateProperties(dataEntry)),
@@ -108,7 +108,7 @@ export class DataEntryService {
         switchMap(dataType =>
           this.httpClient.put<void>(
             this.apiRouter.dataEntryEdit(request.dataEntryId),
-            this.adjustDateToISO(request, dataType)
+            this.adjustRequestDateToISO(request, dataType)
           )
         ),
         tap(() => {

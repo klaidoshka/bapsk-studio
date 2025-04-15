@@ -18,7 +18,7 @@ export class DataTypeService {
   private readonly cacheService = new CacheService<number, DataType>(it => it.id!);
   private readonly instancesFetched = new Set<number>();
 
-  private adjustDateToISO<T extends DataTypeCreateRequest | DataTypeEditRequest>(request: T): T {
+  private adjustRequestDateToISO<T extends DataTypeCreateRequest | DataTypeEditRequest>(request: T): T {
     return {
       ...request,
       fields: request.fields.map(request => ({
@@ -32,7 +32,7 @@ export class DataTypeService {
 
   create(request: DataTypeCreateRequest): Observable<DataType> {
     return this.httpClient
-      .post<DataType>(this.apiRouter.dataTypeCreate(), this.adjustDateToISO(request))
+      .post<DataType>(this.apiRouter.dataTypeCreate(), this.adjustRequestDateToISO(request))
       .pipe(
         map(dataType => this.updateProperties(dataType)),
         tap(dataType => this.cacheService.set(dataType)),
@@ -50,7 +50,7 @@ export class DataTypeService {
 
   edit(request: DataTypeEditRequest): Observable<void> {
     return this.httpClient
-      .put<void>(this.apiRouter.dataTypeEdit(request.dataTypeId), this.adjustDateToISO(request))
+      .put<void>(this.apiRouter.dataTypeEdit(request.dataTypeId), this.adjustRequestDateToISO(request))
       .pipe(
         tap(() => {
             this.cacheService.invalidate(request.dataTypeId);

@@ -23,7 +23,7 @@ export class ImportConfigurationService {
   private readonly cacheService = new CacheService<number, ImportConfigurationJoined>(configuration => configuration.id!);
   private readonly instancesFetched = new Set<number>();
 
-  private adjustDateToISO<T extends ImportConfigurationCreateRequest | ImportConfigurationEditRequest>(request: T, fieldTypes: Map<number, FieldType>): T {
+  private adjustRequestDateToISO<T extends ImportConfigurationCreateRequest | ImportConfigurationEditRequest>(request: T, fieldTypes: Map<number, FieldType>): T {
     return {
       ...request,
       importConfiguration: {
@@ -45,7 +45,7 @@ export class ImportConfigurationService {
         switchMap(dataType =>
           this.httpClient.post<ImportConfiguration>(
             this.apiRouter.importConfigurationCreate(),
-            this.adjustDateToISO(
+            this.adjustRequestDateToISO(
               request,
               new Map<number, FieldType>(dataType.fields.map(f => [f.id, f.type]))
             )
@@ -84,7 +84,7 @@ export class ImportConfigurationService {
         switchMap(dataType =>
           this.httpClient.put<void>(
             this.apiRouter.importConfigurationEdit(request.importConfiguration.id!),
-            this.adjustDateToISO(
+            this.adjustRequestDateToISO(
               request,
               new Map<number, FieldType>(dataType.fields.map(f => [f.id, f.type]))
             )
