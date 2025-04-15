@@ -2,7 +2,12 @@ import {Component, effect, input, signal, untracked} from '@angular/core';
 import {FieldType} from '../../model/data-type-field.model';
 import {Checkbox} from 'primeng/checkbox';
 import {DatePicker} from 'primeng/datepicker';
-import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
+import {
+  ControlValueAccessor,
+  FormsModule,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule
+} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
 import {InputNumber} from 'primeng/inputnumber';
 import {getDefaultIsoCountry, IsoCountries} from '../../model/iso-country.model';
