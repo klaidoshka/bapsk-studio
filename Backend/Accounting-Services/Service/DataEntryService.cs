@@ -32,12 +32,12 @@ public class DataEntryService : IDataEntryService
             .Include(it => it.Entries)
             .ThenInclude(it => it.Fields)
             .FirstOrDefaultAsync(it => it.Id == dataTypeId);
-        
+
         if (dataType is null)
         {
             return;
         }
-        
+
         foreach (var dataEntry in dataType.Entries)
         {
             var missingFields = dataType.Fields
@@ -211,6 +211,15 @@ public class DataEntryService : IDataEntryService
 
     public async Task<IList<DataEntry>> ImportAsync(DataEntryImportRequest request)
     {
-        throw new NotImplementedException();
+        var configuration = _database.ImportConfigurations
+            .Include(it => it.Fields)
+            .FirstOrDefaultAsync(it => it.Id == request.ImportConfigurationId);
+
+        if (configuration is null)
+        {
+            throw new KeyNotFoundException("Import configuration not found");
+        }
+
+        return [];
     }
 }

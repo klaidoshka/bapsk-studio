@@ -135,7 +135,7 @@ public class VatReturnService : IVatReturnService
                 response.Errors
                     .Select(e => e.Description)
                     .ToList(),
-                InternalFailure.VatReturnDeclarationSubmitRejectedButUpdated
+                [FailureCode.VatReturnDeclarationSubmitRejectedButUpdated]
             );
         }
     }

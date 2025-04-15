@@ -28,7 +28,7 @@ public class DataEntryValidator : IDataEntryValidator
 
         if (dataType == null || dataType.IsDeleted)
         {
-            return new Validation("Data type not found.");
+            return new Validation("Data type was not found.");
         }
 
         if (dataType.Instance.CreatedById != request.RequesterId)
@@ -73,7 +73,7 @@ public class DataEntryValidator : IDataEntryValidator
 
         if (dataEntry == null || dataEntry.IsDeleted)
         {
-            return new Validation("Data entry not found.");
+            return new Validation("Data entry was not found.");
         }
 
         return dataEntry.DataType.Instance.CreatedById != request.RequesterId
@@ -90,7 +90,7 @@ public class DataEntryValidator : IDataEntryValidator
 
         if (dataEntry == null || dataEntry.IsDeleted)
         {
-            return new Validation("Data entry not found.");
+            return new Validation("Data entry was not found.");
         }
 
         if (dataEntry.DataType.Instance.CreatedById != request.RequesterId)
@@ -120,7 +120,7 @@ public class DataEntryValidator : IDataEntryValidator
 
         if (dataEntry == null || dataEntry.IsDeleted)
         {
-            return new Validation("Data entry not found.");
+            return new Validation("Data entry was not found.");
         }
 
         return dataEntry.DataType.Instance.UserMetas.All(um => um.UserId != request.RequesterId)
@@ -139,7 +139,7 @@ public class DataEntryValidator : IDataEntryValidator
 
         if (dataType == null || dataType.IsDeleted)
         {
-            return new Validation("Data type not found.");
+            return new Validation("Data type was not found.");
         }
 
         return dataType.Instance.UserMetas.All(um => um.UserId != request.RequesterId)

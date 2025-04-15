@@ -10,8 +10,8 @@ import VatReturnDeclaration, {
 } from '../model/vat-return.model';
 import {catchError, first, map, tap} from 'rxjs';
 import {EnumUtil} from '../util/enum.util';
-import ErrorResponse from '../model/error-response.model';
-import {InternalFailure} from '../model/internal-failure-code.model';
+import {containsFailureCode} from '../model/error-response.model';
+import {FailureCode} from '../model/failure-code.model';
 import {UserService} from './user.service';
 import {SaleService} from './sale.service';
 import {UnitOfMeasureType} from '../model/unit-of-measure-type.model';
@@ -131,14 +131,8 @@ export class VatReturnService {
       .pipe(
         tap(declaration => this.updateSingleInStore(request.instanceId, this.updateProperties(declaration))),
         catchError(response => {
-          const errorResponse = response as ErrorResponse | undefined;
-
-          if (errorResponse?.error?.internalFailure != null) {
-            const failure = EnumUtil.toEnum(errorResponse.error.internalFailure, InternalFailure);
-
-            if (failure == InternalFailure.VatReturnDeclarationSubmitRejectedButUpdated) {
-              this.getBySaleId(request.sale.id).pipe(first()).subscribe();
-            }
+          if (containsFailureCode(response, FailureCode.VatReturnDeclarationSubmitRejectedButUpdated)) {
+            this.getBySaleId(request.sale.id).pipe(first()).subscribe();
           }
 
           throw response;

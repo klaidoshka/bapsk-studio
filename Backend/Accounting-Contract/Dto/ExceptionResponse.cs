@@ -3,13 +3,13 @@ using Accounting.Contract.Configuration;
 
 namespace Accounting.Contract.Dto;
 
-public class ExceptionResponse(HttpStatusCode code, ICollection<string> messages, InternalFailure? internalFailure = null)
+public class ExceptionResponse(HttpStatusCode httpStatusCode, ICollection<string> messages, ICollection<FailureCode> codes)
 {
     /// <summary>
-    /// Code of the failure within the application. Used for specific use-case handling.
-    /// Typically, this is null.
+    /// Codes of the failures within the application. Used for specific use-case handling.
+    /// Typically, this is empty.
     /// </summary>
-    public InternalFailure? InternalFailure { get; set; } = internalFailure;
+    public ICollection<FailureCode> Codes { get; set; } = codes;
 
     /// <summary>
     /// Messages to be returned to the client in case of failure.
@@ -19,11 +19,11 @@ public class ExceptionResponse(HttpStatusCode code, ICollection<string> messages
     /// <summary>
     /// Status code to be returned to the client in case of failure.
     /// </summary>
-    public int StatusCode { get; set; } = (int)code;
+    public int HttpStatusCode { get; set; } = (int)httpStatusCode;
 
-    public ExceptionResponse(HttpStatusCode code, string message, InternalFailure? internalFailure = null) : this(
-        code,
+    public ExceptionResponse(HttpStatusCode httpStatusCode, string message, ICollection<FailureCode>? codes = null) : this(
+        httpStatusCode,
         new HashSet<string> { message },
-        internalFailure
+        codes ?? []
     ) { }
 }

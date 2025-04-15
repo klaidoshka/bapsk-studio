@@ -59,7 +59,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
             ValidationException it => new ExceptionResponse(
                 HttpStatusCode.BadRequest,
                 it.Validation.FailureMessages,
-                it.Validation.InternalFailureCode
+                it.Validation.Codes
             ),
             _ => new ExceptionResponse(
                 HttpStatusCode.InternalServerError,
@@ -67,7 +67,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
             )
         };
 
-        context.Response.StatusCode = exceptionResponse.StatusCode;
+        context.Response.StatusCode = exceptionResponse.HttpStatusCode;
 
         await context.Response.WriteAsJsonAsync(exceptionResponse);
     }

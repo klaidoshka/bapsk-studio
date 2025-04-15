@@ -2,7 +2,7 @@ using Accounting.Contract.Configuration;
 
 namespace Accounting.Contract.Dto;
 
-public class Validation(ICollection<string>? failures, InternalFailure? internalFailure = null)
+public class Validation(ICollection<string>? failures, ICollection<FailureCode>? codes = null)
 {
     /// <summary>
     /// Failures that caused validation to fail.
@@ -10,17 +10,17 @@ public class Validation(ICollection<string>? failures, InternalFailure? internal
     public ICollection<string> FailureMessages { get; } = failures ?? [];
 
     /// <summary>
-    /// Code that represents internal failure. Typically, this is null. Only used for specific use-case handling.
+    /// Codes that represent internal failures. Typically, this is empty. Only used for specific use-case handling.
     /// </summary>
-    public InternalFailure? InternalFailureCode { get; } = internalFailure;
+    public ICollection<FailureCode> Codes { get; } = codes ?? [];
 
     public Validation() : this([]) { }
 
-    public Validation(string message, InternalFailure? internalFailure = null) : this([message], internalFailure) { }
+    public Validation(string message, ICollection<FailureCode>? codes = null) : this([message], codes) { }
 
-    public Validation(bool valid, InternalFailure? internalFailure = null) : this(
-        valid ? [] : ["Validation failed"],
-        internalFailure
+    public Validation(bool valid, ICollection<FailureCode>? codes = null) : this(
+        valid ? [] : ["Validation has failed."],
+        codes
     ) { }
 
     /// <summary>
@@ -38,5 +38,5 @@ public class Validation(ICollection<string>? failures, InternalFailure? internal
     /// <summary>
     /// Checks if validation result is valid.
     /// </summary>
-    public bool IsValid => FailureMessages.Count == 0 && InternalFailureCode is null;
+    public bool IsValid => FailureMessages.Count == 0 && Codes.Count == 0;
 }

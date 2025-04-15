@@ -24,7 +24,7 @@ public class DataTypeValidator : IDataTypeValidator
 
         if (instance == null)
         {
-            return new Validation("Instance not found.");
+            return new Validation("Instance was not found.");
         }
 
         if (instance.CreatedById != request.RequesterId)
@@ -90,7 +90,7 @@ public class DataTypeValidator : IDataTypeValidator
 
         if (dataType == null || dataType.IsDeleted)
         {
-            return new Validation("Data type not found.");
+            return new Validation("Data type was not found.");
         }
 
         return dataType.Instance.CreatedById != request.RequesterId
@@ -108,7 +108,7 @@ public class DataTypeValidator : IDataTypeValidator
 
         if (dataType == null || dataType.IsDeleted)
         {
-            return new Validation("Data type not found.");
+            return new Validation("Data type was not found.");
         }
 
         if (dataType.Instance.CreatedById != request.RequesterId)
@@ -207,7 +207,7 @@ public class DataTypeValidator : IDataTypeValidator
 
         if (dataType == null || dataType.IsDeleted)
         {
-            return new Validation("Data type not found.");
+            return new Validation("Data type was not found.");
         }
 
         return dataType.Instance.CreatedById != request.RequesterId

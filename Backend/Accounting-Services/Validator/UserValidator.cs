@@ -21,7 +21,7 @@ public class UserValidator : IUserValidator
         var user = await _database.Users.FindAsync(userId);
 
         return user == null || user.IsDeleted
-            ? new Validation("User not found.")
+            ? new Validation("User was not found.")
             : new Validation();
     }
 

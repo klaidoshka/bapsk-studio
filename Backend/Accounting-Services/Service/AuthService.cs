@@ -79,7 +79,7 @@ public class AuthService : IAuthService
 
         if (session == null)
         {
-            throw new ValidationException("Session not found.");
+            throw new KeyNotFoundException("Session was not found.");
         }
 
         _database.Sessions.Remove(session);
@@ -104,7 +104,7 @@ public class AuthService : IAuthService
 
         if (session == null)
         {
-            throw new ValidationException("Session not found.");
+            throw new KeyNotFoundException("Session was not found.");
         }
 
         var token = new JwtTokenPair

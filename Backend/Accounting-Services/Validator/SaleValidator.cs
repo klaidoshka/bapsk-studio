@@ -76,7 +76,7 @@ public class SaleValidator : ISaleValidator
     {
         return await _database.Sales.AnyAsync(it => it.Id == saleId && !it.IsDeleted)
             ? new Validation()
-            : new Validation("Sale was not found");
+            : new Validation("Sale was not found.");
     }
 
     public async Task<Validation> ValidateGetByIdRequestAsync(int saleId)

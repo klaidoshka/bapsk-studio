@@ -277,7 +277,7 @@ public class ImportConfigurationService : IImportConfigurationService
 
         if (instance is null || instance.IsDeleted)
         {
-            throw new ValidationException("Instance was not found.");
+            throw new KeyNotFoundException("Instance was not found.");
         }
 
         if (instance.CreatedById != request.RequesterId)

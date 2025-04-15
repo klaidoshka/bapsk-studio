@@ -20,7 +20,7 @@ public class SessionValidator : ISessionValidator
 
         if (session == null)
         {
-            return new Validation("Session not found.");
+            return new Validation("Session was not found.");
         }
 
         return session.UserId != request.RequesterId
@@ -34,7 +34,7 @@ public class SessionValidator : ISessionValidator
 
         if (session == null)
         {
-            return new Validation("Session not found.");
+            return new Validation("Session was not found.");
         }
 
         return session.UserId != request.RequesterId
