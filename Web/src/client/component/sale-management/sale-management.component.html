@@ -14,8 +14,8 @@
   >
     <messages-showcase [messages]="messages()"/>
 
-    <div class="flex flex-wrap gap-4">
-      <div class="flex-1 min-w-[100px]">
+    <div class="flex flex-wrap gap-4 space-y-4">
+      <div class="flex-1 min-w-32">
         <label
           for="customerId"
           class="block text-sm font-medium"
@@ -36,7 +36,7 @@
         </div>
       </div>
 
-      <div class="flex-1 min-w-[100px]">
+      <div class="flex-1 min-w-32">
         <label
           for="salesmanId"
           class="block text-sm font-medium"
@@ -58,8 +58,8 @@
       </div>
     </div>
 
-    <div class="flex flex-wrap gap-4">
-      <div class="flex-1 min-w-[100px]">
+    <div class="flex flex-wrap gap-4 space-y-4">
+      <div class="flex-1 min-w-32">
         <label
           for="date"
           class="block text-sm font-medium"
@@ -70,7 +70,7 @@
           [showIcon]="true"
           [showTime]="true"
           variant="filled"
-          inputStyleClass="p-2 rounded-md"
+          inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-inherit!"
           styleClass="w-full"
           class="mt-1 block"
           required
@@ -84,7 +84,7 @@
         </div>
       </div>
 
-      <div class="flex-1 min-w-[100px] w-fit">
+      <div class="flex-1 min-w-32 w-fit">
         <label
           for="saleReceiptType"
           class="block text-sm font-medium"
@@ -102,7 +102,7 @@
       </div>
     </div>
 
-    <div class="flex-1 min-w-[100px]">
+    <div class="flex-1 min-w-32">
       <div
         *ngIf="selectedSaleReceiptType() === SaleReceiptType.Invoice"
         class="w-1/2 pr-2"
@@ -132,7 +132,7 @@
         class="flex flex-wrap gap-4"
         formGroupName="cashRegister"
       >
-        <div class="flex-1 min-w-[100px]">
+        <div class="flex-1 min-w-32">
           <label
             for="cashRegisterNo"
             class="block text-sm font-medium"
@@ -147,7 +147,7 @@
           />
         </div>
 
-        <div class="flex-1 min-w-[100px]">
+        <div class="flex-1 min-w-32">
           <label
             for="receiptNo"
             class="block text-sm font-medium"

@@ -1,5 +1,5 @@
 import {Component, inject, signal} from "@angular/core";
-import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
+import {FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators} from "@angular/forms";
 import {RouterLink} from "@angular/router";
 import {AutoCompleteCompleteEvent, AutoCompleteModule} from "primeng/autocomplete";
 import {ButtonModule} from "primeng/button";
@@ -11,6 +11,9 @@ import ErrorResponse from "../../model/error-response.model";
 import {AuthService} from "../../service/auth.service";
 import {TextService} from "../../service/text.service";
 import {getDefaultIsoCountry, IsoCountries, IsoCountry} from '../../model/iso-country.model';
+import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
+import Messages from '../../model/messages.model';
+import {LocalizationService} from '../../service/localization.service';
 
 @Component({
   selector: "auth-register",
@@ -22,17 +25,19 @@ import {getDefaultIsoCountry, IsoCountries, IsoCountry} from '../../model/iso-co
     ButtonModule,
     InputText,
     DatePicker,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MessagesShowcaseComponent
   ]
 })
 export class RegisterComponent {
   private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
+  private readonly localizationService = inject(LocalizationService);
   private readonly textService = inject(TextService);
 
   filteredCountries: IsoCountry[] = [];
   isSubmitting = signal<boolean>(false);
-  messages = signal<string[]>([]);
+  messages = signal<Messages>({});
 
   registerForm = this.formBuilder.group({
     birthDate: [new Date(), Validators.required],
@@ -40,8 +45,22 @@ export class RegisterComponent {
     email: ["", [Validators.required, Validators.email]],
     firstName: ["", Validators.required],
     lastName: ["", Validators.required],
-    password: ["", [Validators.required, Validators.minLength(8)]]
+    password: ["", [Validators.required, Validators.minLength(8)]],
+    confirmPassword: ["", [this.validatePasswordConfirmed()]]
   });
+
+  validatePasswordConfirmed(): ValidatorFn {
+    return (control): ValidationErrors | null => {
+      const confirmPassword = control.value;
+      const password = this.registerForm?.get("password")?.value;
+
+      if (password !== confirmPassword) {
+        return {passwordConfirmed: true};
+      }
+
+      return null;
+    }
+  }
 
   getErrorMessage(field: string): string | null {
     const control = this.registerForm.get(field);
@@ -49,14 +68,21 @@ export class RegisterComponent {
     if (!control || !control.touched || !control.invalid) {
       return "";
     }
+
     if (control.errors?.["required"]) {
       return `${this.textService.capitalize(field)} is required.`;
     }
+
     if (control.errors?.["email"]) {
       return "Please enter a valid email address.";
     }
+
     if (control.errors?.["minlength"]) {
       return "Password must be at least 8 characters long.";
+    }
+
+    if (control.errors?.["passwordConfirmed"]) {
+      return "Passwords do not match.";
     }
 
     return null;
@@ -74,12 +100,9 @@ export class RegisterComponent {
     if (this.isSubmitting()) {
       return;
     }
-    if (this.messages.length > 0) {
-      this.messages.set([]);
-    }
 
     if (this.registerForm.invalid) {
-      this.messages.set(["Please fill out all required fields correctly."]);
+      this.messages.set({error: ["Please fill out all required fields correctly."] });
       return;
     }
 
@@ -96,13 +119,16 @@ export class RegisterComponent {
 
     this.authService.register(request).subscribe({
       next: (response) => {
+        this.messages.set({success: ["Registration successful!"]});
+
         if (response) {
           this.authService.acceptAuthResponse(response);
         }
+
         this.isSubmitting.set(false);
       },
       error: (response: ErrorResponse) => {
-        this.messages.set(response.error?.messages || ["Failed to register, please try again later."]);
+        this.localizationService.resolveHttpErrorResponseTo(response, this.messages);
         this.isSubmitting.set(false);
       }
     });

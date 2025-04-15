@@ -69,11 +69,11 @@
             formControlName="birthDate"
             [showIcon]="true"
             variant="filled"
-            inputStyleClass="p-2 rounded-md"
+            inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-inherit!"
             class="mt-1 block w-full"
             required
             appendTo="body"
-          ></p-datepicker>
+          />
           @if (getErrorMessage('birthDate'); as birthDateInvalid) {
             <div class="text-xs text-red-500 mt-1">
               {{ birthDateInvalid }}

@@ -2,17 +2,78 @@
 
 <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-4">
   <!-- Display messages if any -->
-  @if (messages().length > 0) {
-    <div class="mb-4">
-      <ul class="list-disc list-inside text-red-500">
-        @for (message of messages(); track $index) {
-          <li>{{ message }}</li>
-        }
-      </ul>
-    </div>
-  }
+  <messages-showcase [messages]="messages()"/>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- Email -->
+    <div class="form-field">
+      <label for="email" class="block text-sm font-medium">Email</label>
+      <input
+        type="email"
+        id="email"
+        formControlName="email"
+        pInputText
+        class="bg-surface-50 mt-1 block w-full p-2"
+      />
+      @if (getErrorMessage('email'); as emailInvalid) {
+        <div class="text-xs text-red-500 mt-1">
+          {{ emailInvalid }}
+        </div>
+      }
+    </div>
+
+    <!-- Birth Date -->
+    <div class="form-field">
+      <label for="birthDate" class="block text-sm font-medium">Birthdate</label>
+      <p-datepicker
+        inputId="birthDate"
+        formControlName="birthDate"
+        [showIcon]="true"
+        variant="filled"
+        inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-white!"
+        class="mt-1 block w-full rounded-md"
+      ></p-datepicker>
+      @if (getErrorMessage('birthDate'); as birthDateInvalid) {
+        <div class="text-xs text-red-500 mt-1">
+          {{ birthDateInvalid }}
+        </div>
+      }
+    </div>
+
+    <!-- Password -->
+    <div class="form-field">
+      <label for="password" class="block text-sm font-medium">Password</label>
+      <input
+        type="password"
+        id="password"
+        formControlName="password"
+        pInputText
+        class="bg-surface-50 mt-1 block w-full p-2"
+      />
+      @if (getErrorMessage('password'); as passwordInvalid) {
+        <div class="text-xs text-red-500 mt-1">
+          {{ passwordInvalid }}
+        </div>
+      }
+    </div>
+
+    <!-- Confirm Password -->
+    <div class="form-field">
+      <label for="confirmPassword" class="block text-sm font-medium">Confirm Password</label>
+      <input
+        type="password"
+        id="confirmPassword"
+        formControlName="confirmPassword"
+        pInputText
+        class="bg-surface-50 mt-1 block w-full p-2"
+      />
+      @if (getErrorMessage('confirmPassword'); as passwordInvalid) {
+        <div class="text-xs text-red-500 mt-1">
+          {{ passwordInvalid }}
+        </div>
+      }
+    </div>
+
     <!-- First Name -->
     <div class="form-field">
       <label for="firstName" class="block text-sm font-medium">First Name</label>
@@ -22,7 +83,6 @@
         formControlName="firstName"
         pInputText
         class="bg-surface-50 mt-1 block w-full p-2"
-        required
       />
       @if (getErrorMessage('firstName'); as firstNameInvalid) {
         <div class="text-xs text-red-500 mt-1">
@@ -40,66 +100,10 @@
         formControlName="lastName"
         pInputText
         class="bg-surface-50 mt-1 block w-full p-2"
-        required
       />
       @if (getErrorMessage('lastName'); as lastNameInvalid) {
         <div class="text-xs text-red-500 mt-1">
           {{ lastNameInvalid }}
-        </div>
-      }
-    </div>
-
-    <!-- Birth Date -->
-    <div class="form-field">
-      <label for="birthDate" class="block text-sm font-medium">Birthdate</label>
-      <p-datepicker
-        inputId="birthDate"
-        formControlName="birthDate"
-        [showIcon]="true"
-        variant="filled"
-        inputStyleClass="p-2 rounded-md"
-        class="bg-surface-50 mt-1 block w-full rounded-md"
-        required
-      ></p-datepicker>
-      @if (getErrorMessage('birthDate'); as birthDateInvalid) {
-        <div class="text-xs text-red-500 mt-1">
-          {{ birthDateInvalid }}
-        </div>
-      }
-    </div>
-
-    <!-- Email -->
-    <div class="form-field">
-      <label for="email" class="block text-sm font-medium">Email</label>
-      <input
-        type="email"
-        id="email"
-        formControlName="email"
-        pInputText
-        class="bg-surface-50 mt-1 block w-full p-2"
-        required
-      />
-      @if (getErrorMessage('email'); as emailInvalid) {
-        <div class="text-xs text-red-500 mt-1">
-          {{ emailInvalid }}
-        </div>
-      }
-    </div>
-
-    <!-- Password -->
-    <div class="form-field">
-      <label for="password" class="block text-sm font-medium">Password</label>
-      <input
-        type="password"
-        id="password"
-        formControlName="password"
-        pInputText
-        class="bg-surface-50 mt-1 block w-full p-2"
-        required
-      />
-      @if (getErrorMessage('password'); as passwordInvalid) {
-        <div class="text-xs text-red-500 mt-1">
-          {{ passwordInvalid }}
         </div>
       }
     </div>
@@ -116,7 +120,6 @@
         [suggestions]="filteredCountries"
         (completeMethod)="filterCountries($event)"
         class="mt-1 block w-full"
-        required
       />
       @if (getErrorMessage('country'); as countryInvalid) {
         <div class="text-xs text-red-500 mt-1">
