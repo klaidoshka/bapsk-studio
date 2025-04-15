@@ -2,6 +2,7 @@ using Accounting.API.Util;
 using Accounting.Contract.Dto.DataEntry;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
+using DataEntryImportRequest = Accounting.API.Dto.DataEntryImportRequest;
 
 namespace Accounting.API.Endpoint;
 
@@ -14,13 +15,33 @@ public static class DataEntryEndpoints
             async (
                 [FromBody] DataEntryCreateRequest request,
                 IDataEntryService dataEntryService,
-                HttpRequest httpRequest,
-                IJwtService jwtService
+                HttpContext httpContext
             ) =>
             {
-                request.RequesterId = await httpRequest.GetUserIdAsync(jwtService);
+                request.RequesterId = httpContext.GetUserIdOrThrow();
 
                 return Results.Json((await dataEntryService.CreateAsync(request)).ToDto());
+            }
+        );
+
+        builder.MapPost(
+            "import",
+            async (
+                [FromBody] DataEntryImportRequest request,
+                IDataEntryService dataEntryService,
+                HttpContext httpContext
+            ) =>
+            {
+                await using var fileStream = request.File.OpenReadStream();
+                
+                return Results.Json(await dataEntryService.ImportAsync(new Contract.Dto.DataEntry.DataEntryImportRequest
+                {
+                    DataTypeId = request.DataTypeId,
+                    FileName = request.File.FileName,
+                    FileStream = fileStream,
+                    ImportConfigurationId = request.ImportConfigurationId,
+                    RequesterId = httpContext.GetUserIdOrThrow()
+                }));
             }
         );
 
@@ -29,15 +50,14 @@ public static class DataEntryEndpoints
             async (
                 int id,
                 IDataEntryService dataEntryService,
-                IJwtService jwtService,
-                HttpRequest httpRequest
+                HttpContext httpContext
             ) =>
             {
                 await dataEntryService.DeleteAsync(
                     new DataEntryDeleteRequest
                     {
                         DataEntryId = id,
-                        RequesterId = await httpRequest.GetUserIdAsync(jwtService)
+                        RequesterId = httpContext.GetUserIdOrThrow()
                     }
                 );
 
@@ -51,12 +71,11 @@ public static class DataEntryEndpoints
                 int id,
                 [FromBody] DataEntryEditRequest request,
                 IDataEntryService dataEntryService,
-                HttpRequest httpRequest,
-                IJwtService jwtService
+                HttpContext httpContext
             ) =>
             {
                 request.DataEntryId = id;
-                request.RequesterId = await httpRequest.GetUserIdAsync(jwtService);
+                request.RequesterId = httpContext.GetUserIdOrThrow();
 
                 await dataEntryService.EditAsync(request);
 
@@ -69,14 +88,13 @@ public static class DataEntryEndpoints
             async (
                 int id,
                 IDataEntryService dataEntryService,
-                HttpRequest httpRequest,
-                IJwtService jwtService
+                HttpContext httpContext
             ) => Results.Json(
                 (await dataEntryService.GetAsync(
                     new DataEntryGetRequest
                     {
                         DataEntryId = id,
-                        RequesterId = await httpRequest.GetUserIdAsync(jwtService)
+                        RequesterId = httpContext.GetUserIdOrThrow()
                     }
                 )).ToDto()
             )
@@ -87,14 +105,13 @@ public static class DataEntryEndpoints
             async (
                 int dataTypeId,
                 IDataEntryService dataEntryService,
-                HttpRequest httpRequest,
-                IJwtService jwtService
+                HttpContext httpContext
             ) => Results.Json(
                 (await dataEntryService.GetByDataTypeIdAsync(
                     new DataEntryGetByDataTypeRequest
                     {
                         DataTypeId = dataTypeId,
-                        RequesterId = await httpRequest.GetUserIdAsync(jwtService)
+                        RequesterId = httpContext.GetUserIdOrThrow()
                     }
                 ))
                 .Select(i => i.ToDto())

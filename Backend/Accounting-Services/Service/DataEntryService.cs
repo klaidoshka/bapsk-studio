@@ -208,4 +208,9 @@ public class DataEntryService : IDataEntryService
 
         return candidates;
     }
+
+    public async Task<IList<DataEntry>> ImportAsync(DataEntryImportRequest request)
+    {
+        throw new NotImplementedException();
+    }
 }
