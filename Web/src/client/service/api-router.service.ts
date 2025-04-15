@@ -38,6 +38,7 @@ export class ApiRouter {
   public readonly dataEntryGetByDataTypeId = (dataTypeId: number) => `${this.accountingUrl}/data-entry?${this.toParameters({
     dataTypeId: dataTypeId
   })}`;
+  public readonly dataEntryImport = () => `${this.accountingUrl}/data-entry/import`;
 
   public readonly dataTypeCreate = () => `${this.accountingUrl}/data-type`;
   public readonly dataTypeDelete = (id: number) => `${this.accountingUrl}/data-type/${id}`;

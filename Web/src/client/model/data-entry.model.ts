@@ -27,3 +27,9 @@ export interface DataEntryEditRequest {
   dataTypeId: number;
   fields: DataEntryFieldEditRequest[];
 }
+
+export interface DataEntryImportRequest {
+  dataTypeId: number;
+  file: File;
+  importConfigurationId: number;
+}

@@ -2,7 +2,12 @@ import {inject, Injectable} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
 import {combineLatest, first, map, Observable, switchMap, tap} from 'rxjs';
-import DataEntry, {DataEntryCreateRequest, DataEntryEditRequest, DataEntryJoined} from '../model/data-entry.model';
+import DataEntry, {
+  DataEntryCreateRequest,
+  DataEntryEditRequest,
+  DataEntryImportRequest,
+  DataEntryJoined
+} from '../model/data-entry.model';
 import {DateUtil} from '../util/date.util';
 import {UserService} from './user.service';
 import {DataTypeService} from './data-type.service';
@@ -178,6 +183,22 @@ export class DataEntryService {
 
         return map;
       }));
+  }
+
+  import(request: DataEntryImportRequest): Observable<DataEntryJoined[]> {
+    return this.httpClient
+      .post<DataEntry[]>(
+        this.apiRouter.dataEntryImport(),
+        request
+      )
+      .pipe(
+        switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.updateProperties(dataEntry)))),
+        switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.joinOntoDataEntry(dataEntry)))),
+        tap(dataEntries => dataEntries.map(dataEntry => this.cacheService.set(dataEntry))),
+        switchMap(dataEntries => this.cacheService.getAllWhere(dataEntry =>
+          dataEntries.findIndex(dataEntryNew => dataEntryNew.id === dataEntry.id) !== -1
+        ))
+      );
   }
 
   updateProperties(dataEntry: DataEntry): Observable<DataEntry> {
