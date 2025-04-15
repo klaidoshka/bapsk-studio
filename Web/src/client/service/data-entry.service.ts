@@ -2,11 +2,7 @@ import {inject, Injectable} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
 import {combineLatest, first, map, Observable, switchMap, tap} from 'rxjs';
-import DataEntry, {
-  DataEntryCreateRequest,
-  DataEntryEditRequest,
-  DataEntryJoined
-} from '../model/data-entry.model';
+import DataEntry, {DataEntryCreateRequest, DataEntryEditRequest, DataEntryJoined} from '../model/data-entry.model';
 import {DateUtil} from '../util/date.util';
 import {UserService} from './user.service';
 import {DataTypeService} from './data-type.service';
@@ -111,9 +107,9 @@ export class DataEntryService {
           )
         ),
         tap(() => {
-          this.cacheService.invalidate(request.dataEntryId);
+            this.cacheService.invalidate(request.dataEntryId);
 
-          this
+            this
               .getById(request.dataEntryId)
               .pipe(first())
               .subscribe();
@@ -157,6 +153,31 @@ export class DataEntryService {
         }),
         switchMap(_ => this.cacheService.getAllWhere(dataEntry => dataEntry.dataTypeId === dataTypeId))
       );
+  }
+
+  getAllByDataTypeIds(dataTypeIds: number[]): Observable<Map<number, DataEntryJoined[]>> {
+    return combineLatest(dataTypeIds.map(id =>
+      this
+        .getAllByDataTypeId(id)
+        .pipe(
+          map(dataEntries => ({
+            dataTypeId: id,
+            values: dataEntries
+          }))
+        )
+    ))
+      .pipe(map(groupedEntries => {
+        const map = new Map<number, DataEntryJoined[]>();
+
+        groupedEntries.forEach(dataEntries => {
+          map.set(
+            dataEntries.dataTypeId,
+            dataEntries.values
+          );
+        });
+
+        return map;
+      }));
   }
 
   updateProperties(dataEntry: DataEntry): Observable<DataEntry> {

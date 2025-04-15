@@ -1,30 +1,18 @@
-import {Component, effect, inject, Injector, input, signal} from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
+import {Component, computed, effect, inject, input, Signal, signal} from '@angular/core';
+import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {DataEntryService} from '../../service/data-entry.service';
 import {InstanceService} from '../../service/instance.service';
 import {TextService} from '../../service/text.service';
-import DataEntry, {
-  DataEntryCreateRequest,
-  DataEntryEditRequest
-} from '../../model/data-entry.model';
+import DataEntry, {DataEntryCreateRequest, DataEntryEditRequest} from '../../model/data-entry.model';
 import Messages from '../../model/messages.model';
-import {combineLatest, first, map} from 'rxjs';
+import {first} from 'rxjs';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import DataType from '../../model/data-type.model';
 import {FieldType} from '../../model/data-type-field.model';
 import {LocalizationService} from '../../service/localization.service';
-import {
-  DataTypeEntryFieldInputComponent
-} from '../data-type-entry-field-input/data-type-entry-field-input.component';
+import {DataTypeEntryFieldInputComponent} from '../data-type-entry-field-input/data-type-entry-field-input.component';
 import {Select} from 'primeng/select';
 import {NgIf} from '@angular/common';
 import {rxResource} from '@angular/core/rxjs-interop';
@@ -48,7 +36,6 @@ export class DataEntryManagementComponent {
   protected readonly FieldType = FieldType;
   private readonly dataEntryService = inject(DataEntryService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly injector = inject(Injector);
   private readonly instanceService = inject(InstanceService);
   private readonly localizationService = inject(LocalizationService);
   private readonly textService = inject(TextService);
@@ -61,36 +48,7 @@ export class DataEntryManagementComponent {
         .map(field => field.referenceId)
         .filter(id => id != null)
     }),
-    loader: ({request}) => combineLatest(request.dataTypeIds
-      .map(id => this.dataEntryService
-        .getAllByDataTypeId(id)
-        .pipe(
-          map(entries => ({
-            id,
-            values: entries.map(it => ({
-              id: it.id,
-              label: it.display()
-            }))
-          }))
-        )
-      ))
-      .pipe(
-        map(entries => {
-          const map = new Map<number, { label: string, id: number }[]>();
-
-          entries.forEach(entry => {
-            const id = entry.id;
-            const dataEntries = entry.values;
-
-            if (dataEntries.length > 0) {
-              map.set(id, dataEntries);
-            }
-          });
-
-          return map;
-        })
-      ),
-    injector: this.injector
+    loader: ({ request }) => this.dataEntryService.getAllByDataTypeIds(request.dataTypeIds)
   });
 
   dataType = input.required<DataType>();
@@ -139,7 +97,7 @@ export class DataEntryManagementComponent {
   }
 
   private onSuccess(message: string) {
-    this.messages.set({success: [message]});
+    this.messages.set({ success: [message] });
     this.form.markAsPristine();
     this.form.markAsUntouched();
   }
@@ -160,8 +118,19 @@ export class DataEntryManagementComponent {
     );
   }
 
-  getDataEntries(dataTypeId: number) {
-    return this.dataEntries.value()?.get(dataTypeId);
+  getDataEntries(dataTypeId?: number | null): Signal<{ id: number, label: string }[]> {
+    return computed(() => {
+      if (!dataTypeId) {
+        return [];
+      }
+
+      return this.dataEntries.value()
+        ?.get(dataTypeId)
+        ?.map(dataEntry => ({
+          id: dataEntry.id,
+          label: dataEntry.display()
+        })) || [];
+    });
   }
 
   getErrorMessage(field: string): string | null {
@@ -186,7 +155,7 @@ export class DataEntryManagementComponent {
 
   save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill out the form."]});
+      this.messages.set({ error: ["Please fill out the form."] });
       return;
     }
 

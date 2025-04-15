@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, input, signal} from '@angular/core';
+import {Component, computed, effect, inject, input, Signal, signal} from '@angular/core';
 import {
   ImportConfigurationCreateRequest,
   ImportConfigurationEditRequest,
@@ -18,12 +18,10 @@ import {DataTypeService} from '../../service/data-type.service';
 import DataTypeField, {FieldType} from '../../model/data-type-field.model';
 import {TextService} from '../../service/text.service';
 import Messages from '../../model/messages.model';
-import {combineLatest, first, map, of} from 'rxjs';
+import {first, of} from 'rxjs';
 import {LocalizationService} from '../../service/localization.service';
 import {DataEntryService} from '../../service/data-entry.service';
-import {
-  MessagesShowcaseComponent
-} from '../../component/messages-showcase/messages-showcase.component';
+import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {TableModule} from 'primeng/table';
 
@@ -56,7 +54,7 @@ export class ImportConfigurationManagementPageComponent {
     request: () => ({
       configurationId: this.configurationId() === undefined ? undefined : +this.configurationId()!
     }),
-    loader: ({request}) => request.configurationId
+    loader: ({ request }) => request.configurationId
       ? this.importConfigurationService.getById(request.configurationId)
       : of(undefined)
   });
@@ -74,34 +72,10 @@ export class ImportConfigurationManagementPageComponent {
         dataTypeIds = this.dataTypes.value()?.map(dataType => dataType.id);
       }
 
-      return {dataTypeIds: dataTypeIds || []};
+      return { dataTypeIds: dataTypeIds || [] };
     },
-    loader: ({request}) => request.dataTypeIds.length > 0
-      ? combineLatest(request.dataTypeIds.map(id =>
-        this.dataEntryService
-          .getAllByDataTypeId(id)
-          .pipe(
-            map(dataEntries => ({
-              dataTypeId: id,
-              values: dataEntries
-            }))
-          )
-      ))
-        .pipe(map(groupedEntries => {
-          const map = new Map<number, { id: number, label: string }[]>();
-
-          groupedEntries.forEach(dataEntries => {
-            map.set(
-              dataEntries.dataTypeId,
-              dataEntries.values.map(entry => ({
-                id: entry.id,
-                label: entry.display()
-              }))
-            );
-          });
-
-          return map;
-        }))
+    loader: ({ request }) => request.dataTypeIds.length > 0
+      ? this.dataEntryService.getAllByDataTypeIds(request.dataTypeIds)
       : of(undefined)
   });
 
@@ -109,7 +83,7 @@ export class ImportConfigurationManagementPageComponent {
     request: () => ({
       instanceId: this.instanceId()
     }),
-    loader: ({request}) => request.instanceId
+    loader: ({ request }) => request.instanceId
       ? this.dataTypeService.getAllByInstanceId(request.instanceId)
       : of([])
   });
@@ -158,25 +132,21 @@ export class ImportConfigurationManagementPageComponent {
   }
 
   private changeMessages(message: string, success: boolean = true) {
-    this.messages.set(success ? {success: [message]} : {error: [message]});
+    this.messages.set(success ? { success: [message] } : { error: [message] });
   }
 
   private create(request: ImportConfigurationCreateRequest) {
-    this.importConfigurationService.create(request)
-      .pipe(first())
-      .subscribe({
-        next: () => this.changeMessages("Import configuration created successfully."),
-        error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
-      });
+    this.importConfigurationService.create(request).pipe(first()).subscribe({
+      next: () => this.changeMessages("Import configuration created successfully."),
+      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+    });
   }
 
   private edit(request: ImportConfigurationEditRequest) {
-    this.importConfigurationService.edit(request)
-      .pipe(first())
-      .subscribe({
-        next: () => this.changeMessages("Import configuration edited successfully."),
-        error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
-      });
+    this.importConfigurationService.edit(request).pipe(first()).subscribe({
+      next: () => this.changeMessages("Import configuration edited successfully."),
+      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+    });
   }
 
   changeFormFields(dataTypeId: number) {
@@ -212,7 +182,7 @@ export class ImportConfigurationManagementPageComponent {
     return null;
   }
 
-  getDataEntries(index: number) {
+  getDataEntries(index: number): Signal<{ id: number, label: string }[]> {
     return computed(() => {
       const dataTypeId = this.form.value.dataTypeId;
       let dataType = this.configuration.value()?.dataType;
@@ -234,7 +204,12 @@ export class ImportConfigurationManagementPageComponent {
       );
 
       if (dataTypeField?.referenceId) {
-        return this.dataEntries.value()?.get(dataTypeField.referenceId);
+        return this.dataEntries.value()
+          ?.get(dataTypeField.referenceId)
+          ?.map(entry => ({
+            id: entry.id,
+            label: entry.display()
+          })) || [];
       }
 
       return [];

@@ -5,7 +5,7 @@ import {FieldType} from '../../model/data-type-field.model';
 import {Badge} from 'primeng/badge';
 import {CurrencyPipe, DatePipe} from '@angular/common';
 import {getIsoCountryLabel} from '../../model/iso-country.model';
-import {rxResource, toSignal} from '@angular/core/rxjs-interop';
+import {rxResource} from '@angular/core/rxjs-interop';
 import {map, of} from 'rxjs';
 
 @Component({
@@ -25,12 +25,11 @@ export class DataTypeEntryFieldDisplayComponent {
   dataType = input.required<DataType>();
 
   dataTypeField = computed(() => this
-    .dataType()
-    .fields
-    .find(it => it.id === this.dataTypeFieldId()));
+    .dataType().fields
+    .find(it => it.id === this.dataTypeFieldId())
+  );
 
   dataTypeFieldId = input.required<number>();
-
   fieldType = computed(() => this.dataTypeField()?.type || FieldType.Text);
 
   referencedDataEntry = rxResource({
@@ -47,17 +46,13 @@ export class DataTypeEntryFieldDisplayComponent {
         value
       };
     },
-    loader: ({request}) => {
-      if (!request) {
-        return of(undefined);
-      }
-
-      return this.dataEntryService
+    loader: ({ request }) => request
+      ? this.dataEntryService
         .getAllByDataTypeId(request.referenceId)
         .pipe(
           map(entries => entries.find(it => it.id === request.value))
-        );
-    }
+        )
+      : of(undefined)
   });
 
   value = input.required<any>();
