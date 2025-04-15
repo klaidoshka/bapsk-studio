@@ -115,9 +115,9 @@
         [dropdown]="true"
         [suggestions]="filteredCountries"
         (completeMethod)="filterCountries($event)"
-        class="bg-surface-50 mt-1 block w-full"
+        class="mt-1 block w-full"
         required
-      ></p-autocomplete>
+      />
       @if (getErrorMessage('country'); as countryInvalid) {
         <div class="text-xs text-red-500 mt-1">
           {{ countryInvalid }}
