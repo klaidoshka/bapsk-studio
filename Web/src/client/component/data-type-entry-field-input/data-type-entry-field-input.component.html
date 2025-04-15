@@ -22,7 +22,7 @@
   }
   @case (FieldType.Date) {
     <p-datepicker
-      (onInput)="callOnChange()"
+      (onSelect)="callOnChange()"
       (blur)="markAsTouched()"
       [(ngModel)]="value"
       hideOnDateTimeSelect="true"
