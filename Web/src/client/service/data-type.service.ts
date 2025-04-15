@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
-import {first, Observable, switchMap, tap} from 'rxjs';
+import {first, map, Observable, switchMap, tap} from 'rxjs';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../model/data-type.model';
 import {EnumUtil} from '../util/enum.util';
 import {FieldType} from '../model/data-type-field.model';
@@ -15,11 +15,7 @@ export class DataTypeService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly httpClient = inject(HttpClient);
 
-  private readonly cacheService = new CacheService<number, DataType>(
-    dataType => dataType.id,
-    dataType => this.updateProperties(dataType)
-  );
-
+  private readonly cacheService = new CacheService<number, DataType>(it => it.id!);
   private readonly instancesFetched = new Set<number>();
 
   private adjustDateToISO<T extends DataTypeCreateRequest | DataTypeEditRequest>(request: T): T {
@@ -38,6 +34,7 @@ export class DataTypeService {
     return this.httpClient
       .post<DataType>(this.apiRouter.dataTypeCreate(), this.adjustDateToISO(request))
       .pipe(
+        map(dataType => this.updateProperties(dataType)),
         tap(dataType => this.cacheService.set(dataType)),
         switchMap(dataType => this.cacheService.get(dataType.id))
       );
@@ -75,6 +72,7 @@ export class DataTypeService {
     return this.httpClient
       .get<DataType>(this.apiRouter.dataTypeGetById(id))
       .pipe(
+        map(dataType => this.updateProperties(dataType)),
         tap(dataType => this.cacheService.set(dataType)),
         switchMap(dataType => this.cacheService.get(dataType.id))
       );
@@ -88,6 +86,7 @@ export class DataTypeService {
     return this.httpClient
       .get<DataType[]>(this.apiRouter.dataTypeGetByInstanceId(instanceId))
       .pipe(
+        map(dataTypes => dataTypes.map(dataType => this.updateProperties(dataType))),
         tap(dataTypes => {
           this.instancesFetched.add(instanceId);
 
