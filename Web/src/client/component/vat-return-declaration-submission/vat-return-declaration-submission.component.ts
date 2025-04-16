@@ -8,6 +8,7 @@ import {TextService} from '../../service/text.service';
 import {VatReturnService} from '../../service/vat-return.service';
 import {Checkbox} from 'primeng/checkbox';
 import {SaleWithVatReturnDeclaration} from '../../model/sale.model';
+import {first} from 'rxjs';
 
 @Component({
   selector: 'vat-return-declaration-submission',
@@ -36,7 +37,7 @@ export class VatReturnDeclarationSubmissionComponent {
   sale = input.required<SaleWithVatReturnDeclaration>();
 
   private onSuccess(message: string) {
-    this.messages.set({success: [message]});
+    this.messages.set({ success: [message] });
     this.form.markAsUntouched();
     this.form.markAsPristine();
   }
@@ -65,7 +66,7 @@ export class VatReturnDeclarationSubmissionComponent {
 
   save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill out the form."]});
+      this.messages.set({ error: ["Please fill out the form."] });
       return;
     }
 
@@ -85,6 +86,7 @@ export class VatReturnDeclarationSubmissionComponent {
           }
         }
       })
+      .pipe(first())
       .subscribe({
         next: () => this.onSuccess("Declaration for sale's VAT return has been submitted successfully."),
         error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)

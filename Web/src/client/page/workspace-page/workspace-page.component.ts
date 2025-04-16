@@ -1,7 +1,5 @@
 import {Component, computed, effect, inject, signal, untracked} from '@angular/core';
-import {
-  DataEntryShowcaseComponent
-} from '../../component/data-entry-showcase/data-entry-showcase.component';
+import {DataEntryShowcaseComponent} from '../../component/data-entry-showcase/data-entry-showcase.component';
 import {DataTypeService} from '../../service/data-type.service';
 import {InstanceService} from '../../service/instance.service';
 import DataType from '../../model/data-type.model';
@@ -10,12 +8,8 @@ import {CustomerService} from '../../service/customer.service';
 import {SaleService} from '../../service/sale.service';
 import {SalesmanService} from '../../service/salesman.service';
 import {WorkspaceType} from './workspace-selector.model';
-import {
-  CustomerShowcaseComponent
-} from '../../component/customer-showcase/customer-showcase.component';
-import {
-  SalesmanShowcaseComponent
-} from '../../component/salesman-showcase/salesman-showcase.component';
+import {CustomerShowcaseComponent} from '../../component/customer-showcase/customer-showcase.component';
+import {SalesmanShowcaseComponent} from '../../component/salesman-showcase/salesman-showcase.component';
 import {NgForOf, NgIf} from '@angular/common';
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
@@ -26,7 +20,7 @@ import {DataEntryService} from '../../service/data-entry.service';
 import {UserService} from '../../service/user.service';
 import {HttpClient} from '@angular/common/http';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {of} from 'rxjs';
+import {combineLatest, map, of} from 'rxjs';
 
 @Component({
   selector: 'workspace-page',
@@ -73,26 +67,21 @@ export class WorkspacePageComponent {
 
   instanceId = this.instanceService.getActiveInstanceId();
 
-  sales = computed(() => {
-    const instanceId = this.instanceId();
-    const sales = instanceId != null ? this.saleService.getAsSignal(instanceId)() : [];
-
-    return sales.map(sale => {
-      const declaration = this.vatReturnService.getBySaleIdAsSignal(instanceId!, sale.id!)();
-      return {
-        ...sale,
-        vatReturnDeclaration: declaration != null
-          ? {
-            ...declaration,
-            declaredBy: computed(() =>
-              declaration!.declaredById != null
-                ? this.userService.getIdentityByIdAsSignal(declaration!.declaredById!)()
-                : undefined
-            )()!
-          }
-          : undefined
-      };
-    });
+  sales = rxResource({
+    request: () =>({
+      sales: this.instanceId() != null ? this.saleService.getAsSignal(this.instanceId()!)() : []
+    }),
+    loader: ({request}) => combineLatest(
+      request.sales.map(sale => this.vatReturnService
+        .getBySaleId(sale.id)
+        .pipe(
+          map(declaration => ({
+            ...sale,
+            vatReturnDeclaration: declaration
+          }))
+        )
+      )
+    )
   });
 
   salesmen = computed(() => {

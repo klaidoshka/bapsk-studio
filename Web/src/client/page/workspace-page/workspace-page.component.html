@@ -76,7 +76,7 @@
           <sale-showcase
             [customers]="customers()"
             [instanceId]="instanceId()!"
-            [sales]="sales()"
+            [sales]="sales.value() || []"
             [salesmen]="salesmen()"
           />
         </ng-container>

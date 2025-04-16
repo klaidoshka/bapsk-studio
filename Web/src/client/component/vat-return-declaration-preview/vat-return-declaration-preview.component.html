@@ -14,7 +14,7 @@
     <!-- Row of actions -->
     <div class="w-full">
       <p-button
-        *ngIf="!declaration()!.isCancelled"
+        *ngIf="!declaration.value()!.isCancelled"
         title="Refresh declaration"
         icon="pi pi-refresh"
         label="Refresh"
@@ -23,7 +23,7 @@
       />
 
       <p-button
-        *ngIf="!declaration()!.isCancelled"
+        *ngIf="!declaration.value()!.isCancelled"
         title="Cancel declaration"
         icon="pi pi-ban"
         class="ml-2"
@@ -35,36 +35,37 @@
     </div>
 
     <!-- Left Column -->
-    <div class="dark:bg-surface-950 bg-surface-50 flex-1 min-w-42 p-4 rounded-lg shadow-md relative" *ngIf="declaration() != undefined">
+    <div class="dark:bg-surface-950 bg-surface-50 flex-1 min-w-42 p-4 rounded-lg shadow-md relative"
+         *ngIf="declaration.value() != undefined">
       <p class="font-bold text-lg mb-2">Declaration Information</p>
 
       <p class="text-lg">
         <strong>Declaration Id:</strong>
-        {{ declaration()!.id }}
+        {{ declaration.value()!.id }}
       </p>
 
       <p class="text-lg">
         <strong>Declared By</strong>
-        {{ toUserIdentityFullName(declaration()!.declaredBy) }}
+        {{ toUserIdentityFullName(declaration.value()!.declaredBy) }}
       </p>
 
       <p class="text-lg">
         <strong>Submit Date:</strong>
-        {{ declaration()!.submitDate | date:'medium' }}
+        {{ declaration.value()!.submitDate | date:'medium' }}
       </p>
 
       <p class="text-lg">
         <strong>State:</strong>
         <p-badge
           class="ml-1"
-          [value]="declaration()!.isCancelled ? 'Cancelled' : toSubmitDeclarationStateLabel(declaration()!.state)"
-          [severity]="declaration()!.isCancelled || declaration()!.state === SubmitDeclarationState.REJECTED ? 'danger' : 'success'"
+          [value]="declaration.value()!.isCancelled ? 'Cancelled' : toSubmitDeclarationStateLabel(declaration.value()!.state)"
+          [severity]="declaration.value()!.isCancelled || declaration.value()!.state === SubmitDeclarationState.REJECTED ? 'danger' : 'success'"
         />
       </p>
 
-      <p *ngIf="declaration()!.correction > 1" class="text-lg">
+      <p *ngIf="declaration.value()!.correction > 1" class="text-lg">
         <strong>Corrected Times:</strong>
-        {{ declaration()!.correction }}
+        {{ declaration.value()!.correction }}
       </p>
     </div>
 
@@ -94,7 +95,7 @@
     </div>
   </div>
 
-  <div *ngIf="declaration?.() && declaration()?.qrCodes?.length" class="mt-4">
+  <div *ngIf="declaration?.value() && declaration.value()?.qrCodes?.length" class="mt-4">
     <div class="dark:bg-surface-950 bg-surface-50 rounded-lg shadow-md">
       <div class="p-4 cursor-pointer flex justify-between items-center" (click)="showQrCodes.set(!showQrCodes())">
         <p class="font-bold text-lg">QR Codes</p>
@@ -106,7 +107,7 @@
       <div class="p-4" *ngIf="showQrCodes()">
         <div class="flex flex-wrap gap-4">
           <div
-            *ngFor="let qrCode of declaration()!.qrCodes; let i = index"
+            *ngFor="let qrCode of declaration.value()!.qrCodes; let i = index"
             class="flex justify-center w-full sm:w-1/2 md:w-1/3 lg:w-1/4"
           >
             <img
@@ -144,48 +145,51 @@
           <td class="p-2">{{ soldGood.description }}</td>
           <td class="p-2"><p class="text-right">{{ soldGood.quantity }}</p></td>
           <td class="p-2">{{ soldGood.unitOfMeasure }}</td>
-          <td class="p-2"><p class="text-right">{{ soldGood.taxableAmount / soldGood.quantity | round:2 | currency:'EUR':'symbol':'1.2-2' }}</p></td>
-          <td class="p-2"><p class="text-right">{{ soldGood.vatAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }} ({{ soldGood.vatRate | round:2 }}%)</p></td>
+          <td class="p-2"><p class="text-right">{{
+              soldGood.taxableAmount / soldGood.quantity | round:2 | currency:'EUR':'symbol':'1.2-2'
+            }}</p></td>
+          <td class="p-2"><p class="text-right">{{ soldGood.vatAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}
+            ({{ soldGood.vatRate | round:2 }}%)</p></td>
           <td class="p-2"><p class="text-right">{{ soldGood.totalAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}</p></td>
         </tr>
       </ng-template>
     </p-table>
   </div>
 
-  <div class="dark:bg-surface-950 bg-surface-50 card mt-4 p-4 rounded-lg shadow-md" *ngIf="declaration?.()?.export">
+  <div class="dark:bg-surface-950 bg-surface-50 card mt-4 p-4 rounded-lg shadow-md" *ngIf="declaration?.value()?.export">
     <p class="font-bold text-lg mb-4">Export Information</p>
 
     <div class="mb-4">
       <p class="text-lg">
         <strong>Assessment Date:</strong>
-        {{ declaration()!.export!.assessmentDate | date:'medium' }}
+        {{ declaration.value()!.export!.assessmentDate | date:'medium' }}
       </p>
       <p class="text-lg">
         <strong>Assessed Declaration Correction No:</strong>
-        {{ declaration()!.export!.declarationCorrectionNo }}
+        {{ declaration.value()!.export!.declarationCorrectionNo }}
       </p>
-      <p class="text-lg" *ngIf="declaration()!.export!.correctionDate">
+      <p class="text-lg" *ngIf="declaration.value()!.export!.correctionDate">
         <strong>Correction Date:</strong>
-        {{ declaration()!.export!.correctionDate | date:'medium' }}
+        {{ declaration.value()!.export!.correctionDate | date:'medium' }}
       </p>
       <p class="text-lg">
         <strong>Customs Office Code:</strong>
-        {{ declaration()!.export!.customsOfficeCode }}
+        {{ declaration.value()!.export!.customsOfficeCode }}
       </p>
       <p class="text-lg">
         <strong>Verification Date:</strong>
-        {{ declaration()!.export!.verificationDate | date:'medium' }}
+        {{ declaration.value()!.export!.verificationDate | date:'medium' }}
       </p>
       <p class="text-lg">
         <strong>Verification Result:</strong>
-        {{ toExportResultLabel(declaration()!.export!.verificationResult) }}
+        {{ toExportResultLabel(declaration.value()!.export!.verificationResult) }}
       </p>
     </div>
 
     <div class="mb-4">
       <p class="font-bold text-lg mb-2">Assessment Conditions</p>
       <ul class="list-disc pl-6">
-        <li *ngFor="let condition of declaration()!.export!.conditions">
+        <li *ngFor="let condition of declaration.value()!.export!.conditions">
           <p>
             <strong>{{ condition.code }}:</strong> {{ condition.description }}
             <p-badge
@@ -200,7 +204,7 @@
 
     <div class="w-fit">
       <p class="font-bold text-lg mb-2">Verified Sold Goods</p>
-      <p-table [value]="declaration()!.export!.verifiedSoldGoods" class="w-fit">
+      <p-table [value]="declaration.value()!.export!.verifiedSoldGoods" class="w-fit">
         <ng-template #header>
           <tr>
             <th class="text-left p-2">Sequence No</th>
@@ -223,8 +227,8 @@
     </div>
   </div>
 
-  <div *ngIf="sale() !== undefined && !declaration()?.isCancelled" class="dark:bg-surface-950 bg-surface-50">
-    <p class="font-bold text-lg my-2" *ngIf="declaration() === undefined">
+  <div *ngIf="sale() !== undefined && !declaration.value()?.isCancelled" class="dark:bg-surface-950 bg-surface-50">
+    <p class="font-bold text-lg my-2" *ngIf="declaration.value() === undefined">
       This sale does not have a submitted VAT return declaration.
     </p>
 

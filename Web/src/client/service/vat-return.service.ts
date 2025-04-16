@@ -1,20 +1,24 @@
-import {computed, inject, Injectable, signal, WritableSignal} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
 import VatReturnDeclaration, {
+  PaymentType,
   SubmitDeclarationState,
   VatReturnDeclarationExportVerificationResult,
+  VatReturnDeclarationPaymentInfo,
   VatReturnDeclarationSubmitRequest,
   VatReturnDeclarationWithDeclarer,
   VatReturnDeclarationWithSale
 } from '../model/vat-return.model';
-import {catchError, first, map, tap} from 'rxjs';
+import {catchError, first, map, Observable, of, switchMap, tap} from 'rxjs';
 import {EnumUtil} from '../util/enum.util';
 import {containsFailureCode} from '../model/error-response.model';
 import {FailureCode} from '../model/failure-code.model';
 import {UserService} from './user.service';
 import {SaleService} from './sale.service';
 import {UnitOfMeasureType} from '../model/unit-of-measure-type.model';
+import {DateUtil} from '../util/date.util';
+import {CacheService} from './cache.service';
 
 @Injectable({
   providedIn: 'root'
@@ -25,114 +29,126 @@ export class VatReturnService {
   private readonly saleService = inject(SaleService);
   private readonly userService = inject(UserService);
 
-  // Key: InstanceId
-  private readonly store = new Map<number, WritableSignal<VatReturnDeclaration[]>>();
+  private readonly cacheBySaleIdService = new CacheService<number, VatReturnDeclaration | null>();
+  private readonly cacheByCodeService = new CacheService<string, VatReturnDeclarationWithSale | null>();
 
-  private updateSingleInStore(instanceId: number, declaration: VatReturnDeclaration) {
-    const existingSignal = this.store.get(instanceId);
-
-    if (existingSignal != null) {
-      existingSignal.update(declarations => {
-        const index = declarations.findIndex(c => c.id === declaration.id);
-
-        if (index !== -1) {
-          declarations[index] = declaration;
-        } else {
-          declarations.push(declaration);
-        }
-
-        return [...declarations];
-      });
-    } else {
-      this.store.set(instanceId, signal([declaration]));
-    }
-  }
-
-  cancel(saleId: number) {
-    return this.httpClient.post<void>(this.apiRouter.vatReturnCancel(saleId), {}).pipe(
-      tap(() => this.getBySaleId(saleId).subscribe())
-    );
-  }
-
-  getWithSaleByPreviewCode(id: string) {
-    return this.httpClient.get<VatReturnDeclarationWithSale | null>(this.apiRouter.vatReturnGetByPreviewCode(id))
+  cancel(saleId: number): Observable<void> {
+    return this.httpClient
+      .post<void>(this.apiRouter.vatReturnCancel(saleId), {})
       .pipe(
-        map(declaration => {
-          if (declaration) {
-            return this.updateProperties({
-                ...declaration,
-                sale: this.saleService.updateProperties(declaration.sale)
-              } as VatReturnDeclarationWithSale
-            ) as VatReturnDeclarationWithSale;
-          } else {
-            return declaration;
-          }
-        }),
-        tap(declaration => {
-          if (declaration != null) {
-            this.updateSingleInStore(
-              declaration.instanceId!,
-              declaration
-            );
-          }
+        tap(() => {
+          this.cacheBySaleIdService.invalidate(saleId);
+
+          this
+            .getBySaleId(saleId)
+            .pipe((first()))
+            .subscribe();
         })
       );
   }
 
-  getBySaleId(saleId: number) {
-    return this.httpClient.get<VatReturnDeclaration>(this.apiRouter.vatReturnGet(saleId)).pipe(
-      tap(declaration => {
-        if (declaration != null) {
-          this.updateSingleInStore(declaration.instanceId!, this.updateProperties(declaration));
-        }
-      })
-    );
-  }
-
-  /**
-   * Get declaration by sale id as signal
-   *
-   * @param instanceId Instance id to easier resolve where sale belongs
-   * @param saleId Sale id to get declaration for
-   *
-   * @returns Declaration as signal. It may be undefined if declaration is not found.
-   */
-  getBySaleIdAsSignal(instanceId: number, saleId: number) {
-    if (!this.store.has(instanceId)) {
-      this.store.set(instanceId, signal([]));
+  getBySaleId(saleId: number): Observable<VatReturnDeclaration | undefined> {
+    if (this.cacheBySaleIdService.has(saleId)) {
+      return this.cacheBySaleIdService
+        .get(saleId)
+        .pipe(
+          map(declaration => declaration ? declaration : undefined)
+        );
     }
 
-    const existing = this.store.get(instanceId)!().find(it => it.saleId === saleId);
-
-    if (existing == null) {
-      new Promise((resolve) => this.getBySaleId(saleId).pipe(first()).subscribe(resolve));
-    }
-
-    return computed(() => this.store.get(instanceId)!().find(it => it.saleId === saleId));
-  }
-
-  getWithDeclarerBySaleIdAsSignal(instanceId: number, saleId: number) {
-    return computed(() => {
-      const declaration = this.getBySaleIdAsSignal(instanceId, saleId)();
-
-      if (declaration == null) {
-        return undefined;
-      }
-
-      return {
-        ...declaration,
-        declaredBy: declaration?.declaredById == null ? undefined : this.userService.getByIdAsSignal(declaration.declaredById)()
-      } as VatReturnDeclarationWithDeclarer;
-    });
-  }
-
-  submit(request: VatReturnDeclarationSubmitRequest) {
-    return this.httpClient.post<VatReturnDeclaration>(this.apiRouter.vatReturnSubmit(), request)
+    return this.httpClient
+      .get<VatReturnDeclaration | null>(this.apiRouter.vatReturnGet(saleId))
       .pipe(
-        tap(declaration => this.updateSingleInStore(request.instanceId, this.updateProperties(declaration))),
+        map(declaration => declaration ? this.updateProperties(declaration) : undefined),
+        tap(declaration => {
+          if (declaration) {
+            this.cacheBySaleIdService.setToKey(saleId, declaration);
+          }
+        }),
+        switchMap(declaration => declaration
+          ? this.cacheBySaleIdService
+            .get(saleId)
+            .pipe(
+              map(declaration => declaration ? declaration : undefined)
+            )
+          : of(undefined)
+        )
+      );
+  }
+
+  getWithDeclarerBySaleId(saleId: number): Observable<VatReturnDeclarationWithDeclarer | undefined> {
+    return this
+      .getBySaleId(saleId)
+      .pipe(
+        switchMap(declaration => {
+          if (!declaration?.declaredById) {
+            return of(declaration);
+          }
+
+          return this.userService
+            .getIdentityById(declaration.declaredById)
+            .pipe(
+              map(user => ({
+                ...declaration,
+                declaredBy: user
+              }))
+            );
+        }),
+      );
+  }
+
+  getWithSaleByPreviewCode(code: string): Observable<VatReturnDeclarationWithSale | undefined> {
+    if (this.cacheByCodeService.has(code)) {
+      return this.cacheByCodeService
+        .get(code)
+        .pipe(
+          map(declaration => declaration ? declaration : undefined)
+        );
+    }
+
+    return this.httpClient
+      .get<VatReturnDeclarationWithSale | null>(this.apiRouter.vatReturnGetByPreviewCode(code))
+      .pipe(
+        map(declaration => declaration
+          ? ({
+            ...this.updateProperties(declaration),
+            sale: this.saleService.updateProperties(declaration.sale)
+          })
+          : null
+        ),
+        tap(declaration => {
+          if (declaration) {
+            this.cacheByCodeService.setToKey(code, declaration);
+          }
+        }),
+        switchMap(declaration => declaration
+          ? this.cacheByCodeService
+            .get(code)
+            .pipe(
+              map(declaration => declaration ? declaration : undefined)
+            )
+          : of(undefined)
+        )
+      );
+  }
+
+  submit(request: VatReturnDeclarationSubmitRequest): Observable<VatReturnDeclaration> {
+    return this.httpClient
+      .post<VatReturnDeclaration>(this.apiRouter.vatReturnSubmit(), request)
+      .pipe(
+        map(declaration => this.updateProperties(declaration)),
+        tap(declaration => {
+          this.cacheBySaleIdService.invalidate(declaration.saleId);
+          this.cacheBySaleIdService.set(declaration);
+        }),
         catchError(response => {
           if (containsFailureCode(response, FailureCode.VatReturnDeclarationSubmitRejectedButUpdated)) {
-            this.getBySaleId(request.sale.id).pipe(first()).subscribe();
+            this.cacheBySaleIdService.invalidate(request.sale.id);
+
+            this
+              .getBySaleId(request.sale.id)
+              .pipe(first())
+              .subscribe();
           }
 
           throw response;
@@ -140,16 +156,51 @@ export class VatReturnService {
       );
   }
 
-  update(saleId: number) {
-    return this.httpClient.post<void>(this.apiRouter.vatReturnUpdate(saleId), {}).pipe(
-      tap(() => this.getBySaleId(saleId).subscribe())
-    );
+  submitPayments(saleId: number, payments: VatReturnDeclarationPaymentInfo[]): Observable<void> {
+    return this.httpClient
+      .post<void>(this.apiRouter.vatReturnPayment(saleId), payments)
+      .pipe(
+        tap(() => {
+          this.cacheBySaleIdService.invalidate(saleId);
+
+          this
+            .getBySaleId(saleId)
+            .pipe(first())
+            .subscribe();
+        })
+      );
   }
 
-  updateByPreviewCode(code: string) {
-    return this.httpClient.post<void>(this.apiRouter.vatReturnUpdateByPreviewCode(code), {}).pipe(
-      tap(() => this.getWithSaleByPreviewCode(code).subscribe())
-    );
+  update(saleId: number): Observable<void> {
+    return this.httpClient
+      .post<void>(this.apiRouter.vatReturnUpdate(saleId), {})
+      .pipe(
+        tap(() => {
+            this.cacheBySaleIdService.invalidate(saleId);
+
+            this
+              .getBySaleId(saleId)
+              .pipe(first())
+              .subscribe();
+          }
+        )
+      );
+  }
+
+  updateByPreviewCode(code: string): Observable<void> {
+    return this.httpClient
+      .post<void>(this.apiRouter.vatReturnUpdateByPreviewCode(code), {})
+      .pipe(
+        tap(() => {
+            this.cacheByCodeService.invalidate(code);
+
+            this
+              .getWithSaleByPreviewCode(code)
+              .pipe(first())
+              .subscribe();
+          }
+        )
+      );
   }
 
   updateProperties(declaration: VatReturnDeclaration): VatReturnDeclaration {
@@ -158,12 +209,23 @@ export class VatReturnService {
       state: EnumUtil.toEnumOrThrow(declaration.state, SubmitDeclarationState),
       export: declaration.export && {
         ...declaration.export,
+        assessmentDate: DateUtil.adjustToLocalDate(declaration.export.assessmentDate),
+        correctionDate: declaration.export.correctionDate
+          ? DateUtil.adjustToLocalDate(declaration.export.correctionDate)
+          : undefined,
+        verificationDate: DateUtil.adjustToLocalDate(declaration.export.verificationDate),
         verificationResult: EnumUtil.toEnumOrThrow(declaration.export.verificationResult, VatReturnDeclarationExportVerificationResult),
-        verifiedSoldGoods: declaration.export.verifiedSoldGoods.map(it => ({
-          ...it,
-          unitOfMeasureType: EnumUtil.toEnumOrThrow(it.unitOfMeasureType, UnitOfMeasureType)
+        verifiedSoldGoods: declaration.export.verifiedSoldGoods.map(good => ({
+          ...good,
+          unitOfMeasureType: EnumUtil.toEnumOrThrow(good.unitOfMeasureType, UnitOfMeasureType)
         }))
-      } || undefined
+      } || undefined,
+      payments: declaration.payments.map(payment => ({
+        ...payment,
+        date: DateUtil.adjustToLocalDate(payment.date),
+        type: EnumUtil.toEnumOrThrow(payment.type, PaymentType)
+      })),
+      submitDate: DateUtil.adjustToLocalDate(declaration.submitDate)
     };
   }
 }
