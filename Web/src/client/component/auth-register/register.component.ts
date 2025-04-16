@@ -54,7 +54,7 @@ export class RegisterComponent {
     confirmPassword: ["", [this.validatePasswordConfirmed()]]
   });
 
-  validatePasswordConfirmed(): ValidatorFn {
+  private validatePasswordConfirmed(): ValidatorFn {
     return (control): ValidationErrors | null => {
       const confirmPassword = control.value;
       const password = this.registerForm?.get("password")?.value;

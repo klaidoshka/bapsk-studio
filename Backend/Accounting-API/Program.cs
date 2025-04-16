@@ -61,6 +61,7 @@ builder.Services.AddScoped<IDataEntryValidator, DataEntryValidator>();
 builder.Services.AddScoped<IDataTypeService, DataTypeService>();
 builder.Services.AddScoped<IDataTypeValidator, DataTypeValidator>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IEncryptService, EncryptService>();
 builder.Services.AddScoped<IFieldTypeService, FieldTypeService>();
 builder.Services.AddScoped<IFieldTypeValidator, FieldTypeValidator>();
 builder.Services.AddScoped<IHashService, HashService>();

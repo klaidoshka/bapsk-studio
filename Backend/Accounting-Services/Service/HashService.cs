@@ -5,19 +5,8 @@ namespace Accounting.Services.Service;
 
 public class HashService : IHashService
 {
-    /// <summary>
-    /// Size of the hash (in bytes)
-    /// </summary>
     private const int HashSize = 32;
-
-    /// <summary>
-    /// Size of the salt (in bytes)
-    /// </summary>
     private const int SaltSize = 16;
-
-    /// <summary>
-    /// Number of iterations
-    /// </summary>
     private const int Iterations = 10000;
 
     public string Hash(string value)

@@ -1,9 +1,12 @@
 using Accounting.Contract;
+using Accounting.Contract.Configuration;
 using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.Auth;
+using Accounting.Contract.Email;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;
+using ResetPasswordRequest = Accounting.Contract.Dto.Auth.ResetPasswordRequest;
 using Session = Accounting.Contract.Entity.Session;
 using User = Accounting.Contract.Entity.User;
 
@@ -13,20 +16,49 @@ public class AuthService : IAuthService
 {
     private readonly IAuthValidator _authValidator;
     private readonly AccountingDatabase _database;
+    private readonly Email _email;
+    private readonly IEmailService _emailService;
+    private readonly IEncryptService _encryptService;
     private readonly IHashService _hashService;
     private readonly IJwtService _jwtService;
 
     public AuthService(
         IAuthValidator authValidator,
         AccountingDatabase database,
+        Email email,
+        IEmailService emailService,
+        IEncryptService encryptService,
         IHashService hashService,
         IJwtService jwtService
     )
     {
         _authValidator = authValidator;
         _database = database;
+        _email = email;
+        _emailService = emailService;
+        _encryptService = encryptService;
         _hashService = hashService;
         _jwtService = jwtService;
+    }
+
+    public async Task ChangePasswordAsync(ChangePasswordRequest request)
+    {
+        var (userRequester, userByToken) = (await _authValidator.ValidateChangePasswordRequestAsync(request))
+            .AssertValid()
+            .Value;
+
+        if (userRequester is not null)
+        {
+            userRequester.PasswordHash = _hashService.Hash(request.Password);
+
+            await _database.SaveChangesAsync();
+
+            return;
+        }
+
+        userByToken!.PasswordHash = _hashService.Hash(request.Password);
+
+        await _database.SaveChangesAsync();
     }
 
     public async Task<JwtTokenPair> LoginAsync(LoginRequest request)
@@ -89,23 +121,13 @@ public class AuthService : IAuthService
 
     public async Task<JwtTokenPair> RefreshTokenAsync(string refreshToken)
     {
-        var validation = await _authValidator.ValidateRefreshTokenAsync(refreshToken);
-
-        if (!validation.IsValid)
-        {
-            throw new ValidationException("Invalid refresh token.");
-        }
+        (await _authValidator.ValidateRefreshTokenAsync(refreshToken)).AssertValid();
 
         var sessionId = _jwtService.ExtractSessionId(refreshToken);
 
         var session = await _database.Sessions
             .Include(s => s.User)
-            .FirstOrDefaultAsync(s => s.Id == sessionId);
-
-        if (session == null)
-        {
-            throw new ValidationException("Session was not found.");
-        }
+            .FirstAsync(s => s.Id == sessionId);
 
         var token = new JwtTokenPair
         {
@@ -129,7 +151,6 @@ public class AuthService : IAuthService
             Email = request.Email,
             EmailNormalized = request.Email.ToLowerInvariant(),
             FirstName = request.FirstName,
-            IsDeleted = false,
             LastName = request.LastName,
             PasswordHash = _hashService.Hash(request.Password)
         };
@@ -145,6 +166,21 @@ public class AuthService : IAuthService
                 Meta = request.Meta,
                 Password = request.Password
             }
+        );
+    }
+
+    public async Task ResetPasswordAsync(ResetPasswordRequest request)
+    {
+        var user = (await _authValidator.ValidateResetPasswordAsync(request))
+            .AssertValid()
+            .Value;
+
+        var token = $"{user.Id}|{user.EmailNormalized}|{DateTime.UtcNow.AddMinutes(10)}";
+        var tokenEncrypted = await _encryptService.EncryptAsync(token, _email.ResetPassword.Secret);
+
+        await _emailService.SendAsync(
+            user.Email,
+            Emails.ResetPasswordRequest(tokenEncrypted, _email.ResetPassword.Endpoint)
         );
     }
 }

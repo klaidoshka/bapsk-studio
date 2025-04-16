@@ -18,10 +18,12 @@ export class ApiRouter {
     return params.toString();
   }
 
+  public readonly authChangePassword = () => `${this.baseServerUrl}/auth/change-password`;
   public readonly authLogin = () => `${this.baseServerUrl}/auth/login`;
   public readonly authLogout = () => `${this.baseServerUrl}/auth/logout`;
   public readonly authRefresh = () => `${this.baseServerUrl}/auth/refresh`;
   public readonly authRegister = () => `${this.baseServerUrl}/auth/register`;
+  public readonly authResetPassword = () => `${this.baseServerUrl}/auth/reset-password`;
 
   public readonly customerCreate = () => `${this.accountingUrl}/customer`;
   public readonly customerDelete = (id: number) => `${this.accountingUrl}/customer/${id}`;

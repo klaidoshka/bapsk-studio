@@ -8,5 +8,18 @@ public class Email
     public string Host { get; set; }
     public string Password { get; set; }
     public int Port { get; set; }
+    public EmailResetPassword ResetPassword { get; set; }
     public string Username { get; set; }
+    public VatReturnStatusChange VatReturnStatusChange { get; set; }
+}
+
+public class EmailResetPassword
+{
+    public string Endpoint { get; set; }
+    public string Secret { get; set; }
+}
+
+public class VatReturnStatusChange
+{
+    public string Endpoint { get; set; }
 }

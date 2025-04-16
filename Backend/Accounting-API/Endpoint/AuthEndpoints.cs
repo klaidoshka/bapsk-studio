@@ -35,6 +35,37 @@ public static class AuthEndpoints
             }
         );
 
+        builder.MapPost(
+            "/change-password",
+            async (
+                [FromBody] ChangePasswordRequest request,
+                HttpContext httpContext,
+                IAuthService authService
+            ) =>
+            {
+                request.RequesterId = String.IsNullOrWhiteSpace(request.ResetPasswordToken) 
+                    ? httpContext.GetUserIdOrThrow()
+                    : httpContext.GetUserId();
+
+                await authService.ChangePasswordAsync(request);
+
+                return Results.Ok();
+            }
+        );
+
+        builder.MapPost(
+            "/reset-password",
+            async (
+                [FromBody] ResetPasswordRequest request,
+                IAuthService authService
+            ) =>
+            {
+                await authService.ResetPasswordAsync(request);
+
+                return Results.Ok();
+            }
+        );
+
         builder
             .MapPost(
                 "/logout",
