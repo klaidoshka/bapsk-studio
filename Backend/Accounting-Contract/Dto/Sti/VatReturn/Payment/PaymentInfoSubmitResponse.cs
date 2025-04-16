@@ -1,6 +1,6 @@
-namespace Accounting.Contract.Dto.Sti.VatReturn.CancelDeclaration;
+namespace Accounting.Contract.Dto.Sti.VatReturn.Payment;
 
-public class CancelDeclarationResponse
+public class PaymentInfoSubmitResponse
 {
     public IReadOnlyList<StiError>? Errors { get; set; }
     public required DateTime ResultDate { get; set; }

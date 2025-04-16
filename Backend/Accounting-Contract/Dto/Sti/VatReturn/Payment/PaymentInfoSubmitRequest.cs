@@ -1,6 +1,6 @@
-namespace Accounting.Contract.Dto.Sti.VatReturn.ExportedGoods;
+namespace Accounting.Contract.Dto.Sti.VatReturn.Payment;
 
-public class ExportedGoodsRequest
+public class PaymentInfoSubmitRequest
 {
     public required string DocumentId { get; set; }
     public required string RequestId { get; set; }
