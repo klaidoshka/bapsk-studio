@@ -1,3 +1,3 @@
-export enum InternalFailure {
+export enum FailureCode {
   VatReturnDeclarationSubmitRejectedButUpdated = 0
 }

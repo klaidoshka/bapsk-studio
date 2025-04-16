@@ -4,7 +4,7 @@ export default interface DataTypeField {
   id: number;
   isRequired: boolean;
   name: string;
-  referenceId?: number;
+  referenceId?: number | null;
   type: FieldType;
 }
 

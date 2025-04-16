@@ -4,7 +4,7 @@ public class DataType
 {
     public string? Description { get; set; }
     public int? DisplayFieldId { get; set; }
-    public IEnumerable<DataTypeField> Fields { get; set; } = new List<DataTypeField>();
+    public IList<DataTypeField> Fields { get; set; } = new List<DataTypeField>();
     public int Id { get; set; }
     public int InstanceId { get; set; }
     public string Name { get; set; }

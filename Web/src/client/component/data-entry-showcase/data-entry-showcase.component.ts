@@ -1,4 +1,4 @@
-import {Component, input, signal, viewChild} from '@angular/core';
+import {Component, inject, input, signal, viewChild} from '@angular/core';
 import {Button} from "primeng/button";
 import {ConfirmationComponent} from "../confirmation/confirmation.component";
 import {MessagesShowcaseComponent} from "../messages-showcase/messages-showcase.component";
@@ -11,10 +11,11 @@ import {DataEntryManagementComponent} from '../data-entry-management/data-entry-
 import {first} from 'rxjs';
 import {MessageModule} from 'primeng/message';
 import DataType from '../../model/data-type.model';
-import {DatePipe} from '@angular/common';
 import {LocalizationService} from '../../service/localization.service';
-import {toUserIdentityFullName} from '../../model/user.model';
-import {DataTypeEntryFieldDisplayComponent} from '../data-type-entry-field-display/data-type-entry-field-display.component';
+import {DataEntryImportFormComponent} from '../data-entry-import/data-entry-import-form.component';
+import {Dialog} from 'primeng/dialog';
+import {RouterLink} from '@angular/router';
+import {DataEntryTableComponent} from '../data-entry-table/data-entry-table.component';
 
 @Component({
   selector: 'data-entry-showcase',
@@ -26,14 +27,17 @@ import {DataTypeEntryFieldDisplayComponent} from '../data-type-entry-field-displ
     DataEntryPreviewComponent,
     DataEntryManagementComponent,
     MessageModule,
-    DatePipe,
-    DataTypeEntryFieldDisplayComponent
+    DataEntryImportFormComponent,
+    Dialog,
+    RouterLink,
+    DataEntryTableComponent
   ],
   templateUrl: './data-entry-showcase.component.html',
   styles: ``
 })
 export class DataEntryShowcaseComponent {
-  protected readonly toUserIdentityFullName = toUserIdentityFullName;
+  private readonly dataEntryService = inject(DataEntryService);
+  private readonly localizationService = inject(LocalizationService);
 
   confirmationComponent = viewChild.required(ConfirmationComponent);
   dataEntries = input.required<DataEntryJoined[]>();
@@ -41,27 +45,28 @@ export class DataEntryShowcaseComponent {
   managementMenu = viewChild.required(DataEntryManagementComponent);
   messages = signal<Messages>({});
   previewMenu = viewChild.required(DataEntryPreviewComponent);
+  showImporting = signal<boolean>(false);
 
-  constructor(
-    private dataEntryService: DataEntryService,
-    private localizationService: LocalizationService
-  ) {
-  }
-
-  readonly showManagement = (dataEntry?: DataEntry) => {
-    this.managementMenu().show(dataEntry);
-  }
-
-  readonly showPreview = (dataEntry: DataEntryJoined) => {
-    this.previewMenu().show(this.dataType(), dataEntry);
-  }
-
-  readonly delete = (dataEntry: DataEntry) => {
+  delete(dataEntry: DataEntry) {
     this.confirmationComponent().request(() => {
       this.dataEntryService.delete(dataEntry.id!!).pipe(first()).subscribe({
-        next: () => this.messages.set({success: ['Data entry deleted successfully']}),
+        next: () => this.messages.set({ success: ['Data entry deleted successfully'] }),
         error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
       });
     });
+  }
+
+  manage(dataEntry?: DataEntry) {
+    this.managementMenu().show(dataEntry);
+  }
+
+  onDelete = (entry: DataEntryJoined) => this.delete(entry);
+
+  onManage = (entry: DataEntryJoined) => this.manage(entry);
+
+  onPreview = (entry: DataEntryJoined) => this.preview(entry);
+
+  preview(dataEntry: DataEntryJoined) {
+    this.previewMenu().show(this.dataType(), dataEntry);
   }
 }

@@ -1,11 +1,11 @@
-import {Component, input, OnInit, signal} from '@angular/core';
+import {Component, inject, input, signal} from '@angular/core';
 import Salesman, {SalesmanCreateRequest, SalesmanEditRequest} from '../../model/salesman.model';
-import {AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {AbstractControl, FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import Messages from '../../model/messages.model';
 import {SalesmanService} from '../../service/salesman.service';
 import {LocalizationService} from '../../service/localization.service';
 import {TextService} from '../../service/text.service';
-import {IsoCountries} from '../../model/iso-country.model';
+import {getDefaultIsoCountry, IsoCountries} from '../../model/iso-country.model';
 import {first} from 'rxjs';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
@@ -26,54 +26,48 @@ import {Select} from 'primeng/select';
   templateUrl: './salesman-management.component.html',
   styles: ``
 })
-export class SalesmanManagementComponent implements OnInit {
+export class SalesmanManagementComponent {
+  protected readonly IsoCountries = IsoCountries;
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly localizationService = inject(LocalizationService);
+  private readonly salesmanService = inject(SalesmanService);
+  private readonly textService = inject(TextService);
+
   salesman = signal<Salesman | null>(null);
-  form!: FormGroup;
+
+  form = this.formBuilder.group({
+    name: ["", [Validators.required, Validators.maxLength(300)]],
+    vatPayerCode: this.formBuilder.group({
+      issuedBy: [getDefaultIsoCountry().code, [Validators.required]],
+      value: ["", [Validators.required, Validators.pattern("^[0-9]{9,12}$")]]
+    })
+  });
+
   instanceId = input.required<number>();
-  isShownInitially = input<boolean>(false);
   isShown = signal<boolean>(false);
   messages = signal<Messages>({});
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private salesmanService: SalesmanService,
-    private localizationService: LocalizationService,
-    private textService: TextService
-  ) {
-    this.form = this.formBuilder.group({
-      name: ["", [Validators.required, Validators.maxLength(300)]],
-      vatPayerCode: this.formBuilder.group({
-        issuedBy: ["", [Validators.required]],
-        value: ["", [Validators.required, Validators.pattern("^[0-9]{9,12}$")]]
-      })
-    });
-  }
-
-  ngOnInit() {
-    this.isShown.set(this.isShownInitially());
-  }
-
-  private readonly onSuccess = (message: string) => {
+  private onSuccess(message: string) {
     this.messages.set({success: [message]});
     this.form.markAsUntouched();
     this.form.markAsPristine();
   }
 
-  private readonly create = (request: SalesmanCreateRequest) => {
+  private create(request: SalesmanCreateRequest) {
     this.salesmanService.create(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Salesman has been created successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
-  private readonly edit = (request: SalesmanEditRequest) => {
+  private edit(request: SalesmanEditRequest) {
     this.salesmanService.edit(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Salesman has been edited successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
-  readonly getErrorMessage = (field: string): string | null => {
+  getErrorMessage(field: string): string | null {
     const parts = field.split(".");
     let control: AbstractControl<any, any> | null = null;
 
@@ -81,7 +75,9 @@ export class SalesmanManagementComponent implements OnInit {
       control = control ? control.get(part) : this.form.get(part);
     }
 
-    if (!control || !control.touched || !control.invalid) return "";
+    if (!control || !control.touched || !control.invalid) {
+      return "";
+    }
 
     const name = this.textService.capitalize(field);
 
@@ -100,13 +96,13 @@ export class SalesmanManagementComponent implements OnInit {
     return null;
   }
 
-  readonly hide = () => {
+  hide() {
     this.messages.set({});
     this.isShown.set(false);
     this.form.reset();
   }
 
-  readonly save = () => {
+  save() {
     if (!this.form.valid) {
       this.messages.set({error: ["Please fill out the form."]});
       return;
@@ -114,10 +110,10 @@ export class SalesmanManagementComponent implements OnInit {
 
     const request = {
       salesman: {
-        name: this.form.value.name,
+        name: this.form.value.name!,
         vatPayerCode: {
-          issuedBy: this.form.value.vatPayerCode.issuedBy,
-          value: this.form.value.vatPayerCode.value
+          issuedBy: this.form.value.vatPayerCode!.issuedBy!,
+          value: this.form.value.vatPayerCode!.value!
         }
       },
       instanceId: this.instanceId()
@@ -127,7 +123,7 @@ export class SalesmanManagementComponent implements OnInit {
       this.edit({
         ...request,
         salesman: {
-          ...request.salesman,
+          ...request.salesman as any,
           id: this.salesman()!.id
         }
       });
@@ -136,18 +132,17 @@ export class SalesmanManagementComponent implements OnInit {
     }
   }
 
-  readonly show = (salesman: Salesman | null) => {
+  show(salesman: Salesman | null) {
     this.updateForm(salesman);
     this.salesman.set(salesman);
     this.isShown.set(true);
   }
 
-  private readonly updateForm = (salesman?: Salesman | null) => {
+  private updateForm(salesman?: Salesman | null) {
     this.form.reset();
 
     if (salesman != null) {
-      this.form.patchValue({...salesman});
+      this.form.patchValue({...salesman as any});
     }
   }
-  protected readonly IsoCountries = IsoCountries;
 }

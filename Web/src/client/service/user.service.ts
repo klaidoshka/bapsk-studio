@@ -1,6 +1,12 @@
-import {computed, Injectable, Signal, signal} from '@angular/core';
+import {computed, inject, Injectable, Signal, signal} from '@angular/core';
 import {ApiRouter} from './api-router.service';
-import {toUserIdentity, User, UserCreateRequest, UserEditRequest, UserIdentity} from '../model/user.model';
+import {
+  toUserIdentity,
+  User,
+  UserCreateRequest,
+  UserEditRequest,
+  UserIdentity
+} from '../model/user.model';
 import {first, Observable, of, switchMap, tap} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {EnumUtil} from '../util/enum.util';
@@ -12,14 +18,11 @@ import {DateUtil} from '../util/date.util';
   providedIn: 'root'
 })
 export class UserService {
+  private readonly apiRouter = inject(ApiRouter);
+  private readonly httpClient = inject(HttpClient);
+
   private readonly storeUsers = signal<User[]>([]);
   private readonly storeIdentities = signal<UserIdentity[]>([]);
-
-  constructor(
-    private apiRouter: ApiRouter,
-    private httpClient: HttpClient
-  ) {
-  }
 
   private updateCachedUser = (user: User): void => {
     const users = this.storeUsers();
@@ -48,16 +51,16 @@ export class UserService {
     this.storeIdentities.set([...identities]);
   };
 
-  readonly create = (request: UserCreateRequest): Observable<User> => {
+  create(request: UserCreateRequest): Observable<User> {
     return this.httpClient
-    .post<User>(this.apiRouter.userCreate(), {
-      ...request,
-      birthDate: request.birthDate.toISOString() as any
-    } as UserCreateRequest)
-    .pipe(tap(user => this.updateCachedUser(user)));
+      .post<User>(this.apiRouter.userCreate(), {
+        ...request,
+        birthDate: request.birthDate.toISOString() as any
+      } as UserCreateRequest)
+      .pipe(tap(user => this.updateCachedUser(user)));
   };
 
-  readonly delete = (id: number): Observable<void> => {
+  delete(id: number): Observable<void> {
     return this.httpClient.delete<void>(this.apiRouter.userDelete(id)).pipe(
       tap(() => {
         this.storeUsers.set(this.storeUsers().filter(user => user.id !== id));
@@ -66,7 +69,7 @@ export class UserService {
     );
   };
 
-  readonly edit = (request: UserEditRequest): Observable<void> => {
+  edit(request: UserEditRequest): Observable<void> {
     return this.httpClient.put<void>(this.apiRouter.userEdit(request.userId), {
       ...request,
       birthDate: request.birthDate.toISOString() as any
@@ -87,28 +90,28 @@ export class UserService {
     );
   };
 
-  readonly get = (): Observable<User[]> => {
+  get(): Observable<User[]> {
     return this.httpClient.get<User[]>(this.apiRouter.userGet()).pipe(
       tap(users => {
-        this.storeUsers.set(users.map(this.updateProperties));
-        this.storeIdentities.set(users.map(toUserIdentity));
+        this.storeUsers.set(users.map(user => this.updateProperties(user)));
+        this.storeIdentities.set(users.map(user => toUserIdentity(user)));
       })
     );
   };
 
-  readonly getById = (id: number): Observable<User> => {
+  getById(id: number): Observable<User> {
     return this.httpClient.get<User>(this.apiRouter.userGetById(id)).pipe(
       tap(user => this.updateCachedUser(user))
     );
   };
 
-  readonly getIdentityById = (id: number): Observable<UserIdentity> => {
+  getIdentityById(id: number): Observable<UserIdentity> {
     return this.httpClient.get<UserIdentity>(this.apiRouter.userGetById(id, true)).pipe(
       tap(identity => this.updateCachedUserIdentity(identity))
     );
   };
 
-  readonly getAsSignal = (): Signal<User[]> => {
+  getAsSignal(): Signal<User[]> {
     if (this.storeUsers().length === 0) {
       new Promise((resolve) => this.get().pipe(first()).subscribe(resolve));
     }
@@ -116,7 +119,7 @@ export class UserService {
     return this.storeUsers.asReadonly();
   };
 
-  readonly getByIdAsSignal = (id: number): Signal<User | undefined> => {
+  getByIdAsSignal(id: number): Signal<User | undefined> {
     const index = this.storeUsers().findIndex(user => user.id === id);
 
     if (index === -1) {
@@ -130,7 +133,7 @@ export class UserService {
     );
   };
 
-  readonly getIdentityByIdAsSignal = (id: number): Signal<UserIdentity | undefined> => {
+  getIdentityByIdAsSignal(id: number): Signal<UserIdentity | undefined> {
     const index = this.storeIdentities().findIndex(identity => identity.id === id);
 
     if (index === -1) {
@@ -144,7 +147,7 @@ export class UserService {
     );
   };
 
-  readonly getIdentityByEmail = (email: string): Observable<UserIdentity | undefined> => {
+  getIdentityByEmail(email: string): Observable<UserIdentity | undefined> {
     const emailNormalized = email.toLowerCase();
     const index = this.storeUsers().findIndex(user => user.email.toLowerCase() === emailNormalized);
 
@@ -159,7 +162,7 @@ export class UserService {
     );
   }
 
-  readonly updateProperties = (user: User): User => {
+  updateProperties(user: User): User {
     return {
       ...user,
       birthDate: DateUtil.adjustToLocalDate(user.birthDate),

@@ -13,5 +13,5 @@ public interface IInstanceService
 
     public Task<Instance> GetAsync(InstanceGetRequest request);
 
-    public Task<IEnumerable<Instance>> GetByUserIdAsync(InstanceGetByUserRequest request);
+    public Task<IList<Instance>> GetByUserIdAsync(InstanceGetByUserRequest request);
 }

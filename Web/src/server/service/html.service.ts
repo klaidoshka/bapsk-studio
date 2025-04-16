@@ -26,8 +26,7 @@ export class HtmlService {
       .removeAttr("style")
       .removeAttr("border");
 
-    table.wrap("<div class='bg-stone-200 w-fit p-4'></div>");
-    table.addClass("table-auto w-full rounded-md shadow-lg border-separate border-spacing-y-1");
+    table.addClass("table-auto w-fit bg-stone-200 p-2 rounded-md shadow-lg border-separate border-spacing-y-1");
 
     $("tr").addClass("bg-white hover:bg-zinc-100 rounded-md")
     $("tr:first").addClass("border-zinc-300 border-b-2");

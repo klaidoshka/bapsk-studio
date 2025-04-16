@@ -256,6 +256,57 @@ namespace Accounting.Contract.Migrations
                     b.ToTable("DataTypeFields");
                 });
 
+            modelBuilder.Entity("Accounting.Contract.Entity.ImportConfiguration", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DataTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataTypeId");
+
+                    b.ToTable("ImportConfigurations");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.ImportConfigurationField", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ConfigurationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DataTypeFieldId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("DefaultValue")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConfigurationId");
+
+                    b.HasIndex("DataTypeFieldId");
+
+                    b.ToTable("ImportConfigurationFields");
+                });
+
             modelBuilder.Entity("Accounting.Contract.Entity.Instance", b =>
                 {
                     b.Property<int>("Id")
@@ -486,7 +537,7 @@ namespace Accounting.Contract.Migrations
                     b.Property<int?>("InstanceId")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsCanceled")
+                    b.Property<bool>("IsCancelled")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<int>("SaleId")
@@ -791,6 +842,36 @@ namespace Accounting.Contract.Migrations
                     b.Navigation("Reference");
                 });
 
+            modelBuilder.Entity("Accounting.Contract.Entity.ImportConfiguration", b =>
+                {
+                    b.HasOne("Accounting.Contract.Entity.DataType", "DataType")
+                        .WithMany()
+                        .HasForeignKey("DataTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DataType");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.ImportConfigurationField", b =>
+                {
+                    b.HasOne("Accounting.Contract.Entity.ImportConfiguration", "Configuration")
+                        .WithMany("Fields")
+                        .HasForeignKey("ConfigurationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Accounting.Contract.Entity.DataTypeField", "DataTypeField")
+                        .WithMany()
+                        .HasForeignKey("DataTypeFieldId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Configuration");
+
+                    b.Navigation("DataTypeField");
+                });
+
             modelBuilder.Entity("Accounting.Contract.Entity.Instance", b =>
                 {
                     b.HasOne("Accounting.Contract.Entity.User", "CreatedBy")
@@ -960,6 +1041,11 @@ namespace Accounting.Contract.Migrations
                 {
                     b.Navigation("Entries");
 
+                    b.Navigation("Fields");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.ImportConfiguration", b =>
+                {
                     b.Navigation("Fields");
                 });
 

@@ -8,6 +8,6 @@ public class ValidationException(Validation validation) : Exception(
 {
     public Validation Validation { get; } = validation;
 
-    public ValidationException(string message, InternalFailure? internalFailure = null) : this(new Validation(message, internalFailure)) { }
-    public ValidationException(ICollection<string> messages, InternalFailure? internalFailure = null) : this(new Validation(messages, internalFailure)) { }
+    public ValidationException(string message, ICollection<FailureCode>? codes = null) : this(new Validation(message, codes)) { }
+    public ValidationException(ICollection<string> messages, ICollection<FailureCode>? codes = null) : this(new Validation(messages, codes)) { }
 }

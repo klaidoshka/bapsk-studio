@@ -65,7 +65,7 @@ public class JwtService : IJwtService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    private IEnumerable<Claim> ToClaims(User user, Guid sessionId)
+    private IList<Claim> ToClaims(User user, Guid sessionId)
     {
         var claims = new List<Claim>
         {

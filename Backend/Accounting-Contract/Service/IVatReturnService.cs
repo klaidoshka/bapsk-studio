@@ -12,7 +12,7 @@ public interface IVatReturnService
 
     public string GeneratePreviewCode(StiVatReturnDeclaration declaration);
 
-    public IEnumerable<string> GenerateQrCodes(StiVatReturnDeclaration declaration);
+    public IList<string> GenerateQrCodes(StiVatReturnDeclaration declaration);
 
     public Task<StiVatReturnDeclaration?> GetByPreviewCodeAsync(string code);
 

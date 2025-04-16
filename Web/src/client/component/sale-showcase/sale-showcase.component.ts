@@ -1,4 +1,4 @@
-import {Component, input, signal, viewChild} from '@angular/core';
+import {Component, inject, input, signal, viewChild} from '@angular/core';
 import Sale, {SaleWithVatReturnDeclaration, SoldGood} from '../../model/sale.model';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
 import {SaleManagementComponent} from '../sale-management/sale-management.component';
@@ -13,7 +13,9 @@ import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.
 import {TableModule} from 'primeng/table';
 import Customer, {toCustomerFullName} from '../../model/customer.model';
 import Salesman from '../../model/salesman.model';
-import {VatReturnDeclarationPreviewComponent} from '../vat-return-declaration-preview/vat-return-declaration-preview.component';
+import {
+  VatReturnDeclarationPreviewComponent
+} from '../vat-return-declaration-preview/vat-return-declaration-preview.component';
 
 @Component({
   selector: 'sale-showcase',
@@ -32,7 +34,9 @@ import {VatReturnDeclarationPreviewComponent} from '../vat-return-declaration-pr
   styles: ``
 })
 export class SaleShowcaseComponent {
-  protected readonly toCustomerFullName = toCustomerFullName;
+  private readonly localizationService = inject(LocalizationService);
+  private readonly saleService = inject(SaleService);
+
   confirmationComponent = viewChild.required(ConfirmationComponent);
   customers = input.required<Customer[]>();
   instanceId = input.required<number>();
@@ -43,13 +47,9 @@ export class SaleShowcaseComponent {
   sales = input.required<SaleWithVatReturnDeclaration[]>();
   salesmen = input.required<Salesman[]>();
 
-  constructor(
-    private saleService: SaleService,
-    private localizationService: LocalizationService
-  ) {
-  }
+  protected readonly toCustomerFullName = toCustomerFullName;
 
-  readonly delete = (sale: Sale) => {
+  delete(sale: Sale) {
     this.confirmationComponent().request(() => {
       this.saleService.delete(this.instanceId(), sale.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['Sale deleted successfully']}),
@@ -58,19 +58,19 @@ export class SaleShowcaseComponent {
     });
   }
 
-  readonly getTotalPrice = (soldGoods: SoldGood[]): number => {
+  getTotalPrice(soldGoods: SoldGood[]): number {
     return soldGoods.reduce((total, soldGood) => total + soldGood.totalAmount, 0);
   }
 
-  readonly showManagement = (sale: Sale | null) => {
+  showManagement(sale: Sale | null) {
     this.managementMenu().show(sale);
   }
 
-  readonly showSale = (sale: Sale) => {
+  showSale(sale: Sale) {
     this.previewSaleMenu().show(sale);
   }
 
-  readonly showVatReturnDeclaration = (sale: SaleWithVatReturnDeclaration) => {
+  showVatReturnDeclaration(sale: SaleWithVatReturnDeclaration) {
     this.previewDeclarationMenu().show(sale);
   }
 }

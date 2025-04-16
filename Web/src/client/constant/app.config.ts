@@ -1,7 +1,7 @@
 import {provideHttpClient, withFetch, withInterceptors} from "@angular/common/http";
 import {ApplicationConfig, inject, provideAppInitializer, provideExperimentalZonelessChangeDetection} from "@angular/core";
 import {provideAnimationsAsync} from "@angular/platform-browser/animations/async";
-import {provideRouter} from "@angular/router";
+import {provideRouter, withComponentInputBinding} from "@angular/router";
 import {providePrimeNG} from "primeng/config";
 import {routes} from "./app.routes";
 import {authInterceptor} from "../interceptor/auth.interceptor";
@@ -16,7 +16,7 @@ export const appConfig: ApplicationConfig = {
       inject(AuthService);
     }),
     provideExperimentalZonelessChangeDetection(),
-    provideRouter(routes),
+    provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
     provideAnimationsAsync(),
     providePrimeNG({

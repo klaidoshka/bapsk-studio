@@ -4,7 +4,7 @@ import {Injectable} from '@angular/core';
   providedIn: 'root',
 })
 export class TextService {
-  readonly capitalize = (word: string): string => {
+  capitalize(word: string): string {
     let result = word.charAt(0).toUpperCase();
 
     for (let i = 1; i < word.length; i++) {

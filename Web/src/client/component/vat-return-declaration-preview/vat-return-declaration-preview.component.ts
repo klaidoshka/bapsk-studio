@@ -1,4 +1,4 @@
-import {Component, effect, input, Signal, signal, viewChild} from '@angular/core';
+import {Component, effect, inject, input, Signal, signal, viewChild} from '@angular/core';
 import {
   SubmitDeclarationState,
   toExportResultLabel,
@@ -44,6 +44,7 @@ import {ConfirmationComponent} from '../confirmation/confirmation.component';
 })
 export class VatReturnDeclarationPreviewComponent {
   protected readonly SubmitDeclarationState = SubmitDeclarationState;
+  private readonly vatReturnService = inject(VatReturnService);
 
   cancelConfirmationComponent = viewChild(ConfirmationComponent);
   declaration!: Signal<VatReturnDeclarationWithDeclarer | undefined>;
@@ -55,7 +56,7 @@ export class VatReturnDeclarationPreviewComponent {
   showQrCodes = signal<boolean>(false);
   submissionForm = viewChild(VatReturnDeclarationSubmissionComponent);
 
-  constructor(private vatReturnService: VatReturnService) {
+  constructor() {
     effect(() => {
       const saleId = this.sale()?.id;
 
@@ -72,7 +73,7 @@ export class VatReturnDeclarationPreviewComponent {
   protected readonly toSubmitDeclarationStateLabel = toSubmitDeclarationStateLabel;
   protected readonly toUserIdentityFullName = toUserIdentityFullName;
 
-  readonly cancel = () => {
+  cancel() {
     this.cancelConfirmationComponent()?.request(() => {
       this.isCanceling.set(true);
 
@@ -83,18 +84,18 @@ export class VatReturnDeclarationPreviewComponent {
     });
   }
 
-  readonly getVATToReturn = (sale: SaleWithVatReturnDeclaration): number => {
+  getVATToReturn(sale: SaleWithVatReturnDeclaration): number {
     return sale.soldGoods
-    .map(it => it.vatAmount)
-    .reduce((a, b) => a + b);
+      .map(it => it.vatAmount)
+      .reduce((a, b) => a + b);
   }
 
-  readonly hide = () => {
+  hide() {
     this.isShown.set(false);
     this.sale.set(undefined);
   }
 
-  readonly refresh = () => {
+  refresh() {
     this.isRefreshing.set(true);
 
     this.vatReturnService.update(this.declaration()!.saleId).subscribe({
@@ -103,7 +104,7 @@ export class VatReturnDeclarationPreviewComponent {
     });
   }
 
-  readonly show = (sale: SaleWithVatReturnDeclaration) => {
+  show(sale: SaleWithVatReturnDeclaration) {
     this.sale.set(sale);
     this.submissionForm()?.reset();
     this.isShown.set(true);

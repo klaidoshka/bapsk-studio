@@ -7,32 +7,7 @@ namespace Accounting.Services.FieldHandler;
 
 public class DateFieldHandler() : FieldHandler(FieldType.Date)
 {
-    private static readonly string[] DateFormats =
-    [
-        "yyyy-MM-dd",
-        "MM/dd/yyyy",
-        "dd-MM-yyyy",
-        "yyyy/MM/dd",
-        "dd/MM/yyyy",
-        "yyyy.MM.dd",
-        "dd.MM.yyyy",
-        "yyyy MM dd",
-        "dd MM yyyy",
-        "yyyy-MM-ddTHH:mm:ssZ",
-        "yyyy-MM-ddTHH:mm:ss.fffZ",
-        "yyyy-MM-ddTHH:mm:sszzz",
-        "yyyy-MM-ddTHH:mm:ss.fffzzz",
-        "yyyy-MM-ddTHH:mm:ss",
-        "yyyy-MM-dd HH:mm:ss",
-        "MM/dd/yyyy HH:mm:ss",
-        "dd-MM-yyyy HH:mm:ss",
-        "yyyy/MM/dd HH:mm:ss",
-        "dd/MM/yyyy HH:mm:ss",
-        "yyyy.MM.dd HH:mm:ss",
-        "dd.MM.yyyy HH:mm:ss",
-        "yyyy MM dd HH:mm:ss",
-        "dd MM yyyy HH:mm:ss"
-    ];
+    private static readonly string[] DateFormats = ["s", "u", "r", "yyyy-MM-ddTHH:mm:ss.fffZ"];
 
     public override object Deserialize(string value)
     {
@@ -51,7 +26,7 @@ public class DateFieldHandler() : FieldHandler(FieldType.Date)
 
     public override string Serialize(JsonElement value)
     {
-        return ToDateTime(value)!.Value.ToString("u");
+        return ToDateTime(value)!.Value.ToString("s");
     }
 
     private static DateTime? ToDateTime(object value)

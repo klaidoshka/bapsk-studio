@@ -1,4 +1,4 @@
-import {Component, Signal} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {ThemeService} from '../../service/theme.service';
 import {FormsModule} from '@angular/forms';
 
@@ -10,11 +10,11 @@ import {FormsModule} from '@angular/forms';
   templateUrl: './theme-selector.component.html'
 })
 export class ThemeSelectorComponent {
-  isDarkTheme!: Signal<boolean>;
+  private readonly themeService = inject(ThemeService);
 
-  constructor(private themeService: ThemeService) {
-    this.isDarkTheme = this.themeService.isDarkTheme();
+  isDarkTheme = this.themeService.isDarkTheme();
+
+  toggleTheme() {
+    this.themeService.toggleTheme();
   }
-
-  readonly toggleTheme = () => this.themeService.toggleTheme();
 }

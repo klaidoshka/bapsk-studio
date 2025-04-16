@@ -1,11 +1,12 @@
-import {Component, computed, input, OnInit, Signal} from '@angular/core';
+import {Component, computed, inject, input} from '@angular/core';
 import {DataEntryService} from '../../service/data-entry.service';
 import DataType from '../../model/data-type.model';
-import DataTypeField, {FieldType} from '../../model/data-type-field.model';
-import {DataEntryJoined} from '../../model/data-entry.model';
+import {FieldType} from '../../model/data-type-field.model';
 import {Badge} from 'primeng/badge';
 import {CurrencyPipe, DatePipe} from '@angular/common';
 import {getIsoCountryLabel} from '../../model/iso-country.model';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {map, of} from 'rxjs';
 
 @Component({
   selector: 'data-type-entry-field-display',
@@ -17,30 +18,44 @@ import {getIsoCountryLabel} from '../../model/iso-country.model';
   templateUrl: './data-type-entry-field-display.component.html',
   styles: ``
 })
-export class DataTypeEntryFieldDisplayComponent implements OnInit {
+export class DataTypeEntryFieldDisplayComponent {
   protected readonly FieldType = FieldType;
-  private dataTypeField !: Signal<DataTypeField | undefined>;
+  private readonly dataEntryService = inject(DataEntryService);
 
   dataType = input.required<DataType>();
+
+  dataTypeField = computed(() => this
+    .dataType().fields
+    .find(it => it.id === this.dataTypeFieldId())
+  );
+
   dataTypeFieldId = input.required<number>();
-  fieldType!: Signal<FieldType>;
-  referencedDataEntry!: Signal<DataEntryJoined | undefined>;
-  value = input.required<any>();
+  fieldType = computed(() => this.dataTypeField()?.type || FieldType.Text);
 
-  constructor(private dataEntryService: DataEntryService) {
-  }
+  referencedDataEntry = rxResource({
+    request: () => {
+      const referenceId = this.dataTypeField()?.referenceId;
+      const value = this.value();
 
-  protected readonly getIsoCountryLabel = getIsoCountryLabel;
-
-  ngOnInit() {
-    this.dataTypeField = computed(() => this.dataType().fields.find(it => it.id === this.dataTypeFieldId()));
-    this.fieldType = computed(() => this.dataTypeField()?.type || FieldType.Text);
-    this.referencedDataEntry = computed(() => {
-      if (!this.dataTypeField()?.referenceId || this.fieldType() !== FieldType.Reference) {
+      if (!referenceId || this.fieldType() !== FieldType.Reference) {
         return undefined;
       }
 
-      return this.dataEntryService.getAsSignal(Number(this.dataTypeField()?.referenceId))().find(it => it.id === this.value());
-    });
-  }
+      return {
+        referenceId: +referenceId,
+        value
+      };
+    },
+    loader: ({ request }) => request
+      ? this.dataEntryService
+        .getAllByDataTypeId(request.referenceId)
+        .pipe(
+          map(entries => entries.find(it => it.id === request.value))
+        )
+      : of(undefined)
+  });
+
+  value = input.required<any>();
+
+  protected readonly getIsoCountryLabel = getIsoCountryLabel;
 }

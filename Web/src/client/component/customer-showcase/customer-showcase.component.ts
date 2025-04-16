@@ -1,4 +1,4 @@
-import {Component, input, signal, viewChild} from '@angular/core';
+import {Component, inject, input, signal, viewChild} from '@angular/core';
 import Customer from '../../model/customer.model';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
 import Messages from '../../model/messages.model';
@@ -31,6 +31,9 @@ import {getIsoCountryLabel} from '../../model/iso-country.model';
 export class CustomerShowcaseComponent {
   protected readonly getIdentityDocumentTypeLabel = getIdentityDocumentTypeLabel;
   protected readonly getIsoCountryLabel = getIsoCountryLabel;
+  private readonly customerService = inject(CustomerService);
+  private readonly localizationService = inject(LocalizationService);
+
   customers = input.required<Customer[]>();
   confirmationComponent = viewChild.required(ConfirmationComponent);
   instanceId = input.required<number>();
@@ -38,13 +41,7 @@ export class CustomerShowcaseComponent {
   messages = signal<Messages>({});
   previewMenu = viewChild.required(CustomerPreviewComponent);
 
-  constructor(
-    private customerService: CustomerService,
-    private localizationService: LocalizationService
-  ) {
-  }
-
-  readonly delete = (customer: Customer) => {
+  delete(customer: Customer) {
     this.confirmationComponent().request(() => {
       this.customerService.delete(this.instanceId(), customer.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['Customer deleted successfully']}),
@@ -53,11 +50,11 @@ export class CustomerShowcaseComponent {
     });
   }
 
-  readonly showManagement = (customer: Customer | null) => {
+  showManagement(customer: Customer | null) {
     this.managementMenu().show(customer);
   }
 
-  readonly showPreview = (customer: Customer) => {
+  showPreview(customer: Customer) {
     this.previewMenu().show(customer);
   }
 }

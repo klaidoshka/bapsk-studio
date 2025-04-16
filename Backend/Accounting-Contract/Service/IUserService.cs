@@ -11,7 +11,7 @@ public interface IUserService
 
     public Task EditAsync(UserEditRequest request);
 
-    public Task<IEnumerable<User>> GetAsync(UserGetRequest request);
+    public Task<IList<User>> GetAsync(UserGetRequest request);
 
     public Task<User> GetByIdAsync(int userId);
 }

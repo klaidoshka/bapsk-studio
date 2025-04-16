@@ -13,23 +13,19 @@ import {getIsoCountryLabel} from '../../model/iso-country.model';
   templateUrl: './salesman-preview.component.html',
   styles: ``
 })
-export class SalesmanPreviewComponent implements OnInit {
+export class SalesmanPreviewComponent {
   salesman = signal<Salesman | null>(null);
   isShown = signal<boolean>(false);
-  isShownInitially = input<boolean>(false);
 
-  ngOnInit() {
-    this.isShown.set(this.isShownInitially());
-  }
+  protected readonly getIsoCountryLabel = getIsoCountryLabel;
 
-  readonly hide = () => {
+  hide() {
     this.isShown.set(false);
     this.salesman.set(null);
   }
 
-  readonly show = (salesman: Salesman | null) => {
+  show(salesman: Salesman | null) {
     this.salesman.set(salesman);
     this.isShown.set(true);
   }
-  protected readonly getIsoCountryLabel = getIsoCountryLabel;
 }

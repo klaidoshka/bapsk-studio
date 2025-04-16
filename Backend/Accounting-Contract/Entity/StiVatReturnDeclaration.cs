@@ -62,7 +62,7 @@ public class StiVatReturnDeclaration
     /// <summary>
     /// Marks the declaration as canceled.
     /// </summary>
-    public bool IsCanceled { get; set; }
+    public bool IsCancelled { get; set; }
 
     /// <summary>
     /// Navigation property for the QR codes of this declaration.

@@ -1,4 +1,4 @@
-import {Component, Signal, viewChild} from '@angular/core';
+import {Component, inject, Signal, viewChild} from '@angular/core';
 import {TableModule} from "primeng/table";
 import {SessionService} from '../../service/session.service';
 import Session from '../../model/session.model';
@@ -23,20 +23,15 @@ import {Toast} from 'primeng/toast';
   styles: ``
 })
 export class SessionShowcaseComponent {
-  currentSessionId: Signal<string | undefined>;
-  sessions: Signal<Session[]>;
+  private readonly authService = inject(AuthService);
+  private readonly messageService = inject(MessageService);
+  private readonly sessionService = inject(SessionService);
+
+  currentSessionId = this.authService.getSessionId();
+  sessions = this.sessionService.getByUserAsSignal();
   confirmationComponent = viewChild.required(ConfirmationComponent);
 
-  constructor(
-    authService: AuthService,
-    private messageService: MessageService,
-    private sessionService: SessionService
-  ) {
-    this.currentSessionId = authService.getSessionId();
-    this.sessions = sessionService.getByUserAsSignal();
-  }
-
-  readonly revoke = (session: Session) => {
+  revoke(session: Session) {
     this.confirmationComponent().request(() => {
       this.sessionService.revoke(session.id).subscribe(() =>
         this.messageService.add({

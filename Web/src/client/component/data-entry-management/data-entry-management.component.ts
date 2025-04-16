@@ -1,4 +1,4 @@
-import {Component, computed, effect, input, Signal, signal} from '@angular/core';
+import {Component, computed, effect, inject, input, Signal, signal} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {DataEntryService} from '../../service/data-entry.service';
 import {InstanceService} from '../../service/instance.service';
@@ -15,6 +15,7 @@ import {LocalizationService} from '../../service/localization.service';
 import {DataTypeEntryFieldInputComponent} from '../data-type-entry-field-input/data-type-entry-field-input.component';
 import {Select} from 'primeng/select';
 import {NgIf} from '@angular/common';
+import {rxResource} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'data-entry-management',
@@ -32,30 +33,38 @@ import {NgIf} from '@angular/common';
   styles: ``
 })
 export class DataEntryManagementComponent {
-  FieldType = FieldType;
+  protected readonly FieldType = FieldType;
+  private readonly dataEntryService = inject(DataEntryService);
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly instanceService = inject(InstanceService);
+  private readonly localizationService = inject(LocalizationService);
+  private readonly textService = inject(TextService);
+
   dataEntry = signal<DataEntry | undefined>(undefined);
+
+  dataEntries = rxResource({
+    request: () => ({
+      dataTypeIds: this.dataType().fields
+        .map(field => field.referenceId)
+        .filter(id => id != null)
+    }),
+    loader: ({ request }) => this.dataEntryService.getAllByDataTypeIds(request.dataTypeIds)
+  });
+
   dataType = input.required<DataType>();
   form!: FormGroup;
-  instanceId!: Signal<number | undefined>;
+  instanceId = this.instanceService.getActiveInstanceId();
   isShown = signal<boolean>(false);
   messages = signal<Messages>({});
 
-  constructor(
-    private dataEntryService: DataEntryService,
-    private localizationService: LocalizationService,
-    private formBuilder: FormBuilder,
-    private instanceService: InstanceService,
-    private textService: TextService
-  ) {
-    this.instanceId = this.instanceService.getActiveInstanceId();
-
+  constructor() {
     effect(() => {
       this.dataType(); // Init dependency
       this.form = this.createForm();
     });
   }
 
-  private readonly createForm = (dataType?: DataType, dataEntry?: DataEntry): FormGroup => {
+  private createForm(dataType?: DataType, dataEntry?: DataEntry): FormGroup {
     const formGroup = this.formBuilder.group({});
 
     dataType?.fields?.forEach(tf => {
@@ -64,7 +73,7 @@ export class DataEntryManagementComponent {
       formGroup.addControl(
         tf.name,
         this.formBuilder.control(
-          entryField!.value,
+          entryField?.value,
           tf.isRequired ? Validators.required : null
         )
       );
@@ -73,22 +82,22 @@ export class DataEntryManagementComponent {
     return formGroup;
   }
 
-  private readonly create = (request: DataEntryCreateRequest) => {
+  private create(request: DataEntryCreateRequest) {
     this.dataEntryService.create(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Data entry has been created successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
-  private readonly edit = (request: DataEntryEditRequest) => {
+  private edit(request: DataEntryEditRequest) {
     this.dataEntryService.edit(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Data entry has been edited successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
-  private readonly onSuccess = (message: string) => {
-    this.messages.set({success: [message]});
+  private onSuccess(message: string) {
+    this.messages.set({ success: [message] });
     this.form.markAsPristine();
     this.form.markAsUntouched();
   }
@@ -109,21 +118,27 @@ export class DataEntryManagementComponent {
     );
   }
 
-  readonly getDataEntries = (dataTypeId?: number) => {
-    if (!dataTypeId) {
-      return signal([]);
-    }
+  getDataEntries(dataTypeId?: number | null): Signal<{ id: number, label: string }[]> {
+    return computed(() => {
+      if (!dataTypeId) {
+        return [];
+      }
 
-    return computed(() => this.dataEntryService.getAsSignal(dataTypeId)().map(it => ({
-      label: it.display(),
-      id: it.id
-    })));
+      return this.dataEntries.value()
+        ?.get(dataTypeId)
+        ?.map(dataEntry => ({
+          id: dataEntry.id,
+          label: dataEntry.display()
+        })) || [];
+    });
   }
 
-  readonly getErrorMessage = (field: string): string | null => {
+  getErrorMessage(field: string): string | null {
     const control = this.form.get(field);
 
-    if (!control || !control.touched || !control.invalid) return "";
+    if (!control || !control.touched || !control.invalid) {
+      return "";
+    }
 
     if (control.errors?.["required"]) {
       return `${this.textService.capitalize(field)} is required.`;
@@ -132,15 +147,15 @@ export class DataEntryManagementComponent {
     return null;
   }
 
-  readonly hide = () => {
+  hide() {
     this.messages.set({});
     this.isShown.set(false);
     this.form.reset();
   }
 
-  readonly save = () => {
+  save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill out the form."]});
+      this.messages.set({ error: ["Please fill out the form."] });
       return;
     }
 
@@ -171,7 +186,7 @@ export class DataEntryManagementComponent {
     }
   }
 
-  readonly show = (dataEntry?: DataEntry) => {
+  show(dataEntry?: DataEntry) {
     this.dataEntry.set(dataEntry);
     this.form = this.createForm(this.dataType(), dataEntry);
     this.isShown.set(true);

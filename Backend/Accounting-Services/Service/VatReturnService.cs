@@ -135,7 +135,7 @@ public class VatReturnService : IVatReturnService
                 response.Errors
                     .Select(e => e.Description)
                     .ToList(),
-                InternalFailure.VatReturnDeclarationSubmitRejectedButUpdated
+                [FailureCode.VatReturnDeclarationSubmitRejectedButUpdated]
             );
         }
     }
@@ -224,7 +224,7 @@ public class VatReturnService : IVatReturnService
             throw new ValidationException("Couldn't find declaration to cancel.");
         }
 
-        if (declaration.IsCanceled)
+        if (declaration.IsCancelled)
         {
             throw new ValidationException("Declaration is already canceled.");
         }
@@ -254,7 +254,7 @@ public class VatReturnService : IVatReturnService
             );
         }
 
-        declaration.IsCanceled = true;
+        declaration.IsCancelled = true;
 
         await _database.SaveChangesAsync();
     }
@@ -273,7 +273,7 @@ public class VatReturnService : IVatReturnService
         return Convert.ToBase64String(Encoding.ASCII.GetBytes(code));
     }
 
-    public IEnumerable<string> GenerateQrCodes(StiVatReturnDeclaration declaration)
+    public IList<string> GenerateQrCodes(StiVatReturnDeclaration declaration)
     {
         var qrCodeDeclaration = declaration.ToQrCodeDocument();
 

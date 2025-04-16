@@ -14,11 +14,6 @@ namespace Accounting.API.Util;
 
 public static class ProgramExtensions
 {
-    /// <summary>
-    /// Configures the certificate for the application.
-    /// </summary>
-    /// <param name="builder">To configure certificate for</param>
-    /// <exception cref="FileNotFoundException">Thrown if certificate path is invalid</exception>
     public static void AddCertificate(this WebApplicationBuilder builder)
     {
         builder.WebHost.ConfigureKestrel(
@@ -44,13 +39,6 @@ public static class ProgramExtensions
         );
     }
 
-    /// <summary>
-    /// Binds a configuration section to a configuration object and registers it as a singleton.
-    /// </summary>
-    /// <param name="builder">To bind configuration for</param>
-    /// <param name="section">To bind onto configuration</param>
-    /// <typeparam name="TConfiguration">Configuration class type</typeparam>
-    /// <returns>Configuration instance</returns>
     public static TConfiguration AddConfiguration<TConfiguration>(
         this WebApplicationBuilder builder,
         string section
@@ -69,12 +57,6 @@ public static class ProgramExtensions
         return configuration;
     }
 
-    /// <summary>
-    /// Adds a database context to the service collection.
-    /// </summary>
-    /// <param name="services">To add database context to</param>
-    /// <param name="databaseOptions">Configuration of database</param>
-    /// <exception cref="NotSupportedException">If unsupported database dialect is used</exception>
     public static void AddDbContext(
         this IServiceCollection services,
         DatabaseOptions databaseOptions
@@ -101,11 +83,6 @@ public static class ProgramExtensions
         );
     }
 
-    /// <summary>
-    /// Adds JWT authentication and authorization to the application.
-    /// </summary>
-    /// <param name="builder">Builder to use for setting up authentication, authorization</param>
-    /// <exception cref="InvalidConfigurationException">Thrown if JwtSettings:Secret configuration is not set</exception>
     public static void AddJwtAuth(this WebApplicationBuilder builder)
     {
         builder.Services.AddHttpContextAccessor();
@@ -151,15 +128,12 @@ public static class ProgramExtensions
             .AddPolicy(Policies.AdminOnly, policy => policy.RequireRole(Roles.Admin));
     }
 
-    /// <summary>
-    /// Maps the API endpoints.
-    /// </summary>
-    /// <param name="application">Application to map endpoints in</param>
     public static void MapEndpoints(this WebApplication application)
     {
         var apiRouteGroup = application
             .MapGroup("/api/v1")
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .DisableAntiforgery();
 
         apiRouteGroup
             .MapGroup("/auth")
@@ -197,6 +171,10 @@ public static class ProgramExtensions
             .MapDataTypeEndpoints();
 
         accountingRouteGroup
+            .MapGroup("/import-configuration")
+            .MapImportConfigurationEndpoints();
+
+        accountingRouteGroup
             .MapGroup("/instance")
             .MapInstanceEndpoints();
 
@@ -208,7 +186,7 @@ public static class ProgramExtensions
         stiRouteGroup
             .MapGroup("/vat-return")
             .MapVatReturnEndpoints();
-        
+
         stiRouteGroup
             .MapGroup("/butenta-vat-return")
             .MapButentaEndpoints();

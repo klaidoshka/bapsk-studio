@@ -14,8 +14,8 @@
   >
     <messages-showcase [messages]="messages()"/>
 
-    <div class="flex flex-wrap gap-4">
-      <div class="flex-1 min-w-[100px]">
+    <div class="flex flex-wrap gap-4 space-y-4">
+      <div class="flex-1 min-w-32">
         <label
           for="customerId"
           class="block text-sm font-medium"
@@ -26,7 +26,7 @@
           [options]="customersLabeled()"
           optionValue="value"
           optionLabel="label"
-          class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          class="mt-1 block w-full"
         ></p-select>
         <div
           *ngIf="getErrorMessage('customerId')"
@@ -36,7 +36,7 @@
         </div>
       </div>
 
-      <div class="flex-1 min-w-[100px]">
+      <div class="flex-1 min-w-32">
         <label
           for="salesmanId"
           class="block text-sm font-medium"
@@ -47,7 +47,7 @@
           [options]="salesmenLabeled()"
           optionValue="value"
           optionLabel="label"
-          class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          class="mt-1 block w-full"
         ></p-select>
         <div
           *ngIf="getErrorMessage('salesmanId')"
@@ -58,8 +58,8 @@
       </div>
     </div>
 
-    <div class="flex flex-wrap gap-4">
-      <div class="flex-1 min-w-[100px]">
+    <div class="flex flex-wrap gap-4 space-y-4">
+      <div class="flex-1 min-w-32">
         <label
           for="date"
           class="block text-sm font-medium"
@@ -70,9 +70,9 @@
           [showIcon]="true"
           [showTime]="true"
           variant="filled"
-          inputStyleClass="p-2 rounded-md"
+          inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-inherit!"
           styleClass="w-full"
-          class="mt-1 block border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          class="mt-1 block"
           required
           appendTo="body"
         ></p-datepicker>
@@ -84,7 +84,7 @@
         </div>
       </div>
 
-      <div class="flex-1 min-w-[100px] w-fit">
+      <div class="flex-1 min-w-32 w-fit">
         <label
           for="saleReceiptType"
           class="block text-sm font-medium"
@@ -97,12 +97,12 @@
           [options]="saleReceiptTypes"
           optionValue="value"
           optionLabel="label"
-          class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          class="mt-1 block w-full"
         ></p-select>
       </div>
     </div>
 
-    <div class="flex-1 min-w-[100px]">
+    <div class="flex-1 min-w-32">
       <div
         *ngIf="selectedSaleReceiptType() === SaleReceiptType.Invoice"
         class="w-1/2 pr-2"
@@ -117,7 +117,7 @@
           pInputText
           type="text"
           id="invoiceNo"
-          class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          class="mt-1 block w-full"
         />
         <div
           *ngIf="getErrorMessage('invoiceNo')"
@@ -132,7 +132,7 @@
         class="flex flex-wrap gap-4"
         formGroupName="cashRegister"
       >
-        <div class="flex-1 min-w-[100px]">
+        <div class="flex-1 min-w-32">
           <label
             for="cashRegisterNo"
             class="block text-sm font-medium"
@@ -143,11 +143,11 @@
             pInputText
             type="text"
             id="cashRegisterNo"
-            class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="mt-1 block w-full"
           />
         </div>
 
-        <div class="flex-1 min-w-[100px]">
+        <div class="flex-1 min-w-32">
           <label
             for="receiptNo"
             class="block text-sm font-medium"
@@ -158,7 +158,7 @@
             pInputText
             type="text"
             id="receiptNo"
-            class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="mt-1 block w-full"
           />
         </div>
       </div>
@@ -183,7 +183,7 @@
                 formControlName="description"
                 pInputText
                 type="text"
-                class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                class="mt-1 block w-full"
               />
               <div
                 *ngIf="getSoldGoodErrorMessage(i, 'description')"
@@ -199,7 +199,7 @@
                 formControlName="quantity"
                 pInputText
                 type="number"
-                class="mt-1 block w-[100px] border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                class="mt-1 block w-[100px]"
               />
               <div
                 *ngIf="getSoldGoodErrorMessage(i, 'quantity')"
@@ -215,7 +215,7 @@
                 formControlName="unitPrice"
                 pInputText
                 type="number"
-                class="mt-1 block w-[150px] border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                class="mt-1 block w-[150px]"
               />
               <div
                 *ngIf="getSoldGoodErrorMessage(i, 'unitPrice')"
@@ -250,7 +250,7 @@
                   formControlName="unitOfMeasure"
                   pInputText
                   type="text"
-                  class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  class="mt-1 block w-full"
                 />
               } @else {
                 <p-select
@@ -259,7 +259,7 @@
                   optionValue="code"
                   optionLabel="label"
                   styleClass="min-w-[120px]"
-                  class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                  class="mt-1 block w-full"
                   appendTo="body"
                 />
               }
@@ -280,7 +280,7 @@
                 [min]="0"
                 [max]="100"
                 [step]="1"
-                class="mt-1 block w-[80px] border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                class="mt-1 block w-[80px]"
               />
               <div
                 *ngIf="getSoldGoodErrorMessage(i, 'vatRate')"
@@ -294,7 +294,7 @@
               <p-button
                 label="Remove"
                 (onClick)="removeSoldGood(i)"
-              ></p-button>
+              />
             </div>
           </div>
         </div>
@@ -304,7 +304,7 @@
           <p-button
             label="Add Sold Good"
             (onClick)="addSoldGood()"
-          ></p-button>
+          />
         </div>
       </div>
 
@@ -314,7 +314,7 @@
           [label]="sale() == null ? 'Create' : 'Save'"
           [disabled]="!form.valid || !form.dirty"
           (onClick)="save()"
-        ></p-button>
+        />
       </div>
     </div>
   </div>

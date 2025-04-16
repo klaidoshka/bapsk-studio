@@ -1,6 +1,6 @@
 namespace Accounting.Contract.Configuration;
 
-public enum InternalFailure
+public enum FailureCode
 {
     VatReturnDeclarationSubmitRejectedButUpdated = 0
 }

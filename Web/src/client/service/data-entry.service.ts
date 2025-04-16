@@ -1,208 +1,235 @@
-import {computed, Injectable, Signal, signal, WritableSignal} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
-import {first, Observable, tap} from 'rxjs';
-import DataEntry, {DataEntryCreateRequest, DataEntryEditRequest, DataEntryJoined} from '../model/data-entry.model';
+import {combineLatest, first, map, Observable, switchMap, tap} from 'rxjs';
+import DataEntry, {
+  DataEntryCreateRequest,
+  DataEntryEditRequest,
+  DataEntryImportRequest,
+  DataEntryJoined
+} from '../model/data-entry.model';
 import {DateUtil} from '../util/date.util';
 import {UserService} from './user.service';
 import {DataTypeService} from './data-type.service';
 import DataEntryField from '../model/data-entry-field.model';
 import {FieldType} from '../model/data-type-field.model';
 import {FieldTypeUtil} from '../util/field-type.util';
+import {CacheService} from './cache.service';
+import DataType from '../model/data-type.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataEntryService {
-  // Key: DataTypeId
-  private readonly store = new Map<number, WritableSignal<DataEntry[]>>();
+  private readonly apiRouter = inject(ApiRouter);
+  private readonly dataTypeService = inject(DataTypeService);
+  private readonly httpClient = inject(HttpClient);
+  private readonly userService = inject(UserService);
 
-  constructor(
-    private apiRouter: ApiRouter,
-    private dataTypeService: DataTypeService,
-    private httpClient: HttpClient,
-    private userService: UserService
-  ) {
-  }
+  private readonly cacheService = new CacheService<number, DataEntryJoined>(dataEntry => dataEntry.id);
+  private readonly dataTypesFetched = new Set<number>();
 
-  /**
-   * Find the data type id that has specified data entry id. It may be null if no fetched data type
-   * has the data entry.
-   *
-   * @param id The data entry id
-   */
-  private readonly toDataTypeId = (id: number): number | null => {
-    let dataTypeId: number | null = null;
-
-    for (const [key, values] of this.store.entries()) {
-      if (values().find(dataEntry => dataEntry.id === id)) {
-        dataTypeId = key;
-        break
-      }
-    }
-
-    return dataTypeId;
-  }
-
-  readonly create = (request: DataEntryCreateRequest): Observable<DataEntry> => {
-    const dataType = this.dataTypeService.getByIdAsSignal(request.dataTypeId)()!;
-
-    return this.httpClient.post<DataEntry>(this.apiRouter.dataEntryCreate(), ({
+  private adjustRequestDateToISO<T extends DataEntryCreateRequest | DataEntryEditRequest>(request: T, dataType: DataType): T {
+    return {
       ...request,
-      fields: request.fields.map(it => {
-        const dataTypeField = dataType.fields.find(field => field.id === it.dataTypeFieldId)!;
+      fields: request.fields.map(request => {
+        const dataTypeField = dataType.fields.find(field => field.id === request.dataTypeFieldId)!;
 
         if (dataTypeField.type === FieldType.Date) {
           return {
-            ...it,
-            value: it.value.toISOString()
+            ...request,
+            value: request.value.toISOString()
           }
         }
 
-        return it;
+        return request;
       })
-    }) as DataEntryCreateRequest).pipe(
-      tap(dataEntry => {
-        const existingSignal = this.store.get(request.dataTypeId);
-
-        if (existingSignal != null) {
-          existingSignal.update(old => [...old, this.updateProperties(dataEntry)]);
-        } else {
-          this.store.set(request.dataTypeId, signal([this.updateProperties(dataEntry)]));
-        }
-      })
-    );
+    };
   }
 
-  readonly delete = (id: number): Observable<void> => {
-    return this.httpClient.delete<void>(this.apiRouter.dataEntryDelete(id)).pipe(
-      tap(() => {
-        const dataTypeId = this.toDataTypeId(id);
-
-        if (dataTypeId != null) {
-          this.store.get(dataTypeId)?.update(old => old.filter(dataEntry => dataEntry.id !== id));
-        }
-      })
-    );
-  }
-
-  readonly edit = (request: DataEntryEditRequest): Observable<void> => {
-    const dataType = this.dataTypeService.getByIdAsSignal(request.dataTypeId)()!;
-
-    return this.httpClient.put<void>(this.apiRouter.dataEntryEdit(request.dataEntryId), ({
-      ...request,
-      fields: request.fields.map(it => {
-        const dataTypeField = dataType.fields.find(field => field.id === it.dataTypeFieldId)!;
-
-        if (dataTypeField.type === FieldType.Date) {
-          return {
-            ...it,
-            value: it.value.toISOString()
-          }
-        }
-
-        return it;
-      })
-    }) as DataEntryEditRequest).pipe(
-      tap(() => this.get(request.dataEntryId).pipe(first()).subscribe())
-    );
-  }
-
-  readonly get = (id: number): Observable<DataEntry> => {
-    return this.httpClient.get<DataEntry>(this.apiRouter.dataEntryGetById(id)).pipe(
-      tap(dataEntry => {
-        const existingSignal = this.store.get(dataEntry.dataTypeId);
-
-        if (existingSignal != null) {
-          existingSignal.update(old => {
-            const index = old.findIndex(de => de.id === id);
-
-            return index === -1
-              ? [...old, this.updateProperties(dataEntry)]
-              : [...old.slice(0, index), this.updateProperties(dataEntry), ...old.slice(index + 1)];
-          });
-        } else {
-          this.store.set(dataEntry.dataTypeId, signal([this.updateProperties(dataEntry)]));
-        }
-      })
-    );
-  }
-
-  readonly getAll = (dataTypeId: number): Observable<DataEntry[]> => {
-    return this.httpClient.get<DataEntry[]>(this.apiRouter.dataEntryGetByDataTypeId(dataTypeId)).pipe(
-      tap(dataEntries => {
-        const existingSignal = this.store.get(dataTypeId);
-
-        if (existingSignal != null) {
-          existingSignal.set(dataEntries.map(this.updateProperties));
-        } else {
-          this.store.set(dataTypeId, signal(dataEntries.map(this.updateProperties)))
-        }
-      })
-    );
-  }
-
-
-  /**
-   * Get the data entries as a readonly signal. Data entries are cached and updated whenever
-   * HTTP requests are made via this service.
-   *
-   * @returns Readonly signal of data entries
-   */
-  readonly getAsSignal = (dataTypeId: number): Signal<DataEntryJoined[]> => {
-    if (!this.store.has(dataTypeId)) {
-      this.store.set(dataTypeId, signal([]));
-
-      new Promise((resolve) => this.getAll(dataTypeId).pipe(first()).subscribe(resolve));
-    }
-
-    const dataEntries = this.store.get(dataTypeId)!;
-    const dataType = this.dataTypeService.getByIdAsSignal(dataTypeId);
-
-    return computed(() => dataEntries().map(dataEntry => {
-        return {
+  private joinOntoDataEntry(dataEntry: DataEntry): Observable<DataEntryJoined> {
+    return combineLatest([
+      this.userService.getIdentityById(dataEntry.createdById),
+      this.userService.getIdentityById(dataEntry.modifiedById),
+      this.dataTypeService.getById(dataEntry.dataTypeId)
+    ])
+      .pipe(
+        map(([createdBy, modifiedBy, dataType]) => ({
           ...dataEntry,
-          createdBy: computed(() => this.userService.getIdentityByIdAsSignal(dataEntry.createdById)())()!,
+          createdBy: createdBy,
+          modifiedBy: modifiedBy,
+          fields: dataEntry.fields.filter(field =>
+            dataType.fields.some(dataTypeField => dataTypeField.id === field.dataTypeFieldId)
+          ),
           display: () => {
-            if (!dataType()?.displayFieldId) {
+            if (!dataType.displayFieldId) {
               return dataEntry.id.toString();
             }
 
-            const displayFieldId = dataType()?.displayFieldId!;
+            const displayField = dataEntry.fields.find(field =>
+              field.dataTypeFieldId === dataType.displayFieldId
+            );
 
-            return dataEntry.fields.find(field => field.dataTypeFieldId === displayFieldId)?.value || '';
-          },
-          // Ensure that latest data type fields are used
-          fields: dataEntry.fields.filter(field =>
-            dataType()?.fields?.find(dataTypeField => dataTypeField.id === field.dataTypeFieldId)
-          ),
-          modifiedBy: computed(() => this.userService.getIdentityByIdAsSignal(dataEntry.modifiedById)())()!
-        };
-      })
-    );
+            return displayField ? displayField.value : '';
+          }
+        }))
+      );
   }
 
-  readonly updateProperties = (dataEntry: DataEntry): DataEntry => {
-    return {
-      ...dataEntry,
-      createdAt: DateUtil.adjustToLocalDate(dataEntry.createdAt),
-      modifiedAt: DateUtil.adjustToLocalDate(dataEntry.modifiedAt),
-      fields: dataEntry.fields.map(it => this.updateFieldProperty(it, dataEntry.dataTypeId)),
-    }
+  create(request: DataEntryCreateRequest): Observable<DataEntryJoined> {
+    return this.dataTypeService
+      .getById(request.dataTypeId)
+      .pipe(
+        switchMap(dataType =>
+          this.httpClient.post<DataEntry>(
+            this.apiRouter.dataEntryCreate(),
+            this.adjustRequestDateToISO(request, dataType)
+          )
+        ),
+        switchMap(dataEntry => this.updateProperties(dataEntry)),
+        switchMap(dataEntry => this.joinOntoDataEntry(dataEntry)),
+        tap(dataEntry => this.cacheService.set(dataEntry)),
+        switchMap(dataEntry => this.cacheService.get(dataEntry.id))
+      );
   }
 
-  readonly updateFieldProperty = (field: DataEntryField, dataTypeId: number): DataEntryField => {
-    const dataTypeField = this.dataTypeService
-    .getByIdAsSignal(dataTypeId)()?.fields
-    ?.find(it => it.id === field.dataTypeFieldId);
+  delete(id: number): Observable<void> {
+    return this.httpClient
+      .delete<void>(this.apiRouter.dataEntryDelete(id))
+      .pipe(
+        tap(() => this.cacheService.delete(id))
+      );
+  }
 
-    if (!dataTypeField) {
-      return field;
+  edit(request: DataEntryEditRequest): Observable<void> {
+    return this.dataTypeService
+      .getById(request.dataTypeId)
+      .pipe(
+        switchMap(dataType =>
+          this.httpClient.put<void>(
+            this.apiRouter.dataEntryEdit(request.dataEntryId),
+            this.adjustRequestDateToISO(request, dataType)
+          )
+        ),
+        tap(() => {
+            this.cacheService.invalidate(request.dataEntryId);
+
+            this
+              .getById(request.dataEntryId)
+              .pipe(first())
+              .subscribe();
+          }
+        )
+      );
+  }
+
+  getById(id: number): Observable<DataEntryJoined> {
+    if (this.cacheService.has(id)) {
+      return this.cacheService.get(id);
     }
 
-    return {
-      ...field,
-      value: FieldTypeUtil.updateValue(field.value, dataTypeField.type)
+    return this.httpClient
+      .get<DataEntry>(this.apiRouter.dataEntryGetById(id))
+      .pipe(
+        switchMap(dataEntry => this.updateProperties(dataEntry)),
+        switchMap(dataEntry => this.joinOntoDataEntry(dataEntry)),
+        tap(dataEntry => this.cacheService.set(dataEntry)),
+        switchMap(dataEntry => this.cacheService.get(dataEntry.id))
+      );
+  }
+
+  getAllByDataTypeId(dataTypeId: number): Observable<DataEntryJoined[]> {
+    if (this.dataTypesFetched.has(dataTypeId)) {
+      return this.cacheService.getAllWhere(dataEntry => dataEntry.dataTypeId === dataTypeId);
     }
+
+    return this.httpClient
+      .get<DataEntry[]>(this.apiRouter.dataEntryGetByDataTypeId(dataTypeId))
+      .pipe(
+        switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.updateProperties(dataEntry)))),
+        switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.joinOntoDataEntry(dataEntry)))),
+        tap(dataEntries => {
+          this.dataTypesFetched.add(dataTypeId);
+
+          this.cacheService.update(
+            dataEntries,
+            dataEntry => dataEntry.dataTypeId === dataTypeId
+          );
+        }),
+        switchMap(_ => this.cacheService.getAllWhere(dataEntry => dataEntry.dataTypeId === dataTypeId))
+      );
+  }
+
+  getAllByDataTypeIds(dataTypeIds: number[]): Observable<Map<number, DataEntryJoined[]>> {
+    return combineLatest(dataTypeIds.map(id =>
+      this
+        .getAllByDataTypeId(id)
+        .pipe(
+          map(dataEntries => ({
+            dataTypeId: id,
+            values: dataEntries
+          }))
+        )
+    ))
+      .pipe(map(groupedEntries => {
+        const map = new Map<number, DataEntryJoined[]>();
+
+        groupedEntries.forEach(dataEntries => {
+          map.set(
+            dataEntries.dataTypeId,
+            dataEntries.values
+          );
+        });
+
+        return map;
+      }));
+  }
+
+  import(request: DataEntryImportRequest): Observable<DataEntryJoined[]> {
+    const data = new FormData();
+
+    data.append('file', request.file);
+    data.append('importConfigurationId', request.importConfigurationId + '');
+    data.append('skipHeader', request.skipHeader + '');
+
+    return this.httpClient
+      .post<DataEntry[]>(
+        this.apiRouter.dataEntryImport(),
+        data
+      )
+      .pipe(
+        switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.updateProperties(dataEntry)))),
+        switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.joinOntoDataEntry(dataEntry)))),
+        tap(dataEntries => dataEntries.map(dataEntry => this.cacheService.set(dataEntry))),
+        switchMap(dataEntries => this.cacheService.getAllWhere(dataEntry =>
+          dataEntries.findIndex(dataEntryNew => dataEntryNew.id === dataEntry.id) !== -1
+        ))
+      );
+  }
+
+  updateProperties(dataEntry: DataEntry): Observable<DataEntry> {
+    return combineLatest(
+      dataEntry.fields.map(field => this.updateFieldProperty(field, dataEntry.dataTypeId))
+    )
+      .pipe(
+        map(fields => ({
+          ...dataEntry,
+          createdAt: DateUtil.adjustToLocalDate(dataEntry.createdAt),
+          modifiedAt: DateUtil.adjustToLocalDate(dataEntry.modifiedAt),
+          fields: fields
+        }))
+      );
+  }
+
+  updateFieldProperty(field: DataEntryField, dataTypeId: number): Observable<DataEntryField> {
+    return this.dataTypeService
+      .getById(dataTypeId)
+      .pipe(
+        map(dataType => dataType.fields.find(dataTypeField => dataTypeField.id === field.dataTypeFieldId)),
+        map(dataTypeField => ({
+          ...field,
+          value: FieldTypeUtil.updateValue(field.value, dataTypeField?.type || FieldType.Text)
+        }))
+      );
   }
 }

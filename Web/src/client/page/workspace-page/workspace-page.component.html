@@ -2,20 +2,20 @@
   <ng-container *ngIf="instanceId() != null">
     <div class="flex">
       <!-- Sidebar -->
-      <div class="rounded h-screen sticky top-0 w-50 bg-primary text-primary p-4 flex flex-col">
+      <div class="rounded h-screen sticky top-0 w-50 dark:bg-surface-950 bg-surface-50 dark:text-primary dark:text-primary text-primary-50 p-4 flex flex-col">
         <div
           *ngFor="let type of workspacesPart"
-          class="w-full p-2 my-1 bg-primary-500 rounded hover:cursor-pointer text-center text-l"
-          [class.bg-primary-600]="selectedWorkspace() === type"
+          class="w-full p-2 my-1 bg-surface-500 rounded hover:cursor-pointer text-center text-l"
+          [class.bg-surface-600]="selectedWorkspace() === type"
           (click)="selectWorkspace(type)"
         >
           {{ getWorkspaceName(type) }}
         </div>
 
-        <div [class]="'mt-6 rounded' + (selectedWorkspace() === WorkspaceType.DataType ? ' bg-primary-500' : '')">
+        <div [class]="'mt-6 rounded' + (selectedWorkspace() === WorkspaceType.DataType ? ' bg-surface-500' : '')">
           <div
-            class="w-full p-2 bg-primary-500 rounded hover:cursor-pointer text-center text-l"
-            [class.bg-primary-600]="selectedWorkspace() === WorkspaceType.DataType"
+            class="w-full p-2 bg-surface-500 rounded hover:cursor-pointer text-center text-l"
+            [class.bg-surface-600]="selectedWorkspace() === WorkspaceType.DataType"
             (click)="selectWorkspace(WorkspaceType.DataType)"
           >
             {{ getWorkspaceName(WorkspaceType.DataType) }}
@@ -24,16 +24,16 @@
           <div *ngIf="selectedWorkspace() === WorkspaceType.DataType" class="mt-4">
             <p-select
               [(ngModel)]="selectedDataType"
-              [options]="dataTypes()"
+              [options]="dataTypes.value() || []"
               (onChange)="selectDataType($event.value)"
               optionLabel="name"
               placeholder="Select..."
               class="m-1 w-40 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-            ></p-select>
+            />
           </div>
         </div>
 
-        <div class="mt-8 bg-primary-500 mt-2 p-2 border rounded shadow">
+        <div class="mt-8 bg-surface-500 mt-2 p-2 border rounded shadow">
           <label for="htmlFileInput" class="block text-sm font-semibold">Upload HTML</label>
           <input
             id="htmlFileInput"
@@ -51,8 +51,8 @@
           <h1 class="text-xl font-bold">{{ selectedDataType()?.name }}</h1>
 
           <data-entry-showcase
-            *ngIf="selectedDataType() != null"
-            [dataEntries]="dataEntries()"
+            *ngIf="selectedDataType() !== undefined"
+            [dataEntries]="dataEntries.value() || []"
             [dataType]="selectedDataType()!"
           />
 

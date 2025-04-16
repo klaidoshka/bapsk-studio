@@ -5,6 +5,8 @@ namespace Accounting.Contract.Service;
 
 public interface IDataEntryService
 {
+    public Task AddMissingDataTypeFieldsWithoutSaveAsync(int dataTypeId);
+
     public Task<DataEntry> CreateAsync(DataEntryCreateRequest request);
 
     public Task DeleteAsync(DataEntryDeleteRequest request);
@@ -13,5 +15,7 @@ public interface IDataEntryService
 
     public Task<DataEntry> GetAsync(DataEntryGetRequest request);
 
-    public Task<IEnumerable<DataEntry>> GetByDataTypeIdAsync(DataEntryGetByDataTypeRequest request);
+    public Task<IList<DataEntry>> GetByDataTypeIdAsync(DataEntryGetByDataTypeRequest request);
+    
+    public Task<IList<DataEntry>> ImportAsync(DataEntryImportRequest request);
 }

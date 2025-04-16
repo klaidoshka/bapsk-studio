@@ -1,4 +1,4 @@
-import {Injectable, signal, WritableSignal} from '@angular/core';
+import {inject, Injectable, signal, WritableSignal} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {ApiRouter} from './api-router.service';
 import Customer, {CustomerCreateRequest, CustomerEditRequest} from '../model/customer.model';
@@ -12,16 +12,13 @@ import {DateUtil} from '../util/date.util';
   providedIn: 'root'
 })
 export class CustomerService {
+  private readonly apiRouter = inject(ApiRouter);
+  private readonly httpClient = inject(HttpClient);
+
   // Key: InstanceId
   private readonly store = new Map<number, WritableSignal<Customer[]>>();
 
-  constructor(
-    private apiRouter: ApiRouter,
-    private httpClient: HttpClient
-  ) {
-  }
-
-  private readonly updateSingleInStore = (instanceId: number, customer: Customer) => {
+  private updateSingleInStore(instanceId: number, customer: Customer) {
     const existingSignal = this.store.get(instanceId);
 
     if (existingSignal != null) {
@@ -37,7 +34,7 @@ export class CustomerService {
     }
   }
 
-  readonly create = (request: CustomerCreateRequest) => {
+  create(request: CustomerCreateRequest) {
     return this.httpClient.post<Customer>(this.apiRouter.customerCreate(), {
       ...request,
       customer: {
@@ -49,7 +46,7 @@ export class CustomerService {
     );
   }
 
-  readonly delete = (instanceId: number, id: number) => {
+  delete(instanceId: number, id: number) {
     return this.httpClient.delete<void>(this.apiRouter.customerDelete(id)).pipe(
       tap(() => {
         const existingSignal = this.store.get(instanceId);
@@ -63,7 +60,7 @@ export class CustomerService {
     );
   }
 
-  readonly edit = (request: CustomerEditRequest) => {
+  edit(request: CustomerEditRequest) {
     return this.httpClient.put<void>(this.apiRouter.customerEdit(request.customer.id!), {
       ...request,
       customer: {
@@ -75,21 +72,21 @@ export class CustomerService {
     );
   }
 
-  readonly get = (instanceId: number) => {
+  get(instanceId: number) {
     return this.httpClient.get<Customer[]>(this.apiRouter.customerGet(instanceId)).pipe(
       tap(customers => {
         const existingSignal = this.store.get(instanceId);
 
         if (existingSignal != null) {
-          existingSignal.update(() => customers.map(this.updateProperties));
+          existingSignal.update(() => customers.map(customer => this.updateProperties(customer)));
         } else {
-          this.store.set(instanceId, signal(customers.map(this.updateProperties)));
+          this.store.set(instanceId, signal(customers.map(customer => this.updateProperties(customer))));
         }
       })
     );
   }
 
-  readonly getById = (instanceId: number, id: number) => {
+  getById(instanceId: number, id: number) {
     return this.httpClient.get<Customer>(this.apiRouter.customerGetById(id)).pipe(
       tap(customer => this.updateSingleInStore(instanceId, this.updateProperties(customer)))
     );
@@ -103,7 +100,7 @@ export class CustomerService {
    *
    * @returns Readonly signal of customers
    */
-  readonly getAsSignal = (instanceId: number) => {
+  getAsSignal(instanceId: number) {
     if (!this.store.has(instanceId)) {
       this.store.set(instanceId, signal([]));
 
@@ -113,7 +110,7 @@ export class CustomerService {
     return this.store.get(instanceId)!.asReadonly();
   }
 
-  readonly updateProperties = (customer: Customer): Customer => {
+  updateProperties(customer: Customer): Customer {
     return {
       ...customer,
       birthdate: DateUtil.adjustToLocalDate(customer.birthdate),

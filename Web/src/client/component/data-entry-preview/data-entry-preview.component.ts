@@ -28,12 +28,12 @@ export class DataEntryPreviewComponent {
   dataTypeEntry = signal<DataTypeEntryPair | undefined>(undefined);
   isShown = signal<boolean>(false);
 
-  readonly hide = () => {
+  hide() {
     this.isShown.set(false);
     this.dataTypeEntry.set(undefined);
   }
 
-  readonly show = (dataType: DataType, dataEntry: DataEntryJoined) => {
+  show(dataType: DataType, dataEntry: DataEntryJoined) {
     this.dataTypeEntry.set({
       dataType: dataType,
       dataEntry: dataEntry

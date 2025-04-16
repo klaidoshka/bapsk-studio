@@ -26,7 +26,7 @@
             pInputText
             type="text"
             id="name"
-            class="mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            class="mt-1 block w-full"
           />
           @if (getErrorMessage("name"); as error) {
             <div class="text-xs text-red-500 mt-1">{{ error }}</div>
@@ -62,7 +62,7 @@
           formControlName="description"
           pTextarea
           id="description"
-          class="mt-1 p-2 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+          class="mt-1 p-2 block w-full"
         ></textarea>
         @if (getErrorMessage("description"); as error) {
           <div class="text-xs text-red-500 mt-1">{{ error }}</div>
@@ -119,7 +119,7 @@
                       <p-select
                         id="referencedType"
                         placeholder="Select referenced type"
-                        formControlName="referencedType" [options]="dataTypes()"
+                        formControlName="referencedType" [options]="dataTypes.value() || []"
                         optionLabel="name" optionValue="id" appendTo="body"
                         class="mt-1 w-full"
                       />
@@ -158,7 +158,7 @@
           <p-button
             label="Add Field"
             (onClick)="addField()"
-          ></p-button>
+          />
         </div>
       </div>
     </div>
@@ -168,7 +168,7 @@
         [label]="dataType() === undefined ? 'Create' : 'Save'"
         [disabled]="form.invalid || !form.dirty"
         (onClick)="save()"
-      ></p-button>
+      />
     </div>
   </div>
 </p-dialog>

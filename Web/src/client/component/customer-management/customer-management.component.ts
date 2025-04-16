@@ -1,6 +1,17 @@
-import {Component, input, OnInit, signal} from '@angular/core';
-import {AbstractControl, FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import Customer, {CustomerCreateRequest, CustomerEditRequest, CustomerOtherDocument} from '../../model/customer.model';
+import {Component, inject, input, OnInit, signal} from '@angular/core';
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
+import Customer, {
+  CustomerCreateRequest,
+  CustomerEditRequest,
+  CustomerOtherDocument
+} from '../../model/customer.model';
 import Messages from '../../model/messages.model';
 import {CustomerService} from '../../service/customer.service';
 import {TextService} from '../../service/text.service';
@@ -32,67 +43,60 @@ import {NgForOf, NgIf} from '@angular/common';
   templateUrl: './customer-management.component.html',
   styles: ``
 })
-export class CustomerManagementComponent implements OnInit {
+export class CustomerManagementComponent {
   protected readonly IsoCountries = IsoCountries;
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly customerService = inject(CustomerService);
+  private readonly localizationService = inject(LocalizationService);
+  private readonly textService = inject(TextService);
 
   customer = signal<Customer | null>(null);
-  form!: FormGroup;
-  instanceId = input.required<number>();
-  isShownInitially = input<boolean>(false);
-  isShown = signal<boolean>(false);
-  messages = signal<Messages>({});
+
+  form = this.formBuilder.group({
+    birthdate: [new Date(), [Validators.required]],
+    email: [""],
+    firstName: ["", [Validators.required, Validators.maxLength(200)]],
+    identityDocument: this.formBuilder.group({
+      issuedBy: [getDefaultIsoCountry().code, [Validators.required]],
+      number: ["", [Validators.required, Validators.maxLength(50)]],
+      type: [IdentityDocumentType.Passport, [Validators.required]],
+      value: [null, [Validators.maxLength(50)]]
+    }),
+    lastName: ["", [Validators.required, Validators.maxLength(200)]],
+    otherDocuments: this.formBuilder.array([]),
+    residenceCountry: [getDefaultIsoCountry().code, [Validators.required]]
+  });
+
   identityDocumentTypes = [
     {label: 'ID Card', value: IdentityDocumentType.NationalId},
-    {label: 'Passport', value: IdentityDocumentType.Passport},
+    {label: 'Passport', value: IdentityDocumentType.Passport}
   ]
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private customerService: CustomerService,
-    private localizationService: LocalizationService,
-    private textService: TextService
-  ) {
-    this.form = this.formBuilder.group({
-      birthdate: [new Date(), [Validators.required]],
-      email: [""],
-      firstName: ["", [Validators.required, Validators.maxLength(200)]],
-      identityDocument: this.formBuilder.group({
-        issuedBy: [getDefaultIsoCountry().code, [Validators.required]],
-        number: ["", [Validators.required, Validators.maxLength(50)]],
-        type: [IdentityDocumentType.Passport, [Validators.required]],
-        value: [null, [Validators.maxLength(50)]]
-      }),
-      lastName: ["", [Validators.required, Validators.maxLength(200)]],
-      otherDocuments: this.formBuilder.array([]),
-      residenceCountry: [getDefaultIsoCountry().code, [Validators.required]]
-    });
-  }
+  instanceId = input.required<number>();
+  isShown = signal<boolean>(false);
+  messages = signal<Messages>({});
 
-  ngOnInit() {
-    this.isShown.set(this.isShownInitially());
-  }
-
-  private readonly onSuccess = (message: string) => {
+  private onSuccess(message: string) {
     this.messages.set({success: [message]});
     this.form.markAsUntouched();
     this.form.markAsPristine();
   }
 
-  private readonly create = (request: CustomerCreateRequest) => {
+  private create(request: CustomerCreateRequest) {
     this.customerService.create(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Customer has been created successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
-  private readonly edit = (request: CustomerEditRequest) => {
+  private edit(request: CustomerEditRequest) {
     this.customerService.edit(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Customer has been edited successfully."),
       error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
-  readonly addOtherDocument = (document?: CustomerOtherDocument) => {
+  addOtherDocument(document?: CustomerOtherDocument) {
     this.otherDocuments().push(this.formBuilder.group({
       issuedBy: [document?.issuedBy || getDefaultIsoCountry().code, [Validators.required]],
       type: [document?.type || "", [Validators.required, Validators.maxLength(70)]],
@@ -102,7 +106,7 @@ export class CustomerManagementComponent implements OnInit {
     this.form.markAsDirty();
   }
 
-  readonly getErrorMessage = (field: string): string | null => {
+  getErrorMessage(field: string): string | null {
     const parts = field.split(".");
     let control: AbstractControl<any, any> | null = null;
 
@@ -110,7 +114,9 @@ export class CustomerManagementComponent implements OnInit {
       control = control ? control.get(part) : this.form.get(part);
     }
 
-    if (!control || !control.touched || !control.invalid) return "";
+    if (!control || !control.touched || !control.invalid) {
+      return "";
+    }
 
     const name = this.textService.capitalize(field);
 
@@ -125,10 +131,12 @@ export class CustomerManagementComponent implements OnInit {
     return null;
   }
 
-  readonly getOtherDocumentErrorMessage = (index: number, field: string) => {
+  getOtherDocumentErrorMessage(index: number, field: string) {
     const control = this.otherDocuments().at(index).get(field);
 
-    if (!control || !control.touched || !control.invalid) return "";
+    if (!control || !control.touched || !control.invalid) {
+      return "";
+    }
 
     const name = this.textService.capitalize(field);
 
@@ -143,23 +151,23 @@ export class CustomerManagementComponent implements OnInit {
     return null;
   }
 
-  readonly hide = () => {
+  hide() {
     this.messages.set({});
     this.isShown.set(false);
     this.form.reset();
     this.otherDocuments().clear();
   }
 
-  readonly otherDocuments = (): FormArray => {
+  otherDocuments(): FormArray {
     return this.form.get("otherDocuments") as FormArray;
   }
 
-  readonly removeOtherDocument = (index: number) => {
+  removeOtherDocument(index: number) {
     this.otherDocuments().removeAt(index);
     this.form.markAsDirty();
   }
 
-  readonly save = () => {
+  save() {
     if (!this.form.valid) {
       this.messages.set({error: ["Please fill out the form."]});
       return;
@@ -167,18 +175,18 @@ export class CustomerManagementComponent implements OnInit {
 
     const request: CustomerCreateRequest = {
       customer: {
-        birthdate: this.form.value.birthdate,
-        email: this.form.value.email,
-        firstName: this.form.value.firstName,
-        lastName: this.form.value.lastName,
+        birthdate: this.form.value.birthdate!,
+        email: this.form.value.email || undefined,
+        firstName: this.form.value.firstName!,
+        lastName: this.form.value.lastName!,
         identityDocument: {
-          issuedBy: this.form.value.identityDocument.issuedBy,
-          number: this.form.value.identityDocument.number,
-          type: this.form.value.identityDocument.type,
-          value: this.form.value.identityDocument.value
+          issuedBy: this.form.value.identityDocument!.issuedBy!,
+          number: this.form.value.identityDocument!.number!,
+          type: this.form.value.identityDocument!.type!,
+          value: this.form.value.identityDocument!.value || undefined
         },
-        otherDocuments: this.form.value.otherDocuments,
-        residenceCountry: this.form.value.residenceCountry
+        otherDocuments: this.form.value.otherDocuments as any,
+        residenceCountry: this.form.value.residenceCountry!
       },
       instanceId: this.instanceId()
     };
@@ -196,17 +204,17 @@ export class CustomerManagementComponent implements OnInit {
     }
   }
 
-  readonly show = (customer: Customer | null) => {
+  show(customer: Customer | null) {
     this.updateForm(customer);
     this.customer.set(customer);
     this.isShown.set(true);
   }
 
-  private readonly updateForm = (customer?: Customer | null) => {
+  private updateForm(customer?: Customer | null) {
     this.form.reset();
 
     if (customer != null) {
-      this.form.patchValue({...customer});
+      this.form.patchValue({...customer as any});
 
       if (customer.otherDocuments.length > 0) {
         customer.otherDocuments.forEach(it => this.addOtherDocument(it));

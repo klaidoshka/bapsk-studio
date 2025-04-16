@@ -8,7 +8,7 @@ export default interface VatReturnDeclaration {
   export?: VatReturnDeclarationExport;
   id: string;
   instanceId?: number;
-  isCanceled: boolean;
+  isCancelled: boolean;
   qrCodes: string[];
   saleId: number;
   state: SubmitDeclarationState;

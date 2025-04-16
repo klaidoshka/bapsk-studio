@@ -1,6 +1,6 @@
-import {Component, Signal, viewChild} from '@angular/core';
+import {Component, inject, viewChild} from '@angular/core';
 import {AuthService} from '../../service/auth.service';
-import {toUserFullName, User} from '../../model/user.model';
+import {toUserFullName} from '../../model/user.model';
 import {TableModule} from 'primeng/table';
 import {Role} from '../../model/role.model';
 import {getUserIsoCountryLabel} from "../../model/iso-country.model";
@@ -15,19 +15,15 @@ import {UserManagementComponent} from '../user-management/user-management.compon
   styles: ``
 })
 export class ProfileShowcaseComponent {
+  private readonly authService = inject(AuthService);
+
+  managementMenu = viewChild.required(UserManagementComponent);
+  user = this.authService.getUser();
+
   protected readonly getUserIsoCountryLabel = getUserIsoCountryLabel;
   protected readonly toUserFullName = toUserFullName;
 
-  managementMenu = viewChild.required(UserManagementComponent);
-  user!: Signal<User | undefined>;
-
-  constructor(
-    private authService: AuthService
-  ) {
-    this.user = this.authService.getUser();
-  }
-
-  readonly showManagement = () => {
+  showManagement() {
     if (this.user() == null) {
       return;
     }
@@ -35,7 +31,7 @@ export class ProfileShowcaseComponent {
     this.managementMenu().show(this.user());
   }
 
-  readonly toRoleString = (role: Role): string => {
+  toRoleString(role: Role): string {
     return Role[role];
   }
 }

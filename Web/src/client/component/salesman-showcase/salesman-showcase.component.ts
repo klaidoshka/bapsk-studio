@@ -1,4 +1,4 @@
-import {Component, input, signal, viewChild} from '@angular/core';
+import {Component, inject, input, signal, viewChild} from '@angular/core';
 import Salesman from '../../model/salesman.model';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
 import {SalesmanManagementComponent} from '../salesman-management/salesman-management.component';
@@ -26,6 +26,9 @@ import {getIsoCountryLabel} from '../../model/iso-country.model';
   styles: ``
 })
 export class SalesmanShowcaseComponent {
+  private readonly localizationService = inject(LocalizationService);
+  private readonly salesmanService = inject(SalesmanService);
+
   confirmationComponent = viewChild.required(ConfirmationComponent);
   instanceId = input.required<number>();
   managementMenu = viewChild.required(SalesmanManagementComponent);
@@ -33,13 +36,9 @@ export class SalesmanShowcaseComponent {
   previewMenu = viewChild.required(SalesmanPreviewComponent);
   salesmen = input.required<Salesman[]>();
 
-  constructor(
-    private salesmanService: SalesmanService,
-    private localizationService: LocalizationService
-  ) {
-  }
+  protected readonly getCountryLabel = getIsoCountryLabel;
 
-  readonly delete = (salesman: Salesman) => {
+  delete(salesman: Salesman) {
     this.confirmationComponent().request(() => {
       this.salesmanService.delete(this.instanceId(), salesman.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['Salesman deleted successfully']}),
@@ -48,12 +47,11 @@ export class SalesmanShowcaseComponent {
     });
   }
 
-  readonly showManagement = (salesman: Salesman | null) => {
+  showManagement(salesman: Salesman | null) {
     this.managementMenu().show(salesman);
   }
 
-  readonly showPreview = (salesman: Salesman) => {
+  showPreview(salesman: Salesman) {
     this.previewMenu().show(salesman);
   }
-  protected readonly getCountryLabel = getIsoCountryLabel;
 }

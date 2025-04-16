@@ -8,14 +8,11 @@ import ErrorResponse, {ErrorResponseDetails} from '../model/error-response.model
 export class LocalizationService {
   private readonly defaultErrorMessage = 'Extremely rare error occurred, please try again later.';
 
-  constructor() {
-  }
-
-  readonly resolveHttpErrorResponseTo = (response: any, messages: WritableSignal<Messages>) => {
+  resolveHttpErrorResponseTo(response: any, messages: WritableSignal<Messages>) {
     messages.set({error: this.resolveError(response)});
   }
 
-  readonly resolveError = (error: any): string[] => {
+  resolveError(error: any): string[] {
     if (error instanceof Error) {
       return [error.message];
     } else if (typeof error === 'string') {

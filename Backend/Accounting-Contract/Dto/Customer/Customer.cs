@@ -10,7 +10,7 @@ public class Customer
     public int? Id { get; set; }
     public CustomerIdentityDocument IdentityDocument { get; set; } = new();
     public string LastName { get; set; } = String.Empty;
-    public IEnumerable<CustomerOtherDocument> OtherDocuments { get; set; } = new List<CustomerOtherDocument>();
+    public IList<CustomerOtherDocument> OtherDocuments { get; set; } = new List<CustomerOtherDocument>();
     public IsoCountryCode ResidenceCountry { get; set; } = IsoCountryCode.LT;
 }
 
