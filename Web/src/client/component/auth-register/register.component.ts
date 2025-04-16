@@ -1,6 +1,6 @@
 import {Component, inject, signal} from "@angular/core";
 import {FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators} from "@angular/forms";
-import {RouterLink} from "@angular/router";
+import {Router, RouterLink} from "@angular/router";
 import {AutoCompleteCompleteEvent, AutoCompleteModule} from "primeng/autocomplete";
 import {ButtonModule} from "primeng/button";
 import {DatePicker} from "primeng/datepicker";
@@ -14,6 +14,8 @@ import {getDefaultIsoCountry, IsoCountries, IsoCountry} from '../../model/iso-co
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import Messages from '../../model/messages.model';
 import {LocalizationService} from '../../service/localization.service';
+import {Password} from 'primeng/password';
+import {MessageService} from 'primeng/api';
 
 @Component({
   selector: "auth-register",
@@ -26,13 +28,16 @@ import {LocalizationService} from '../../service/localization.service';
     InputText,
     DatePicker,
     ReactiveFormsModule,
-    MessagesShowcaseComponent
+    MessagesShowcaseComponent,
+    Password
   ]
 })
 export class RegisterComponent {
   private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly localizationService = inject(LocalizationService);
+  private readonly messageService = inject(MessageService);
+  private readonly router = inject(Router);
   private readonly textService = inject(TextService);
 
   filteredCountries: IsoCountry[] = [];
@@ -55,7 +60,7 @@ export class RegisterComponent {
       const password = this.registerForm?.get("password")?.value;
 
       if (password !== confirmPassword) {
-        return {passwordConfirmed: true};
+        return { passwordConfirmed: true };
       }
 
       return null;
@@ -102,7 +107,7 @@ export class RegisterComponent {
     }
 
     if (this.registerForm.invalid) {
-      this.messages.set({error: ["Please fill out all required fields correctly."] });
+      this.messages.set({ error: ["Please fill out all required fields correctly."] });
       return;
     }
 
@@ -119,12 +124,18 @@ export class RegisterComponent {
 
     this.authService.register(request).subscribe({
       next: (response) => {
-        this.messages.set({success: ["Registration successful!"]});
+        this.registerForm.reset();
+        this.messages.set({ success: ["Registration successful!"] });
 
-        if (response) {
-          this.authService.acceptAuthResponse(response);
-        }
+        this.messageService.add({
+          key: "root",
+          summary: "Logged In",
+          detail: "You have successfully registered",
+          severity: "success"
+        });
 
+        this.authService.acceptAuthResponse(response);
+        this.router.navigate(["/"]);
         this.isSubmitting.set(false);
       },
       error: (response: ErrorResponse) => {

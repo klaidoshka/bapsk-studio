@@ -7,15 +7,7 @@
 >
 
   <!-- Display messages if any -->
-  @if (messages().length > 0) {
-    <div class="mb-4">
-      <ul class="list-disc list-inside text-red-500">
-        @for (message of messages(); track $index) {
-          <li>{{ message }}</li>
-        }
-      </ul>
-    </div>
-  }
+  <messages-showcase [messages]="messages()"/>
 
   <!-- Email Input -->
   <div class="form-field">
@@ -30,7 +22,6 @@
       formControlName="email"
       pInputText
       class="mt-1 block w-full p-2 bg-surface-50"
-      required
     />
 
     @if (getErrorMessage('email'); as emailInvalid) {
@@ -47,13 +38,14 @@
       class="block text-sm font-medium"
     >Password</label>
 
-    <input
-      type="password"
+    <p-password
       id="password"
       formControlName="password"
-      pInputText
-      class="bg-surface-50 mt-1 block w-full p-2"
-      required
+      class="bg-surface-50 mt-1 block w-full!"
+      inputStyleClass="w-full"
+      styleClass="w-full"
+      toggleMask="true"
+      feedback="false"
     />
 
     @if (getErrorMessage('password'); as passwordInvalid) {

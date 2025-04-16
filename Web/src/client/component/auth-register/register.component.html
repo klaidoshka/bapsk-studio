@@ -43,12 +43,14 @@
     <!-- Password -->
     <div class="form-field">
       <label for="password" class="block text-sm font-medium">Password</label>
-      <input
-        type="password"
+      <p-password
         id="password"
         formControlName="password"
-        pInputText
-        class="bg-surface-50 mt-1 block w-full p-2"
+        class="bg-surface-50 mt-1 block w-full!"
+        inputStyleClass="w-full"
+        styleClass="w-full"
+        toggleMask="true"
+        feedback="false"
       />
       @if (getErrorMessage('password'); as passwordInvalid) {
         <div class="text-xs text-red-500 mt-1">
@@ -60,12 +62,14 @@
     <!-- Confirm Password -->
     <div class="form-field">
       <label for="confirmPassword" class="block text-sm font-medium">Confirm Password</label>
-      <input
-        type="password"
+      <p-password
         id="confirmPassword"
         formControlName="confirmPassword"
-        pInputText
-        class="bg-surface-50 mt-1 block w-full p-2"
+        class="bg-surface-50 mt-1 block w-full!"
+        inputStyleClass="w-full"
+        styleClass="w-full"
+        toggleMask="true"
+        feedback="false"
       />
       @if (getErrorMessage('confirmPassword'); as passwordInvalid) {
         <div class="text-xs text-red-500 mt-1">
