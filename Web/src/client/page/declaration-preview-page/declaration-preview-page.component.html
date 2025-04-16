@@ -119,13 +119,13 @@
             let-soldGood
           >
             <tr>
-              <td class="p-2">{{ soldGood.sequenceNo }}</td>
+              <td class="p-2"><p class="text-right">{{ soldGood.sequenceNo }}</p></td>
               <td class="p-2">{{ soldGood.description }}</td>
-              <td class="p-2">{{ soldGood.quantity }}</td>
+              <td class="p-2"><p class="text-right">{{ soldGood.quantity }}</p></td>
               <td class="p-2">{{ soldGood.unitOfMeasure }}</td>
-              <td class="p-2">{{ soldGood.taxableAmount / soldGood.quantity | round:2 | currency:'EUR':'symbol':'1.2-2' }}</td>
-              <td class="p-2">{{ soldGood.vatAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }} ({{ soldGood.vatRate | round:2 }}%)</td>
-              <td class="p-2">{{ soldGood.totalAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}</td>
+              <td class="p-2"><p class="text-right">{{ soldGood.taxableAmount / soldGood.quantity | round:2 | currency:'EUR':'symbol':'1.2-2' }}</p></td>
+              <td class="p-2"><p class="text-right">{{ soldGood.vatAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }} ({{ soldGood.vatRate | round:2 }}%)</p></td>
+              <td class="p-2"><p class="text-right">{{ soldGood.totalAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}</p></td>
             </tr>
           </ng-template>
         </p-table>
