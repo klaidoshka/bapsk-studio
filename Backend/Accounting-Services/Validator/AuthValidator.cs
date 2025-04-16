@@ -67,39 +67,47 @@ public class AuthValidator : IAuthValidator
 
         if (request.ResetPasswordToken is not null)
         {
-            var token = _encryptService.DecryptAsync(request.ResetPasswordToken!, _email.ResetPassword.Secret);
-            var tokenParts = token.Result.Split('|');
-            
-            if (tokenParts.Length != 3)
+            try
             {
-                return new("Invalid reset password token.");
-            }
-            
-            if (!Int32.TryParse(tokenParts[0], out var userId))
-            {
-                return new("Invalid reset password token.");
-            }
-            
-            if (!DateTime.TryParse(tokenParts[2], out var expirationDate))
-            {
-                return new("Invalid reset password token.");
-            }
-            
-            if (expirationDate < DateTime.UtcNow)
-            {
-                return new("Reset password token expired.");
-            }
-            
-            var user = await _database.Users.FirstOrDefaultAsync(
-                u => u.Id == userId && u.EmailNormalized.Equals(tokenParts[1], StringComparison.InvariantCultureIgnoreCase)
-            );
-            
-            if (user is null || user.IsDeleted)
-            {
-                return new("Requested account does not exist.");
-            }
 
-            return new((null, user));
+                var token = _encryptService.DecryptAsync(request.ResetPasswordToken!, _email.ResetPassword.Secret);
+                var tokenParts = token.Result.Split('|');
+
+                if (tokenParts.Length != 3)
+                {
+                    return new("Invalid reset password token.");
+                }
+
+                if (!Int32.TryParse(tokenParts[0], out var userId))
+                {
+                    return new("Invalid reset password token.");
+                }
+
+                if (!DateTime.TryParse(tokenParts[2], out var expirationDate))
+                {
+                    return new("Invalid reset password token.");
+                }
+
+                if (expirationDate < DateTime.UtcNow)
+                {
+                    return new("Reset password token expired.");
+                }
+
+                var user = await _database.Users.FirstOrDefaultAsync(
+                    u => u.Id == userId && u.EmailNormalized.Equals(tokenParts[1], StringComparison.InvariantCultureIgnoreCase)
+                );
+
+                if (user is null || user.IsDeleted)
+                {
+                    return new("Requested account does not exist.");
+                }
+
+                return new((null, user));
+            }
+            catch (Exception)
+            {
+                return new("Invalid reset password token.");
+            }
         }
         
         var userRequester = await _database.Users.FirstOrDefaultAsync(

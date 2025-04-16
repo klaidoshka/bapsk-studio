@@ -28,7 +28,7 @@ public class ResetPasswordRequest : IEmailForm
 
     public ResetPasswordRequest(string token, string endpoint)
     {
-        Body = BuildBody(token, endpoint);
+        Body = BuildBody(Uri.EscapeDataString(token), endpoint);
         Subject = "Reset Password Request";
     }
 

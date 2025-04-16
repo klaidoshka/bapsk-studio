@@ -1,5 +1,5 @@
 import {Component, inject, signal} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, RouterLink} from '@angular/router';
 import {AuthService} from '../../service/auth.service';
 import {FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
 import Messages from '../../model/messages.model';
@@ -9,6 +9,7 @@ import {rxResource} from '@angular/core/rxjs-interop';
 import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
 import {Password} from 'primeng/password';
 import {Button} from 'primeng/button';
+import {ProgressSpinner} from 'primeng/progressspinner';
 
 @Component({
   selector: 'reset-password-page',
@@ -16,7 +17,9 @@ import {Button} from 'primeng/button';
     ReactiveFormsModule,
     MessagesShowcaseComponent,
     Password,
-    Button
+    Button,
+    ProgressSpinner,
+    RouterLink
   ],
   templateUrl: './reset-password-page.component.html',
   styles: ``
@@ -83,7 +86,10 @@ export class ResetPasswordPageComponent {
       })
       .pipe(first())
       .subscribe({
-        next: () => this.messages.set({ success: ["Password changed successfully."] }),
+        next: () => {
+          this.form.reset();
+          this.messages.set({ success: ["Password changed successfully."] });
+        },
         error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
       })
   }
