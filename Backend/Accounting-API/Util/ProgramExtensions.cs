@@ -181,8 +181,6 @@ public static class ProgramExtensions
         var stiRouteGroup = accountingRouteGroup
             .MapGroup("/sti");
 
-        stiRouteGroup.MapStiEndpoints();
-
         stiRouteGroup
             .MapGroup("/vat-return")
             .MapVatReturnEndpoints();

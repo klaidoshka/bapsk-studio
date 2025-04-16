@@ -54,7 +54,7 @@
             class="mt-1 block w-fit"
             required
             appendTo="body"
-          ></p-datepicker>
+          />
           @if (getErrorMessage("birthdate"); as error) {
             <div class="text-xs text-red-500 mt-1">{{ error }}</div>
           }
@@ -82,7 +82,7 @@
             optionValue="code"
             class="mt-1 block w-full"
             appendTo="body"
-          ></p-select>
+          />
           @if (getErrorMessage("residenceCountry"); as error) {
             <div class="text-xs text-red-500 mt-1">{{ error }}</div>
           }
@@ -100,7 +100,7 @@
               optionLabel="label"
               id="identityDocumentType"
               class="mt-1 block w-full"
-            ></p-select>
+            />
             @if (getErrorMessage("identityDocument.type"); as error) {
               <div class="text-xs text-red-500 mt-1">{{ error }}</div>
             }
@@ -116,7 +116,7 @@
               optionValue="code"
               class="mt-1 block w-full"
               appendTo="body"
-            ></p-select>
+            />
             @if (getErrorMessage("identityDocument.issuedBy"); as error) {
               <div class="text-xs text-red-500 mt-1">{{ error }}</div>
             }
@@ -171,7 +171,7 @@
                 optionValue="code"
                 class="mt-1 block w-full"
                 appendTo="body"
-              ></p-select>
+              />
               <div *ngIf="getOtherDocumentErrorMessage(i, 'issuedBy')" class="text-xs text-red-500 mt-1">
                 {{ getOtherDocumentErrorMessage(i, 'issuedBy') }}
               </div>

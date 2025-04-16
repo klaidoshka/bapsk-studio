@@ -7,7 +7,7 @@ type CachedValue<V> = V & {
 export class CacheService<K, V> {
   private readonly store = new BehaviorSubject<Map<K, CachedValue<V>>>(new Map());
 
-  constructor(private idMapper: (value: V) => K) {
+  constructor(private idMapper?: (value: V) => K) {
   }
 
   delete(key: K) {
@@ -61,10 +61,18 @@ export class CacheService<K, V> {
   }
 
   set(value: V) {
+    if (!this.idMapper) {
+      throw new Error('idMapper is not set');
+    }
+
+    this.setToKey(this.idMapper(value), value);
+  }
+
+  setToKey(key: K, value: V) {
     const updated = new Map(this.store.value);
 
     updated.set(
-      this.idMapper(value),
+      key,
       {
         ...value,
         __isInvalidated__: false
@@ -85,9 +93,15 @@ export class CacheService<K, V> {
       }
     }
 
+    if (setValues.length > 0) {
+      if (!this.idMapper) {
+        throw new Error('idMapper is not set');
+      }
+    }
+
     for (const value of setValues) {
       updated.set(
-        this.idMapper(value),
+        this.idMapper!(value),
         {
           ...value,
           __isInvalidated__: false

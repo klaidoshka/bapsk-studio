@@ -11,6 +11,7 @@ public class VatReturnRequirement(VatReturnRequirement.CrudOperation operation) 
         Cancel,
         Create,
         GetBySaleId,
+        SubmitPayment,
         UpdateInfo
     }
 }

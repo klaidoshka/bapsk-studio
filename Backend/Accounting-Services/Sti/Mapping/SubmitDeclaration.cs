@@ -74,7 +74,7 @@ public static class SubmitDeclaration
     }
 
     private static OtherDocument_Type[] ToExternalType(
-        this IReadOnlyList<SubmitDeclarationOtherDocument> documents
+        this IList<SubmitDeclarationOtherDocument> documents
     )
     {
         return documents
@@ -141,7 +141,7 @@ public static class SubmitDeclaration
     }
 
     private static SalesDocument_Type[] ToExternalType(
-        this IReadOnlyList<SubmitDeclarationSalesDocument> documents
+        this IList<SubmitDeclarationSalesDocument> documents
     )
     {
         return documents
@@ -157,7 +157,7 @@ public static class SubmitDeclaration
             .ToArray();
     }
 
-    private static GoodsItem_Type[] ToExternalType(this IReadOnlyList<SubmitDeclarationGoods> goods)
+    private static GoodsItem_Type[] ToExternalType(this IList<SubmitDeclarationGoods> goods)
     {
         return goods
             .Select(

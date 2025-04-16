@@ -29,7 +29,7 @@ public class StiVatReturnDeclaration
     /// external requests.
     /// </summary>
     public int? DeclaredById { get; set; }
-    
+
     /// <summary>
     /// Navigation property to Export entity.
     /// May not exist, if the declaration's goods are not yet assessed for export.
@@ -63,6 +63,11 @@ public class StiVatReturnDeclaration
     /// Marks the declaration as canceled.
     /// </summary>
     public bool IsCancelled { get; set; }
+    
+    /// <summary>
+    /// Navigation property for the VAT return payments of this declaration.
+    /// </summary>
+    public ICollection<StiVatReturnDeclarationPayment> Payments { get; set; } = new List<StiVatReturnDeclarationPayment>();
 
     /// <summary>
     /// Navigation property for the QR codes of this declaration.

@@ -1,6 +1,7 @@
 using Accounting.API.AuthorizationHandler.Requirement;
 using Accounting.API.Util;
 using Accounting.Contract.Dto.Sti.VatReturn;
+using Accounting.Contract.Dto.Sti.VatReturn.Payment;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -46,18 +47,6 @@ public static class VatReturnEndpoints
             );
 
         builder
-            .MapGet(
-                "{saleId:int}",
-                async (
-                    int saleId,
-                    IVatReturnService vatReturnService
-                ) => Results.Json((await vatReturnService.GetBySaleIdAsync(saleId))?.ToDto())
-            )
-            .RequireAuthorization(
-                o => o.AddRequirements(new VatReturnRequirement(VatReturnRequirement.CrudOperation.GetBySaleId))
-            );
-
-        builder
             .MapPost(
                 "/{saleId:int}/update",
                 async (
@@ -77,6 +66,36 @@ public static class VatReturnEndpoints
             )
             .RequireAuthorization(
                 o => o.AddRequirements(new VatReturnRequirement(VatReturnRequirement.CrudOperation.UpdateInfo))
+            );
+
+        builder
+            .MapPost(
+                "/{saleId:int}/payment",
+                async (
+                    int saleId,
+                    [FromBody] IList<PaymentInfo> payments,
+                    IVatReturnService vatReturnService
+                ) =>
+                {
+                    await vatReturnService.SubmitPaymentInfoAsync(saleId, payments);
+
+                    return Results.Ok();
+                }
+            )
+            .RequireAuthorization(
+                o => o.AddRequirements(new VatReturnRequirement(VatReturnRequirement.CrudOperation.SubmitPayment))
+            );
+
+        builder
+            .MapGet(
+                "{saleId:int}",
+                async (
+                    int saleId,
+                    IVatReturnService vatReturnService
+                ) => Results.Json((await vatReturnService.GetBySaleIdAsync(saleId))?.ToDto())
+            )
+            .RequireAuthorization(
+                o => o.AddRequirements(new VatReturnRequirement(VatReturnRequirement.CrudOperation.GetBySaleId))
             );
 
         builder

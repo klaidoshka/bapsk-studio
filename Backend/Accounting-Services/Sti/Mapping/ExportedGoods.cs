@@ -65,7 +65,7 @@ public static class ExportedGoods
         };
     }
 
-    private static IReadOnlyList<ExportedGoodsVerifiedGoods> ToInternalType(
+    private static IList<ExportedGoodsVerifiedGoods> ToInternalType(
         this VerifiedGoods_Type[] goods
     )
     {
@@ -95,7 +95,7 @@ public static class ExportedGoods
         };
     }
 
-    private static IReadOnlyList<ExportedGoodsStiAssessmentResultCondition> ToInternalType(
+    private static IList<ExportedGoodsStiAssessmentResultCondition> ToInternalType(
         this STIAssessmentResults_TypeCondition[] conditions
     )
     {

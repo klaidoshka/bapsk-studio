@@ -1,0 +1,103 @@
+<div>
+  <confirmation
+    [key]="'submit-confirmation'"
+    [header]="'Are you sure? No later changes can be made!'"
+  />
+
+  <messages-showcase [messages]="messages()"/>
+
+  <form [formGroup]="form">
+    <div formArrayName="payments" class="w-fit space-y-2">
+      <div
+        *ngFor="let payment of getFormPayments().controls; let i = index" [formGroupName]="i"
+        class="flex flex-row gap-4 items-center justify-between"
+      >
+        <!-- Type Dropdown -->
+        <div class="flex-1">
+          <label
+            for="type"
+            class="block text-sm font-medium"
+          >Payment Type</label>
+
+          <p-select
+            inputId="type"
+            formControlName="type"
+            [options]="types"
+            optionLabel="label"
+            optionValue="id"
+            class="mt-1 block w-full min-w-24 max-w-32"
+            appendTo="body"
+          />
+        </div>
+
+        <!-- Amount Input -->
+        <div class="flex-1">
+          <label
+            for="amount"
+            class="block text-sm font-medium"
+          >Amount</label>
+
+          <p-input-number
+            inputId="amount"
+            formControlName="amount"
+            currency="EUR"
+            mode="currency"
+            [min]="0"
+            [showButtons]="true"
+            [step]="0.05"
+            inputStyleClass="w-32"
+            class="mt-1 w-32"
+          />
+        </div>
+
+        <!-- Date Input -->
+        <div class="flex-1">
+          <label
+            for="date"
+            class="block text-sm font-medium"
+          >Date</label>
+
+          <p-datepicker
+            inputId="date"
+            formControlName="date"
+            [showIcon]="true"
+            [showTime]="true"
+            variant="filled"
+            inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-inherit!"
+            class="mt-1 block w-48"
+            appendTo="body"
+          />
+        </div>
+
+        <!-- Remove Button -->
+        <div *ngIf="getFormPayments().length > 1" class="self-end">
+          <p-button
+            variant="text"
+            icon="pi pi-trash"
+            type="button"
+            (click)="removePaymentInfo(i)"
+          />
+        </div>
+      </div>
+
+      <!-- Add Payment Info Button -->
+      <div class="mt-4">
+        <p-button
+          label="Add Payment Info"
+          icon="pi pi-plus"
+          type="button"
+          (click)="addFormPaymentInfo()"
+        />
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="flex w-full justify-end items-center mt-2">
+      <p-button
+        label="Submit Payments"
+        type="button"
+        (onClick)="submit()"
+      />
+    </div>
+  </form>
+</div>

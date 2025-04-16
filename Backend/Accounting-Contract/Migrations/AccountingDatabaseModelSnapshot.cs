@@ -666,6 +666,34 @@ namespace Accounting.Contract.Migrations
                     b.ToTable("StiVatReturnDeclarationExportVerifiedGoods");
                 });
 
+            modelBuilder.Entity("Accounting.Contract.Entity.StiVatReturnDeclarationPayment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("DeclarationId")
+                        .IsRequired()
+                        .HasColumnType("varchar(34)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeclarationId");
+
+                    b.ToTable("StiVatReturnDeclarationPayments");
+                });
+
             modelBuilder.Entity("Accounting.Contract.Entity.StiVatReturnDeclarationQrCode", b =>
                 {
                     b.Property<int>("Id")
@@ -1014,6 +1042,17 @@ namespace Accounting.Contract.Migrations
                     b.Navigation("Export");
                 });
 
+            modelBuilder.Entity("Accounting.Contract.Entity.StiVatReturnDeclarationPayment", b =>
+                {
+                    b.HasOne("Accounting.Contract.Entity.StiVatReturnDeclaration", "Declaration")
+                        .WithMany("Payments")
+                        .HasForeignKey("DeclarationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Declaration");
+                });
+
             modelBuilder.Entity("Accounting.Contract.Entity.StiVatReturnDeclarationQrCode", b =>
                 {
                     b.HasOne("Accounting.Contract.Entity.StiVatReturnDeclaration", "Declaration")
@@ -1067,6 +1106,8 @@ namespace Accounting.Contract.Migrations
             modelBuilder.Entity("Accounting.Contract.Entity.StiVatReturnDeclaration", b =>
                 {
                     b.Navigation("Export");
+
+                    b.Navigation("Payments");
 
                     b.Navigation("QrCodes");
                 });

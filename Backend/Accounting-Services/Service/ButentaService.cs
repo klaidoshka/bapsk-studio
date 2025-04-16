@@ -121,9 +121,11 @@ public class ButentaService : IButentaService
             .Include(it => it.Declaration)
             .ThenInclude(it => it.Export)
             .ThenInclude(it => it!.Conditions)
+            .Include(it => it.Declaration)
+            .ThenInclude(it => it.Payments)
+            .AsSplitQuery()
             .Where(it => it.Id == tradeId)
             .Select(it => it.Declaration)
-            .AsSplitQuery()
             .FirstOrDefaultAsync();
     }
 }

@@ -9,6 +9,7 @@ export default interface VatReturnDeclaration {
   id: string;
   instanceId?: number;
   isCancelled: boolean;
+  payments: VatReturnDeclarationPaymentInfo[];
   qrCodes: string[];
   saleId: number;
   state: SubmitDeclarationState;
@@ -33,6 +34,28 @@ export interface VatReturnDeclarationExport {
   verificationDate: Date;
   verificationResult: VatReturnDeclarationExportVerificationResult;
   verifiedSoldGoods: VatReturnDeclarationExportVerifiedSoldGoods[];
+}
+
+export interface VatReturnDeclarationPaymentInfo {
+  amount: number;
+  date: Date;
+  type: PaymentType;
+}
+
+export enum PaymentType {
+  Cash = 1,
+  Bank = 2,
+  Other = 3
+}
+
+export const PaymentTypes = [
+  { id: PaymentType.Cash, label: 'Cash' },
+  { id: PaymentType.Bank, label: 'Bank' },
+  { id: PaymentType.Other, label: 'Other' }
+]
+
+export const toPaymentTypeLabel = (type: PaymentType): string => {
+  return PaymentTypes.find(paymentType => paymentType.id === type)?.label || '';
 }
 
 export interface VatReturnDeclarationExportAssessmentCondition {

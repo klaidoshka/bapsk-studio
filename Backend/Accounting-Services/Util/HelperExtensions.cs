@@ -16,16 +16,10 @@ public static class HelperExtensions
         return @object;
     }
 
-    /// <summary>
-    /// Maps object to another form
-    /// </summary>
-    /// <param name="object">Object to map</param>
-    /// <param name="function">Function to apply</param>
-    /// <typeparam name="T">Initial object type</typeparam>
-    /// <typeparam name="TResult">Result type</typeparam>
-    /// <returns>Result of function</returns>
-    public static TResult Let<T, TResult>(this T @object, Func<T, TResult> function)
+    public static string Squash(this string text)
     {
-        return function(@object);
+        return text
+            .ReplaceLineEndings(String.Empty)
+            .Replace("\t", String.Empty);
     }
 }
