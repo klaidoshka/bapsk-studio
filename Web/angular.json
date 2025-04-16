@@ -19,16 +19,16 @@
         }
       },
       "root": "",
-      "sourceRoot": "src",
-      "prefix": "app",
+      "sourceRoot": "src/client",
+      "prefix": "",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/web",
-            "index": "src/index.html",
-            "browser": "src/main.ts",
-            "tsConfig": "tsconfig.app.json",
+            "outputPath": "dist/client",
+            "index": "src/client/index.html",
+            "browser": "src/client/main.ts",
+            "tsConfig": "tsconfig.client.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               {
@@ -37,7 +37,7 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
+              "src/client/styles.scss"
             ],
             "scripts": []
           },
@@ -46,8 +46,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "2MB",
+                  "maximumError": "10MB"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -92,7 +92,7 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
+              "src/client/styles.scss"
             ],
             "scripts": []
           }

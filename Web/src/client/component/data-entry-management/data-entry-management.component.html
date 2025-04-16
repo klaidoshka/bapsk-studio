@@ -1,0 +1,56 @@
+<p-dialog
+  *ngIf="dataType() !== undefined"
+  header="Data Entry Management"
+  closeOnEscape="true"
+  modal="true"
+  styleClass="min-w-128"
+  closable="true"
+  [(visible)]="isShown"
+  (onHide)="hide()"
+  (close)="hide()"
+>
+  <div class="min-w-128">
+    <messages-showcase [messages]="messages()"/>
+
+    <div
+      class="grid grid-cols-1 gap-4"
+      [formGroup]="form"
+    >
+      @for (field of formFields; track $index) {
+        @let isReferenceField = field.type === FieldType.Reference;
+
+        <div class="flex flex-col gap-1">
+          <label
+            [for]="field.field"
+            class="block text-sm font-medium"
+          >{{ field.field }}</label>
+
+          @if (isReferenceField) {
+            <p-select
+              placeholder="Select referenced entry" [options]="getDataEntries(field.referenceId)()"
+              optionLabel="label" optionValue="id" appendTo="body" [formControl]="field.control"
+              class="w-full" [required]="field.isRequired!"
+            />
+          }
+          @else {
+            <data-type-entry-field-input
+              [formControl]="field.control" [type]="field.type" [required]="field.isRequired!"
+            />
+          }
+
+          @if (getErrorMessage(field.field); as error) {
+            <div class="text-xs text-red-500 mt-1">{{ error }}</div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="flex justify-end mt-4">
+      <p-button
+        [label]="dataEntry() === undefined ? 'Create' : 'Save'"
+        [disabled]="form.invalid || !form.dirty"
+        (onClick)="save()"
+      ></p-button>
+    </div>
+  </div>
+</p-dialog>

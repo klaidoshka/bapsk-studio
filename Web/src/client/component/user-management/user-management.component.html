@@ -1,0 +1,163 @@
+<p-dialog
+  header="User Management"
+  closeOnEscape="true"
+  modal="true"
+  styleClass="min-w-128"
+  closable="true"
+  [(visible)]="isShown"
+  (onHide)="hide()"
+  (close)="hide()"
+>
+  <div class="min-w-128">
+    <messages-showcase [messages]="messages()"/>
+
+    @if (isFormSet()) {
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 gap-4"
+        [formGroup]="form"
+      >
+        <!-- First Name -->
+        <div class="form-field">
+          <label
+            for="firstName"
+            class="block text-sm font-medium"
+          >First Name</label>
+          <input
+            type="text"
+            id="firstName"
+            formControlName="firstName"
+            pInputText
+            class="bg-surface-50 mt-1 block w-full p-2 border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            required
+          />
+          @if (getErrorMessage('firstName'); as firstNameInvalid) {
+            <div class="text-xs text-red-500 mt-1">
+              {{ firstNameInvalid }}
+            </div>
+          }
+        </div>
+
+        <!-- Last Name -->
+        <div class="form-field">
+          <label
+            for="lastName"
+            class="block text-sm font-medium"
+          >Last Name</label>
+          <input
+            type="text"
+            id="lastName"
+            formControlName="lastName"
+            pInputText
+            class="bg-surface-50 mt-1 block w-full p-2 border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            required
+          />
+          @if (getErrorMessage('lastName'); as lastNameInvalid) {
+            <div class="text-xs text-red-500 mt-1">
+              {{ lastNameInvalid }}
+            </div>
+          }
+        </div>
+
+        <!-- Birth Date -->
+        <div class="form-field">
+          <label
+            for="birthDate"
+            class="block text-sm font-medium"
+          >Birthdate</label>
+          <p-datepicker
+            inputId="birthDate"
+            formControlName="birthDate"
+            [showIcon]="true"
+            variant="filled"
+            inputStyleClass="p-2 rounded-md"
+            class="bg-surface-50 mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            required
+            appendTo="body"
+          ></p-datepicker>
+          @if (getErrorMessage('birthDate'); as birthDateInvalid) {
+            <div class="text-xs text-red-500 mt-1">
+              {{ birthDateInvalid }}
+            </div>
+          }
+        </div>
+
+        <!-- Email -->
+        <div class="form-field">
+          <label
+            for="email"
+            class="block text-sm font-medium"
+          >Email</label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            pInputText
+            class="bg-surface-50 mt-1 block w-full p-2 border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            required
+          />
+          @if (getErrorMessage('email'); as emailInvalid) {
+            <div class="text-xs text-red-500 mt-1">
+              {{ emailInvalid }}
+            </div>
+          }
+        </div>
+
+        @if (user() == null) {
+          <!-- Password -->
+          <div class="form-field">
+            <label
+              for="password"
+              class="block text-sm font-medium"
+            >Password</label>
+            <input
+              type="password"
+              id="password"
+              formControlName="password"
+              pInputText
+              class="bg-surface-50 mt-1 block w-full p-2 border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              required
+            />
+            @if (getErrorMessage('password'); as passwordInvalid) {
+              <div class="text-xs text-red-500 mt-1">
+                {{ passwordInvalid }}
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Country Dropdown -->
+        <div class="form-field">
+          <label
+            for="country"
+            class="block text-sm font-medium"
+          >Country</label>
+          <p-autocomplete
+            inputId="country"
+            formControlName="country"
+            optionLabel="name"
+            placeholder="Select a Country"
+            [dropdown]="true"
+            [suggestions]="filteredCountries"
+            (completeMethod)="filterCountries($event)"
+            class="bg-surface-50 mt-1 block w-full border border-surface-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+            required
+            appendTo="body"
+          ></p-autocomplete>
+          @if (getErrorMessage('country'); as countryInvalid) {
+            <div class="text-xs text-red-500 mt-1">
+              {{ countryInvalid }}
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="flex justify-end mt-4">
+        <p-button
+          [label]="user() == null ? 'Create' : 'Save'"
+          [disabled]="!form.valid || !form.dirty"
+          (onClick)="save()"
+        ></p-button>
+      </div>
+    }
+  </div>
+</p-dialog>
