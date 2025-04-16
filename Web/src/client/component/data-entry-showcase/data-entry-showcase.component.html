@@ -30,23 +30,20 @@
     <p-button
       label="Create"
       icon="pi pi-plus"
-      type="button"
       (onClick)="manage()"
     />
 
     <p-button
-      class="ml-1"
+      class="ml-2"
       label="Import"
       icon="pi pi-file-import"
-      type="button"
       (onClick)="showImporting.set(true)"
     />
 
     <p-button
-      class="ml-1"
+      class="ml-2"
       label="Import Configurations"
       icon="pi pi-eye"
-      type="button"
       routerLink="../import-configuration"
       [queryParams]="{dataTypeId: dataType().id}"
     />
