@@ -10,5 +10,5 @@ public class ExportedGoodsCustomsVerificationResult
     public required string DocumentId { get; set; }
     public required DateTime VerificationDate { get; set; }
     public required StiVatReturnDeclarationExportVerificationResult VerificationResult { get; set; }
-    public required IReadOnlyList<ExportedGoodsVerifiedGoods> VerifiedGoods { get; set; }
+    public required IList<ExportedGoodsVerifiedGoods> VerifiedGoods { get; set; }
 }

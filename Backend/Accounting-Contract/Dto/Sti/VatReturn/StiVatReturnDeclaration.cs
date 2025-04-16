@@ -1,4 +1,5 @@
 using Accounting.Contract.Dto.Sti.VatReturn.ExportedGoods;
+using Accounting.Contract.Dto.Sti.VatReturn.Payment;
 using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
 
 namespace Accounting.Contract.Dto.Sti.VatReturn;
@@ -11,6 +12,7 @@ public class StiVatReturnDeclaration
     public string Id { get; set; }
     public int? InstanceId { get; set; }
     public bool IsCancelled { get; set; }
+    public IList<PaymentInfo> Payments { get; set; }
     public IList<string> QrCodes { get; set; }
     public int SaleId { get; set; }
     public SubmitDeclarationState? State { get; set; }
@@ -29,6 +31,9 @@ public static class StiVatReturnDeclarationExtensions
             Id = declaration.Id,
             InstanceId = declaration.InstanceId,
             IsCancelled = declaration.IsCancelled,
+            Payments = declaration.Payments
+                .Select(it => it.ToDto())
+                .ToList(),
             QrCodes = declaration.QrCodes
                 .Select(it => it.Value)
                 .ToList(),

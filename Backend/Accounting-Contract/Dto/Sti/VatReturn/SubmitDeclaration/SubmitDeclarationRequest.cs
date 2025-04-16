@@ -17,13 +17,11 @@ public static class SubmitDeclarationRequestExtensions
         this Entity.StiVatReturnDeclaration declaration,
         NonEuCountryCode customerResidenceCountry,
         string requestId,
-        StiVatReturn vatReturnConfiguration
+        StiVatReturn vatReturnConfiguration,
+        DateTime date,
+        TimeZoneInfo timeZone
     )
     {
-        var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Vilnius");
-        var now = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZone);
-        var nowNoMillis = DateTime.Parse(now.ToString("yyyy-MM-ddTHH:mm:ss"));
-
         var customerIdentityDocument = new SubmitDeclarationIdentityDocument
         {
             DocumentNo = new()
@@ -116,7 +114,7 @@ public static class SubmitDeclarationRequestExtensions
                 Header = new SubmitDeclarationDocumentHeader
                 {
                     Affirmation = SubmitDeclarationDocumentHeaderAffirmation.Y,
-                    CompletionDate = now.Date,
+                    CompletionDate = date.Date,
                     DocumentCorrectionNo = declaration.Correction,
                     DocumentId = declaration.Id
                 },
@@ -131,7 +129,7 @@ public static class SubmitDeclarationRequestExtensions
             RequestId = requestId,
             SenderId = vatReturnConfiguration.Sender.Id,
             Situation = 1,
-            TimeStamp = nowNoMillis
+            TimeStamp = date
         };
     }
 }

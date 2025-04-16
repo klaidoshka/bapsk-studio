@@ -13,6 +13,7 @@ using Accounting.Contract.Dto.Sti;
 using Accounting.Contract.Dto.Sti.VatReturn;
 using Accounting.Contract.Dto.Sti.VatReturn.CancelDeclaration;
 using Accounting.Contract.Dto.Sti.VatReturn.ExportedGoods;
+using Accounting.Contract.Dto.Sti.VatReturn.Payment;
 using Accounting.Contract.Dto.Sti.VatReturn.Qr;
 using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
 using Accounting.Contract.Email;
@@ -221,26 +222,20 @@ public class VatReturnService : IVatReturnService
 
         if (declaration is null)
         {
-            throw new ValidationException("Couldn't find declaration to cancel.");
+            throw new ValidationException("Sale declaration was not found.");
         }
 
         if (declaration.IsCancelled)
         {
-            throw new ValidationException("Declaration is already canceled.");
+            throw new ValidationException("Declaration is already cancelled.");
         }
-
-        var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Vilnius");
 
         var clientRequest = new CancelDeclarationRequest
         {
             DocumentId = declaration.Id,
             RequestId = $"{Guid.NewGuid():N}",
             SenderId = _stiVatReturn.Sender.Id,
-            TimeStamp = DateTime.Parse(
-                TimeZoneInfo
-                    .ConvertTimeFromUtc(DateTime.UtcNow, timeZone)
-                    .ToString("yyyy-MM-ddTHH:mm:ss")
-            )
+            TimeStamp = DateUtil.StripMilliseconds(DateUtil.GetVilniusDateTime())
         };
 
         var clientResponse = await _stiVatReturnClientService.CancelDeclarationAsync(clientRequest);
@@ -275,28 +270,20 @@ public class VatReturnService : IVatReturnService
 
     public IList<string> GenerateQrCodes(StiVatReturnDeclaration declaration)
     {
-        var qrCodeDeclaration = declaration.ToQrCodeDocument();
+        var json = JsonSerializer
+            .Serialize(declaration.ToQrCodeDocument(), JsonOptions)
+            .Squash();
 
-        var json = QrGeneratorUtil.CleanUpBeforeGenerating(
-            JsonSerializer.Serialize(qrCodeDeclaration, JsonOptions)
-        );
-
-        var chunks = QrGeneratorUtil.CreateQrCodeEnvelopeChunks(json);
-
-        var qrCodes = chunks
+        return QrGeneratorUtil
+            .CreateQrCodeEnvelopeChunks(json)
             .Select(
-                it =>
-                {
-                    var chunkJson = QrGeneratorUtil.CleanUpBeforeGenerating(
-                        JsonSerializer.Serialize(it, JsonOptions)
-                    );
-
-                    return QrGeneratorUtil.GenerateQrCode(chunkJson);
-                }
+                it => QrGeneratorUtil.GenerateQrCode(
+                    JsonSerializer
+                        .Serialize(it, JsonOptions)
+                        .Squash()
+                )
             )
             .ToList();
-
-        return qrCodes;
     }
 
     public async Task<StiVatReturnDeclaration?> GetByPreviewCodeAsync(string code)
@@ -332,6 +319,7 @@ public class VatReturnService : IVatReturnService
             .ThenInclude(it => it!.VerifiedSoldGoods)
             .Include(it => it.Export)
             .ThenInclude(it => it!.Conditions)
+            .Include(it => it.Payments)
             .AsSplitQuery()
             .FirstOrDefaultAsync(d => d.SaleId == saleId);
     }
@@ -397,7 +385,9 @@ public class VatReturnService : IVatReturnService
         var clientRequest = declaration.ToSubmitDeclarationRequest(
             declaration.Sale.Customer.ResidenceCountry.ConvertToEnum<NonEuCountryCode>(),
             $"{Guid.NewGuid():N}",
-            _stiVatReturn
+            _stiVatReturn,
+            DateUtil.StripMilliseconds(DateUtil.GetVilniusDateTime()),
+            DateUtil.GetVilniusTimeZone()
         );
 
         var clientResponse = await _stiVatReturnClientService.SubmitDeclarationAsync(clientRequest);
@@ -410,6 +400,55 @@ public class VatReturnService : IVatReturnService
         );
 
         return declaration;
+    }
+
+    public async Task SubmitPaymentInfoAsync(int saleId, IList<PaymentInfo> payments)
+    {
+        var declaration = await GetBySaleIdAsync(saleId);
+
+        if (declaration is null)
+        {
+            throw new ValidationException("Sale declaration was not found.");
+        }
+
+        if (payments.Count == 0)
+        {
+            throw new ValidationException("No payments were provided.");
+        }
+
+        var clientRequest = new PaymentInfoSubmitRequest
+        {
+            DocumentId = declaration.Id,
+            Payments = payments,
+            RequestId = $"{Guid.NewGuid():N}",
+            SenderId = _stiVatReturn.Sender.Id,
+            TimeStamp = DateUtil.StripMilliseconds(DateUtil.GetVilniusDateTime())
+        };
+
+        var clientResponse = await _stiVatReturnClientService.SubmitPaymentInfoAsync(clientRequest);
+
+        if (clientResponse.ResultStatus == ResultStatus.ERROR)
+        {
+            throw new ValidationException(
+                clientResponse.Errors!
+                    .Select(e => e.Description)
+                    .ToList()
+            );
+        }
+
+        foreach (var payment in payments)
+        {
+            declaration.Payments.Add(
+                new StiVatReturnDeclarationPayment
+                {
+                    Amount = payment.Amount,
+                    Date = payment.Date,
+                    Type = payment.Type
+                }
+            );
+        }
+        
+        await _database.SaveChangesAsync();
     }
 
     public async Task<StiVatReturnDeclaration> SubmitButentaTradeAsync(int tradeId)
@@ -427,7 +466,9 @@ public class VatReturnService : IVatReturnService
         var clientRequest = declaration.ToSubmitDeclarationRequest(
             declaration.Sale.Customer.ResidenceCountry.ConvertToEnum<NonEuCountryCode>(),
             $"{Guid.NewGuid():N}",
-            _stiVatReturn
+            _stiVatReturn,
+            DateUtil.StripMilliseconds(DateUtil.GetVilniusDateTime()),
+            DateUtil.GetVilniusTimeZone()
         );
 
         var clientResponse = await _stiVatReturnClientService.SubmitDeclarationAsync(clientRequest);
@@ -493,7 +534,7 @@ public class VatReturnService : IVatReturnService
     {
         if (request.PreviewCode is null && request.SaleId is null)
         {
-            throw new ValidationException("Invalid declaration info update request.");
+            throw new ArgumentException("SaleId or PreviewCode must be provided.");
         }
 
         var declaration = request.PreviewCode is null
@@ -502,23 +543,15 @@ public class VatReturnService : IVatReturnService
 
         if (declaration is null)
         {
-            throw new ValidationException("Couldn't find declaration to update info for.");
+            throw new ValidationException("Sale declaration was not found.");
         }
-
-        var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Vilnius");
-
-        var now = DateTime.Parse(
-            TimeZoneInfo
-                .ConvertTimeFromUtc(DateTime.UtcNow, timeZone)
-                .ToString("yyyy-MM-ddTHH:mm:ss")
-        );
 
         var clientRequest = new ExportedGoodsRequest
         {
             DocumentId = declaration.Id,
             RequestId = $"{Guid.NewGuid():N}",
             SenderId = _stiVatReturn.Sender.Id,
-            TimeStamp = now
+            TimeStamp = DateUtil.StripMilliseconds(DateUtil.GetVilniusDateTime())
         };
 
         var clientResponse = await _stiVatReturnClientService.GetInfoOnExportedGoodsAsync(clientRequest);
@@ -538,7 +571,7 @@ public class VatReturnService : IVatReturnService
         declaration.Export = clientResponse.ToEntity();
 
         _database.Update(declaration);
-        
+
         await _database.SaveChangesAsync();
     }
 }

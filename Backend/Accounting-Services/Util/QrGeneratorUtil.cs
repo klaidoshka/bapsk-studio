@@ -10,11 +10,7 @@ public static class QrGeneratorUtil
 {
     private const int ChunkSize = 2048;
 
-    /// <summary>
-    /// Calculates checksum of provided text with Adler32 algorithm
-    /// </summary>
-    /// <param name="text">Text to calculate checksum for</param>
-    /// <returns>Calculated checksum of text value in HEX format of at least 8 digits</returns>
+    // Calculates checksum of provided text with Adler32 algorithm
     private static string CalculateChecksum(string text)
     {
         var adler32 = new Adler32();
@@ -24,23 +20,7 @@ public static class QrGeneratorUtil
         return adler32.Value.ToString("X8");
     }
 
-    /// <summary>
-    /// Strips line-endings and tabs from text
-    /// </summary>
-    /// <param name="text">Text to strip of formats</param>
-    /// <returns>Text without new line endings or tab characters</returns>
-    public static string CleanUpBeforeGenerating(string text)
-    {
-        return text
-            .ReplaceLineEndings(String.Empty)
-            .Replace("\t", String.Empty);
-    }
-
-    /// <summary>
-    /// Compresses text into byte array with GZip
-    /// </summary>
-    /// <param name="text">Text to compress</param>
-    /// <returns>Compressed text in byte[] form</returns>
+    // Compresses text into byte array with GZip
     private static byte[] Compress(string text)
     {
         if (String.IsNullOrEmpty(text))
@@ -59,11 +39,7 @@ public static class QrGeneratorUtil
         return memoryStream.ToArray();
     }
 
-    /// <summary>
-    /// Creates QR code envelope chunks from provided JSON
-    /// </summary>
-    /// <param name="json">Json to use for QR code chunks creation</param>
-    /// <returns>List of QR code chunks, split by 2KB size</returns>
+    // Creates QR code envelope chunks split by 2KB size from provided JSON string
     public static List<QrCodeEnvelopeChunk> CreateQrCodeEnvelopeChunks(string json)
     {
         var compressed = Compress(json);
@@ -93,11 +69,7 @@ public static class QrGeneratorUtil
         return envelopes;
     }
 
-    /// <summary>
-    /// Generates QR code from provided text as a Base64 string
-    /// </summary>
-    /// <param name="text">Text to generate QR code for</param>
-    /// <returns>Base64 string that resolves into QR code image</returns>
+    // Generates QR code from provided text as a Base64 string
     public static string GenerateQrCode(string text)
     {
         using var generator = new QRCodeGenerator();

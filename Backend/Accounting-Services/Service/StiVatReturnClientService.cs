@@ -5,6 +5,7 @@ using Accounting.Contract.Configuration;
 using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.Sti.VatReturn.CancelDeclaration;
 using Accounting.Contract.Dto.Sti.VatReturn.ExportedGoods;
+using Accounting.Contract.Dto.Sti.VatReturn.Payment;
 using Accounting.Contract.Dto.Sti.VatReturn.SubmitDeclaration;
 using Accounting.Contract.Service;
 using Accounting.Services.Sti;
@@ -71,6 +72,12 @@ public class StiVatReturnClientService : IStiVatReturnClientService, IAsyncDispo
 
             throw new ValidationException(errors);
         }
+    }
+
+    public async Task<PaymentInfoSubmitResponse> SubmitPaymentInfoAsync(PaymentInfoSubmitRequest request)
+    {
+        return (await _client.submitPaymentInfoAsync(request.ToExternalType()))
+            .ToInternalType();
     }
 
     private static VATRefundforForeignTravelerTRPortClient CreateClient(

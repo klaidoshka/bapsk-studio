@@ -4,7 +4,7 @@ namespace Accounting.Contract.Dto.Sti.VatReturn.ExportedGoods;
 
 public class ExportedGoodsResponse
 {
-    public required IReadOnlyList<StiError>? Errors { get; set; }
+    public required IList<StiError>? Errors { get; set; }
     public required ExportedGoodsInfo? Info { get; set; }
     public required DateTime ResultDate { get; set; }
     public required ResultStatus ResultStatus { get; set; }

@@ -5,7 +5,7 @@ namespace Accounting.Services.Sti.Mapping;
 
 public static class Sti
 {
-    public static IReadOnlyList<StiError> ToInternalType(this Errors_TypeError[] errors)
+    public static IList<StiError> ToInternalType(this Errors_TypeError[] errors)
     {
         return errors
             .Select(
