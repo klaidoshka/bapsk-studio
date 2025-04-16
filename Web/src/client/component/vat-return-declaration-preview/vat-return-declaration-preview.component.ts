@@ -17,6 +17,9 @@ import {Button} from 'primeng/button';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {first, of} from 'rxjs';
+import {decl} from 'postcss';
+import {VatReturnDeclarationPaymentComponent} from '../vat-return-declaration-payment/vat-return-declaration-payment.component';
+import {VatReturnPaymentTableComponent} from '../vat-return-payment-table/vat-return-payment-table.component';
 
 @Component({
   selector: 'vat-return-declaration-preview',
@@ -34,7 +37,9 @@ import {first, of} from 'rxjs';
     Badge,
     Button,
     NgClass,
-    ConfirmationComponent
+    ConfirmationComponent,
+    VatReturnDeclarationPaymentComponent,
+    VatReturnPaymentTableComponent
   ],
   templateUrl: './vat-return-declaration-preview.component.html',
   styles: ``
@@ -103,4 +108,6 @@ export class VatReturnDeclarationPreviewComponent {
     this.submissionForm()?.reset();
     this.isShown.set(true);
   }
+
+  protected readonly decl = decl;
 }

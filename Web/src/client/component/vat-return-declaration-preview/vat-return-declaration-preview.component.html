@@ -14,7 +14,7 @@
     <!-- Row of actions -->
     <div class="w-full">
       <p-button
-        *ngIf="!declaration.value()!.isCancelled"
+        *ngIf="!declaration.value()?.isCancelled"
         title="Refresh declaration"
         icon="pi pi-refresh"
         label="Refresh"
@@ -23,7 +23,7 @@
       />
 
       <p-button
-        *ngIf="!declaration.value()!.isCancelled"
+        *ngIf="!declaration.value()?.isCancelled && !declaration.value()?.export"
         title="Cancel declaration"
         icon="pi pi-ban"
         class="ml-2"
@@ -202,7 +202,7 @@
       </ul>
     </div>
 
-    <div class="w-fit">
+    <div class="w-fit mb-4">
       <p class="font-bold text-lg mb-2">Verified Sold Goods</p>
       <p-table [value]="declaration.value()!.export!.verifiedSoldGoods" class="w-fit">
         <ng-template #header>
@@ -225,9 +225,23 @@
         </ng-template>
       </p-table>
     </div>
+
+    <div class="w-full">
+      <p class="font-bold text-lg mb-2">VAT Return Payment</p>
+      @if (declaration.value()!.payments.length) {
+        <div class="w-fit">
+          <vat-return-payment-table [payments]="declaration.value()!.payments"/>
+        </div>
+      } @else if (!declaration.value()!.isCancelled) {
+        <vat-return-declaration-payment [saleId]="sale()!.id"/>
+      } @else {
+        <p>Because this declaration is cancelled, the payment fact cannot be submitted.</p>
+      }
+    </div>
   </div>
 
-  <div *ngIf="sale() !== undefined && !declaration.value()?.isCancelled" class="dark:bg-surface-950 bg-surface-50">
+  <div *ngIf="sale() !== undefined && !declaration.value()?.isCancelled && !declaration.value()?.export"
+       class="dark:bg-surface-950 bg-surface-50">
     <p class="font-bold text-lg my-2" *ngIf="declaration.value() === undefined">
       This sale does not have a submitted VAT return declaration.
     </p>

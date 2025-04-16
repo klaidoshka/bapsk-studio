@@ -18,6 +18,7 @@ import {
   DeclarationPreviewPageSkeletonComponent
 } from './declaration-preview-page-skeleton/declaration-preview-page-skeleton.component';
 import {Badge} from 'primeng/badge';
+import {VatReturnPaymentTableComponent} from '../../component/vat-return-payment-table/vat-return-payment-table.component';
 
 @Component({
   selector: 'declaration-preview-page',
@@ -31,7 +32,8 @@ import {Badge} from 'primeng/badge';
     NgClass,
     Button,
     DeclarationPreviewPageSkeletonComponent,
-    Badge
+    Badge,
+    VatReturnPaymentTableComponent
   ],
   templateUrl: './declaration-preview-page.component.html',
   styles: ``

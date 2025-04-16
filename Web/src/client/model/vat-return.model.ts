@@ -48,6 +48,16 @@ export enum PaymentType {
   Other = 3
 }
 
+export const PaymentTypes = [
+  { id: PaymentType.Cash, label: 'Cash' },
+  { id: PaymentType.Bank, label: 'Bank' },
+  { id: PaymentType.Other, label: 'Other' }
+]
+
+export const toPaymentTypeLabel = (type: PaymentType): string => {
+  return PaymentTypes.find(paymentType => paymentType.id === type)?.label || '';
+}
+
 export interface VatReturnDeclarationExportAssessmentCondition {
   code: string;
   description: string;
