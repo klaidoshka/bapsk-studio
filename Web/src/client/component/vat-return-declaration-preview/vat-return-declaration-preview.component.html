@@ -14,7 +14,7 @@
     <!-- Row of actions -->
     <div class="w-full">
       <p-button
-        *ngIf="!declaration()!.isCanceled"
+        *ngIf="!declaration()!.isCancelled"
         title="Refresh declaration"
         icon="pi pi-refresh"
         label="Refresh"
@@ -23,7 +23,7 @@
       />
 
       <p-button
-        *ngIf="!declaration()!.isCanceled"
+        *ngIf="!declaration()!.isCancelled"
         title="Cancel declaration"
         icon="pi pi-ban"
         class="ml-2"
@@ -57,8 +57,8 @@
         <strong>State:</strong>
         <p-badge
           class="ml-1"
-          [value]="declaration()!.isCanceled ? 'Canceled' : toSubmitDeclarationStateLabel(declaration()!.state)"
-          [severity]="declaration()!.isCanceled || declaration()!.state === SubmitDeclarationState.REJECTED ? 'danger' : 'success'"
+          [value]="declaration()!.isCancelled ? 'Cancelled' : toSubmitDeclarationStateLabel(declaration()!.state)"
+          [severity]="declaration()!.isCancelled || declaration()!.state === SubmitDeclarationState.REJECTED ? 'danger' : 'success'"
         />
       </p>
 
@@ -223,7 +223,7 @@
     </div>
   </div>
 
-  <div *ngIf="sale() !== undefined && !declaration()?.isCanceled" class="dark:bg-surface-950 bg-surface-50">
+  <div *ngIf="sale() !== undefined && !declaration()?.isCancelled" class="dark:bg-surface-950 bg-surface-50">
     <p class="font-bold text-lg my-2" *ngIf="declaration() === undefined">
       This sale does not have a submitted VAT return declaration.
     </p>

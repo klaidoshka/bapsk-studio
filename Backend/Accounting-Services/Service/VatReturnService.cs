@@ -224,7 +224,7 @@ public class VatReturnService : IVatReturnService
             throw new ValidationException("Couldn't find declaration to cancel.");
         }
 
-        if (declaration.IsCanceled)
+        if (declaration.IsCancelled)
         {
             throw new ValidationException("Declaration is already canceled.");
         }
@@ -254,7 +254,7 @@ public class VatReturnService : IVatReturnService
             );
         }
 
-        declaration.IsCanceled = true;
+        declaration.IsCancelled = true;
 
         await _database.SaveChangesAsync();
     }

@@ -4,6 +4,7 @@ using Accounting.Contract;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Accounting.Contract.Migrations
 {
     [DbContext(typeof(AccountingDatabase))]
-    partial class AccountingDatabaseModelSnapshot : ModelSnapshot
+    [Migration("20250416070557_Change_StiVatReturnDeclaration_IsCancelled_Field")]
+    partial class Change_StiVatReturnDeclaration_IsCancelled_Field
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

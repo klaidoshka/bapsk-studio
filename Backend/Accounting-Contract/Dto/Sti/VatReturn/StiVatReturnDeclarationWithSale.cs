@@ -19,6 +19,7 @@ public static class StiVatReturnDeclarationWithSaleExtensions
             Export = declaration.Export?.ToDto(),
             Id = declaration.Id,
             InstanceId = declaration.InstanceId,
+            IsCancelled = declaration.IsCancelled,
             QrCodes = declaration.QrCodes
                 .Select(it => it.Value)
                 .ToList(),

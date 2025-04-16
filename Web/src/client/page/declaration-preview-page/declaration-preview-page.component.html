@@ -9,7 +9,7 @@
         <!-- Row of actions -->
         <div class="w-full">
           <p-button
-            *ngIf="!declaration()!.isCanceled"
+            *ngIf="!declaration()!.isCancelled"
             title="Refresh declaration"
             icon="pi pi-refresh"
             label="Refresh"
@@ -36,8 +36,8 @@
             <strong>State:</strong>
             <p-badge
               class="ml-1"
-              [value]="declaration()!.isCanceled ? 'Canceled' : toSubmitDeclarationStateLabel(declaration()!.state)"
-              [severity]="declaration()!.isCanceled || declaration()!.state === SubmitDeclarationState.REJECTED ? 'danger' : 'success'"
+              [value]="declaration()!.isCancelled ? 'Cancelled' : toSubmitDeclarationStateLabel(declaration()!.state)"
+              [severity]="declaration()!.isCancelled || declaration()!.state === SubmitDeclarationState.REJECTED ? 'danger' : 'success'"
             />
           </p>
 
@@ -73,7 +73,7 @@
         </div>
       </div>
 
-      <div *ngIf="!declaration()!.qrCodes.length" class="mt-4">
+      <div *ngIf="declaration()!.qrCodes.length" class="mt-4">
         <div class="dark:bg-surface-950 bg-surface-50 rounded-lg shadow-md">
           <div class="p-4 cursor-pointer flex justify-between items-center" (click)="showQrCodes.set(!showQrCodes())">
             <p class="font-bold text-lg">QR Codes</p>

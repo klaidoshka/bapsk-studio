@@ -10,7 +10,7 @@ public class StiVatReturnDeclaration
     public Export? Export { get; set; }
     public string Id { get; set; }
     public int? InstanceId { get; set; }
-    public bool IsCanceled { get; set; }
+    public bool IsCancelled { get; set; }
     public IList<string> QrCodes { get; set; }
     public int SaleId { get; set; }
     public SubmitDeclarationState? State { get; set; }
@@ -28,7 +28,7 @@ public static class StiVatReturnDeclarationExtensions
             Export = declaration.Export?.ToDto(),
             Id = declaration.Id,
             InstanceId = declaration.InstanceId,
-            IsCanceled = declaration.IsCanceled,
+            IsCancelled = declaration.IsCancelled,
             QrCodes = declaration.QrCodes
                 .Select(it => it.Value)
                 .ToList(),
