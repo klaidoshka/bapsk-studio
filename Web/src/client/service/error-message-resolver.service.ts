@@ -5,7 +5,7 @@ import ErrorResponse, {ErrorResponseDetails} from '../model/error-response.model
 @Injectable({
   providedIn: 'root'
 })
-export class LocalizationService {
+export class ErrorMessageResolverService {
   private readonly defaultErrorMessage = 'Extremely rare error occurred, please try again later.';
 
   resolveHttpErrorResponseTo(response: any, messages: WritableSignal<Messages>) {

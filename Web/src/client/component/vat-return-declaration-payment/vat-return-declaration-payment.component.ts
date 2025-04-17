@@ -2,7 +2,7 @@ import {Component, inject, input, signal, viewChild} from '@angular/core';
 import {Button} from 'primeng/button';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {VatReturnService} from '../../service/vat-return.service';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import Messages from '../../model/messages.model';
 import {PaymentType, PaymentTypes} from '../../model/vat-return.model';
 import {first} from 'rxjs';
@@ -33,7 +33,7 @@ import {ConfirmationComponent} from '../confirmation/confirmation.component';
 export class VatReturnDeclarationPaymentComponent {
   protected readonly types = PaymentTypes;
   private readonly formBuilder = inject(FormBuilder);
-  private readonly localizationService = inject(LocalizationService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly messageService = inject(MessageService);
   private readonly vatReturnService = inject(VatReturnService);
 
@@ -89,7 +89,7 @@ export class VatReturnDeclarationPaymentComponent {
           detail: 'You have successfully submitted the payment info.',
           severity: 'success'
         }),
-        error: response => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+        error: response => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
       });
     });
   }

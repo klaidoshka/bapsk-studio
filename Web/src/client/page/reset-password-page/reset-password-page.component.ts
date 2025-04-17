@@ -3,13 +3,14 @@ import {ActivatedRoute, RouterLink} from '@angular/router';
 import {AuthService} from '../../service/auth.service';
 import {FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
 import Messages from '../../model/messages.model';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {first, map} from 'rxjs';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
 import {Password} from 'primeng/password';
 import {Button} from 'primeng/button';
 import {ProgressSpinner} from 'primeng/progressspinner';
+import {FormInputErrorComponent} from '../../component/form-input-error/form-input-error.component';
 
 @Component({
   selector: 'reset-password-page',
@@ -19,7 +20,8 @@ import {ProgressSpinner} from 'primeng/progressspinner';
     Password,
     Button,
     ProgressSpinner,
-    RouterLink
+    RouterLink,
+    FormInputErrorComponent
   ],
   templateUrl: './reset-password-page.component.html',
   styles: ``
@@ -27,7 +29,7 @@ import {ProgressSpinner} from 'primeng/progressspinner';
 export class ResetPasswordPageComponent {
   private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly localizationService = inject(LocalizationService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly route = inject(ActivatedRoute);
 
   messages = signal<Messages>({});
@@ -41,36 +43,18 @@ export class ResetPasswordPageComponent {
     confirmPassword: ['', [this.validatePasswordConfirmed()]]
   });
 
+  customErrorMessages = {
+    'mismatchPassword': () => "Passwords do not match."
+  }
+
   private validatePasswordConfirmed(): ValidatorFn {
     return (control): ValidationErrors | null => {
       if (this.form?.value?.password !== control.value) {
-        return { passwordConfirmed: true };
+        return { mismatchPassword: true };
       }
 
       return null;
     }
-  }
-
-  getErrorMessage(field: string): string | null {
-    const control = this.form.get(field);
-
-    if (!control || !control.touched || !control.invalid) {
-      return "";
-    }
-
-    if (control.errors?.["required"]) {
-      return `Field is required.`;
-    }
-
-    if (control.errors?.["minlength"]) {
-      return "Password must be at least 8 characters long.";
-    }
-
-    if (control.errors?.["passwordConfirmed"]) {
-      return "Passwords do not match.";
-    }
-
-    return null;
   }
 
   changePassword() {
@@ -90,7 +74,7 @@ export class ResetPasswordPageComponent {
           this.form.reset();
           this.messages.set({ success: ["Password changed successfully."] });
         },
-        error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
-      })
+        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+      });
   }
 }

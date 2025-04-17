@@ -1,16 +1,9 @@
 import {Component, computed, inject, input, signal} from '@angular/core';
 import Sale, {SaleCreateRequest, SaleEditRequest, SoldGood} from '../../model/sale.model';
-import {
-  AbstractControl,
-  FormArray,
-  FormBuilder,
-  FormsModule,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
+import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import Messages from '../../model/messages.model';
 import {SaleService} from '../../service/sale.service';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {TextService} from '../../service/text.service';
 import {first} from 'rxjs';
 import Salesman from '../../model/salesman.model';
@@ -26,6 +19,7 @@ import {NgForOf, NgIf} from '@angular/common';
 import {UnitOfMeasureType} from '../../model/unit-of-measure-type.model';
 import {defaultStandardMeasurement, StandardMeasurements} from './standard-measurement.model';
 import {NumberUtil} from '../../util/number.util';
+import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
 
 @Component({
   selector: 'sale-management',
@@ -39,7 +33,8 @@ import {NumberUtil} from '../../util/number.util';
     Select,
     FormsModule,
     NgIf,
-    NgForOf
+    NgForOf,
+    FormInputErrorComponent
   ],
   templateUrl: './sale-management.component.html',
   styles: ``
@@ -48,7 +43,7 @@ export class SaleManagementComponent {
   protected readonly SaleReceiptType = SaleReceiptType;
   protected readonly UnitOfMeasureType = UnitOfMeasureType;
   private readonly formBuilder = inject(FormBuilder);
-  private readonly localizationService = inject(LocalizationService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly saleService = inject(SaleService);
   private readonly textService = inject(TextService);
 
@@ -68,7 +63,7 @@ export class SaleManagementComponent {
     date: [new Date(), [Validators.required]],
     invoiceNo: ["", [Validators.maxLength(70)]],
     salesmanId: [-1, [Validators.required]],
-    soldGoods: this.formBuilder.array([])
+    soldGoods: this.formBuilder.array([this.createSoldGood()])
   });
 
   instanceId = input.required<number>();
@@ -105,14 +100,26 @@ export class SaleManagementComponent {
   private create(request: SaleCreateRequest) {
     this.saleService.create(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Sale has been created successfully."),
-      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+    });
+  }
+
+  private createSoldGood(soldGood?: SoldGood) {
+    return this.formBuilder.group({
+      description: [soldGood?.description || "", [Validators.required, Validators.maxLength(500)]],
+      id: [soldGood?.id || null],
+      quantity: [soldGood?.quantity || 1, [Validators.required, Validators.min(1)]],
+      unitOfMeasure: [soldGood?.unitOfMeasure || defaultStandardMeasurement, [Validators.required, Validators.maxLength(50)]],
+      unitOfMeasureType: [soldGood?.unitOfMeasureType || UnitOfMeasureType.UnitOfMeasureCode, [Validators.required]],
+      unitPrice: [soldGood != null ? NumberUtil.round(soldGood.taxableAmount / soldGood.quantity, 2) : 0, [Validators.required, Validators.min(0)]],
+      vatRate: [soldGood?.vatRate || 21, [Validators.required, Validators.min(0), Validators.max(100)]]
     });
   }
 
   private edit(request: SaleEditRequest) {
     this.saleService.edit(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Sale has been edited successfully."),
-      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
@@ -144,15 +151,7 @@ export class SaleManagementComponent {
   }
 
   addSoldGood(soldGood?: SoldGood | null) {
-    this.soldGoods().push(this.formBuilder.group({
-      description: [soldGood?.description || "...", [Validators.required, Validators.maxLength(500)]],
-      id: [soldGood?.id || null],
-      quantity: [soldGood?.quantity || 1, [Validators.required, Validators.min(1)]],
-      unitOfMeasure: [soldGood?.unitOfMeasure || defaultStandardMeasurement, [Validators.required, Validators.maxLength(50)]],
-      unitOfMeasureType: [soldGood?.unitOfMeasureType || UnitOfMeasureType.UnitOfMeasureCode, [Validators.required]],
-      unitPrice: [soldGood != null ? NumberUtil.round(soldGood.taxableAmount / soldGood.quantity, 2) : 0, [Validators.required, Validators.min(0)]],
-      vatRate: [soldGood?.vatRate || 21, [Validators.required, Validators.min(0), Validators.max(100)]]
-    }));
+    this.soldGoods().push(this.createSoldGood(soldGood || undefined));
     this.soldGoods().markAsDirty();
   }
 
@@ -164,67 +163,10 @@ export class SaleManagementComponent {
     }
   }
 
-  getErrorMessage(field: string): string | null {
-    const parts = field.split(".");
-    let control: AbstractControl<any, any> | null = null;
-
-    for (const part of parts) {
-      control = control ? control.get(part) : this.form.get(part);
-    }
-
-    if (!control || !control.touched || !control.invalid) {
-      return "";
-    }
-
-    const name = this.textService.capitalize(field);
-
-    if (control.errors?.["required"]) {
-      return `${name} is required.`;
-    }
-
-    if (control.errors?.["maxlength"]) {
-      return `${name} must be at most ${control.errors["maxlength"].requiredLength} characters long.`;
-    }
-
-    return null;
-  }
-
   getMeasurementUnit(index: number): UnitOfMeasureType {
     return this.soldGoods()
       .at(index)
       .get("unitOfMeasureType")?.value || UnitOfMeasureType.UnitOfMeasureCode;
-  }
-
-  getSoldGoodErrorMessage(index: number, field: string): string | null {
-    const control = this.soldGoods().at(index).get(field);
-
-    if (!control || !control.touched || !control.invalid) {
-      return "";
-    }
-
-    const name = this.textService.capitalize(field);
-
-    if (control.errors?.["required"]) {
-      return `${name} is required.`;
-    }
-
-    if (control.errors?.["maxlength"]) {
-      return `${name} must be at most ${control.errors["maxlength"].requiredLength} characters long.`;
-    }
-
-    if (control.errors?.["min"]) {
-      return `${name} must be at least ${control.errors["min"].min}.`;
-    }
-
-    if (control.errors?.["max"]) {
-      return `${name} must be at most ${control.errors["max"].max}.`;
-    }
-
-    if (control.errors?.["pattern"]) {
-      return `${name} must be 4 digits.`;
-    }
-
-    return null;
   }
 
   hide() {
@@ -276,6 +218,6 @@ export class SaleManagementComponent {
   }
 
   soldGoods() {
-    return this.form.controls["soldGoods"] as FormArray;
+    return this.form.controls.soldGoods;
   }
 }

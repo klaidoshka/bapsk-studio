@@ -11,7 +11,7 @@ import {DataTypeManagementComponent} from '../data-type-management/data-type-man
 import {first, of} from 'rxjs';
 import {InstanceService} from '../../service/instance.service';
 import {MessageModule} from 'primeng/message';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {rxResource} from '@angular/core/rxjs-interop';
 
 @Component({
@@ -30,7 +30,7 @@ import {rxResource} from '@angular/core/rxjs-interop';
 })
 export class DataTypeShowcaseComponent {
   private readonly dataTypeService = inject(DataTypeService);
-  private readonly localizationService = inject(LocalizationService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly instanceService = inject(InstanceService);
 
   confirmationComponent = viewChild.required(ConfirmationComponent);
@@ -53,7 +53,7 @@ export class DataTypeShowcaseComponent {
     this.confirmationComponent().request(() => {
       this.dataTypeService.delete(dataType.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['Data type deleted successfully']}),
-        error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
       });
     });
   }

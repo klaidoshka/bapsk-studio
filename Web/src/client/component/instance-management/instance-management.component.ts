@@ -1,9 +1,5 @@
 import {ChangeDetectorRef, Component, inject, signal} from '@angular/core';
-import Instance, {
-  InstanceCreateRequest,
-  InstanceEditRequest,
-  InstanceWithUsers
-} from '../../model/instance.model';
+import Instance, {InstanceCreateRequest, InstanceEditRequest, InstanceWithUsers} from '../../model/instance.model';
 import {Dialog} from 'primeng/dialog';
 import {
   FormArray,
@@ -14,7 +10,6 @@ import {
   ValidatorFn,
   Validators
 } from '@angular/forms';
-import {TextService} from '../../service/text.service';
 import Messages from '../../model/messages.model';
 import {InstanceService} from '../../service/instance.service';
 import {first} from 'rxjs';
@@ -22,11 +17,12 @@ import {Button} from 'primeng/button';
 import {Textarea} from 'primeng/textarea';
 import {InputText} from 'primeng/inputtext';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {UserService} from '../../service/user.service';
 import {toUserIdentityFullName} from '../../model/user.model';
 import {AuthService} from '../../service/auth.service';
 import {TableModule} from 'primeng/table';
+import {FormInputErrorComponent} from "../form-input-error/form-input-error.component";
 
 @Component({
   selector: 'instance-management',
@@ -38,7 +34,8 @@ import {TableModule} from 'primeng/table';
     InputText,
     MessagesShowcaseComponent,
     ReactiveFormsModule,
-    TableModule
+    TableModule,
+    FormInputErrorComponent
   ],
   templateUrl: './instance-management.component.html',
   styles: ``
@@ -48,8 +45,7 @@ export class InstanceManagementComponent {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly formBuilder = inject(FormBuilder);
   private readonly instanceService = inject(InstanceService);
-  private readonly localizationService = inject(LocalizationService);
-  private readonly textService = inject(TextService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly userService = inject(UserService);
 
   form = this.formBuilder.group({
@@ -67,17 +63,21 @@ export class InstanceManagementComponent {
   messages = signal<Messages>({});
   messagesUserMetas = signal<Messages>({});
 
+  customErrorMessages = {
+    'emailExists': () => 'User with this email already exists in the list.'
+  };
+
   private create(request: InstanceCreateRequest) {
     this.instanceService.create(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Instance has been created successfully."),
-      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   private edit(request: InstanceEditRequest) {
     this.instanceService.edit(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Instance has been edited successfully."),
-      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
@@ -131,38 +131,6 @@ export class InstanceManagementComponent {
 
   formUsers() {
     return this.form.controls["userMetas"] as FormArray;
-  }
-
-  getErrorMessage(field: string): string | null {
-    const control = this.form.get(field);
-
-    if (!control || !control.touched || !control.invalid) {
-      return "";
-    }
-
-    if (control.errors?.["required"]) {
-      return `${this.textService.capitalize(field)} is required.`;
-    }
-
-    return null;
-  }
-
-  getUserEmailErrorMessage(): string | null {
-    const control = this.formUser.get("email");
-
-    if (!control || !control.touched || !control.invalid) {
-      return "";
-    }
-
-    if (control.errors?.["email"]) {
-      return "Invalid email.";
-    }
-
-    if (control.errors?.["emailExists"]) {
-      return "User is already added.";
-    }
-
-    return null;
   }
 
   hide() {

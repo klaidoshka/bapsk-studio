@@ -51,9 +51,9 @@ public class AuthValidator : IAuthValidator
 
     public async Task<Validation<(User?, User?)>> ValidateChangePasswordRequestAsync(ChangePasswordRequest request)
     {
-        if (request.RequesterId is null && request.ResetPasswordToken is null)
+        if ((request.RequesterId is null || request.CurrentPassword is null) && request.ResetPasswordToken is null)
         {
-            throw new ArgumentException("Either requesterId or resetPasswordToken must be provided.");
+            throw new ArgumentException("Either requesterId, currentPassword or resetPasswordToken must be provided.");
         }
 
         if (
@@ -67,59 +67,70 @@ public class AuthValidator : IAuthValidator
 
         if (request.ResetPasswordToken is not null)
         {
-            try
-            {
-
-                var token = _encryptService.DecryptAsync(request.ResetPasswordToken!, _email.ResetPassword.Secret);
-                var tokenParts = token.Result.Split('|');
-
-                if (tokenParts.Length != 3)
-                {
-                    return new("Invalid reset password token.");
-                }
-
-                if (!Int32.TryParse(tokenParts[0], out var userId))
-                {
-                    return new("Invalid reset password token.");
-                }
-
-                if (!DateTime.TryParse(tokenParts[2], out var expirationDate))
-                {
-                    return new("Invalid reset password token.");
-                }
-
-                if (expirationDate < DateTime.UtcNow)
-                {
-                    return new("Reset password token expired.");
-                }
-
-                var user = await _database.Users.FirstOrDefaultAsync(
-                    u => u.Id == userId && u.EmailNormalized.Equals(tokenParts[1], StringComparison.InvariantCultureIgnoreCase)
-                );
-
-                if (user is null || user.IsDeleted)
-                {
-                    return new("Requested account does not exist.");
-                }
-
-                return new((null, user));
-            }
-            catch (Exception)
-            {
-                return new("Invalid reset password token.");
-            }
+            return await ValidateChangePasswordRequestByTokenAsync(request.ResetPasswordToken);
         }
-        
+
+        if (request.CurrentPassword is null)
+        {
+            return new("Current password is required.");
+        }
+
         var userRequester = await _database.Users.FirstOrDefaultAsync(
             u => u.Id == request.RequesterId && u.IsDeleted == false
         );
         
-        if (userRequester is null)
+        var validation = ValidateUserCredentials(userRequester, request.CurrentPassword);
+
+        if (validation.IsValid)
         {
-            return new("Requested account does not exist.");
+            return new((userRequester, null));
         }
 
-        return new((userRequester, null));
+        return new(validation);
+    }
+
+    private async Task<Validation<(User?, User?)>> ValidateChangePasswordRequestByTokenAsync(string resetPasswordToken)
+    {
+        try
+        {
+            var token = _encryptService.DecryptAsync(resetPasswordToken, _email.ResetPassword.Secret);
+            var tokenParts = token.Result.Split('|');
+
+            if (tokenParts.Length != 3)
+            {
+                return new("Invalid reset password token.");
+            }
+
+            if (!Int32.TryParse(tokenParts[0], out var userId))
+            {
+                return new("Invalid reset password token.");
+            }
+
+            if (!DateTime.TryParse(tokenParts[2], out var expirationDate))
+            {
+                return new("Invalid reset password token.");
+            }
+
+            if (expirationDate < DateTime.UtcNow)
+            {
+                return new("Reset password token expired.");
+            }
+
+            var user = await _database.Users.FirstOrDefaultAsync(
+                u => u.Id == userId && u.EmailNormalized.Equals(tokenParts[1], StringComparison.InvariantCultureIgnoreCase)
+            );
+
+            if (user is null || user.IsDeleted)
+            {
+                return new("Requested account does not exist.");
+            }
+
+            return new((null, user));
+        }
+        catch (Exception)
+        {
+            return new("Invalid reset password token.");
+        }
     }
 
     public Validation ValidateLoginRequest(LoginRequest request)
@@ -227,14 +238,19 @@ public class AuthValidator : IAuthValidator
             )
         );
 
+        return ValidateUserCredentials(user, password);
+    }
+
+    private Validation ValidateUserCredentials(User? user, string password)
+    {
         if (user is null || user.IsDeleted)
         {
-            return new("Invalid credentials or user does not exist.");
+            return new("Invalid credentials.");
         }
 
         return _hashService.Verify(password, user.PasswordHash)
             ? new()
-            : new("Invalid credentials or user does not exist.");
+            : new("Invalid credentials.");
     }
 
     public async Task<Validation<User>> ValidateResetPasswordAsync(ResetPasswordRequest request)

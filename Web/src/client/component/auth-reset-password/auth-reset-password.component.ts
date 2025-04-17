@@ -2,11 +2,12 @@ import {Component, inject, signal} from '@angular/core';
 import {InputText} from 'primeng/inputtext';
 import {Button} from 'primeng/button';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import Messages from '../../model/messages.model';
 import {AuthService} from '../../service/auth.service';
 import {first} from 'rxjs';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
+import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
 
 @Component({
   selector: 'auth-reset-password',
@@ -14,7 +15,8 @@ import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.
     InputText,
     Button,
     ReactiveFormsModule,
-    MessagesShowcaseComponent
+    MessagesShowcaseComponent,
+    FormInputErrorComponent
   ],
   templateUrl: './auth-reset-password.component.html',
   styles: ``
@@ -22,31 +24,13 @@ import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.
 export class AuthResetPasswordComponent {
   private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly localizationService = inject(LocalizationService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
 
   messages = signal<Messages>({});
 
   form = this.formBuilder.group({
     email: ['', [Validators.email]],
   });
-
-  getErrorMessage(): string | undefined {
-    const control = this.form.controls.email;
-
-    if (!control || !control.touched || !control.invalid) {
-      return "";
-    }
-
-    if (control.errors?.["required"]) {
-      return `Field is required.`;
-    }
-
-    if (control.errors?.["email"]) {
-      return "Please enter a valid email address.";
-    }
-
-    return undefined;
-  }
 
   resetPassword() {
     if (this.form.invalid) {
@@ -67,7 +51,7 @@ export class AuthResetPasswordComponent {
             ]
           });
         },
-        error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
       });
   }
 }

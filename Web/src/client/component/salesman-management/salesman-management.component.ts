@@ -1,9 +1,9 @@
 import {Component, inject, input, signal} from '@angular/core';
 import Salesman, {SalesmanCreateRequest, SalesmanEditRequest} from '../../model/salesman.model';
-import {AbstractControl, FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import Messages from '../../model/messages.model';
 import {SalesmanService} from '../../service/salesman.service';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {TextService} from '../../service/text.service';
 import {getDefaultIsoCountry, IsoCountries} from '../../model/iso-country.model';
 import {first} from 'rxjs';
@@ -12,6 +12,7 @@ import {Dialog} from 'primeng/dialog';
 import {InputText} from 'primeng/inputtext';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {Select} from 'primeng/select';
+import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
 
 @Component({
   selector: 'salesman-management',
@@ -21,7 +22,8 @@ import {Select} from 'primeng/select';
     InputText,
     MessagesShowcaseComponent,
     ReactiveFormsModule,
-    Select
+    Select,
+    FormInputErrorComponent
   ],
   templateUrl: './salesman-management.component.html',
   styles: ``
@@ -29,7 +31,7 @@ import {Select} from 'primeng/select';
 export class SalesmanManagementComponent {
   protected readonly IsoCountries = IsoCountries;
   private readonly formBuilder = inject(FormBuilder);
-  private readonly localizationService = inject(LocalizationService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly salesmanService = inject(SalesmanService);
   private readonly textService = inject(TextService);
 
@@ -48,7 +50,7 @@ export class SalesmanManagementComponent {
   messages = signal<Messages>({});
 
   private onSuccess(message: string) {
-    this.messages.set({success: [message]});
+    this.messages.set({ success: [message] });
     this.form.markAsUntouched();
     this.form.markAsPristine();
   }
@@ -56,44 +58,15 @@ export class SalesmanManagementComponent {
   private create(request: SalesmanCreateRequest) {
     this.salesmanService.create(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Salesman has been created successfully."),
-      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   private edit(request: SalesmanEditRequest) {
     this.salesmanService.edit(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Salesman has been edited successfully."),
-      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
     });
-  }
-
-  getErrorMessage(field: string): string | null {
-    const parts = field.split(".");
-    let control: AbstractControl<any, any> | null = null;
-
-    for (const part of parts) {
-      control = control ? control.get(part) : this.form.get(part);
-    }
-
-    if (!control || !control.touched || !control.invalid) {
-      return "";
-    }
-
-    const name = this.textService.capitalize(field);
-
-    if (control.errors?.["required"]) {
-      return `${name} is required.`;
-    }
-
-    if (control.errors?.["maxlength"]) {
-      return `${name} must be at most ${control.errors["maxlength"].requiredLength} characters long.`;
-    }
-
-    if (control.errors?.["pattern"]) {
-      return `${name} must be a 9 or 12 digits number.`;
-    }
-
-    return null;
   }
 
   hide() {
@@ -104,7 +77,7 @@ export class SalesmanManagementComponent {
 
   save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill out the form."]});
+      this.messages.set({ error: ["Please fill out the form."] });
       return;
     }
 
@@ -142,7 +115,7 @@ export class SalesmanManagementComponent {
     this.form.reset();
 
     if (salesman != null) {
-      this.form.patchValue({...salesman as any});
+      this.form.patchValue({ ...salesman as any });
     }
   }
 }

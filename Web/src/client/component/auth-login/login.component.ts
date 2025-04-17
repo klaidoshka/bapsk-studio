@@ -8,7 +8,7 @@ import {AuthService} from "../../service/auth.service";
 import {TextService} from "../../service/text.service";
 import {InputText} from "primeng/inputtext";
 import Messages from "../../model/messages.model";
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {Password} from 'primeng/password';
 import {MessageService} from 'primeng/api';
@@ -24,7 +24,7 @@ import {AuthResetPasswordComponent} from '../auth-reset-password/auth-reset-pass
 export class LoginComponent {
   private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly localizationService = inject(LocalizationService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly messageService = inject(MessageService);
   private readonly router = inject(Router);
   private readonly textService = inject(TextService);
@@ -89,7 +89,7 @@ export class LoginComponent {
         this.isSubmitting.set(false);
       },
       error: (response: ErrorResponse) => {
-        this.localizationService.resolveHttpErrorResponseTo(response, this.messages);
+        this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages);
         this.isSubmitting.set(false);
       }
     });

@@ -9,7 +9,7 @@ import {first} from 'rxjs';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {InstancePreviewComponent} from '../instance-preview/instance-preview.component';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {DatePipe} from '@angular/common';
 import {UserService} from '../../service/user.service';
 
@@ -29,7 +29,7 @@ import {UserService} from '../../service/user.service';
 })
 export class InstanceShowcaseComponent {
   private readonly instanceService = inject(InstanceService);
-  private readonly localizationService = inject(LocalizationService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly userService = inject(UserService);
 
   confirmationComponent = viewChild.required(ConfirmationComponent);
@@ -54,7 +54,7 @@ export class InstanceShowcaseComponent {
     this.confirmationComponent().request(() => {
       this.instanceService.delete(instance.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['Instance deleted successfully']}),
-        error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
       });
     });
   }

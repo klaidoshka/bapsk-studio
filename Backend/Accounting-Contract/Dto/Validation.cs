@@ -59,6 +59,11 @@ public class Validation<T> : Validation
 
     public Validation(string message, ICollection<FailureCode>? codes = null) : base(message, codes) { }
     
+    public Validation(Validation validation) : base(validation.FailureMessages, validation.Codes)
+    {
+        _value = default;
+    }
+    
     public new Validation<T> AssertValid()
     {
         if (!IsValid)

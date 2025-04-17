@@ -11,7 +11,7 @@ import {DataEntryManagementComponent} from '../data-entry-management/data-entry-
 import {first} from 'rxjs';
 import {MessageModule} from 'primeng/message';
 import DataType from '../../model/data-type.model';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {DataEntryImportFormComponent} from '../data-entry-import/data-entry-import-form.component';
 import {Dialog} from 'primeng/dialog';
 import {RouterLink} from '@angular/router';
@@ -37,7 +37,7 @@ import {DataEntryTableComponent} from '../data-entry-table/data-entry-table.comp
 })
 export class DataEntryShowcaseComponent {
   private readonly dataEntryService = inject(DataEntryService);
-  private readonly localizationService = inject(LocalizationService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
 
   confirmationComponent = viewChild.required(ConfirmationComponent);
   dataEntries = input.required<DataEntryJoined[]>();
@@ -51,7 +51,7 @@ export class DataEntryShowcaseComponent {
     this.confirmationComponent().request(() => {
       this.dataEntryService.delete(dataEntry.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({ success: ['Data entry deleted successfully'] }),
-        error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
       });
     });
   }

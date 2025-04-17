@@ -10,7 +10,6 @@ import {
   Validators
 } from '@angular/forms';
 import {DataTypeService} from '../../service/data-type.service';
-import {TextService} from '../../service/text.service';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../../model/data-type.model';
 import Messages from '../../model/messages.model';
 import {first, of} from 'rxjs';
@@ -21,21 +20,16 @@ import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.
 import {Textarea} from 'primeng/textarea';
 import {InstanceService} from '../../service/instance.service';
 import {TableModule} from 'primeng/table';
-import DataTypeField, {
-  DataTypeFieldEditRequest,
-  FieldType,
-  fieldTypes
-} from '../../model/data-type-field.model';
+import DataTypeField, {DataTypeFieldEditRequest, FieldType, fieldTypes} from '../../model/data-type-field.model';
 import {Checkbox} from 'primeng/checkbox';
 import {Select} from 'primeng/select';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {DataEntryService} from '../../service/data-entry.service';
 import Option from '../../model/options.model';
 import {NgIf} from '@angular/common';
-import {
-  DataTypeEntryFieldInputComponent
-} from '../data-type-entry-field-input/data-type-entry-field-input.component';
+import {DataTypeEntryFieldInputComponent} from '../data-type-entry-field-input/data-type-entry-field-input.component';
 import {rxResource} from '@angular/core/rxjs-interop';
+import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
 
 @Component({
   selector: 'data-type-management',
@@ -51,7 +45,8 @@ import {rxResource} from '@angular/core/rxjs-interop';
     Select,
     FormsModule,
     NgIf,
-    DataTypeEntryFieldInputComponent
+    DataTypeEntryFieldInputComponent,
+    FormInputErrorComponent
   ],
   templateUrl: './data-type-management.component.html',
   styles: ``
@@ -61,10 +56,9 @@ export class DataTypeManagementComponent {
   protected readonly fieldTypes = fieldTypes;
   private readonly dataEntryService = inject(DataEntryService);
   private readonly dataTypeService = inject(DataTypeService);
-  private readonly localizationService = inject(LocalizationService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly instanceService = inject(InstanceService);
-  private readonly textService = inject(TextService);
 
   dataType = signal<DataType | undefined>(undefined);
 
@@ -72,7 +66,7 @@ export class DataTypeManagementComponent {
     request: () => ({
       instanceId: this.instanceId()
     }),
-    loader: ({request}) => request.instanceId
+    loader: ({ request }) => request.instanceId
       ? this.dataTypeService.getAllByInstanceId(request.instanceId)
       : of([])
   });
@@ -87,6 +81,10 @@ export class DataTypeManagementComponent {
   isShown = signal<boolean>(false);
   messages = signal<Messages>({});
 
+  customErrorMessages = {
+    'noFields': () => 'At least one field is required.'
+  };
+
   get formFields() {
     return this.form.get("fields") as FormArray<FormGroup>;
   }
@@ -94,7 +92,7 @@ export class DataTypeManagementComponent {
   private create(request: DataTypeCreateRequest) {
     this.dataTypeService.create(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Data type has been created successfully."),
-      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
@@ -121,16 +119,16 @@ export class DataTypeManagementComponent {
         this.onSuccess("Data type has been edited successfully.");
         this.dataEntryService.getAllByDataTypeId(request.dataTypeId).subscribe();
       },
-      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   private fieldsValidator(control: AbstractControl): ValidationErrors | null {
-    return (control as FormArray).length === 0 ? {noFields: true} : null;
+    return (control as FormArray).length === 0 ? { noFields: true } : null;
   };
 
   private onSuccess(message: string) {
-    this.messages.set({success: [message]});
+    this.messages.set({ success: [message] });
     this.form.markAsPristine();
     this.form.markAsUntouched();
   }
@@ -182,24 +180,6 @@ export class DataTypeManagementComponent {
     this.form.markAsDirty();
   }
 
-  getErrorMessage(field: string): string | null {
-    const control = this.form.get(field);
-
-    if (!control || !control.touched || !control.invalid) {
-      return "";
-    }
-
-    if (control.errors?.["noFields"]) {
-      return "At least one field is required.";
-    }
-
-    if (control.errors?.["required"]) {
-      return `${this.textService.capitalize(field)} is required.`;
-    }
-
-    return null;
-  }
-
   hide() {
     this.messages.set({});
     this.isShown.set(false);
@@ -208,7 +188,7 @@ export class DataTypeManagementComponent {
 
   save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill out the form."]});
+      this.messages.set({ error: ["Please fill out the form."] });
       return;
     }
 

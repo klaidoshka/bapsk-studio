@@ -127,7 +127,7 @@ export class AuthService {
       if (userId == null) {
         const value = localStorage.getItem(this.userKey);
 
-        return value !== null ? JSON.parse(value) : undefined;
+        return value !== null ? this.userService.updateProperties(JSON.parse(value)) : undefined;
       }
 
       const user = this.userService.getByIdAsSignal(userId)();
@@ -135,7 +135,7 @@ export class AuthService {
       if (user == null) {
         const value = localStorage.getItem(this.userKey);
 
-        return value !== null ? JSON.parse(value) : undefined;
+        return value !== null ? this.userService.updateProperties(JSON.parse(value)) : undefined;
       }
 
       localStorage.setItem(this.userKey, JSON.stringify(user));

@@ -19,7 +19,7 @@ import DataTypeField, {FieldType} from '../../model/data-type-field.model';
 import {TextService} from '../../service/text.service';
 import Messages from '../../model/messages.model';
 import {first, of} from 'rxjs';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {DataEntryService} from '../../service/data-entry.service';
 import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
 import {rxResource} from '@angular/core/rxjs-interop';
@@ -47,7 +47,7 @@ export class ImportConfigurationManagementPageComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly importConfigurationService = inject(ImportConfigurationService);
   private readonly instanceService = inject(InstanceService);
-  private readonly localizationService = inject(LocalizationService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly textService = inject(TextService);
 
   configuration = rxResource({
@@ -138,14 +138,14 @@ export class ImportConfigurationManagementPageComponent {
   private create(request: ImportConfigurationCreateRequest) {
     this.importConfigurationService.create(request).pipe(first()).subscribe({
       next: () => this.changeMessages("Import configuration created successfully."),
-      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   private edit(request: ImportConfigurationEditRequest) {
     this.importConfigurationService.edit(request).pipe(first()).subscribe({
       next: () => this.changeMessages("Import configuration edited successfully."),
-      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
