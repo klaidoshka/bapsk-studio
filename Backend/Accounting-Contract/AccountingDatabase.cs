@@ -16,6 +16,7 @@ public class AccountingDatabase : DbContext
     public DbSet<ImportConfigurationField> ImportConfigurationFields { get; set; }
     public DbSet<Instance> Instances { get; set; }
     public DbSet<InstanceUserMeta> InstanceUserMetas { get; set; }
+    public DbSet<ReportTemplate> ReportTemplates { get; set; }
     public DbSet<Sale> Sales { get; set; }
     public DbSet<Salesman> Salesmen { get; set; }
     public DbSet<Session> Sessions { get; set; }
@@ -34,14 +35,22 @@ public class AccountingDatabase : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<DataType>()
-            .HasMany(d => d.Fields)
-            .WithOne(f => f.DataType)
-            .HasForeignKey(f => f.DataTypeId);
+        modelBuilder
+            .Entity<DataType>()
+            .HasMany(it => it.Fields)
+            .WithOne(it => it.DataType)
+            .HasForeignKey(it => it.DataTypeId);
 
-        modelBuilder.Entity<DataTypeField>()
-            .HasOne(f => f.Reference)
+        modelBuilder
+            .Entity<DataTypeField>()
+            .HasOne(it => it.Reference)
             .WithMany()
-            .HasForeignKey(f => f.ReferenceId);
+            .HasForeignKey(it => it.ReferenceId);
+        
+        modelBuilder
+            .Entity<ReportTemplate>()
+            .HasMany(it => it.Fields)
+            .WithMany(it => it.ReportTemplates)
+            .UsingEntity(it => it.ToTable("ReportTemplateFields"));
     }
 }
