@@ -19,3 +19,9 @@ export interface RegisterRequest {
   lastName: string;
   password: string;
 }
+
+export interface ChangePasswordRequest {
+  currentPassword?: string;
+  password: string;
+  resetPasswordToken?: string;
+}

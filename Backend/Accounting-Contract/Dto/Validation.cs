@@ -4,14 +4,7 @@ namespace Accounting.Contract.Dto;
 
 public class Validation(ICollection<string>? failures, ICollection<FailureCode>? codes = null)
 {
-    /// <summary>
-    /// Failures that caused validation to fail.
-    /// </summary>
     public ICollection<string> FailureMessages { get; } = failures ?? [];
-
-    /// <summary>
-    /// Codes that represent internal failures. Typically, this is empty. Only used for specific use-case handling.
-    /// </summary>
     public ICollection<FailureCode> Codes { get; } = codes ?? [];
 
     public Validation() : this([]) { }
@@ -23,20 +16,61 @@ public class Validation(ICollection<string>? failures, ICollection<FailureCode>?
         codes
     ) { }
 
-    /// <summary>
-    /// Asserts that validation result is valid. Throws <see cref="ValidationException"/> if not.
-    /// </summary>
-    /// <exception cref="ValidationException">Thrown if validation instance is not valid (contains failures)</exception>
-    public void AssertValid()
+    public Validation AssertValid()
     {
         if (!IsValid)
         {
             throw new ValidationException(this);
         }
+
+        return this;
     }
 
-    /// <summary>
-    /// Checks if validation result is valid.
-    /// </summary>
     public bool IsValid => FailureMessages.Count == 0 && Codes.Count == 0;
+}
+
+public class Validation<T> : Validation
+{
+    private readonly T? _value;
+
+    public T Value
+    {
+        get
+        {
+            if (!IsValid)
+            {
+                throw new ValidationException(this);
+            }
+
+            return _value ?? throw new InvalidOperationException("Validation result value is null.");
+        }
+        init => _value = value;
+    }
+
+    public Validation(T value) : base([])
+    {
+        _value = value;
+    }
+
+    public Validation(ICollection<string>? failures = null, ICollection<FailureCode>? codes = null) : base(
+        failures,
+        codes
+    ) { }
+
+    public Validation(string message, ICollection<FailureCode>? codes = null) : base(message, codes) { }
+    
+    public Validation(Validation validation) : base(validation.FailureMessages, validation.Codes)
+    {
+        _value = default;
+    }
+    
+    public new Validation<T> AssertValid()
+    {
+        if (!IsValid)
+        {
+            throw new ValidationException(this);
+        }
+
+        return this;
+    }
 }

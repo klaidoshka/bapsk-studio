@@ -1,37 +1,23 @@
-import {Component, inject, viewChild} from '@angular/core';
+import {Component, inject, input} from '@angular/core';
 import {AuthService} from '../../service/auth.service';
-import {toUserFullName} from '../../model/user.model';
 import {TableModule} from 'primeng/table';
-import {Role} from '../../model/role.model';
-import {getUserIsoCountryLabel} from "../../model/iso-country.model";
-import {DatePipe} from '@angular/common';
-import {Button} from 'primeng/button';
-import {UserManagementComponent} from '../user-management/user-management.component';
+import {ProfileManagementComponent} from '../profile-management/profile-management.component';
+import {Badge} from 'primeng/badge';
+import {Role, toRoleLabel} from '../../model/role.model';
+import {User} from '../../model/user.model';
+import {ProfileChangePasswordFormComponent} from '../profile-change-password-form/profile-change-password-form.component';
 
 @Component({
   selector: 'profile-showcase',
-  imports: [TableModule, DatePipe, Button, UserManagementComponent],
+  imports: [TableModule, ProfileManagementComponent, Badge, ProfileChangePasswordFormComponent],
   templateUrl: './profile-showcase.component.html',
   styles: ``
 })
 export class ProfileShowcaseComponent {
+  protected readonly Role = Role;
   private readonly authService = inject(AuthService);
 
-  managementMenu = viewChild.required(UserManagementComponent);
-  user = this.authService.getUser();
+  user = input.required<User>();
 
-  protected readonly getUserIsoCountryLabel = getUserIsoCountryLabel;
-  protected readonly toUserFullName = toUserFullName;
-
-  showManagement() {
-    if (this.user() == null) {
-      return;
-    }
-
-    this.managementMenu().show(this.user());
-  }
-
-  toRoleString(role: Role): string {
-    return Role[role];
-  }
+  protected readonly toRoleLabel = toRoleLabel;
 }

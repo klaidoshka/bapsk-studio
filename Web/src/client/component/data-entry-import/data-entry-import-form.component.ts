@@ -5,7 +5,7 @@ import {DataEntryService} from '../../service/data-entry.service';
 import Messages from '../../model/messages.model';
 import {DataEntryImportRequest, DataEntryJoined} from '../../model/data-entry.model';
 import {first, map} from 'rxjs';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {Select} from 'primeng/select';
 import DataType from '../../model/data-type.model';
 import {ImportConfigurationService} from '../../service/import-configuration.service';
@@ -37,7 +37,7 @@ export class DataEntryImportFormComponent {
   private readonly dataEntryService = inject(DataEntryService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly importConfigurationService = inject(ImportConfigurationService);
-  private readonly localizationService = inject(LocalizationService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
 
   clearImportedValues = input<boolean>();
   dataType = input.required<DataType>();
@@ -110,7 +110,7 @@ export class DataEntryImportFormComponent {
         this.importedEntries.set(entries);
         this.messages.set({ success: ['Data entries imported successfully.'] });
       },
-      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 

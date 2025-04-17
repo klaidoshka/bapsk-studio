@@ -13,7 +13,7 @@
         id="email"
         formControlName="email"
         pInputText
-        class="bg-surface-50 mt-1 block w-full p-2"
+        class="mt-1 block w-full"
       />
       @if (getErrorMessage('email'); as emailInvalid) {
         <div class="text-xs text-red-500 mt-1">
@@ -46,7 +46,7 @@
       <p-password
         id="password"
         formControlName="password"
-        class="bg-surface-50 mt-1 block w-full!"
+        class="mt-1 block w-full!"
         inputStyleClass="w-full"
         styleClass="w-full"
         toggleMask="true"
@@ -65,7 +65,7 @@
       <p-password
         id="confirmPassword"
         formControlName="confirmPassword"
-        class="bg-surface-50 mt-1 block w-full!"
+        class="mt-1 block w-full!"
         inputStyleClass="w-full"
         styleClass="w-full"
         toggleMask="true"
@@ -86,7 +86,7 @@
         id="firstName"
         formControlName="firstName"
         pInputText
-        class="bg-surface-50 mt-1 block w-full p-2"
+        class="mt-1 block w-full"
       />
       @if (getErrorMessage('firstName'); as firstNameInvalid) {
         <div class="text-xs text-red-500 mt-1">
@@ -103,7 +103,7 @@
         id="lastName"
         formControlName="lastName"
         pInputText
-        class="bg-surface-50 mt-1 block w-full p-2"
+        class="mt-1 block w-full"
       />
       @if (getErrorMessage('lastName'); as lastNameInvalid) {
         <div class="text-xs text-red-500 mt-1">
@@ -119,7 +119,7 @@
         id="country"
         formControlName="country"
         optionLabel="name"
-        placeholder="Select a Country"
+        placeholder="Select a country"
         [dropdown]="true"
         [suggestions]="filteredCountries"
         (completeMethod)="filterCountries($event)"
@@ -149,5 +149,5 @@
 <p class="mt-4 text-sm text-center">Already have an account?</p>
 
 <p class="text-center">
-  <a routerLink="/auth/login" class="text-indigo-600 hover:underline">Login here</a>
+  <a routerLink="/auth/login" class="dark:text-indigo-400 text-indigo-600 hover:underline">Login here</a>
 </p>

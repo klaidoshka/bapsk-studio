@@ -1,0 +1,70 @@
+import {Component, inject, input, signal} from '@angular/core';
+import {User} from '../../model/user.model';
+import {Button} from 'primeng/button';
+import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
+import {AbstractControl, FormBuilder, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Password} from 'primeng/password';
+import {AuthService} from '../../service/auth.service';
+import {first} from 'rxjs';
+import Messages from '../../model/messages.model';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
+
+@Component({
+  selector: 'profile-change-password-form',
+  imports: [
+    Button,
+    FormInputErrorComponent,
+    FormsModule,
+    Password,
+    ReactiveFormsModule,
+    MessagesShowcaseComponent
+  ],
+  templateUrl: './profile-change-password-form.component.html',
+  styles: ``
+})
+export class ProfileChangePasswordFormComponent {
+  private readonly authService = inject(AuthService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly formBuilder = inject(FormBuilder);
+
+  messages = signal<Messages>({});
+  user = input.required<User>();
+
+  form = this.formBuilder.group({
+    password: ['', [Validators.required, Validators.minLength(8)]],
+    confirmPassword: ['', [(control: AbstractControl) => {
+      if (this.form?.value?.password !== control.value) {
+        return { 'mismatchPassword': true };
+      }
+
+      return undefined;
+    }]],
+    currentPassword: ['', [Validators.required]],
+  });
+
+  customErrorMessages = {
+    'mismatchPassword': () => "Passwords do not match."
+  }
+
+  changePassword() {
+    if (this.form.invalid) {
+      this.messages.set({ error: ["Please fill in all fields."] });
+      return;
+    }
+
+    this.authService
+      .changePassword({
+        currentPassword: this.form.value.currentPassword!,
+        password: this.form.value.password!
+      })
+      .pipe(first())
+      .subscribe({
+        next: () => {
+          this.form.reset();
+          this.messages.set({ success: ["Password changed successfully."] });
+        },
+        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+      })
+  }
+}

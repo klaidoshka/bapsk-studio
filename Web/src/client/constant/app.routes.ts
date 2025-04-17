@@ -19,6 +19,7 @@ import {
 import {
   ImportConfigurationManagementPageComponent
 } from '../page/import-configuration-management-page/import-configuration-management-page.component';
+import {ResetPasswordPageComponent} from "../page/reset-password-page/reset-password-page.component";
 
 export const routes: Routes = [
   {
@@ -86,6 +87,10 @@ export const routes: Routes = [
         loadComponent: () => RegisterComponent
       }
     ]
+  },
+  {
+    path: "auth/reset-password",
+    loadComponent: () => ResetPasswordPageComponent
   },
   {
     path: "declaration",

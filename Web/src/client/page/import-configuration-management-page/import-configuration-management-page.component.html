@@ -44,7 +44,7 @@
             [options]="dataTypes.value()"
             optionLabel="name"
             optionValue="id"
-            placeholder="Select data type..."
+            placeholder="Select a data type"
             appendTo="body"
             styleClass="w-full"
             class="mt-1"
@@ -89,7 +89,7 @@
 
                 @if (fieldType === FieldType.Reference) {
                   <p-select
-                    placeholder="Select referenced entry"
+                    placeholder="Select a referenced entry"
                     [options]="getDataEntries(i)()"
                     optionLabel="label"
                     optionValue="id"
@@ -131,6 +131,7 @@
         [label]="configuration.hasValue() ? 'Save' : 'Create'"
         [disabled]="form.invalid || !form.dirty"
         (onClick)="save()"
+        type="submit"
       />
     </div>
   </div>

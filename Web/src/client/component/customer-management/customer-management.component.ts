@@ -1,22 +1,10 @@
-import {Component, inject, input, OnInit, signal} from '@angular/core';
-import {
-  AbstractControl,
-  FormArray,
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
-import Customer, {
-  CustomerCreateRequest,
-  CustomerEditRequest,
-  CustomerOtherDocument
-} from '../../model/customer.model';
+import {Component, inject, input, signal} from '@angular/core';
+import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import Customer, {CustomerCreateRequest, CustomerEditRequest, CustomerOtherDocument} from '../../model/customer.model';
 import Messages from '../../model/messages.model';
 import {CustomerService} from '../../service/customer.service';
-import {TextService} from '../../service/text.service';
 import {first} from 'rxjs';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
@@ -25,7 +13,8 @@ import {Select} from 'primeng/select';
 import {IdentityDocumentType} from '../../model/identity-document-type.model';
 import {DatePicker} from 'primeng/datepicker';
 import {getDefaultIsoCountry, IsoCountries} from '../../model/iso-country.model';
-import {NgForOf, NgIf} from '@angular/common';
+import {NgForOf} from '@angular/common';
+import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
 
 @Component({
   selector: 'customer-management',
@@ -38,7 +27,7 @@ import {NgForOf, NgIf} from '@angular/common';
     Select,
     DatePicker,
     NgForOf,
-    NgIf
+    FormInputErrorComponent
   ],
   templateUrl: './customer-management.component.html',
   styles: ``
@@ -47,8 +36,7 @@ export class CustomerManagementComponent {
   protected readonly IsoCountries = IsoCountries;
   private readonly formBuilder = inject(FormBuilder);
   private readonly customerService = inject(CustomerService);
-  private readonly localizationService = inject(LocalizationService);
-  private readonly textService = inject(TextService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
 
   customer = signal<Customer | null>(null);
 
@@ -63,13 +51,19 @@ export class CustomerManagementComponent {
       value: [null, [Validators.maxLength(50)]]
     }),
     lastName: ["", [Validators.required, Validators.maxLength(200)]],
-    otherDocuments: this.formBuilder.array([]),
+    otherDocuments: this.formBuilder.array([
+      this.formBuilder.group({
+        issuedBy: [getDefaultIsoCountry().code, [Validators.required]],
+        type: ["", [Validators.required, Validators.maxLength(70)]],
+        value: ["", [Validators.required, Validators.maxLength(70)]]
+      })
+    ]),
     residenceCountry: [getDefaultIsoCountry().code, [Validators.required]]
   });
 
   identityDocumentTypes = [
-    {label: 'ID Card', value: IdentityDocumentType.NationalId},
-    {label: 'Passport', value: IdentityDocumentType.Passport}
+    { label: 'ID Card', value: IdentityDocumentType.NationalId },
+    { label: 'Passport', value: IdentityDocumentType.Passport }
   ]
 
   instanceId = input.required<number>();
@@ -77,7 +71,7 @@ export class CustomerManagementComponent {
   messages = signal<Messages>({});
 
   private onSuccess(message: string) {
-    this.messages.set({success: [message]});
+    this.messages.set({ success: [message] });
     this.form.markAsUntouched();
     this.form.markAsPristine();
   }
@@ -85,14 +79,14 @@ export class CustomerManagementComponent {
   private create(request: CustomerCreateRequest) {
     this.customerService.create(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Customer has been created successfully."),
-      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   private edit(request: CustomerEditRequest) {
     this.customerService.edit(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Customer has been edited successfully."),
-      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
@@ -106,51 +100,6 @@ export class CustomerManagementComponent {
     this.form.markAsDirty();
   }
 
-  getErrorMessage(field: string): string | null {
-    const parts = field.split(".");
-    let control: AbstractControl<any, any> | null = null;
-
-    for (const part of parts) {
-      control = control ? control.get(part) : this.form.get(part);
-    }
-
-    if (!control || !control.touched || !control.invalid) {
-      return "";
-    }
-
-    const name = this.textService.capitalize(field);
-
-    if (control.errors?.["required"]) {
-      return `${name} is required.`;
-    }
-
-    if (control.errors?.["maxlength"]) {
-      return `${name} must be at most ${control.errors["maxlength"].requiredLength} characters long.`;
-    }
-
-    return null;
-  }
-
-  getOtherDocumentErrorMessage(index: number, field: string) {
-    const control = this.otherDocuments().at(index).get(field);
-
-    if (!control || !control.touched || !control.invalid) {
-      return "";
-    }
-
-    const name = this.textService.capitalize(field);
-
-    if (control.errors?.["required"]) {
-      return `${name} is required.`;
-    }
-
-    if (control.errors?.["maxlength"]) {
-      return `${name} must be at most ${control.errors["maxlength"].requiredLength} characters long.`;
-    }
-
-    return null;
-  }
-
   hide() {
     this.messages.set({});
     this.isShown.set(false);
@@ -158,8 +107,8 @@ export class CustomerManagementComponent {
     this.otherDocuments().clear();
   }
 
-  otherDocuments(): FormArray {
-    return this.form.get("otherDocuments") as FormArray;
+  otherDocuments() {
+    return this.form.controls.otherDocuments;
   }
 
   removeOtherDocument(index: number) {
@@ -169,7 +118,7 @@ export class CustomerManagementComponent {
 
   save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill out the form."]});
+      this.messages.set({ error: ["Please fill out the form."] });
       return;
     }
 
@@ -214,7 +163,7 @@ export class CustomerManagementComponent {
     this.form.reset();
 
     if (customer != null) {
-      this.form.patchValue({...customer as any});
+      this.form.patchValue({ ...customer as any });
 
       if (customer.otherDocuments.length > 0) {
         customer.otherDocuments.forEach(it => this.addOtherDocument(it));

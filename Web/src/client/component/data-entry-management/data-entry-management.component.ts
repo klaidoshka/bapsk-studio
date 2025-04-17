@@ -1,8 +1,7 @@
 import {Component, computed, effect, inject, input, Signal, signal} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {DataEntryService} from '../../service/data-entry.service';
 import {InstanceService} from '../../service/instance.service';
-import {TextService} from '../../service/text.service';
 import DataEntry, {DataEntryCreateRequest, DataEntryEditRequest} from '../../model/data-entry.model';
 import Messages from '../../model/messages.model';
 import {first} from 'rxjs';
@@ -11,11 +10,12 @@ import {Dialog} from 'primeng/dialog';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import DataType from '../../model/data-type.model';
 import {FieldType} from '../../model/data-type-field.model';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {DataTypeEntryFieldInputComponent} from '../data-type-entry-field-input/data-type-entry-field-input.component';
 import {Select} from 'primeng/select';
 import {NgIf} from '@angular/common';
 import {rxResource} from '@angular/core/rxjs-interop';
+import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
 
 @Component({
   selector: 'data-entry-management',
@@ -27,7 +27,8 @@ import {rxResource} from '@angular/core/rxjs-interop';
     DataTypeEntryFieldInputComponent,
     FormsModule,
     Select,
-    NgIf
+    NgIf,
+    FormInputErrorComponent
   ],
   templateUrl: './data-entry-management.component.html',
   styles: ``
@@ -37,8 +38,7 @@ export class DataEntryManagementComponent {
   private readonly dataEntryService = inject(DataEntryService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly instanceService = inject(InstanceService);
-  private readonly localizationService = inject(LocalizationService);
-  private readonly textService = inject(TextService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
 
   dataEntry = signal<DataEntry | undefined>(undefined);
 
@@ -52,7 +52,7 @@ export class DataEntryManagementComponent {
   });
 
   dataType = input.required<DataType>();
-  form!: FormGroup;
+  form = this.createForm();
   instanceId = this.instanceService.getActiveInstanceId();
   isShown = signal<boolean>(false);
   messages = signal<Messages>({});
@@ -64,35 +64,32 @@ export class DataEntryManagementComponent {
     });
   }
 
-  private createForm(dataType?: DataType, dataEntry?: DataEntry): FormGroup {
-    const formGroup = this.formBuilder.group({});
+  private createForm(dataType?: DataType, dataEntry?: DataEntry) {
+    return this.formBuilder.group({
+      values: this.formBuilder.array(
+        dataType?.fields?.map(tf => {
+          const entryField = dataEntry?.fields?.find(ef => ef.dataTypeFieldId === tf.id);
 
-    dataType?.fields?.forEach(tf => {
-      const entryField = dataEntry?.fields?.find(ef => ef.dataTypeFieldId === tf.id);
-
-      formGroup.addControl(
-        tf.name,
-        this.formBuilder.control(
-          entryField?.value,
-          tf.isRequired ? Validators.required : null
-        )
-      );
+          return this.formBuilder.group({
+            name: [tf.name, [Validators.required]],
+            value: [entryField?.value, [tf.isRequired ? Validators.required : null]]
+          });
+        }) || []
+      )
     });
-
-    return formGroup;
   }
 
   private create(request: DataEntryCreateRequest) {
     this.dataEntryService.create(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Data entry has been created successfully."),
-      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
   private edit(request: DataEntryEditRequest) {
     this.dataEntryService.edit(request).pipe(first()).subscribe({
       next: () => this.onSuccess("Data entry has been edited successfully."),
-      error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
     });
   }
 
@@ -103,19 +100,17 @@ export class DataEntryManagementComponent {
   }
 
   get formFields() {
-    return Object.keys(this.form.controls).map(key => {
-        const control = this.form.get(key)!;
-        const dataTypeField = this.dataType()!.fields.find(f => f.name === key)!;
-        return {
-          control: control as FormControl<any>,
-          dataTypeFieldId: dataTypeField.id,
-          field: key,
-          isRequired: dataTypeField.isRequired,
-          referenceId: dataTypeField.referenceId,
-          type: dataTypeField.type
-        };
-      }
-    );
+    return this.form.controls.values.controls.map(control => {
+      const dataTypeField = this.dataType()!.fields.find(f => f.name === control.value.name);
+      return {
+        control: control,
+        dataTypeFieldId: dataTypeField?.id,
+        field: control.value.name,
+        isRequired: dataTypeField?.isRequired,
+        referenceId: dataTypeField?.referenceId,
+        type: dataTypeField?.type
+      };
+    });
   }
 
   getDataEntries(dataTypeId?: number | null): Signal<{ id: number, label: string }[]> {
@@ -131,20 +126,6 @@ export class DataEntryManagementComponent {
           label: dataEntry.display()
         })) || [];
     });
-  }
-
-  getErrorMessage(field: string): string | null {
-    const control = this.form.get(field);
-
-    if (!control || !control.touched || !control.invalid) {
-      return "";
-    }
-
-    if (control.errors?.["required"]) {
-      return `${this.textService.capitalize(field)} is required.`;
-    }
-
-    return null;
   }
 
   hide() {
@@ -168,8 +149,8 @@ export class DataEntryManagementComponent {
 
           return {
             dataEntryFieldId: candidate.id,
-            dataTypeFieldId: field.dataTypeFieldId,
-            value: field.control.value
+            dataTypeFieldId: field.dataTypeFieldId!,
+            value: field.control.value.value
           };
         })
       });
@@ -179,7 +160,7 @@ export class DataEntryManagementComponent {
         fields: this.dataType()!.fields.map((dataTypeField, _) => {
           return {
             dataTypeFieldId: dataTypeField.id,
-            value: this.formFields.find(f => f.field === dataTypeField.name)!.control!.value
+            value: this.formFields.find(f => f.field === dataTypeField.name)!.control!.value.value
           };
         })
       });
@@ -191,4 +172,6 @@ export class DataEntryManagementComponent {
     this.form = this.createForm(this.dataType(), dataEntry);
     this.isShown.set(true);
   }
+
+  protected readonly Object = Object;
 }

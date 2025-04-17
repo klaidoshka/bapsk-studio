@@ -10,7 +10,7 @@ import Messages from '../../model/messages.model';
 import {User} from '../../model/user.model';
 import {first} from 'rxjs';
 import {getUserIsoCountryLabel} from '../../model/iso-country.model';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {DatePipe} from '@angular/common';
 
 @Component({
@@ -28,7 +28,7 @@ import {DatePipe} from '@angular/common';
   styles: ``
 })
 export class UserShowcaseComponent {
-  private readonly localizationService = inject(LocalizationService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly userService = inject(UserService);
 
   confirmationComponent = viewChild.required(ConfirmationComponent);
@@ -43,7 +43,7 @@ export class UserShowcaseComponent {
     this.confirmationComponent().request(() => {
       this.userService.delete(user.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['User deleted successfully']}),
-        error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
       });
     });
   }

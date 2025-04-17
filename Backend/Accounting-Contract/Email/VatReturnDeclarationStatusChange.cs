@@ -24,7 +24,7 @@ public class VatReturnDeclarationStatusChange : IEmailForm
                                    status to <strong>{{Status}}</strong>.
                                  </p>
                                  <p style="margin-top: 16px; color: #374151;">
-                                   <a href="http://localhost:4200/declaration?code={{PreviewCode}}" style="color: #1a0dab; text-decoration: underline;">
+                                   <a href="{{Endpoint}}?code={{PreviewCode}}" style="color: #1a0dab; text-decoration: underline;">
                                      Press here to open declaration preview
                                   </a>
                                  </p>
@@ -39,7 +39,7 @@ public class VatReturnDeclarationStatusChange : IEmailForm
 
     public string Subject { get; }
 
-    public VatReturnDeclarationStatusChange(StiVatReturnDeclaration declaration, string previewCode)
+    public VatReturnDeclarationStatusChange(StiVatReturnDeclaration declaration, string previewCode, string endpoint)
     {
         var color = declaration.State != SubmitDeclarationState.REJECTED ? "#22c55e" : "#ef4444";
 
@@ -66,19 +66,21 @@ public class VatReturnDeclarationStatusChange : IEmailForm
             declaration.Id,
             statusText,
             previewCode,
-            declaration.QrCodes.Count > 0
+            declaration.QrCodes.Count > 0,
+            endpoint
         );
 
         Subject = $"VAT Return Declaration - {declaration.Id} - Status Change";
     }
 
-    private string BuildBody(string color, string id, string status, string previewCode, bool qrCodesAssigned)
+    private string BuildBody(string color, string id, string status, string previewCode, bool qrCodesAssigned, string endpoint)
     {
         var html = Html
             .Replace("{{Color}}", color)
             .Replace("{{Id}}", id)
             .Replace("{{PreviewCode}}", previewCode)
-            .Replace("{{Status}}", status);
+            .Replace("{{Status}}", status)
+            .Replace("{{Endpoint}}", endpoint);
 
         html = html.Replace(
             "{{QrCodesBelow}}",

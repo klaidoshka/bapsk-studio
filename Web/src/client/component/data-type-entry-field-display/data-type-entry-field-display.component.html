@@ -1,9 +1,6 @@
 @switch (fieldType()) {
   @case (FieldType.Check) {
-    <p-badge
-      [value]="value() === true ? 'Yes' : 'No'"
-      [severity]="value() === true ? 'success' : 'danger'"
-    />
+    <p-badge [value]="value() === true ? 'Yes' : 'No'" [severity]="value() === true ? 'success' : 'danger'"/>
   }
   @case (FieldType.Currency) {
     <p>{{ value() | currency: 'EUR':'symbol':'1.2-2' }}</p>

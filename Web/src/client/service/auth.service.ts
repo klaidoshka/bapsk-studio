@@ -1,7 +1,7 @@
 import {HttpClient} from "@angular/common/http";
-import {computed, inject, Injectable, Signal, signal, WritableSignal} from "@angular/core";
+import {computed, inject, Injectable, Signal, signal} from "@angular/core";
 import {finalize, Observable, of} from "rxjs";
-import {AuthResponse, LoginRequest, RegisterRequest} from "../model/auth.model";
+import {AuthResponse, ChangePasswordRequest, LoginRequest, RegisterRequest} from "../model/auth.model";
 import {User} from "../model/user.model";
 import {ApiRouter} from "./api-router.service";
 import {UserService} from './user.service';
@@ -18,7 +18,7 @@ export class AuthService {
 
   private readonly accessKey: string = "__accounting_access__";
   private readonly userKey: string = "__accounting_user__";
-  
+
   private readonly access = signal<AuthResponse | null>(this.getAccess());
   private readonly user = this.toUser();
   private readonly userAuthenticated = computed(() => this.access() !== null);
@@ -42,13 +42,17 @@ export class AuthService {
     });
   }
 
-  acceptAuthResponse(response: AuthResponse): void {
+  acceptAuthResponse(response: AuthResponse) {
     localStorage.setItem(this.accessKey, JSON.stringify(response));
 
     this.access.set(response);
   }
 
-  cleanupCredentials(): void {
+  changePassword(request: ChangePasswordRequest): Observable<void> {
+    return this.httpClient.post<void>(this.apiRouter.authChangePassword(), request);
+  }
+
+  cleanupCredentials() {
     localStorage.removeItem(this.accessKey);
     localStorage.removeItem(this.userKey);
 
@@ -112,6 +116,10 @@ export class AuthService {
     return this.httpClient.post<AuthResponse>(this.apiRouter.authRefresh(), {});
   }
 
+  resetPassword(email: string): Observable<void> {
+    return this.httpClient.post<void>(this.apiRouter.authResetPassword(), { email });
+  }
+
   private toUser(): Signal<User | undefined> {
     return computed(() => {
       const userId = this.access()?.userId;
@@ -119,7 +127,7 @@ export class AuthService {
       if (userId == null) {
         const value = localStorage.getItem(this.userKey);
 
-        return value !== null ? JSON.parse(value) : undefined;
+        return value !== null ? this.userService.updateProperties(JSON.parse(value)) : undefined;
       }
 
       const user = this.userService.getByIdAsSignal(userId)();
@@ -127,7 +135,7 @@ export class AuthService {
       if (user == null) {
         const value = localStorage.getItem(this.userKey);
 
-        return value !== null ? JSON.parse(value) : undefined;
+        return value !== null ? this.userService.updateProperties(JSON.parse(value)) : undefined;
       }
 
       localStorage.setItem(this.userKey, JSON.stringify(user));

@@ -5,7 +5,7 @@ import {SalesmanManagementComponent} from '../salesman-management/salesman-manag
 import Messages from '../../model/messages.model';
 import {SalesmanPreviewComponent} from '../salesman-preview/salesman-preview.component';
 import {SalesmanService} from '../../service/salesman.service';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {first} from 'rxjs';
 import {Button} from 'primeng/button';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
@@ -26,7 +26,7 @@ import {getIsoCountryLabel} from '../../model/iso-country.model';
   styles: ``
 })
 export class SalesmanShowcaseComponent {
-  private readonly localizationService = inject(LocalizationService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly salesmanService = inject(SalesmanService);
 
   confirmationComponent = viewChild.required(ConfirmationComponent);
@@ -42,7 +42,7 @@ export class SalesmanShowcaseComponent {
     this.confirmationComponent().request(() => {
       this.salesmanService.delete(this.instanceId(), salesman.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['Salesman deleted successfully']}),
-        error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
       });
     });
   }

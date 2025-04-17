@@ -5,7 +5,7 @@ import {SaleManagementComponent} from '../sale-management/sale-management.compon
 import Messages from '../../model/messages.model';
 import {SalePreviewComponent} from '../sale-preview/sale-preview.component';
 import {SaleService} from '../../service/sale.service';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {first} from 'rxjs';
 import {Button} from 'primeng/button';
 import {CurrencyPipe, DatePipe} from '@angular/common';
@@ -13,9 +13,7 @@ import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.
 import {TableModule} from 'primeng/table';
 import Customer, {toCustomerFullName} from '../../model/customer.model';
 import Salesman from '../../model/salesman.model';
-import {
-  VatReturnDeclarationPreviewComponent
-} from '../vat-return-declaration-preview/vat-return-declaration-preview.component';
+import {VatReturnDeclarationPreviewComponent} from '../vat-return-declaration-preview/vat-return-declaration-preview.component';
 
 @Component({
   selector: 'sale-showcase',
@@ -34,7 +32,7 @@ import {
   styles: ``
 })
 export class SaleShowcaseComponent {
-  private readonly localizationService = inject(LocalizationService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly saleService = inject(SaleService);
 
   confirmationComponent = viewChild.required(ConfirmationComponent);
@@ -53,7 +51,7 @@ export class SaleShowcaseComponent {
     this.confirmationComponent().request(() => {
       this.saleService.delete(this.instanceId(), sale.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['Sale deleted successfully']}),
-        error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
       });
     });
   }

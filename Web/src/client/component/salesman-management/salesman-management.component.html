@@ -8,75 +8,35 @@
   (onHide)="hide()"
   (close)="hide()"
 >
-  <div class="min-w-128">
+  <form class="min-w-128">
     <messages-showcase [messages]="messages()"/>
 
-    <div
-      class="grid grid-cols-1 md:grid-cols-2 gap-4"
-      [formGroup]="form"
-    >
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" [formGroup]="form">
       <div>
-        <label
-          for="name"
-          class="block text-sm font-medium"
-        >Name</label>
-        <input
-          formControlName="name"
-          pInputText
-          type="text"
-          id="name"
-          class="mt-1 block w-full"
-        />
-        @if (getErrorMessage("name"); as error) {
-          <div class="text-xs text-red-500 mt-1">{{ error }}</div>
-        }
+        <label for="name" class="block text-sm font-medium">Name</label>
+        <input formControlName="name" pInputText type="text" id="name" class="mt-1 block w-full"/>
+        <form-input-error [control]="form.controls.name"/>
       </div>
 
       <ng-container formGroupName="vatPayerCode">
         <div>
-          <label
-            for="vatPayerCodeValue"
-            class="block text-sm font-medium"
-          >Vat Payer Code</label>
-          <input
-            formControlName="value"
-            pInputText
-            type="text"
-            id="vatPayerCodeValue"
-            class="mt-1 block w-full"
-          />
-          @if (getErrorMessage("vatPayerCode.value"); as error) {
-            <div class="text-xs text-red-500 mt-1">{{ error }}</div>
-          }
+          <label for="vatPayerCodeValue" class="block text-sm font-medium">Vat Payer Code</label>
+          <input formControlName="value" pInputText type="text" id="vatPayerCodeValue" class="mt-1 block w-full"/>
+          <form-input-error [control]="form.controls.vatPayerCode.controls.value"/>
         </div>
 
         <div>
-          <label
-            for="vatPayerCodeIssuedBy"
-            class="block text-sm font-medium"
-          >Vat Payer Code Issued By</label>
-          <p-select
-            inputId="issuedBy"
-            formControlName="issuedBy"
-            [options]="IsoCountries"
-            optionLabel="name"
-            optionValue="code"
-            class="mt-1 block w-full"
-            appendTo="body"
-          />
-          @if (getErrorMessage("vatPayerCode.issuedBy"); as error) {
-            <div class="text-xs text-red-500 mt-1">{{ error }}</div>
-          }
+          <label for="vatPayerCodeIssuedBy" class="block text-sm font-medium">Vat Payer Code Issued By</label>
+          <p-select inputId="issuedBy" formControlName="issuedBy" [options]="IsoCountries" optionLabel="name" optionValue="code"
+                    class="mt-1 block w-full" appendTo="body"/>
+          <form-input-error [control]="form.controls.vatPayerCode.controls.issuedBy"/>
         </div>
       </ng-container>
     </div>
 
     <div class="flex justify-end mt-4">
-      <p-button
-        [label]="salesman() == null ? 'Create' : 'Save'"
-        [disabled]="!form.valid || !form.dirty"
-        (onClick)="save()"
-      />
+      <p-button [label]="salesman() == null ? 'Create' : 'Save'" [disabled]="!form.valid || !form.dirty" (onClick)="save()"
+                type="submit"/>
     </div>
-  </div>
+  </form>
 </p-dialog>

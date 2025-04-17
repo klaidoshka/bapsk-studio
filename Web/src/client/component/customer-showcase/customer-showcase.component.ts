@@ -6,7 +6,7 @@ import {first} from 'rxjs';
 import {CustomerManagementComponent} from '../customer-management/customer-management.component';
 import {CustomerPreviewComponent} from '../customer-preview/customer-preview.component';
 import {CustomerService} from '../../service/customer.service';
-import {LocalizationService} from '../../service/localization.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {Button} from 'primeng/button';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {TableModule} from 'primeng/table';
@@ -32,7 +32,7 @@ export class CustomerShowcaseComponent {
   protected readonly getIdentityDocumentTypeLabel = getIdentityDocumentTypeLabel;
   protected readonly getIsoCountryLabel = getIsoCountryLabel;
   private readonly customerService = inject(CustomerService);
-  private readonly localizationService = inject(LocalizationService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
 
   customers = input.required<Customer[]>();
   confirmationComponent = viewChild.required(ConfirmationComponent);
@@ -45,7 +45,7 @@ export class CustomerShowcaseComponent {
     this.confirmationComponent().request(() => {
       this.customerService.delete(this.instanceId(), customer.id!!).pipe(first()).subscribe({
         next: () => this.messages.set({success: ['Customer deleted successfully']}),
-        error: (response) => this.localizationService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
       });
     });
   }

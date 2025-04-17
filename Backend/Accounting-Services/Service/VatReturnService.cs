@@ -42,6 +42,7 @@ public class VatReturnService : IVatReturnService
     private readonly ICountryService _countryService;
     private readonly ICustomerService _customerService;
     private readonly AccountingDatabase _database;
+    private readonly Email _email;
     private readonly IEmailService _emailService;
     private readonly ISaleService _saleService;
     private readonly ISalesmanService _salesmanService;
@@ -54,6 +55,7 @@ public class VatReturnService : IVatReturnService
         ICountryService countryService,
         ICustomerService customerService,
         AccountingDatabase database,
+        Email email,
         IEmailService emailService,
         ISaleService saleService,
         ISalesmanService salesmanService,
@@ -66,6 +68,7 @@ public class VatReturnService : IVatReturnService
         _countryService = countryService;
         _customerService = customerService;
         _database = database;
+        _email = email;
         _emailService = emailService;
         _saleService = saleService;
         _salesmanService = salesmanService;
@@ -210,7 +213,8 @@ public class VatReturnService : IVatReturnService
                 declaration.Sale.Customer.Email,
                 Emails.VatReturnDeclarationStatusChange(
                     declaration,
-                    GeneratePreviewCode(declaration)
+                    GeneratePreviewCode(declaration),
+                    _email.VatReturnStatusChange.Endpoint
                 )
             );
         }

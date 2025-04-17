@@ -1,6 +1,8 @@
 using Accounting.Contract;
+using Accounting.Contract.Configuration;
 using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.Auth;
+using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;
@@ -10,16 +12,22 @@ namespace Accounting.Services.Validator;
 public class AuthValidator : IAuthValidator
 {
     private readonly AccountingDatabase _database;
+    private readonly Email _email;
+    private readonly IEncryptService _encryptService;
     private readonly IHashService _hashService;
     private readonly IJwtService _jwtService;
 
     public AuthValidator(
         AccountingDatabase database,
+        Email email,
+        IEncryptService encryptService,
         IHashService hashService,
         IJwtService jwtService
     )
     {
         _database = database;
+        _email = email;
+        _encryptService = encryptService;
         _jwtService = jwtService;
         _hashService = hashService;
     }
@@ -38,7 +46,91 @@ public class AuthValidator : IAuthValidator
             failures.Add("IP address is required in authentication meta.");
         }
 
-        return new Validation(failures);
+        return new(failures);
+    }
+
+    public async Task<Validation<(User?, User?)>> ValidateChangePasswordRequestAsync(ChangePasswordRequest request)
+    {
+        if ((request.RequesterId is null || request.CurrentPassword is null) && request.ResetPasswordToken is null)
+        {
+            throw new ArgumentException("Either requesterId, currentPassword or resetPasswordToken must be provided.");
+        }
+
+        if (
+            String.IsNullOrWhiteSpace(request.Password) ||
+            request.Password.Length < 7 ||
+            request.Password.All(ch => request.Password[0] == ch)
+        )
+        {
+            return new("Password must have at least 7 characters and be not a sequence of the same character.");
+        }
+
+        if (request.ResetPasswordToken is not null)
+        {
+            return await ValidateChangePasswordRequestByTokenAsync(request.ResetPasswordToken);
+        }
+
+        if (request.CurrentPassword is null)
+        {
+            return new("Current password is required.");
+        }
+
+        var userRequester = await _database.Users.FirstOrDefaultAsync(
+            u => u.Id == request.RequesterId && u.IsDeleted == false
+        );
+        
+        var validation = ValidateUserCredentials(userRequester, request.CurrentPassword);
+
+        if (validation.IsValid)
+        {
+            return new((userRequester, null));
+        }
+
+        return new(validation);
+    }
+
+    private async Task<Validation<(User?, User?)>> ValidateChangePasswordRequestByTokenAsync(string resetPasswordToken)
+    {
+        try
+        {
+            var token = _encryptService.DecryptAsync(resetPasswordToken, _email.ResetPassword.Secret);
+            var tokenParts = token.Result.Split('|');
+
+            if (tokenParts.Length != 3)
+            {
+                return new("Invalid reset password token.");
+            }
+
+            if (!Int32.TryParse(tokenParts[0], out var userId))
+            {
+                return new("Invalid reset password token.");
+            }
+
+            if (!DateTime.TryParse(tokenParts[2], out var expirationDate))
+            {
+                return new("Invalid reset password token.");
+            }
+
+            if (expirationDate < DateTime.UtcNow)
+            {
+                return new("Reset password token expired.");
+            }
+
+            var user = await _database.Users.FirstOrDefaultAsync(
+                u => u.Id == userId && u.EmailNormalized.Equals(tokenParts[1], StringComparison.InvariantCultureIgnoreCase)
+            );
+
+            if (user is null || user.IsDeleted)
+            {
+                return new("Requested account does not exist.");
+            }
+
+            return new((null, user));
+        }
+        catch (Exception)
+        {
+            return new("Invalid reset password token.");
+        }
     }
 
     public Validation ValidateLoginRequest(LoginRequest request)
@@ -64,7 +156,7 @@ public class AuthValidator : IAuthValidator
             failures.Add("Email is required.");
         }
 
-        return new Validation(failures);
+        return new(failures);
     }
 
     public async Task<Validation> ValidateRegisterRequestAsync(RegisterRequest request)
@@ -118,7 +210,7 @@ public class AuthValidator : IAuthValidator
             failures.Add("First name is required.");
         }
 
-        return new Validation(failures);
+        return new(failures);
     }
 
     public async Task<Validation> ValidateRefreshTokenAsync(string refreshToken)
@@ -129,12 +221,12 @@ public class AuthValidator : IAuthValidator
             .Include(s => s.User)
             .FirstOrDefaultAsync(s => s.Id == sessionId);
 
-        if (session == null || session.User.IsDeleted || session.RefreshToken != refreshToken)
+        if (session is null || session.User.IsDeleted || session.RefreshToken != refreshToken)
         {
-            return new Validation("Session was not found.");
+            return new("Session was not found.");
         }
 
-        return new Validation();
+        return new();
     }
 
     public async Task<Validation> ValidateUserCredentialsAsync(string email, string password)
@@ -146,13 +238,35 @@ public class AuthValidator : IAuthValidator
             )
         );
 
-        if (user == null || user.IsDeleted)
+        return ValidateUserCredentials(user, password);
+    }
+
+    private Validation ValidateUserCredentials(User? user, string password)
+    {
+        if (user is null || user.IsDeleted)
         {
-            return new Validation("Invalid credentials or user does not exist.");
+            return new("Invalid credentials.");
         }
 
         return _hashService.Verify(password, user.PasswordHash)
-            ? new Validation()
-            : new Validation("Invalid credentials or user does not exist.");
+            ? new()
+            : new("Invalid credentials.");
+    }
+
+    public async Task<Validation<User>> ValidateResetPasswordAsync(ResetPasswordRequest request)
+    {
+        var user = await _database.Users.FirstOrDefaultAsync(
+            u => u.EmailNormalized.Equals(
+                request.Email,
+                StringComparison.InvariantCultureIgnoreCase
+            )
+        );
+
+        if (user is null || user.IsDeleted)
+        {
+            return new("Requested account does not exist.");
+        }
+
+        return new(user);
     }
 }
