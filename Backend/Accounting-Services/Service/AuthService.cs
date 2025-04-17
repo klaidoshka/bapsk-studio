@@ -73,7 +73,7 @@ public class AuthService : IAuthService
         var user = await _database.Users.FirstAsync(
             u => u.EmailNormalized.Equals(
                 request.Email,
-                StringComparison.InvariantCultureIgnoreCase
+                StringComparison.OrdinalIgnoreCase
             )
         );
 

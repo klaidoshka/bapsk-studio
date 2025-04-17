@@ -117,7 +117,7 @@ public class AuthValidator : IAuthValidator
             }
 
             var user = await _database.Users.FirstOrDefaultAsync(
-                u => u.Id == userId && u.EmailNormalized.Equals(tokenParts[1], StringComparison.InvariantCultureIgnoreCase)
+                u => u.Id == userId && u.EmailNormalized.Equals(tokenParts[1], StringComparison.OrdinalIgnoreCase)
             );
 
             if (user is null || user.IsDeleted)
@@ -186,7 +186,7 @@ public class AuthValidator : IAuthValidator
             await _database.Users.AnyAsync(
                 u => u.EmailNormalized.Equals(
                     request.Email,
-                    StringComparison.InvariantCultureIgnoreCase
+                    StringComparison.OrdinalIgnoreCase
                 )
             )
         )
@@ -234,7 +234,7 @@ public class AuthValidator : IAuthValidator
         var user = await _database.Users.FirstOrDefaultAsync(
             u => u.EmailNormalized.Equals(
                 email,
-                StringComparison.InvariantCultureIgnoreCase
+                StringComparison.OrdinalIgnoreCase
             )
         );
 
@@ -258,7 +258,7 @@ public class AuthValidator : IAuthValidator
         var user = await _database.Users.FirstOrDefaultAsync(
             u => u.EmailNormalized.Equals(
                 request.Email,
-                StringComparison.InvariantCultureIgnoreCase
+                StringComparison.OrdinalIgnoreCase
             )
         );
 

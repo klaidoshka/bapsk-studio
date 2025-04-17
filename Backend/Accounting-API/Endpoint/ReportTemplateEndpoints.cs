@@ -1,19 +1,19 @@
 using Accounting.API.Util;
-using Accounting.Contract.Dto.ImportConfiguration;
+using Accounting.Contract.Dto.ReportTemplate;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Accounting.API.Endpoint;
 
-public static class ImportConfigurationEndpoints
+public static class ReportTemplateEndpoints
 {
-    public static void MapImportConfigurationEndpoints(this RouteGroupBuilder builder)
+    public static void MapReportTemplateEndpoints(this RouteGroupBuilder builder)
     {
         builder.MapPost(
             String.Empty,
             async (
-                [FromBody] ImportConfigurationCreateRequest request,
-                IImportConfigurationService importConfigurationService,
+                [FromBody] ReportTemplateCreateRequest request,
+                IReportTemplateService importConfigurationService,
                 HttpContext httpContext
             ) =>
             {
@@ -27,14 +27,14 @@ public static class ImportConfigurationEndpoints
             "/{id:int}",
             async (
                 int id,
-                IImportConfigurationService importConfigurationService,
+                IReportTemplateService importConfigurationService,
                 HttpContext httpContext
             ) =>
             {
                 await importConfigurationService.DeleteAsync(
-                    new ImportConfigurationDeleteRequest
+                    new ReportTemplateDeleteRequest
                     {
-                        ImportConfigurationId = id,
+                        ReportTemplateId = id,
                         RequesterId = httpContext.GetUserIdOrThrow()
                     }
                 );
@@ -47,12 +47,12 @@ public static class ImportConfigurationEndpoints
             "/{id:int}",
             async (
                 int id,
-                [FromBody] ImportConfigurationEditRequest request,
-                IImportConfigurationService importConfigurationService,
+                [FromBody] ReportTemplateEditRequest request,
+                IReportTemplateService importConfigurationService,
                 HttpContext httpContext
             ) =>
             {
-                request.ImportConfiguration.Id = id;
+                request.ReportTemplate.Id = id;
                 request.RequesterId = httpContext.GetUserIdOrThrow();
 
                 await importConfigurationService.EditAsync(request);
@@ -65,37 +65,16 @@ public static class ImportConfigurationEndpoints
             "/{id:int}",
             async (
                 int id,
-                IImportConfigurationService importConfigurationService,
+                IReportTemplateService importConfigurationService,
                 HttpContext httpContext
             ) => Results.Json(
                 (await importConfigurationService.GetAsync(
-                    new ImportConfigurationGetRequest
+                    new ReportTemplateGetRequest
                     {
-                        ImportConfigurationId = id,
+                        ReportTemplateId = id,
                         RequesterId = httpContext.GetUserIdOrThrow()
                     }
                 )).ToDto()
-            )
-        );
-
-        builder.MapGet(
-            String.Empty,
-            async (
-                int? instanceId,
-                int? dataTypeId,
-                IImportConfigurationService importConfigurationService,
-                HttpContext httpContext
-            ) => Results.Json(
-                (await importConfigurationService.GetAsync(
-                    new ImportConfigurationGetBySomeIdRequest
-                    {
-                        DataTypeId = dataTypeId,
-                        InstanceId = instanceId,
-                        RequesterId = httpContext.GetUserIdOrThrow()
-                    }
-                ))
-                .Select(i => i.ToDto())
-                .ToList()
             )
         );
     }

@@ -29,7 +29,7 @@ public class DataTypeValidator : IDataTypeValidator
 
         if (instance.CreatedById != request.RequesterId)
         {
-            return new Validation("You are not allowed to create data types in this instance.");
+            return new Validation("You are not authorized to create data types in this instance.");
         }
 
         if (String.IsNullOrWhiteSpace(request.Name))
@@ -42,7 +42,7 @@ public class DataTypeValidator : IDataTypeValidator
                 dt => dt.InstanceId == request.InstanceId &&
                       dt.Name.Equals(
                           request.Name,
-                          StringComparison.InvariantCultureIgnoreCase
+                          StringComparison.OrdinalIgnoreCase
                       )
             )
         )
@@ -94,7 +94,7 @@ public class DataTypeValidator : IDataTypeValidator
         }
 
         return dataType.Instance.CreatedById != request.RequesterId
-            ? new Validation("You are not allowed to delete this data type.")
+            ? new Validation("You are not authorized to delete this data type.")
             : new Validation();
     }
 
@@ -113,7 +113,7 @@ public class DataTypeValidator : IDataTypeValidator
 
         if (dataType.Instance.CreatedById != request.RequesterId)
         {
-            return new Validation("You are not allowed to edit this data type.");
+            return new Validation("You are not authorized to edit this data type.");
         }
 
         if (String.IsNullOrWhiteSpace(request.Name))
@@ -127,7 +127,7 @@ public class DataTypeValidator : IDataTypeValidator
                 dt => dt.InstanceId == dataType.InstanceId &&
                       dt.Name.Equals(
                           request.Name,
-                          StringComparison.InvariantCultureIgnoreCase
+                          StringComparison.OrdinalIgnoreCase
                       ) &&
                       dt.Id != request.DataTypeId
             )
@@ -211,7 +211,7 @@ public class DataTypeValidator : IDataTypeValidator
         }
 
         return dataType.Instance.CreatedById != request.RequesterId
-            ? new Validation("You are not allowed to view this data type.")
+            ? new Validation("You are not authorized to view this data type.")
             : new Validation();
     }
 
@@ -233,7 +233,7 @@ public class DataTypeValidator : IDataTypeValidator
             .ToHashSet();
 
         return !userIds.Contains(request.RequesterId)
-            ? new Validation("You are not allowed to view data types in this instance.")
+            ? new Validation("You are not authorized to view data types in this instance.")
             : new Validation();
     }
 

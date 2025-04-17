@@ -77,7 +77,10 @@ public static class ProgramExtensions
                 optionsBuilder.UseMySql(
                     databaseOptions.ConnectionString,
                     version,
-                    mySqlOptionsBuilder => mySqlOptionsBuilder.EnableStringComparisonTranslations()
+                    mySqlOptionsBuilder => mySqlOptionsBuilder
+                        .EnableStringComparisonTranslations()
+                        .EnablePrimitiveCollectionsSupport()
+                        .TranslateParameterizedCollectionsToConstants()
                 );
             }
         );
@@ -177,6 +180,10 @@ public static class ProgramExtensions
         accountingRouteGroup
             .MapGroup("/instance")
             .MapInstanceEndpoints();
+        
+        accountingRouteGroup
+            .MapGroup("/report-template")
+            .MapReportTemplateEndpoints();
 
         var stiRouteGroup = accountingRouteGroup
             .MapGroup("/sti");
