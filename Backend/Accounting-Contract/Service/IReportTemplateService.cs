@@ -13,5 +13,7 @@ public interface IReportTemplateService
 
     public Task<ReportTemplate> GetAsync(ReportTemplateGetRequest request);
 
-    public Task<IList<ReportTemplate>> GetByInstanceIdAsync(ReportTemplateGetByInstanceIdRequest request);
+    public Task<int> GetInstanceIdAsync(int templateId);
+
+    public Task<IList<ReportTemplate>> GetAsync(ReportTemplateGetByInstanceIdRequest request);
 }

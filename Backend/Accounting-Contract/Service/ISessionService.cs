@@ -9,5 +9,5 @@ public interface ISessionService
 
     public Task<Session> GetAsync(SessionGetRequest request);
 
-    public Task<IList<Session>> GetByUserIdAsync(SessionGetByUserRequest request);
+    public Task<IList<Session>> GetAsync(SessionGetByUserRequest request);
 }

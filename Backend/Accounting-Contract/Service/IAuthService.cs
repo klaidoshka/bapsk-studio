@@ -4,15 +4,15 @@ namespace Accounting.Contract.Service;
 
 public interface IAuthService
 {
-    Task ChangePasswordAsync(ChangePasswordRequest request);
-    
-    Task<JwtTokenPair> LoginAsync(LoginRequest request);
+    public Task ChangePasswordAsync(ChangePasswordRequest request);
 
-    Task LogoutAsync(Guid sessionId);
+    public Task<JwtTokenPair> LoginAsync(LoginRequest request);
 
-    Task<JwtTokenPair> RefreshTokenAsync(string refreshToken);
+    public Task LogoutAsync(Guid sessionId);
 
-    Task<JwtTokenPair> RegisterAsync(RegisterRequest request);
-    
-    Task ResetPasswordAsync(ResetPasswordRequest request);
+    public Task<JwtTokenPair> RefreshTokenAsync(string refreshToken);
+
+    public Task<JwtTokenPair> RegisterAsync(RegisterRequest request);
+
+    public Task ResetPasswordAsync(ResetPasswordRequest request);
 }

@@ -21,9 +21,6 @@ public class SaleService : ISaleService
 
     public async Task<Sale> CreateAsync(SaleCreateRequest request)
     {
-        // Validate if instance exists (HIGHER LEVEL)
-        // Validate if requester can access the instance (HIGHER LEVEL)
-        // Validate properties
         _saleValidator
             .ValidateSale(request.Sale)
             .AssertValid();
@@ -58,9 +55,6 @@ public class SaleService : ISaleService
 
     public async Task DeleteAsync(SaleDeleteRequest request)
     {
-        // Validate if instance exists (HIGHER LEVEL)
-        // Validate if requester can access the instance (HIGHER LEVEL)
-        // Validate if sale exists
         (await _saleValidator.ValidateDeleteRequestAsync(request.SaleId)).AssertValid();
 
         var sale = await _database.Sales
@@ -79,10 +73,6 @@ public class SaleService : ISaleService
 
     public async Task EditAsync(SaleEditRequest request)
     {
-        // Validate if instance exists (HIGHER LEVEL)
-        // Validate if requester can access the instance (HIGHER LEVEL)
-        // Validate if sale exists
-        // Validate properties
         (await _saleValidator.ValidateEditRequestAsync(request.Sale)).AssertValid();
 
         var sale = await _database.Sales
@@ -121,7 +111,6 @@ public class SaleService : ISaleService
                         it.UnitOfMeasure = soldGood.UnitOfMeasure;
                         it.UnitOfMeasureType = soldGood.UnitOfMeasureType;
                         it.VatRate = Math.Round(soldGood.VatRate, 2);
-                        // TODO: Fix Quantity * UnitPrice calculation, it differs by UnitOfMeasureType
                         it.TaxableAmount = Math.Round(soldGood.Quantity * soldGood.UnitPrice, 2);
                         it.VatAmount = Math.Round(it.TaxableAmount * soldGood.VatRate / 100, 2);
                         it.TotalAmount = Math.Round(it.TaxableAmount + it.VatAmount, 2);
@@ -143,8 +132,6 @@ public class SaleService : ISaleService
 
     public async Task<IList<Sale>> GetAsync(SaleGetRequest request)
     {
-        // Validate if instance exists (HIGHER LEVEL)
-        // Validate if requester can access the instance (HIGHER LEVEL)
         (await _saleValidator.ValidateGetRequestAsync(request.InstanceId)).AssertValid();
 
         return (await _database.Sales
@@ -163,10 +150,30 @@ public class SaleService : ISaleService
             );
     }
 
+    public async Task<IList<Sale>> GetAsync(SaleWithinIntervalGetRequest request)
+    {
+        return (await _database.Sales
+                .Include(it => it.Customer)
+                .Include(it => it.Salesman)
+                .Include(it => it.SoldGoods)
+                .Where(it => !it.IsDeleted &&
+                             it.CustomerId == request.CustomerId &&
+                             it.SalesmanId == request.SalesmanId &&
+                             it.Date >= request.From &&
+                             it.Date <= request.To
+                )
+                .OrderBy(it => it.Date)
+                .AsSplitQuery()
+                .ToListAsync())
+            .Also(sales => sales.ForEach(s => s.SoldGoods = s.SoldGoods
+                    .Where(it => !it.IsDeleted)
+                    .ToList()
+                )
+            );
+    }
+
     public async Task<Sale> GetByIdAsync(int id)
     {
-        // Validate if sale exists
-        // Validate if requester can access (HIGHER LEVEL)
         (await _saleValidator.ValidateGetByIdRequestAsync(id)).AssertValid();
 
         return (await _database.Sales

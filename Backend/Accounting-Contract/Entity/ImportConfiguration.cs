@@ -19,7 +19,7 @@ public class ImportConfiguration
     /// <summary>
     /// Navigation property to this import configuration's fields and their metadata.
     /// </summary>
-    public ICollection<ImportConfigurationField> Fields { get; set; }
+    public ICollection<ImportConfigurationField> Fields { get; set; } = new List<ImportConfigurationField>();
     
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

@@ -13,5 +13,7 @@ public interface ISaleService
 
     public Task<IList<Sale>> GetAsync(SaleGetRequest request);
 
+    public Task<IList<Sale>> GetAsync(SaleWithinIntervalGetRequest request);
+
     public Task<Sale> GetByIdAsync(int id);
 }

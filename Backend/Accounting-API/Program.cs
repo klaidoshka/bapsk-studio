@@ -13,18 +13,16 @@ using Accounting.Services.Validator;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuration
 builder.AddConfiguration<Butenta>("Butenta");
 builder.AddConfiguration<Email>("Email");
 builder.AddConfiguration<JwtSettings>("JwtSettings");
 builder.AddConfiguration<Logging>("Logging");
 builder.AddConfiguration<StiVatReturn>("StiVatReturn");
 
-var databaseOptions = builder.AddConfiguration<DatabaseOptions>("DatabaseOptions");
-
 builder.AddCertificate();
 
-// Services
+var databaseOptions = builder.AddConfiguration<DatabaseOptions>("DatabaseOptions");
+
 builder.Services.AddDbContext(databaseOptions);
 builder.Services.AddSingleton<ExceptionHandlingMiddleware>();
 builder.Services.AddSingleton<UserIdExtractorMiddleware>();
@@ -36,8 +34,7 @@ builder.Services.AddScoped<NumberFieldHandler>();
 builder.Services.AddScoped<ReferenceFieldHandler>();
 builder.Services.AddScoped<TextFieldHandler>();
 
-builder.Services.AddScoped<Dictionary<FieldType, FieldHandler>>(
-    provider => new Dictionary<FieldType, FieldHandler>
+builder.Services.AddScoped<Dictionary<FieldType, FieldHandler>>(provider => new()
     {
         [FieldType.Check] = provider.GetRequiredService<CheckFieldHandler>(),
         [FieldType.Currency] = provider.GetRequiredService<CurrencyFieldHandler>(),
@@ -70,6 +67,7 @@ builder.Services.AddScoped<IInstanceAuthorizationService, InstanceAuthorizationS
 builder.Services.AddScoped<IInstanceService, InstanceService>();
 builder.Services.AddScoped<IInstanceValidator, InstanceValidator>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IReportTemplateService, ReportTemplateService>();
 builder.Services.AddScoped<ISaleService, SaleService>();
 builder.Services.AddScoped<ISaleValidator, SaleValidator>();
@@ -87,8 +85,7 @@ builder.AddJwtAuth();
 
 builder.Services.AddOpenApi();
 
-builder.Services.ConfigureHttpJsonOptions(
-    json =>
+builder.Services.ConfigureHttpJsonOptions(json =>
     {
         json.SerializerOptions.PropertyNameCaseInsensitive = true;
         json.SerializerOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString;
@@ -99,15 +96,15 @@ builder.Services.ConfigureHttpJsonOptions(
     }
 );
 
-var application = builder.Build();
-
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+var application = builder.Build();
 
 application.UseMiddleware<UserIdExtractorMiddleware>();
 application.UseAuthentication();
 application.UseAuthorization();
 application.UseMiddleware<ExceptionHandlingMiddleware>();
-application.MapEndpoints();
+application.MapMinimalApi();
 
 if (application.Environment.IsDevelopment())
 {

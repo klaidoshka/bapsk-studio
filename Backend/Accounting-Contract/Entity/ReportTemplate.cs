@@ -19,7 +19,7 @@ public class ReportTemplate
     /// <summary>
     /// Navigation property to the fields this report template contains.
     /// </summary>
-    public ICollection<DataTypeField> Fields { get; set; }
+    public ICollection<DataTypeField> Fields { get; set; } = new List<DataTypeField>();
     
     /// <summary>
     /// Unique identifier for the report template.

@@ -53,8 +53,7 @@ public class ReportTemplateService : IReportTemplateService
             throw new ValidationException("You are not authorized to create a report template.");
         }
 
-        if (await _database.ReportTemplates.AnyAsync(
-                it => String.Equals(
+        if (await _database.ReportTemplates.AnyAsync(it => String.Equals(
                     it.Name,
                     request.ReportTemplate.Name,
                     StringComparison.OrdinalIgnoreCase
@@ -129,8 +128,7 @@ public class ReportTemplateService : IReportTemplateService
             throw new ValidationException("You are not authorized to edit this report template.");
         }
 
-        if (await _database.ReportTemplates.AnyAsync(
-                it => String.Equals(
+        if (await _database.ReportTemplates.AnyAsync(it => String.Equals(
                     it.Name,
                     request.ReportTemplate.Name,
                     StringComparison.OrdinalIgnoreCase
@@ -175,7 +173,15 @@ public class ReportTemplateService : IReportTemplateService
         return template;
     }
 
-    public async Task<IList<ReportTemplate>> GetByInstanceIdAsync(ReportTemplateGetByInstanceIdRequest request)
+    public async Task<int> GetInstanceIdAsync(int templateId)
+    {
+        return (await _database.ReportTemplates.Include(rt => rt.Fields)
+                .ThenInclude(f => f.DataType)
+                .FirstAsync(rt => rt.Id == templateId)).Fields
+            .First().DataType.InstanceId;
+    }
+
+    public async Task<IList<ReportTemplate>> GetAsync(ReportTemplateGetByInstanceIdRequest request)
     {
         if (!await _instanceAuthorizationService.IsMemberAsync(
                 request.InstanceId,
