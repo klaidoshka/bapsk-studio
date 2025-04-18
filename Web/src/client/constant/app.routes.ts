@@ -20,6 +20,11 @@ import {
   ImportConfigurationManagementPageComponent
 } from '../page/import-configuration-management-page/import-configuration-management-page.component';
 import {ResetPasswordPageComponent} from "../page/reset-password-page/reset-password-page.component";
+import {ReportTemplatePageComponent} from '../page/report-template-page/report-template-page.component';
+import {
+  ReportTemplateManagementPageComponent
+} from '../page/report-template-management-page/report-template-management-page.component';
+import {ReportTemplatePreviewPageComponent} from '../page/report-template-preview-page/report-template-preview-page.component';
 
 export const routes: Routes = [
   {
@@ -51,6 +56,28 @@ export const routes: Routes = [
           {
             path: ":configurationId",
             loadComponent: () => ImportConfigurationPreviewPageComponent
+          }
+        ]
+      },
+      {
+        path: "report-template",
+        loadChildren: () => [
+          {
+            path: "",
+            pathMatch: "full",
+            loadComponent: () => ReportTemplatePageComponent
+          },
+          {
+            path: "create",
+            loadComponent: () => ReportTemplateManagementPageComponent
+          },
+          {
+            path: ":templateId/edit",
+            loadComponent: () => ReportTemplateManagementPageComponent
+          },
+          {
+            path: ":templateId",
+            loadComponent: () => ReportTemplatePreviewPageComponent
           }
         ]
       },

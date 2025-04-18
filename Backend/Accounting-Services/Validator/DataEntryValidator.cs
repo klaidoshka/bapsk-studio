@@ -33,7 +33,7 @@ public class DataEntryValidator : IDataEntryValidator
 
         if (dataType.Instance.CreatedById != request.RequesterId)
         {
-            return new Validation("You are not allowed to create data entries in this instance.");
+            return new Validation("You are not authorized to create data entries in this instance.");
         }
 
         var failures = new List<string>();
@@ -77,7 +77,7 @@ public class DataEntryValidator : IDataEntryValidator
         }
 
         return dataEntry.DataType.Instance.CreatedById != request.RequesterId
-            ? new Validation("You are not allowed to delete this data entry.")
+            ? new Validation("You are not authorized to delete this data entry.")
             : new Validation();
     }
 
@@ -95,7 +95,7 @@ public class DataEntryValidator : IDataEntryValidator
 
         if (dataEntry.DataType.Instance.CreatedById != request.RequesterId)
         {
-            return new Validation("You are not allowed to edit this data entry.");
+            return new Validation("You are not authorized to edit this data entry.");
         }
 
         var failures = new List<string>();
@@ -124,7 +124,7 @@ public class DataEntryValidator : IDataEntryValidator
         }
 
         return dataEntry.DataType.Instance.UserMetas.All(um => um.UserId != request.RequesterId)
-            ? new Validation("You are not allowed to view this data entry.")
+            ? new Validation("You are not authorized to view this data entry.")
             : new Validation();
     }
 
@@ -143,7 +143,7 @@ public class DataEntryValidator : IDataEntryValidator
         }
 
         return dataType.Instance.UserMetas.All(um => um.UserId != request.RequesterId)
-            ? new Validation("You are not allowed to view data entries in this instance.")
+            ? new Validation("You are not authorized to view data entries in this instance.")
             : new Validation();
     }
 

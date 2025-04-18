@@ -44,10 +44,10 @@ export class CacheService<K, V> {
     );
   }
 
-  has(key: K): boolean {
+  has(key: K, acceptInvalidated: boolean = false): boolean {
     const candidate = this.store.value.get(key);
 
-    return candidate && !candidate.__isInvalidated__ || false;
+    return candidate !== undefined && (!candidate.__isInvalidated__ || acceptInvalidated);
   }
 
   invalidate(key: K) {

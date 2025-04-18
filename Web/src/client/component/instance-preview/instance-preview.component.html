@@ -20,13 +20,13 @@
 
   <h1 class="mt-4 font-bold">Users</h1>
   <p-table [value]="instance()!.userMetas">
-    <ng-template pTemplate="header">
+    <ng-template #header>
       <tr>
         <th>Name</th>
         <th>Email</th>
       </tr>
     </ng-template>
-    <ng-template pTemplate="body" let-userMeta>
+    <ng-template #body let-userMeta>
       <tr>
         <td>{{ toUserFullName(userMeta.user) }}</td>
         <td>{{ userMeta.user.email }}</td>

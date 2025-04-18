@@ -14,11 +14,10 @@ public static class DataTypeEndpoints
             async (
                 [FromBody] DataTypeCreateRequest request,
                 IDataTypeService dataTypeService,
-                HttpRequest httpRequest,
-                IJwtService jwtService
+                HttpContext httpContext
             ) =>
             {
-                request.RequesterId = await httpRequest.GetUserIdAsync(jwtService);
+                request.RequesterId = httpContext.GetUserIdOrThrow();
 
                 return Results.Json((await dataTypeService.CreateAsync(request)).ToDto());
             }
@@ -29,15 +28,14 @@ public static class DataTypeEndpoints
             async (
                 int id,
                 IDataTypeService dataTypeService,
-                IJwtService jwtService,
-                HttpRequest request
+                HttpContext httpContext
             ) =>
             {
                 await dataTypeService.DeleteAsync(
                     new DataTypeDeleteRequest
                     {
                         DataTypeId = id,
-                        RequesterId = await request.GetUserIdAsync(jwtService)
+                        RequesterId = httpContext.GetUserIdOrThrow()
                     }
                 );
 
@@ -51,12 +49,11 @@ public static class DataTypeEndpoints
                 int id,
                 [FromBody] DataTypeEditRequest request,
                 IDataTypeService dataTypeService,
-                HttpRequest httpRequest,
-                IJwtService jwtService
+                HttpContext httpContext
             ) =>
             {
                 request.DataTypeId = id;
-                request.RequesterId = await httpRequest.GetUserIdAsync(jwtService);
+                request.RequesterId = httpContext.GetUserIdOrThrow();
 
                 await dataTypeService.EditAsync(request);
 
@@ -69,14 +66,13 @@ public static class DataTypeEndpoints
             async (
                 int id,
                 IDataTypeService dataTypeService,
-                HttpRequest httpRequest,
-                IJwtService jwtService
+                HttpContext httpContext
             ) => Results.Json(
                 (await dataTypeService.GetAsync(
                     new DataTypeGetRequest
                     {
                         DataTypeId = id,
-                        RequesterId = await httpRequest.GetUserIdAsync(jwtService)
+                        RequesterId = httpContext.GetUserIdOrThrow()
                     }
                 )).ToDto()
             )
@@ -87,14 +83,13 @@ public static class DataTypeEndpoints
             async (
                 int instanceId,
                 IDataTypeService dataTypeService,
-                HttpRequest httpRequest,
-                IJwtService jwtService
+                HttpContext httpContext
             ) => Results.Json(
                 (await dataTypeService.GetByInstanceIdAsync(
                     new DataTypeGetByInstanceRequest
                     {
                         InstanceId = instanceId,
-                        RequesterId = await httpRequest.GetUserIdAsync(jwtService)
+                        RequesterId = httpContext.GetUserIdOrThrow()
                     }
                 ))
                 .Select(i => i.ToDto())

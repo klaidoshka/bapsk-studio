@@ -8,7 +8,7 @@
       class="mb-4 min-w-256"
       styleClass="p-2 dark:bg-primary-950! bg-primary-50!"
     >
-      <ng-template pTemplate="header">
+      <ng-template #header>
         <h2 class="text-lg font-bold">{{ value.name }}</h2>
       </ng-template>
       <div>
@@ -20,7 +20,7 @@
       class="min-w-256"
       styleClass="p-2 dark:bg-primary-950! bg-primary-50!"
     >
-      <ng-template pTemplate="header">
+      <ng-template #header>
         <h2 class="text-lg font-semibold">Fields</h2>
       </ng-template>
 
@@ -28,7 +28,7 @@
         [value]="value.fields"
         class="mt-4"
       >
-        <ng-template pTemplate="header">
+        <ng-template #header>
           <tr>
             <th class="text-left">Order</th>
             <th class="text-left">Field Name</th>
@@ -36,7 +36,7 @@
           </tr>
         </ng-template>
         <ng-template
-          pTemplate="body"
+          #body
           let-field
         >
           @let dataTypeField = resolveDataTypeField(field);

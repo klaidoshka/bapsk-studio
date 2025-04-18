@@ -33,14 +33,14 @@
   <ng-container *ngIf="customer()!.otherDocuments.length">
     <p class="font-bold mt-4">Other Documents</p>
     <p-table [value]="customer()!.otherDocuments">
-      <ng-template pTemplate="header">
+      <ng-template #header>
         <tr>
           <th>Issued By</th>
           <th>Type</th>
           <th>Number</th>
         </tr>
       </ng-template>
-      <ng-template pTemplate="body" let-otherDocument>
+      <ng-template #body let-otherDocument>
         <tr>
           <td>{{ getCountryName(otherDocument.issuedBy) }}</td>
           <td>{{ otherDocument.type }}</td>

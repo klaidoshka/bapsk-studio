@@ -47,7 +47,10 @@ public class AccountingDatabaseFactory : IDesignTimeDbContextFactory<AccountingD
         optionsBuilder.UseMySql(
             connectionString,
             version,
-            mySqlOptionsBuilder => mySqlOptionsBuilder.EnableStringComparisonTranslations()
+            mySqlOptionsBuilder => mySqlOptionsBuilder
+                .EnableStringComparisonTranslations()
+                .EnablePrimitiveCollectionsSupport()
+                .TranslateParameterizedCollectionsToConstants()
         );
 
         return new AccountingDatabase(optionsBuilder.Options);

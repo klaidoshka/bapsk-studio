@@ -34,7 +34,7 @@ public class InstanceValidator : IInstanceValidator
         var exists = user.InstancesCreated.Any(
             ic => ic.Name.Equals(
                 request.Name,
-                StringComparison.InvariantCultureIgnoreCase
+                StringComparison.OrdinalIgnoreCase
             )
         );
 

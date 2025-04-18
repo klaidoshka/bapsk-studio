@@ -46,6 +46,11 @@ public class DataTypeField
     /// Navigation property for the reference data type. This is only set when FieldType is Reference.
     /// </summary>
     public DataType? Reference { get; set; }
+    
+    /// <summary>
+    /// Navigation property to the report templates that use this field.
+    /// </summary>
+    public ICollection<ReportTemplate> ReportTemplates { get; set; }
 
     /// <summary>
     /// Reference to another data type. This is only set when FieldType is Reference.

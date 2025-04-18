@@ -31,7 +31,7 @@ public class CsvService : ICsvService
             .Any(
                 it => it.Equals(
                     fileExtension,
-                    StringComparison.InvariantCultureIgnoreCase
+                    StringComparison.OrdinalIgnoreCase
                 )
             );
     }

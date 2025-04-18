@@ -81,7 +81,7 @@ public class ImportConfigurationService : IImportConfigurationService
 
         if (!await _instanceAuthorizationService.IsMemberAsync(dataType.InstanceId, request.RequesterId))
         {
-            throw new ValidationException("You are not allowed to create import configurations.");
+            throw new ValidationException("You are not authorized to create import configurations.");
         }
 
         // Validate fields
@@ -121,7 +121,7 @@ public class ImportConfigurationService : IImportConfigurationService
         if (await _database.ImportConfigurations.AnyAsync(
                 it => it.Name.Equals(
                     request.ImportConfiguration.Name,
-                    StringComparison.CurrentCultureIgnoreCase
+                    StringComparison.OrdinalIgnoreCase
                 )
             ))
         {
@@ -132,7 +132,7 @@ public class ImportConfigurationService : IImportConfigurationService
             new ImportConfiguration
             {
                 DataTypeId = request.ImportConfiguration.DataTypeId,
-                Id = request.ImportConfiguration.Id ?? 0,
+                Id = request.ImportConfiguration.Id,
                 Name = request.ImportConfiguration.Name,
                 Fields = request.ImportConfiguration.Fields
                     .Select(
@@ -169,7 +169,7 @@ public class ImportConfigurationService : IImportConfigurationService
 
         if (!await _instanceAuthorizationService.IsMemberAsync(configuration.DataType.InstanceId, request.RequesterId))
         {
-            throw new ValidationException("You are not allowed to delete import configurations.");
+            throw new ValidationException("You are not authorized to delete import configurations.");
         }
 
         _database.Remove(configuration);
@@ -194,7 +194,7 @@ public class ImportConfigurationService : IImportConfigurationService
 
         if (!await _instanceAuthorizationService.IsMemberAsync(configuration.DataType.InstanceId, request.RequesterId))
         {
-            throw new ValidationException("You are not allowed to edit import configurations.");
+            throw new ValidationException("You are not authorized to edit import configurations.");
         }
 
         configuration.Name = request.ImportConfiguration.Name;
@@ -268,7 +268,7 @@ public class ImportConfigurationService : IImportConfigurationService
 
         if (!await _instanceAuthorizationService.IsMemberAsync(configuration.DataType.InstanceId, request.RequesterId))
         {
-            throw new ValidationException("You are not allowed to get import configurations.");
+            throw new ValidationException("You are not authorized to get import configurations.");
         }
 
         return configuration;
@@ -283,7 +283,7 @@ public class ImportConfigurationService : IImportConfigurationService
         {
             if (!await _instanceAuthorizationService.IsMemberAsync(instance.Id, request.RequesterId))
             {
-                throw new ValidationException("You are not allowed to get import configurations.");
+                throw new ValidationException("You are not authorized to get import configurations.");
             }
 
             configurations.AddRange(
@@ -306,7 +306,7 @@ public class ImportConfigurationService : IImportConfigurationService
 
         if (!await _instanceAuthorizationService.IsMemberAsync(dataType.InstanceId, request.RequesterId))
         {
-            throw new ValidationException("You are not allowed to get import configurations.");
+            throw new ValidationException("You are not authorized to get import configurations.");
         }
 
         configurations.AddRange(

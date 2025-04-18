@@ -12,15 +12,14 @@ public static class SessionEndpoints
             "{id:guid}",
             async (
                 Guid id,
-                HttpRequest httpRequest,
-                IJwtService jwtService,
+                HttpContext httpContext,
                 ISessionService sessionService
             ) =>
             {
                 await sessionService.DeleteAsync(
                     new SessionDeleteRequest
                     {
-                        RequesterId = await httpRequest.GetUserIdAsync(jwtService),
+                        RequesterId = httpContext.GetUserIdOrThrow(),
                         SessionId = id
                     }
                 );
@@ -33,14 +32,13 @@ public static class SessionEndpoints
             "{id:guid}",
             async (
                 Guid id,
-                HttpRequest httpRequest,
-                IJwtService jwtService,
+                HttpContext httpContext,
                 ISessionService sessionService
             ) => Results.Json(
                 (await sessionService.GetAsync(
                     new SessionGetRequest
                     {
-                        RequesterId = await httpRequest.GetUserIdAsync(jwtService),
+                        RequesterId = httpContext.GetUserIdOrThrow(),
                         SessionId = id
                     }
                 )).ToDto()
@@ -50,14 +48,13 @@ public static class SessionEndpoints
         builder.MapGet(
             String.Empty,
             async (
-                HttpRequest httpRequest,
-                IJwtService jwtService,
+                HttpContext httpContext,
                 ISessionService sessionService
             ) => Results.Json(
                 (await sessionService.GetByUserIdAsync(
                     new SessionGetByUserRequest
                     {
-                        RequesterId = await httpRequest.GetUserIdAsync(jwtService)
+                        RequesterId = httpContext.GetUserIdOrThrow()
                     }
                 ))
                 .Select(s => s.ToDto())

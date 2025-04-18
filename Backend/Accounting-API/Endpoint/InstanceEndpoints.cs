@@ -13,12 +13,11 @@ public static class InstanceEndpoints
             String.Empty,
             async (
                 [FromBody] InstanceCreateRequest request,
-                HttpRequest httpRequest,
-                IJwtService jwtService,
+                HttpContext httpContext,
                 IInstanceService instanceService
             ) =>
             {
-                request.RequesterId = await httpRequest.GetUserIdAsync(jwtService);
+                request.RequesterId = httpContext.GetUserIdOrThrow();
 
                 return Results.Json((await instanceService.CreateAsync(request)).ToDto());
             }
@@ -29,15 +28,14 @@ public static class InstanceEndpoints
             async (
                 int id,
                 IInstanceService instanceService,
-                HttpRequest httpRequest,
-                IJwtService jwtService
+                HttpContext httpContext
             ) =>
             {
                 await instanceService.DeleteAsync(
                     new InstanceDeleteRequest
                     {
                         InstanceId = id,
-                        RequesterId = await httpRequest.GetUserIdAsync(jwtService)
+                        RequesterId = httpContext.GetUserIdOrThrow()
                     }
                 );
 
@@ -50,13 +48,12 @@ public static class InstanceEndpoints
             async (
                 int id,
                 [FromBody] InstanceEditRequest request,
-                HttpRequest httpRequest,
-                IJwtService jwtService,
+                HttpContext httpContext,
                 IInstanceService instanceService
             ) =>
             {
                 request.InstanceId = id;
-                request.RequesterId = await httpRequest.GetUserIdAsync(jwtService);
+                request.RequesterId = httpContext.GetUserIdOrThrow();
 
                 await instanceService.EditAsync(request);
 
@@ -68,15 +65,14 @@ public static class InstanceEndpoints
             "/{id:int}",
             async (
                 int id,
-                HttpRequest httpRequest,
-                IJwtService jwtService,
+                HttpContext httpContext,
                 IInstanceService instanceService
             ) => Results.Json(
                 (await instanceService.GetAsync(
                     new InstanceGetRequest
                     {
                         InstanceId = id,
-                        RequesterId = await httpRequest.GetUserIdAsync(jwtService)
+                        RequesterId = httpContext.GetUserIdOrThrow()
                     }
                 )).ToDto()
             )
@@ -85,14 +81,13 @@ public static class InstanceEndpoints
         builder.MapGet(
             String.Empty,
             async (
-                HttpRequest httpRequest,
-                IJwtService jwtService,
+                HttpContext httpContext,
                 IInstanceService instanceService
             ) => Results.Json(
                 (await instanceService.GetByUserIdAsync(
                     new InstanceGetByUserRequest
                     {
-                        RequesterId = await httpRequest.GetUserIdAsync(jwtService)
+                        RequesterId = httpContext.GetUserIdOrThrow()
                     }
                 ))
                 .Select(i => i.ToDto())

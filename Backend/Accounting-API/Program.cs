@@ -70,6 +70,7 @@ builder.Services.AddScoped<IInstanceAuthorizationService, InstanceAuthorizationS
 builder.Services.AddScoped<IInstanceService, InstanceService>();
 builder.Services.AddScoped<IInstanceValidator, InstanceValidator>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IReportTemplateService, ReportTemplateService>();
 builder.Services.AddScoped<ISaleService, SaleService>();
 builder.Services.AddScoped<ISaleValidator, SaleValidator>();
 builder.Services.AddScoped<ISalesmanService, SalesmanService>();
