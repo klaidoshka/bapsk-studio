@@ -20,7 +20,7 @@
 
   <p class="font-bold mt-4">Fields</p>
   <p-table [value]="dataType()!.fields || []">
-    <ng-template pTemplate="header">
+    <ng-template #header>
       <tr>
         <th>Name</th>
         <th>Type</th>
@@ -30,7 +30,7 @@
     </ng-template>
 
     <ng-template
-      pTemplate="body"
+      #body
       let-field
     >
       @let isReferenceField = field.type === FieldType.Reference;

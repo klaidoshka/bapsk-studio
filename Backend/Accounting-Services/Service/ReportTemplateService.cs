@@ -24,7 +24,7 @@ public class ReportTemplateService : IReportTemplateService
     public async Task<ReportTemplate> CreateAsync(ReportTemplateCreateRequest request)
     {
         // Should throw if request contains fields that are deleted
-        
+
         if (!request.ReportTemplate.Fields.Any())
         {
             throw new ValidationException("At least one field is required.");
@@ -108,7 +108,7 @@ public class ReportTemplateService : IReportTemplateService
     public async Task EditAsync(ReportTemplateEditRequest request)
     {
         // Should throw if request contains fields that are deleted
-        
+
         var template = await _database.ReportTemplates
             .Include(it => it.Fields)
             .ThenInclude(it => it.DataType)
@@ -173,5 +173,23 @@ public class ReportTemplateService : IReportTemplateService
         }
 
         return template;
+    }
+
+    public async Task<IList<ReportTemplate>> GetByInstanceIdAsync(ReportTemplateGetByInstanceIdRequest request)
+    {
+        if (!await _instanceAuthorizationService.IsMemberAsync(
+                request.InstanceId,
+                request.RequesterId
+            ))
+        {
+            throw new ValidationException("You are not authorized to get these report templates.");
+        }
+
+        return await _database.ReportTemplates
+            .Include(it => it.Fields)
+            .ThenInclude(it => it.DataType)
+            .AsSplitQuery()
+            .Where(it => !it.IsDeleted && it.Fields.Any(field => field.DataType.InstanceId == request.InstanceId))
+            .ToListAsync();
     }
 }

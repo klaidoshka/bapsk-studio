@@ -77,5 +77,24 @@ public static class ReportTemplateEndpoints
                 )).ToDto()
             )
         );
+
+        builder.MapGet(
+            String.Empty,
+            async (
+                int instanceId,
+                IReportTemplateService importConfigurationService,
+                HttpContext httpContext
+            ) => Results.Json(
+                (await importConfigurationService.GetByInstanceIdAsync(
+                    new ReportTemplateGetByInstanceIdRequest()
+                    {
+                        InstanceId = instanceId,
+                        RequesterId = httpContext.GetUserIdOrThrow()
+                    }
+                ))
+                .Select(it => it.ToDto())
+                .ToList()
+            )
+        );
     }
 }

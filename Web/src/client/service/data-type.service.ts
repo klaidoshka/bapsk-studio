@@ -4,7 +4,7 @@ import {HttpClient} from '@angular/common/http';
 import {first, map, Observable, switchMap, tap} from 'rxjs';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../model/data-type.model';
 import {EnumUtil} from '../util/enum.util';
-import {FieldType} from '../model/data-type-field.model';
+import DataTypeField, {FieldType} from '../model/data-type-field.model';
 import {FieldTypeUtil} from '../util/field-type.util';
 import {CacheService} from './cache.service';
 
@@ -108,18 +108,20 @@ export class DataTypeService {
     return instanceId !== undefined ? instanceId : null;
   }
 
+  updateFieldProperties(field: DataTypeField): DataTypeField {
+    const type = EnumUtil.toEnumOrThrow(field.type, FieldType);
+
+    return {
+      ...field,
+      type: type,
+      defaultValue: FieldTypeUtil.updateValue(field.defaultValue, type)
+    }
+  }
+
   updateProperties(dataType: DataType): DataType {
     return {
       ...dataType,
-      fields: dataType.fields.map(field => {
-        const type = EnumUtil.toEnumOrThrow(field.type, FieldType);
-
-        return {
-          ...field,
-          type: type,
-          defaultValue: FieldTypeUtil.updateValue(field.defaultValue, type)
-        };
-      })
+      fields: dataType.fields.map(field => this.updateFieldProperties(field))
     }
   }
 }

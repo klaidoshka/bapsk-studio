@@ -12,4 +12,6 @@ public interface IReportTemplateService
     public Task EditAsync(ReportTemplateEditRequest request);
 
     public Task<ReportTemplate> GetAsync(ReportTemplateGetRequest request);
+
+    public Task<IList<ReportTemplate>> GetByInstanceIdAsync(ReportTemplateGetByInstanceIdRequest request);
 }

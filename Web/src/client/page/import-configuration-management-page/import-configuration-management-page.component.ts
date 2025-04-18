@@ -16,7 +16,6 @@ import {NgIf} from '@angular/common';
 import {InstanceService} from '../../service/instance.service';
 import {DataTypeService} from '../../service/data-type.service';
 import DataTypeField, {FieldType} from '../../model/data-type-field.model';
-import {TextService} from '../../service/text.service';
 import Messages from '../../model/messages.model';
 import {first, of} from 'rxjs';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
@@ -24,6 +23,7 @@ import {DataEntryService} from '../../service/data-entry.service';
 import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {TableModule} from 'primeng/table';
+import {FormInputErrorComponent} from '../../component/form-input-error/form-input-error.component';
 
 @Component({
   selector: 'import-configuration-management-page',
@@ -35,7 +35,8 @@ import {TableModule} from 'primeng/table';
     Button,
     NgIf,
     MessagesShowcaseComponent,
-    TableModule
+    TableModule,
+    FormInputErrorComponent
   ],
   templateUrl: './import-configuration-management-page.component.html',
   styles: ``
@@ -48,7 +49,6 @@ export class ImportConfigurationManagementPageComponent {
   private readonly importConfigurationService = inject(ImportConfigurationService);
   private readonly instanceService = inject(InstanceService);
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
-  private readonly textService = inject(TextService);
 
   configuration = rxResource({
     request: () => ({
@@ -168,20 +168,6 @@ export class ImportConfigurationManagementPageComponent {
     return this.form.get('fields') as FormArray<FormGroup>;
   }
 
-  getErrorMessage(field: string) {
-    const control = this.form.get(field);
-
-    if (!control || !control.touched || !control.invalid) {
-      return "";
-    }
-
-    if (control.errors?.["required"]) {
-      return `${this.textService.capitalize(field)} is required.`;
-    }
-
-    return null;
-  }
-
   getDataEntries(index: number): Signal<{ id: number, label: string }[]> {
     return computed(() => {
       const dataTypeId = this.form.value.dataTypeId;
@@ -262,7 +248,7 @@ export class ImportConfigurationManagementPageComponent {
           id: it.id,
           order: index
         })),
-        id: this.form.value.id || undefined,
+        id: this.form.value.id || 0,
         name: this.form.value.name!
       }
     };

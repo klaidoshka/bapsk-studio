@@ -27,14 +27,14 @@
       <div>
         <label for="users" class="block text-l font-bold">Users</label>
         <p-table [value]="formUsers().controls">
-          <ng-template pTemplate="header">
+          <ng-template #header>
             <tr>
               <th>Email</th>
               <th>Name</th>
               <th>Actions</th>
             </tr>
           </ng-template>
-          <ng-template pTemplate="body" let-user let-i="rowIndex">
+          <ng-template #body let-user let-i="rowIndex">
             <tr>
               <td>{{ user.value.email }}</td>
               <td>{{ user.value.name }}</td>

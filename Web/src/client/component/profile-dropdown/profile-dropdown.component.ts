@@ -1,13 +1,4 @@
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-  untracked,
-  viewChild,
-  ViewEncapsulation
-} from '@angular/core';
+import {Component, computed, effect, inject, signal, untracked, viewChild, ViewEncapsulation} from '@angular/core';
 import {ButtonModule} from 'primeng/button';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {AuthService} from '../../service/auth.service';
@@ -101,6 +92,11 @@ export class ProfileDropdownComponent {
             label: 'Import Configurations',
             icon: 'pi pi-file-import',
             routerLink: "/home/import-configuration"
+          },
+          {
+            label: 'Report Templates',
+            icon: 'pi pi-file',
+            routerLink: "/home/report-template"
           },
           {
             label: 'Workspace',

@@ -5,7 +5,6 @@ import {Dialog} from 'primeng/dialog';
 import {DatePipe, NgIf} from '@angular/common';
 import {getIsoCountryLabel} from '../../model/iso-country.model';
 import {getIdentityDocumentTypeLabel} from '../../model/identity-document-type.model';
-import {PrimeTemplate} from 'primeng/api';
 import {TableModule} from 'primeng/table';
 
 @Component({
@@ -14,7 +13,6 @@ import {TableModule} from 'primeng/table';
     Button,
     Dialog,
     DatePipe,
-    PrimeTemplate,
     TableModule,
     NgIf
   ],
@@ -25,7 +23,7 @@ export class CustomerPreviewComponent {
   protected readonly getCountryName = getIsoCountryLabel;
   protected readonly getIdentityDocumentTypeLabel = getIdentityDocumentTypeLabel;
   protected readonly getIsoCountryLabel = getIsoCountryLabel;
-  
+
   customer = signal<Customer | null>(null);
   isShown = signal<boolean>(false);
 

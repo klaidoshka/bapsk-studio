@@ -67,6 +67,14 @@ export class ApiRouter {
   public readonly instanceGetById = (id: number) => `${this.accountingUrl}/instance/${id}`;
   public readonly instanceGetByUser = () => `${this.accountingUrl}/instance`;
 
+  public readonly reportTemplateCreate = () => `${this.accountingUrl}/report-template`;
+  public readonly reportTemplateDelete = (id: number) => `${this.accountingUrl}/report-template/${id}`;
+  public readonly reportTemplateEdit = (id: number) => `${this.accountingUrl}/report-template/${id}`;
+  public readonly reportTemplateGetById = (id: number) => `${this.accountingUrl}/report-template/${id}`;
+  public readonly reportTemplateGetAllByInstanceId = (id: number) => `${this.accountingUrl}/report-template?${this.toParameters({
+    instanceId: id
+  })}`;
+
   public readonly saleCreate = () => `${this.accountingUrl}/sale`;
   public readonly saleDelete = (id: number) => `${this.accountingUrl}/sale/${id}`;
   public readonly saleEdit = (id: number) => `${this.accountingUrl}/sale/${id}`;
