@@ -25,6 +25,7 @@ import {
   ReportTemplateManagementPageComponent
 } from '../page/report-template-management-page/report-template-management-page.component';
 import {ReportTemplatePreviewPageComponent} from '../page/report-template-preview-page/report-template-preview-page.component';
+import {ReportPreviewPageComponent} from '../page/report-preview-page/report-preview-page.component';
 
 export const routes: Routes = [
   {
@@ -60,6 +61,18 @@ export const routes: Routes = [
         ]
       },
       {
+        path: "instance",
+        loadComponent: () => InstancePageComponent
+      },
+      {
+        path: "profile",
+        loadComponent: () => ProfilePageComponent
+      },
+      {
+        path: "report-preview",
+        loadComponent: () => ReportPreviewPageComponent
+      },
+      {
         path: "report-template",
         loadChildren: () => [
           {
@@ -82,20 +95,12 @@ export const routes: Routes = [
         ]
       },
       {
-        path: "instance",
-        loadComponent: () => InstancePageComponent
-      },
-      {
-        path: "profile",
-        loadComponent: () => ProfilePageComponent
+        path: "user",
+        loadComponent: () => UserPageComponent
       },
       {
         path: "workspace",
         loadComponent: () => WorkspacePageComponent
-      },
-      {
-        path: "user",
-        loadComponent: () => UserPageComponent
       }
     ]
   },

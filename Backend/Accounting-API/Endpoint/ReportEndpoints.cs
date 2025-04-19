@@ -1,3 +1,4 @@
+using Accounting.API.Util;
 using Accounting.Contract.Dto.Report;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
@@ -9,21 +10,33 @@ public static class ReportEndpoints
     public static void MapReportEndpoints(this RouteGroupBuilder builder)
     {
         builder
-            .MapPost("generate/data-entry-report", GenerateDataEntriesReport)
+            .MapPost("/generate-data-entries", GenerateDataEntriesReport)
             .RequireAuthorization();
 
         builder
-            .MapPost("generate/sale-reports", GenerateSalesReport)
+            .MapPost("/generate-sales", GenerateSalesReport)
             .RequireAuthorization();
     }
 
     private static async Task<IResult> GenerateDataEntriesReport(
         [FromBody] ReportByDataEntriesGenerateRequest request,
+        HttpContext httpContext,
         IReportService reportService
-    ) => Results.Json(await reportService.GenerateDataEntriesReportAsync(request));
+    )
+    {
+        request.RequesterId = httpContext.GetUserIdOrThrow();
+
+        return Results.Json(await reportService.GenerateDataEntriesReportAsync(request));
+    }
 
     private static async Task<IResult> GenerateSalesReport(
         [FromBody] ReportBySalesGenerateRequest request,
+        HttpContext httpContext,
         IReportService reportService
-    ) => Results.Json(await reportService.GenerateSalesReportAsync(request));
+    )
+    {
+        request.RequesterId = httpContext.GetUserIdOrThrow();
+
+        return Results.Json(await reportService.GenerateSalesReportAsync(request));
+    }
 }

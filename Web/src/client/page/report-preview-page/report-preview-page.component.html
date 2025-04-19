@@ -1,0 +1,29 @@
+<div *ngFor="let report of reports.value() || []">
+  <!-- Info -->
+  <ng-container *ngIf="report.info.fields.length">
+    <div class="text-lg font-medium mt-4 text-gray-700">Info</div>
+    <div class="grid grid-cols-2 gap-2 text-sm text-gray-600">
+      <div *ngFor="let field of report.info.fields">
+        <span class="font-semibold">{{ field.name }}:</span> {{ field.value }}
+      </div>
+    </div>
+  </ng-container>
+
+  <p-table [value]="report.entries" class="w-fit">
+    <!-- Header -->
+    <ng-template #header>
+      <tr>
+        <th *ngFor="let field of report.header">{{ field }}</th>
+      </tr>
+    </ng-template>
+
+    <!-- Entries -->
+    <ng-template #body let-entry>
+      <tr>
+        <td *ngFor="let field of entry.fields">
+          <data-type-entry-field-display [value]="field.value" [type]="field.type"/>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
