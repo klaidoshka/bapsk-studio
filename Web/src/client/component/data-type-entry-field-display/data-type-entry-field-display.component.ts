@@ -25,7 +25,8 @@ export class DataTypeEntryFieldDisplayComponent {
   dataType = input<DataType>();
   dataTypeField = computed(() => this.dataType()?.fields.find(it => it.id === this.dataTypeFieldId()));
   dataTypeFieldId = input<number>();
-  type = input(this.dataTypeField()?.type || FieldType.Text);
+  type = input<FieldType>();
+  typeResolved = computed(() => this.type() || this.dataTypeField()?.type || FieldType.Text)
   value = input.required<any>();
 
   referencedDataEntry = rxResource({

@@ -1,4 +1,4 @@
-@switch (type()) {
+@switch (typeResolved()) {
   @case (FieldType.Check) {
     <p-badge [value]="value() === true ? 'Yes' : 'No'" [severity]="value() === true ? 'success' : 'danger'"/>
   }
