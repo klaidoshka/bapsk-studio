@@ -26,6 +26,7 @@ import {
 } from '../page/report-template-management-page/report-template-management-page.component';
 import {ReportTemplatePreviewPageComponent} from '../page/report-template-preview-page/report-template-preview-page.component';
 import {ReportPreviewPageComponent} from '../page/report-preview-page/report-preview-page.component';
+import {MiscLayoutComponent} from '../page/misc-layout/misc-layout.component';
 
 export const routes: Routes = [
   {
@@ -67,10 +68,6 @@ export const routes: Routes = [
       {
         path: "profile",
         loadComponent: () => ProfilePageComponent
-      },
-      {
-        path: "report-preview",
-        loadComponent: () => ReportPreviewPageComponent
       },
       {
         path: "report-template",
@@ -121,12 +118,22 @@ export const routes: Routes = [
     ]
   },
   {
-    path: "auth/reset-password",
-    loadComponent: () => ResetPasswordPageComponent
+    path: "misc",
+    loadComponent: () => MiscLayoutComponent,
+    loadChildren: () => [
+      {
+        path: "declaration-preview",
+        loadComponent: () => DeclarationPreviewPageComponent
+      },
+      {
+        path: "report-preview",
+        loadComponent: () => ReportPreviewPageComponent
+      }
+    ]
   },
   {
-    path: "declaration",
-    loadComponent: () => DeclarationPreviewPageComponent
+    path: "auth/reset-password",
+    loadComponent: () => ResetPasswordPageComponent
   },
   {
     path: "",

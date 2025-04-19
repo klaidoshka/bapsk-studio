@@ -23,6 +23,7 @@ import {Button} from 'primeng/button';
 })
 export class ReportPreviewPageComponent {
   private readonly reportService = inject(ReportService);
+
   reportContainers = viewChildren<ElementRef>('reportContainer');
 
   reports = rxResource({
