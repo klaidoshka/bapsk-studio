@@ -26,7 +26,7 @@ export class ReportTemplateService {
 
   create(request: ReportTemplateCreateRequest): Observable<ReportTemplate> {
     return this.httpClient
-      .post<ReportTemplate>(this.apiRouter.reportTemplateCreate(), request)
+      .post<ReportTemplate>(this.apiRouter.reportTemplate.create(), request)
       .pipe(
         map(template => this.updateProperties(template)),
         tap(template => {
@@ -39,7 +39,7 @@ export class ReportTemplateService {
 
   delete(id: number): Observable<void> {
     return this.httpClient
-      .delete<void>(this.apiRouter.reportTemplateDelete(id))
+      .delete<void>(this.apiRouter.reportTemplate.delete(id))
       .pipe(
         tap(() => this.cacheService.delete(id))
       );
@@ -47,7 +47,7 @@ export class ReportTemplateService {
 
   edit(request: ReportTemplateEditRequest): Observable<void> {
     return this.httpClient
-      .put<void>(this.apiRouter.reportTemplateEdit(request.reportTemplate.id), request)
+      .put<void>(this.apiRouter.reportTemplate.edit(request.reportTemplate.id), request)
       .pipe(
         tap(() => {
             this.cacheService.invalidate(request.reportTemplate.id);
@@ -67,7 +67,7 @@ export class ReportTemplateService {
     }
 
     return this.httpClient
-      .get<ReportTemplate>(this.apiRouter.reportTemplateGetById(id))
+      .get<ReportTemplate>(this.apiRouter.reportTemplate.getById(id))
       .pipe(
         map(template => this.updateProperties(template)),
         tap(template => this.cacheService.set(template)),
@@ -97,7 +97,7 @@ export class ReportTemplateService {
     }
 
     return this.httpClient
-      .get<ReportTemplate[]>(this.apiRouter.reportTemplateGetAllByInstanceId(instanceId))
+      .get<ReportTemplate[]>(this.apiRouter.reportTemplate.getByInstanceId(instanceId))
       .pipe(
         map(templates => templates.map(template => ({
           ...this.updateProperties(template),

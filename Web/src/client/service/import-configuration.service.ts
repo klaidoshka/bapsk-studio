@@ -45,7 +45,7 @@ export class ImportConfigurationService {
       .pipe(
         switchMap(dataType =>
           this.httpClient.post<ImportConfiguration>(
-            this.apiRouter.importConfigurationCreate(),
+            this.apiRouter.importConfiguration.create(),
             this.adjustRequestDateToISO(
               request,
               new Map<number, FieldType>(dataType.fields.map(f => [f.id, f.type]))
@@ -72,7 +72,7 @@ export class ImportConfigurationService {
 
   delete(id: number): Observable<void> {
     return this.httpClient
-      .delete<void>(this.apiRouter.importConfigurationDelete(id))
+      .delete<void>(this.apiRouter.importConfiguration.delete(id))
       .pipe(
         tap(() => this.cacheService.delete(id))
       );
@@ -84,7 +84,7 @@ export class ImportConfigurationService {
       .pipe(
         switchMap(dataType =>
           this.httpClient.put<void>(
-            this.apiRouter.importConfigurationEdit(request.importConfiguration.id!),
+            this.apiRouter.importConfiguration.edit(request.importConfiguration.id!),
             this.adjustRequestDateToISO(
               request,
               new Map<number, FieldType>(dataType.fields.map(f => [f.id, f.type]))
@@ -108,7 +108,7 @@ export class ImportConfigurationService {
     }
 
     return this.httpClient
-      .get<ImportConfiguration>(this.apiRouter.importConfigurationGetById(id))
+      .get<ImportConfiguration>(this.apiRouter.importConfiguration.getById(id))
       .pipe(
         switchMap(configuration => this
           .updateProperties(configuration)
@@ -137,7 +137,7 @@ export class ImportConfigurationService {
     }
 
     return this.httpClient
-      .get<ImportConfiguration[]>(this.apiRouter.importConfigurationGetByDataTypeId(dataTypeId))
+      .get<ImportConfiguration[]>(this.apiRouter.importConfiguration.getByDataTypeId(dataTypeId))
       .pipe(
         switchMap(configurations => combineLatest(configurations.map(configuration => this
           .updateProperties(configuration)
@@ -175,7 +175,7 @@ export class ImportConfigurationService {
     }
 
     return this.httpClient
-      .get<ImportConfiguration[]>(this.apiRouter.importConfigurationGetByInstanceId(instanceId))
+      .get<ImportConfiguration[]>(this.apiRouter.importConfiguration.getByInstanceId(instanceId))
       .pipe(
         switchMap(configurations => combineLatest(configurations.map(configuration => this
           .updateProperties(configuration)

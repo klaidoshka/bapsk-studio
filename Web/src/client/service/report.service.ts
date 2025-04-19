@@ -25,7 +25,7 @@ export class ReportService {
   generateDataEntryReports(request: GenerateDataEntriesReportRequest): Observable<Report[]> {
     return this.httpClient
       .post<Report>(
-        this.apiRouter.reportDataEntriesGenerate(),
+        this.apiRouter.report.generateDataEntries(),
         this.adjustRequestDateToISO(request)
       )
       .pipe(
@@ -36,7 +36,7 @@ export class ReportService {
   generateSaleReports(request: GenerateSalesReportsRequest): Observable<Report[]> {
     return this.httpClient
       .post<Report[]>(
-        this.apiRouter.reportSalesGenerate(),
+        this.apiRouter.report.generateSales(),
         this.adjustRequestDateToISO(request)
       )
       .pipe(

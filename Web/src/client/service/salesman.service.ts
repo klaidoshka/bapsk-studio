@@ -33,13 +33,13 @@ export class SalesmanService {
   }
 
   create(request: SalesmanCreateRequest) {
-    return this.httpClient.post<Salesman>(this.apiRouter.salesmanCreate(), request).pipe(
+    return this.httpClient.post<Salesman>(this.apiRouter.salesman.create(), request).pipe(
       tap(salesman => this.updateSingleInStore(request.instanceId, this.updateProperties(salesman)))
     );
   }
 
   delete(instanceId: number, id: number) {
-    return this.httpClient.delete<void>(this.apiRouter.salesmanDelete(id)).pipe(
+    return this.httpClient.delete<void>(this.apiRouter.salesman.delete(id)).pipe(
       tap(() => {
         const existingSignal = this.store.get(instanceId);
 
@@ -53,14 +53,14 @@ export class SalesmanService {
   }
 
   edit(request: SalesmanEditRequest) {
-    return this.httpClient.put<void>(this.apiRouter.salesmanEdit(request.salesman.id!), request)
+    return this.httpClient.put<void>(this.apiRouter.salesman.edit(request.salesman.id!), request)
       .pipe(
         tap(() => this.getById(request.instanceId, request.salesman.id!).pipe(first()).subscribe())
       );
   }
 
   get(instanceId: number) {
-    return this.httpClient.get<Salesman[]>(this.apiRouter.salesmanGet(instanceId)).pipe(
+    return this.httpClient.get<Salesman[]>(this.apiRouter.salesman.getByInstanceId(instanceId)).pipe(
       tap(salesmen => {
         const existingSignal = this.store.get(instanceId);
 
@@ -74,7 +74,7 @@ export class SalesmanService {
   }
 
   getById(instanceId: number, id: number) {
-    return this.httpClient.get<Salesman>(this.apiRouter.salesmanGetById(id)).pipe(
+    return this.httpClient.get<Salesman>(this.apiRouter.salesman.getById(id)).pipe(
       tap(salesman => this.updateSingleInStore(instanceId, this.updateProperties(salesman)))
     );
   }

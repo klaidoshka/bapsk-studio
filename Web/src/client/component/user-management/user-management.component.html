@@ -60,12 +60,12 @@
                           class="mt-1 block w-full" appendTo="body"/>
           <form-input-error [control]="form.controls.country"/>
         </div>
-      </form>
 
-      <div class="flex justify-end mt-4">
-        <p-button [label]="user() === undefined ? 'Create' : 'Save'" [disabled]="!form.valid || !form.dirty" (onClick)="save()"
-                  type="submit"/>
-      </div>
+        <div class="flex justify-end mt-4">
+          <p-button [label]="user() === undefined ? 'Create' : 'Save'" [disabled]="!form.valid || !form.dirty" (onClick)="save()"
+                    type="submit"/>
+        </div>
+      </form>
     }
   </div>
 </p-dialog>

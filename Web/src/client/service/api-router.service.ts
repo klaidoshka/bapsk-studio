@@ -1,125 +1,134 @@
 import {Injectable} from '@angular/core';
-import {HttpParams} from '@angular/common/http';
+
+const buildRoute = (template: string, parameters: Record<string, string | number> = {}) =>
+  template.replace(/:([a-zA-Z]+)/g, (_, key) => encodeURIComponent(parameters[key]));
+
+const buildUrl = (
+  base: string,
+  routeTemplate: string,
+  routeParameters?: Record<string, string | number>,
+  queryParameters?: Record<string, string | number | boolean>
+) => {
+  const route = buildRoute(routeTemplate, routeParameters);
+  const url = new URL(base + route);
+
+  if (queryParameters) {
+    Object
+      .entries(queryParameters)
+      .forEach(([key, val]) => url.searchParams.set(key, String(val)));
+  }
+
+  return url.toString();
+};
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiRouter {
-  private readonly baseServerUrl = 'http://localhost:5125/api/v1';
-  private readonly accountingUrl = this.baseServerUrl + '/accounting';
+  private readonly base = 'http://localhost:5125/api/v1';
+  private readonly accounting = this.base + '/accounting';
 
-  public toParameters(parameters: { [key: string]: string | number | boolean }) {
-    let params = new HttpParams();
+  readonly auth = {
+    changePassword: () => buildUrl(this.base, '/auth/change-password'),
+    login: () => buildUrl(this.base, '/auth/login'),
+    logout: () => buildUrl(this.base, '/auth/logout'),
+    refresh: () => buildUrl(this.base, '/auth/refresh'),
+    register: () => buildUrl(this.base, '/auth/register'),
+    resetPassword: () => buildUrl(this.base, '/auth/reset-password'),
+  };
 
-    Object.keys(parameters).forEach(key => {
-      params = params.set(key, parameters[key]);
-    });
+  readonly customer = {
+    create: () => buildUrl(this.accounting, '/customer'),
+    delete: (id: number) => buildUrl(this.accounting, '/customer/:id', { id }),
+    edit: (id: number) => buildUrl(this.accounting, '/customer/:id', { id }),
+    getById: (id: number) => buildUrl(this.accounting, '/customer/:id', { id }),
+    getByInstanceId: (instanceId: number) => buildUrl(this.accounting, '/customer', {}, { instanceId }),
+  };
 
-    return params.toString();
-  }
+  readonly dataEntry = {
+    create: () => buildUrl(this.accounting, '/data-entry'),
+    delete: (id: number) => buildUrl(this.accounting, '/data-entry/:id', { id }),
+    edit: (id: number) => buildUrl(this.accounting, '/data-entry/:id', { id }),
+    getByDataTypeId: (dataTypeId: number) => buildUrl(this.accounting, '/data-entry', {}, { dataTypeId }),
+    getById: (id: number) => buildUrl(this.accounting, '/data-entry/:id', { id }),
+    import: () => buildUrl(this.accounting, '/data-entry/import'),
+  };
 
-  public readonly authChangePassword = () => `${this.baseServerUrl}/auth/change-password`;
-  public readonly authLogin = () => `${this.baseServerUrl}/auth/login`;
-  public readonly authLogout = () => `${this.baseServerUrl}/auth/logout`;
-  public readonly authRefresh = () => `${this.baseServerUrl}/auth/refresh`;
-  public readonly authRegister = () => `${this.baseServerUrl}/auth/register`;
-  public readonly authResetPassword = () => `${this.baseServerUrl}/auth/reset-password`;
+  readonly dataType = {
+    create: () => buildUrl(this.accounting, '/data-type'),
+    delete: (id: number) => buildUrl(this.accounting, '/data-type/:id', { id }),
+    edit: (id: number) => buildUrl(this.accounting, '/data-type/:id', { id }),
+    getById: (id: number) => buildUrl(this.accounting, '/data-type/:id', { id }),
+    getByInstanceId: (instanceId: number) => buildUrl(this.accounting, '/data-type', {}, { instanceId }),
+  };
 
-  public readonly customerCreate = () => `${this.accountingUrl}/customer`;
-  public readonly customerDelete = (id: number) => `${this.accountingUrl}/customer/${id}`;
-  public readonly customerEdit = (id: number) => `${this.accountingUrl}/customer/${id}`;
-  public readonly customerGet = (instanceId: number) => `${this.accountingUrl}/customer?${this.toParameters({
-    instanceId: instanceId
-  })}`;
-  public readonly customerGetById = (id: number) => `${this.accountingUrl}/customer/${id}`;
+  readonly importConfiguration = {
+    create: () => buildUrl(this.accounting, '/import-configuration'),
+    delete: (id: number) => buildUrl(this.accounting, '/import-configuration/:id', { id }),
+    edit: (id: number) => buildUrl(this.accounting, '/import-configuration/:id', { id }),
+    getById: (id: number) => buildUrl(this.accounting, '/import-configuration/:id', { id }),
+    getByDataTypeId: (dataTypeId: number) => buildUrl(this.accounting, '/import-configuration', {}, { dataTypeId }),
+    getByInstanceId: (instanceId: number) => buildUrl(this.accounting, '/import-configuration', {}, { instanceId }),
+  };
 
-  public readonly dataEntryCreate = () => `${this.accountingUrl}/data-entry`;
-  public readonly dataEntryDelete = (id: number) => `${this.accountingUrl}/data-entry/${id}`;
-  public readonly dataEntryEdit = (id: number) => `${this.accountingUrl}/data-entry/${id}`;
-  public readonly dataEntryGetById = (id: number) => `${this.accountingUrl}/data-entry/${id}`;
-  public readonly dataEntryGetByDataTypeId = (dataTypeId: number) => `${this.accountingUrl}/data-entry?${this.toParameters({
-    dataTypeId: dataTypeId
-  })}`;
-  public readonly dataEntryImport = () => `${this.accountingUrl}/data-entry/import`;
+  readonly instance = {
+    create: () => buildUrl(this.accounting, '/instance'),
+    delete: (id: number) => buildUrl(this.accounting, '/instance/:id', { id }),
+    edit: (id: number) => buildUrl(this.accounting, '/instance/:id', { id }),
+    getById: (id: number) => buildUrl(this.accounting, '/instance/:id', { id }),
+    getByUser: () => buildUrl(this.accounting, '/instance'),
+  };
 
-  public readonly dataTypeCreate = () => `${this.accountingUrl}/data-type`;
-  public readonly dataTypeDelete = (id: number) => `${this.accountingUrl}/data-type/${id}`;
-  public readonly dataTypeEdit = (id: number) => `${this.accountingUrl}/data-type/${id}`;
-  public readonly dataTypeGetById = (id: number) => `${this.accountingUrl}/data-type/${id}`;
-  public readonly dataTypeGetByInstanceId = (instanceId: number) => `${this.accountingUrl}/data-type?${this.toParameters({
-    instanceId: instanceId
-  })}`;
+  readonly report = {
+    generateDataEntries: () => buildUrl(this.accounting, '/report/generate-data-entries'),
+    generateSales: () => buildUrl(this.accounting, '/report/generate-sales'),
+  };
 
-  public readonly importConfigurationCreate = () => `${this.accountingUrl}/import-configuration`;
-  public readonly importConfigurationDelete = (id: number) => `${this.accountingUrl}/import-configuration/${id}`;
-  public readonly importConfigurationEdit = (id: number) => `${this.accountingUrl}/import-configuration/${id}`;
-  public readonly importConfigurationGetById = (id: number) => `${this.accountingUrl}/import-configuration/${id}`;
-  public readonly importConfigurationGetByDataTypeId = (dataTypeId: number) => `${this.accountingUrl}/import-configuration?${this.toParameters({
-    dataTypeId: dataTypeId
-  })}`;
-  public readonly importConfigurationGetByInstanceId = (instanceId: number) => `${this.accountingUrl}/import-configuration?${this.toParameters({
-    instanceId: instanceId
-  })}`;
+  readonly reportTemplate = {
+    create: () => buildUrl(this.accounting, '/report-template'),
+    delete: (id: number) => buildUrl(this.accounting, '/report-template/:id', { id }),
+    edit: (id: number) => buildUrl(this.accounting, '/report-template/:id', { id }),
+    getById: (id: number) => buildUrl(this.accounting, '/report-template/:id', { id }),
+    getByInstanceId: (id: number) => buildUrl(this.accounting, '/report-template', {}, { instanceId: id }),
+  };
 
-  public readonly instanceCreate = () => `${this.accountingUrl}/instance`;
-  public readonly instanceDelete = (id: number) => `${this.accountingUrl}/instance/${id}`;
-  public readonly instanceEdit = (id: number) => `${this.accountingUrl}/instance/${id}`;
-  public readonly instanceGetById = (id: number) => `${this.accountingUrl}/instance/${id}`;
-  public readonly instanceGetByUser = () => `${this.accountingUrl}/instance`;
+  readonly sale = {
+    create: () => buildUrl(this.accounting, '/sale'),
+    delete: (id: number) => buildUrl(this.accounting, '/sale/:id', { id }),
+    edit: (id: number) => buildUrl(this.accounting, '/sale/:id', { id }),
+    getById: (id: number) => buildUrl(this.accounting, '/sale/:id', { id }),
+    getByInstanceId: (instanceId: number) => buildUrl(this.accounting, '/sale', {}, { instanceId }),
+  };
 
-  public readonly reportDataEntriesGenerate = () => `${this.accountingUrl}/report/generate-data-entries`;
-  public readonly reportSalesGenerate = () => `${this.accountingUrl}/report/generate-sales`;
+  readonly salesman = {
+    create: () => buildUrl(this.accounting, '/salesman'),
+    delete: (id: number) => buildUrl(this.accounting, '/salesman/:id', { id }),
+    edit: (id: number) => buildUrl(this.accounting, '/salesman/:id', { id }),
+    getById: (id: number) => buildUrl(this.accounting, '/salesman/:id', { id }),
+    getByInstanceId: (instanceId: number) => buildUrl(this.accounting, '/salesman', {}, { instanceId }),
+  };
 
-  public readonly reportTemplateCreate = () => `${this.accountingUrl}/report-template`;
-  public readonly reportTemplateDelete = (id: number) => `${this.accountingUrl}/report-template/${id}`;
-  public readonly reportTemplateEdit = (id: number) => `${this.accountingUrl}/report-template/${id}`;
-  public readonly reportTemplateGetById = (id: number) => `${this.accountingUrl}/report-template/${id}`;
-  public readonly reportTemplateGetAllByInstanceId = (id: number) => `${this.accountingUrl}/report-template?${this.toParameters({
-    instanceId: id
-  })}`;
+  readonly session = {
+    getByUser: () => buildUrl(this.base, '/session'),
+    revoke: (id: string) => buildUrl(this.base, '/session/:id', { id }),
+  };
 
-  public readonly saleCreate = () => `${this.accountingUrl}/sale`;
-  public readonly saleDelete = (id: number) => `${this.accountingUrl}/sale/${id}`;
-  public readonly saleEdit = (id: number) => `${this.accountingUrl}/sale/${id}`;
-  public readonly saleGet = (instanceId: number) => `${this.accountingUrl}/sale?${this.toParameters({
-    instanceId: instanceId
-  })}`;
-  public readonly saleGetById = (id: number) => `${this.accountingUrl}/sale/${id}`;
+  readonly user = {
+    create: () => buildUrl(this.base, '/user'),
+    delete: (id: number) => buildUrl(this.base, '/user/:id', { id }),
+    edit: (id: number) => buildUrl(this.base, '/user/:id', { id }),
+    get: (returnIdentityOnly = false) => buildUrl(this.base, '/user', {}, { returnIdentityOnly }),
+    getByEmail: (email: string, returnIdentityOnly = false) => buildUrl(this.base, '/user', {}, { email, returnIdentityOnly }),
+    getById: (id: number, returnIdentityOnly = false) => buildUrl(this.base, '/user/:id', { id }, { returnIdentityOnly }),
+  };
 
-  public readonly salesmanCreate = () => `${this.accountingUrl}/salesman`;
-  public readonly salesmanDelete = (id: number) => `${this.accountingUrl}/salesman/${id}`;
-  public readonly salesmanEdit = (id: number) => `${this.accountingUrl}/salesman/${id}`;
-  public readonly salesmanGet = (instanceId: number) => `${this.accountingUrl}/salesman?${this.toParameters({
-    instanceId: instanceId
-  })}`;
-  public readonly salesmanGetById = (id: number) => `${this.accountingUrl}/salesman/${id}`;
-
-  public readonly sessionGetByUser = () => `${this.baseServerUrl}/session`;
-  public readonly sessionRevoke = (id: string) => `${this.baseServerUrl}/session/${id}`;
-
-  public readonly userCreate = () => `${this.baseServerUrl}/user`;
-  public readonly userDelete = (id: number) => `${this.baseServerUrl}/user/${id}`;
-  public readonly userEdit = (id: number) => `${this.baseServerUrl}/user/${id}`;
-  public readonly userGet = (returnIdentityOnly: boolean = false) => `${this.baseServerUrl}/user?${this.toParameters({
-    returnIdentityOnly: returnIdentityOnly
-  })}`
-  public readonly userGetById = (id: number, returnIdentityOnly: boolean = false) => `${this.baseServerUrl}/user/${id}?${this.toParameters({
-    returnIdentityOnly: returnIdentityOnly
-  })}`
-  public readonly userGetByEmail = (email: string, returnIdentityOnly: boolean = false) => `${this.baseServerUrl}/user?${this.toParameters({
-    email: email,
-    returnIdentityOnly: returnIdentityOnly
-  })}`
-
-  public readonly vatReturnCancel = (saleId: number) => `${this.accountingUrl}/sti/vat-return/${saleId}/cancel`;
-  public readonly vatReturnSubmit = () => `${this.accountingUrl}/sti/vat-return`;
-  public readonly vatReturnGet = (saleId: number) => `${this.accountingUrl}/sti/vat-return/${saleId}`;
-  public readonly vatReturnGetByPreviewCode = (code: string) => `${this.accountingUrl}/sti/vat-return?${this.toParameters({
-    code: code
-  })}`;
-  public readonly vatReturnPayment = (saleId: number) => `${this.accountingUrl}/sti/vat-return/${saleId}/payment`;
-  public readonly vatReturnUpdate = (saleId: number) => `${this.accountingUrl}/sti/vat-return/${saleId}/update`;
-  public readonly vatReturnUpdateByPreviewCode = (code: string) => `${this.accountingUrl}/sti/vat-return/update?${this.toParameters({
-    code: code
-  })}`;
+  readonly vatReturn = {
+    cancel: (saleId: number) => buildUrl(this.accounting, '/sti/vat-return/:saleId/cancel', { saleId }),
+    submit: () => buildUrl(this.accounting, '/sti/vat-return'),
+    getBySaleId: (saleId: number) => buildUrl(this.accounting, '/sti/vat-return/:saleId', { saleId }),
+    getByCode: (code: string) => buildUrl(this.accounting, '/sti/vat-return', {}, { code }),
+    payment: (saleId: number) => buildUrl(this.accounting, '/sti/vat-return/:saleId/payment', { saleId }),
+    update: (saleId: number) => buildUrl(this.accounting, '/sti/vat-return/:saleId/update', { saleId }),
+    updateByCode: (code: string) => buildUrl(this.accounting, '/sti/vat-return/update', {}, { code }),
+  };
 }

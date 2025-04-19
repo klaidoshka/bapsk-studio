@@ -82,7 +82,7 @@ export class DataEntryService {
       .pipe(
         switchMap(dataType =>
           this.httpClient.post<DataEntry>(
-            this.apiRouter.dataEntryCreate(),
+            this.apiRouter.dataEntry.create(),
             this.adjustRequestDateToISO(request, dataType)
           )
         ),
@@ -95,7 +95,7 @@ export class DataEntryService {
 
   delete(id: number): Observable<void> {
     return this.httpClient
-      .delete<void>(this.apiRouter.dataEntryDelete(id))
+      .delete<void>(this.apiRouter.dataEntry.delete(id))
       .pipe(
         tap(() => this.cacheService.delete(id))
       );
@@ -107,7 +107,7 @@ export class DataEntryService {
       .pipe(
         switchMap(dataType =>
           this.httpClient.put<void>(
-            this.apiRouter.dataEntryEdit(request.dataEntryId),
+            this.apiRouter.dataEntry.edit(request.dataEntryId),
             this.adjustRequestDateToISO(request, dataType)
           )
         ),
@@ -129,7 +129,7 @@ export class DataEntryService {
     }
 
     return this.httpClient
-      .get<DataEntry>(this.apiRouter.dataEntryGetById(id))
+      .get<DataEntry>(this.apiRouter.dataEntry.getById(id))
       .pipe(
         switchMap(dataEntry => this.updateProperties(dataEntry)),
         switchMap(dataEntry => this.joinOntoDataEntry(dataEntry)),
@@ -144,7 +144,7 @@ export class DataEntryService {
     }
 
     return this.httpClient
-      .get<DataEntry[]>(this.apiRouter.dataEntryGetByDataTypeId(dataTypeId))
+      .get<DataEntry[]>(this.apiRouter.dataEntry.getByDataTypeId(dataTypeId))
       .pipe(
         switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.updateProperties(dataEntry)))),
         switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.joinOntoDataEntry(dataEntry)))),
@@ -194,7 +194,7 @@ export class DataEntryService {
 
     return this.httpClient
       .post<DataEntry[]>(
-        this.apiRouter.dataEntryImport(),
+        this.apiRouter.dataEntry.import(),
         data
       )
       .pipe(
