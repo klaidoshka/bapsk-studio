@@ -1,11 +1,12 @@
-import {Component, inject} from '@angular/core';
+import {Component, ElementRef, inject, viewChildren} from '@angular/core';
 import {ReportService} from '../../service/report.service';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {NgForOf, NgIf} from '@angular/common';
+import {NgClass, NgForOf, NgIf} from '@angular/common';
 import {TableModule} from 'primeng/table';
 import {
   DataTypeEntryFieldDisplayComponent
 } from '../../component/data-type-entry-field-display/data-type-entry-field-display.component';
+import {Button} from 'primeng/button';
 
 @Component({
   selector: 'report-preview-page',
@@ -13,13 +14,16 @@ import {
     NgForOf,
     NgIf,
     TableModule,
-    DataTypeEntryFieldDisplayComponent
+    DataTypeEntryFieldDisplayComponent,
+    Button,
+    NgClass
   ],
   templateUrl: './report-preview-page.component.html',
   styles: ``
 })
 export class ReportPreviewPageComponent {
   private readonly reportService = inject(ReportService);
+  reportContainers = viewChildren<ElementRef>('reportContainer');
 
   reports = rxResource({
     loader: () => this.reportService.generateDataEntryReports({
@@ -28,4 +32,14 @@ export class ReportPreviewPageComponent {
       reportTemplateId: 2
     })
   });
+
+  export(index: number) {
+    const element = this.reportContainers()?.at(index)?.nativeElement;
+
+    if (!element) {
+      return;
+    }
+
+    this.reportService.export(element);
+  }
 }

@@ -1,29 +1,63 @@
-<div *ngFor="let report of reports.value() || []">
-  <!-- Info -->
-  <ng-container *ngIf="report.info.fields.length">
-    <div class="text-lg font-medium mt-4 text-gray-700">Info</div>
-    <div class="grid grid-cols-2 gap-2 text-sm text-gray-600">
-      <div *ngFor="let field of report.info.fields">
-        <span class="font-semibold">{{ field.name }}:</span> {{ field.value }}
+<div class="w-full h-full p-4">
+  <div *ngIf="!reports.hasValue(); else hasReports" class="flex flex-col gap-4 p-4 dark:bg-surface-950 bg-surface-50 rounded shadow-lg">
+    <!-- No Reports -->
+    <div *ngIf="!reports.isLoading()" class="text-lg font-semibold">No reports available</div>
+  </div>
+
+  <ng-template #hasReports>
+    <div *ngFor="let report of reports.value()!; let i = index; let count = count" class="flex flex-col gap-4">
+      <div class="flex flex-row justify-between items-center" [ngClass]="{'mt-16': i > 0}">
+        <p-button label="Export" icon="pi pi-file-export" (onClick)="export(i)"/>
+        <p class="self-end font-semibold">{{ i + 1 }} / {{ count }}</p>
+      </div>
+
+      <div #reportContainer class="flex flex-col gap-4">
+        <!-- Info -->
+        <div *ngIf="report.info.fields.length" class="flex flex-col gap-4 p-4 dark:bg-surface-950 bg-surface-50 rounded shadow-lg">
+          <div class="text-lg font-semibold">Report Info</div>
+          <div class="flex flex-row gap-8 w-fit p-4 dark:text-primary-50 text-primary-950/70">
+            <div class="flex flex-col gap-4 items-start w-fit">
+              <p *ngFor="let field of report.info.fields" class="font-semibold min-w-max">
+                {{ field.name }}
+              </p>
+            </div>
+            <div class="flex flex-col gap-4 items-start w-fit">
+              <data-type-entry-field-display
+                *ngFor="let field of report.info.fields"
+                [value]="field.value"
+                [type]="field.type"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Entries -->
+        <div *ngIf="report.entries.length; else noEntries"
+             class="flex flex-col gap-4 p-4 dark:bg-surface-950 bg-surface-50 rounded shadow-lg overflow-x-auto">
+          <div class="text-lg font-semibold">Report Entries</div>
+          <p-table [value]="report.entries" class="w-fit">
+            <ng-template #header>
+              <tr>
+                <th *ngFor="let field of report.header">{{ field }}</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-entry>
+              <tr>
+                <td *ngFor="let field of entry.fields">
+                  <data-type-entry-field-display [value]="field.value" [type]="field.type"/>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+
+        <!-- No Entries -->
+        <ng-template #noEntries>
+          <div class="flex flex-col gap-4 p-4 dark:bg-surface-950 bg-surface-50 rounded">
+            <div class="text-lg font-semibold">No entries within this report found</div>
+          </div>
+        </ng-template>
       </div>
     </div>
-  </ng-container>
-
-  <p-table [value]="report.entries" class="w-fit">
-    <!-- Header -->
-    <ng-template #header>
-      <tr>
-        <th *ngFor="let field of report.header">{{ field }}</th>
-      </tr>
-    </ng-template>
-
-    <!-- Entries -->
-    <ng-template #body let-entry>
-      <tr>
-        <td *ngFor="let field of entry.fields">
-          <data-type-entry-field-display [value]="field.value" [type]="field.type"/>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+  </ng-template>
 </div>

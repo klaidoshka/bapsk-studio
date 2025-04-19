@@ -56,25 +56,32 @@ public class ReportService : IReportService
 
     private static ReportEntry CreateDataEntryReportEntry(
         DataEntry entry,
-        Dictionary<int, DataTypeField> dataTypeFields,
+        Dictionary<int, DataTypeField> templateDataTypeFields,
         Dictionary<int, ReportEntryField> referenceDataEntryToDisplay
     )
     {
         return new ReportEntry
         {
-            Fields = entry.Fields
-                .Select(field =>
+            Fields = templateDataTypeFields.Keys
+                .Select(dataTypeFieldId =>
                     {
-                        if (referenceDataEntryToDisplay.TryGetValue(field.Id, out var reportEntryField))
+                        var entryField = entry.Fields.FirstOrDefault(f => f.DataTypeFieldId == dataTypeFieldId);
+
+                        if (entryField is null)
+                        {
+                            return CreateReportEntryField(String.Empty);
+                        }
+
+                        if (referenceDataEntryToDisplay.TryGetValue(entryField.Id, out var reportEntryField))
                         {
                             return reportEntryField;
                         }
 
-                        dataTypeFields.TryGetValue(field.DataTypeFieldId, out var dataTypeField);
+                        templateDataTypeFields.TryGetValue(dataTypeFieldId, out var dataTypeField);
 
                         return CreateReportEntryField(
                             dataTypeField is not null
-                                ? field.Value
+                                ? entryField.Value
                                 : String.Empty,
                             dataTypeField?.Type ?? FieldType.Text
                         );
@@ -84,12 +91,13 @@ public class ReportService : IReportService
         };
     }
 
-    private static ReportInfo CreateDataEntryReportInfo(DateTime from, DateTime to)
+    private static ReportInfo CreateDataEntryReportInfo(DateTime from, DateTime to, string templateName)
     {
         return new ReportInfo
         {
             Fields = new List<ReportInfoField>
             {
+                CreateReportInfoField("Report Template", templateName),
                 CreateReportInfoField("Report From", from.ToString("u"), FieldType.Date),
                 CreateReportInfoField("Report To", to.ToString("u"), FieldType.Date)
             }
@@ -148,10 +156,11 @@ public class ReportService : IReportService
     {
         var fields = new List<ReportInfoField>
         {
+            CreateReportInfoField("Report Template", "Sales"),
             CreateReportInfoField("Report From", from.ToString("u"), FieldType.Date),
             CreateReportInfoField("Report To", to.ToString("u"), FieldType.Date),
             CreateReportInfoField("Customer", $"{customer.FirstName} {customer.LastName}".Trim()),
-            CreateReportInfoField("Customer ID Number", customer.IdentityDocumentNumber),
+            CreateReportInfoField("Customer Identity Document Number", customer.IdentityDocumentNumber),
             CreateReportInfoField("Salesman", salesman.Name),
             CreateReportInfoField("Salesman VAT Payer Code", salesman.VatPayerCode),
             CreateReportInfoField("Sale Date", sale.Date.ToString("u"), FieldType.Date)
@@ -159,7 +168,7 @@ public class ReportService : IReportService
 
         if (customer.Email is not null)
         {
-            fields.Insert(2, CreateReportInfoField("Customer Email", customer.Email));
+            fields.Insert(5, CreateReportInfoField("Customer Email", customer.Email));
         }
 
         if (sale.InvoiceNo is not null)
@@ -195,27 +204,30 @@ public class ReportService : IReportService
             }
         );
 
-        var dataEntries = await Task.WhenAll(
-            template.Fields
-                .Select(field => field.DataTypeId)
-                .Distinct()
-                .Select(dataTypeId =>
-                    _dataEntryService.GetAsync(
-                        new DataEntryGetWithinIntervalRequest
-                        {
-                            DataTypeId = dataTypeId,
-                            From = request.From,
-                            To = request.To
-                        }
-                    )
+        var templateDataTypeIds = template.Fields
+            .Select(field => field.DataTypeId)
+            .Distinct()
+            .ToList();
+
+        var dataEntries = new List<DataEntry>();
+
+        foreach (var dataTypeId in templateDataTypeIds)
+        {
+            dataEntries.AddRange(
+                await _dataEntryService.GetAsync(
+                    new DataEntryGetWithinIntervalRequest
+                    {
+                        DataTypeId = dataTypeId,
+                        From = request.From,
+                        To = request.To
+                    }
                 )
-                .ToList()
-        );
+            );
+        }
 
         var templateDataTypeFields = template.Fields.ToDictionary(f => f.Id);
 
         var dataEntryFieldReferenceMetas = dataEntries
-            .SelectMany(entries => entries)
             .SelectMany(dataEntry => dataEntry.Fields
                 .Where(field =>
                     templateDataTypeFields.TryGetValue(field.DataTypeFieldId, out var dataTypeField) &&
@@ -275,7 +287,6 @@ public class ReportService : IReportService
         }
 
         var reportEntries = dataEntries
-            .SelectMany(entries => entries)
             .Select(entry => CreateDataEntryReportEntry(entry, templateDataTypeFields, referenceReportEntryFields))
             .ToList();
 
@@ -285,7 +296,7 @@ public class ReportService : IReportService
             Header = template.Fields
                 .Select(field => field.Name)
                 .ToList(),
-            Info = CreateDataEntryReportInfo(request.From, request.To)
+            Info = CreateDataEntryReportInfo(request.From, request.To, template.Name)
         };
     }
 
