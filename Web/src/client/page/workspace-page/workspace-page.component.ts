@@ -17,15 +17,17 @@ import {SaleShowcaseComponent} from '../../component/sale-showcase/sale-showcase
 import {Select} from 'primeng/select';
 import {VatReturnService} from '../../service/vat-return.service';
 import {DataEntryService} from '../../service/data-entry.service';
-import {UserService} from '../../service/user.service';
 import {HttpClient} from '@angular/common/http';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {combineLatest, map, of} from 'rxjs';
+import {Button} from 'primeng/button';
+import {Dialog} from 'primeng/dialog';
+import {ReportGenerateFormComponent} from '../../component/report-generate-form/report-generate-form.component';
 
 @Component({
   selector: 'workspace-page',
   templateUrl: './workspace-page.component.html',
-  imports: [DataEntryShowcaseComponent, Message, CustomerShowcaseComponent, SalesmanShowcaseComponent, NgIf, NgForOf, DropdownModule, FormsModule, SaleShowcaseComponent, Select],
+  imports: [DataEntryShowcaseComponent, Message, CustomerShowcaseComponent, SalesmanShowcaseComponent, NgIf, NgForOf, DropdownModule, FormsModule, SaleShowcaseComponent, Select, Button, Dialog, ReportGenerateFormComponent],
   providers: []
 })
 export class WorkspacePageComponent {
@@ -37,8 +39,9 @@ export class WorkspacePageComponent {
   private instanceService = inject(InstanceService);
   private saleService = inject(SaleService);
   private salesmanService = inject(SalesmanService);
-  private userService = inject(UserService);
   private vatReturnService = inject(VatReturnService);
+
+  showGenerateReportDialog = signal<boolean>(false);
 
   customers = computed(() => {
     const instanceId = this.instanceId();
@@ -193,5 +196,9 @@ export class WorkspacePageComponent {
     }
 
     this.selectedWorkspace.set(workspace);
+  }
+
+  generateReport() {
+
   }
 }

@@ -37,3 +37,7 @@ export interface GenerateSalesReportsRequest {
   salesmanId: number;
   to: Date;
 }
+
+export interface Reports {
+  reports: Report[];
+}

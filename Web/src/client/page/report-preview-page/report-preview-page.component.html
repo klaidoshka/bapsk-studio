@@ -1,11 +1,11 @@
 <div class="w-full h-full p-4">
-  <div *ngIf="!reports.hasValue(); else hasReports" class="flex flex-col gap-4 p-4 dark:bg-surface-950 bg-surface-50 rounded shadow-lg">
-    <!-- No Reports -->
-    <div *ngIf="!reports.isLoading()" class="text-lg font-semibold">No reports available</div>
+  <!-- No Reports -->
+  <div *ngIf="!reports; else hasReports" class="flex flex-col gap-4 p-4 dark:bg-surface-950 bg-surface-50 rounded shadow-lg">
+    <p class="text-lg font-semibold">No reports available</p>
   </div>
 
   <ng-template #hasReports>
-    <div *ngFor="let report of reports.value()!; let i = index; let count = count" class="flex flex-col gap-4">
+    <div *ngFor="let report of reports?.reports!; let i = index; let count = count" class="flex flex-col gap-4">
       <div class="flex flex-row justify-between items-center" [ngClass]="{'mt-16': i > 0}">
         <p-button label="Export" icon="pi pi-file-export" (onClick)="export(i)"/>
         <p class="self-end font-semibold">{{ i + 1 }} / {{ count }}</p>
@@ -13,7 +13,8 @@
 
       <div #reportContainer class="flex flex-col gap-4">
         <!-- Info -->
-        <div *ngIf="report.info.fields.length" class="flex flex-col gap-4 p-4 dark:bg-surface-950 bg-surface-50 rounded shadow-lg">
+        <div *ngIf="report.info.fields.length"
+             class="flex flex-col gap-4 p-4 dark:bg-surface-950 bg-surface-50 rounded shadow-lg">
           <div class="text-lg font-semibold">Report Info</div>
           <div class="flex flex-row gap-8 w-fit p-4 dark:text-primary-50 text-primary-950/70">
             <div class="flex flex-col gap-4 items-start w-fit">
@@ -53,8 +54,8 @@
 
         <!-- No Entries -->
         <ng-template #noEntries>
-          <div class="flex flex-col gap-4 p-4 dark:bg-surface-950 bg-surface-50 rounded">
-            <div class="text-lg font-semibold">No entries within this report found</div>
+          <div class="flex flex-col gap-4 p-4 dark:bg-surface-950 bg-surface-50 rounded shadow-lg">
+            <p class="text-lg font-semibold">No entries within this report found</p>
           </div>
         </ng-template>
       </div>

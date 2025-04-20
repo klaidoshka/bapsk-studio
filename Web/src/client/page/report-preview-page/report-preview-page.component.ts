@@ -1,12 +1,13 @@
 import {Component, ElementRef, inject, viewChildren} from '@angular/core';
 import {ReportService} from '../../service/report.service';
-import {rxResource} from '@angular/core/rxjs-interop';
 import {NgClass, NgForOf, NgIf} from '@angular/common';
 import {TableModule} from 'primeng/table';
 import {
   DataTypeEntryFieldDisplayComponent
 } from '../../component/data-type-entry-field-display/data-type-entry-field-display.component';
 import {Button} from 'primeng/button';
+import {Router} from '@angular/router';
+import {Reports} from '../../model/report.model';
 
 @Component({
   selector: 'report-preview-page',
@@ -23,16 +24,10 @@ import {Button} from 'primeng/button';
 })
 export class ReportPreviewPageComponent {
   private readonly reportService = inject(ReportService);
+  private readonly router = inject(Router);
 
+  reports = this.router.lastSuccessfulNavigation?.extras?.state as Reports | undefined;
   reportContainers = viewChildren<ElementRef>('reportContainer');
-
-  reports = rxResource({
-    loader: () => this.reportService.generateDataEntryReports({
-      from: new Date("2023-01-01"),
-      to: new Date("2025-12-31"),
-      reportTemplateId: 2
-    })
-  });
 
   export(index: number) {
     const element = this.reportContainers()?.at(index)?.nativeElement;

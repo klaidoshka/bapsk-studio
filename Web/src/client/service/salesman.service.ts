@@ -59,7 +59,7 @@ export class SalesmanService {
       );
   }
 
-  get(instanceId: number) {
+  getByInstanceId(instanceId: number) {
     return this.httpClient.get<Salesman[]>(this.apiRouter.salesman.getByInstanceId(instanceId)).pipe(
       tap(salesmen => {
         const existingSignal = this.store.get(instanceId);
@@ -91,7 +91,7 @@ export class SalesmanService {
     if (!this.store.has(instanceId)) {
       this.store.set(instanceId, signal([]));
 
-      new Promise((resolve) => this.get(instanceId).subscribe(resolve));
+      new Promise((resolve) => this.getByInstanceId(instanceId).subscribe(resolve));
     }
 
     return this.store.get(instanceId)!.asReadonly();
