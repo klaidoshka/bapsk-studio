@@ -1,12 +1,6 @@
 import {computed, inject, Injectable, Signal, signal} from '@angular/core';
 import {ApiRouter} from './api-router.service';
-import {
-  toUserIdentity,
-  User,
-  UserCreateRequest,
-  UserEditRequest,
-  UserIdentity
-} from '../model/user.model';
+import {toUserIdentity, User, UserCreateRequest, UserEditRequest, UserIdentity} from '../model/user.model';
 import {first, Observable, of, switchMap, tap} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {EnumUtil} from '../util/enum.util';
@@ -53,7 +47,7 @@ export class UserService {
 
   create(request: UserCreateRequest): Observable<User> {
     return this.httpClient
-      .post<User>(this.apiRouter.userCreate(), {
+      .post<User>(this.apiRouter.user.create(), {
         ...request,
         birthDate: request.birthDate.toISOString() as any
       } as UserCreateRequest)
@@ -61,7 +55,7 @@ export class UserService {
   };
 
   delete(id: number): Observable<void> {
-    return this.httpClient.delete<void>(this.apiRouter.userDelete(id)).pipe(
+    return this.httpClient.delete<void>(this.apiRouter.user.delete(id)).pipe(
       tap(() => {
         this.storeUsers.set(this.storeUsers().filter(user => user.id !== id));
         this.storeIdentities.set(this.storeIdentities().filter(identity => identity.id !== id));
@@ -70,7 +64,7 @@ export class UserService {
   };
 
   edit(request: UserEditRequest): Observable<void> {
-    return this.httpClient.put<void>(this.apiRouter.userEdit(request.userId), {
+    return this.httpClient.put<void>(this.apiRouter.user.edit(request.userId), {
       ...request,
       birthDate: request.birthDate.toISOString() as any
     } as UserEditRequest).pipe(
@@ -91,7 +85,7 @@ export class UserService {
   };
 
   get(): Observable<User[]> {
-    return this.httpClient.get<User[]>(this.apiRouter.userGet()).pipe(
+    return this.httpClient.get<User[]>(this.apiRouter.user.get()).pipe(
       tap(users => {
         this.storeUsers.set(users.map(user => this.updateProperties(user)));
         this.storeIdentities.set(users.map(user => toUserIdentity(user)));
@@ -100,13 +94,13 @@ export class UserService {
   };
 
   getById(id: number): Observable<User> {
-    return this.httpClient.get<User>(this.apiRouter.userGetById(id)).pipe(
+    return this.httpClient.get<User>(this.apiRouter.user.getById(id)).pipe(
       tap(user => this.updateCachedUser(user))
     );
   };
 
   getIdentityById(id: number): Observable<UserIdentity> {
-    return this.httpClient.get<UserIdentity>(this.apiRouter.userGetById(id, true)).pipe(
+    return this.httpClient.get<UserIdentity>(this.apiRouter.user.getById(id, true)).pipe(
       tap(identity => this.updateCachedUserIdentity(identity))
     );
   };
@@ -155,7 +149,7 @@ export class UserService {
       return of(toUserIdentity(this.storeUsers().at(index)!));
     }
 
-    return this.httpClient.get<UserIdentity[]>(this.apiRouter.userGetByEmail(email, true)).pipe(
+    return this.httpClient.get<UserIdentity[]>(this.apiRouter.user.getByEmail(email, true)).pipe(
       tap(identities => identities.forEach(this.updateCachedUserIdentity)),
       switchMap(identities => of(identities.length > 0 ? identities[0] : undefined)),
       first()

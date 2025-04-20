@@ -23,7 +23,7 @@ export class SessionService {
   }
 
   getByUser(): Observable<Session[]> {
-    return this.httpClient.get<Session[]>(this.apiRouter.sessionGetByUser()).pipe(
+    return this.httpClient.get<Session[]>(this.apiRouter.session.getByUser()).pipe(
       map((sessions: Session[]) => sessions
         .map(s => {
           return {
@@ -42,7 +42,7 @@ export class SessionService {
   }
 
   revoke(id: string): Observable<void> {
-    return this.httpClient.delete<void>(this.apiRouter.sessionRevoke(id))
+    return this.httpClient.delete<void>(this.apiRouter.session.revoke(id))
       .pipe(
         // Remove the session from the client if it's the current session
         tap(() => {

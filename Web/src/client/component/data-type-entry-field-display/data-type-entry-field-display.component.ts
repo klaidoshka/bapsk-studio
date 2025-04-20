@@ -22,22 +22,19 @@ export class DataTypeEntryFieldDisplayComponent {
   protected readonly FieldType = FieldType;
   private readonly dataEntryService = inject(DataEntryService);
 
-  dataType = input.required<DataType>();
-
-  dataTypeField = computed(() => this
-    .dataType().fields
-    .find(it => it.id === this.dataTypeFieldId())
-  );
-
-  dataTypeFieldId = input.required<number>();
-  fieldType = computed(() => this.dataTypeField()?.type || FieldType.Text);
+  dataType = input<DataType>();
+  dataTypeField = computed(() => this.dataType()?.fields.find(it => it.id === this.dataTypeFieldId()));
+  dataTypeFieldId = input<number>();
+  type = input<FieldType>();
+  typeResolved = computed(() => this.type() || this.dataTypeField()?.type || FieldType.Text)
+  value = input.required<any>();
 
   referencedDataEntry = rxResource({
     request: () => {
       const referenceId = this.dataTypeField()?.referenceId;
       const value = this.value();
 
-      if (!referenceId || this.fieldType() !== FieldType.Reference) {
+      if (!referenceId || this.type() !== FieldType.Reference) {
         return undefined;
       }
 
@@ -54,8 +51,6 @@ export class DataTypeEntryFieldDisplayComponent {
         )
       : of(undefined)
   });
-
-  value = input.required<any>();
 
   protected readonly getIsoCountryLabel = getIsoCountryLabel;
 }

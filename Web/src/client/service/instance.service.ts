@@ -44,25 +44,25 @@ export class InstanceService {
   }
 
   create(request: InstanceCreateRequest): Observable<Instance> {
-    return this.httpClient.post<Instance>(this.apiRouter.instanceCreate(), request).pipe(
+    return this.httpClient.post<Instance>(this.apiRouter.instance.create(), request).pipe(
       tap((instance: Instance) => this.store.update(old => [...old, this.updateProperties(instance)]))
     );
   }
 
   delete(id: number): Observable<void> {
-    return this.httpClient.delete<void>(this.apiRouter.instanceDelete(id)).pipe(
+    return this.httpClient.delete<void>(this.apiRouter.instance.delete(id)).pipe(
       tap(() => this.store.update(old => old.filter(instance => instance.id !== id)))
     );
   }
 
   edit(request: InstanceEditRequest): Observable<void> {
-    return this.httpClient.put<void>(this.apiRouter.instanceEdit(request.instanceId), request).pipe(
+    return this.httpClient.put<void>(this.apiRouter.instance.edit(request.instanceId), request).pipe(
       tap(() => this.get(request.instanceId).pipe(first()).subscribe())
     );
   }
 
   get(id: number): Observable<Instance> {
-    return this.httpClient.get<Instance>(this.apiRouter.instanceGetById(id)).pipe(
+    return this.httpClient.get<Instance>(this.apiRouter.instance.getById(id)).pipe(
       tap((instance: Instance) => this.store.update(old => {
         const index = old.findIndex(i => i.id === instance.id);
 
@@ -80,7 +80,7 @@ export class InstanceService {
   }
 
   getAll(): Observable<Instance[]> {
-    return this.httpClient.get<Instance[]>(this.apiRouter.instanceGetByUser()).pipe(
+    return this.httpClient.get<Instance[]>(this.apiRouter.instance.getByUser()).pipe(
       tap((instances: Instance[]) => this.store.set(instances.map(instance => this.updateProperties(instance))))
     );
   }

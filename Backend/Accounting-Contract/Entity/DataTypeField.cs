@@ -50,7 +50,7 @@ public class DataTypeField
     /// <summary>
     /// Navigation property to the report templates that use this field.
     /// </summary>
-    public ICollection<ReportTemplate> ReportTemplates { get; set; }
+    public ICollection<ReportTemplate> ReportTemplates { get; set; } = new List<ReportTemplate>();
 
     /// <summary>
     /// Reference to another data type. This is only set when FieldType is Reference.

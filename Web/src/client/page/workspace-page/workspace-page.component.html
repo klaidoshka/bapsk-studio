@@ -1,60 +1,51 @@
-<div class="h-screen w-full">
+<p-dialog [closable]="true" [modal]="true" [(visible)]="showGenerateReportDialog" header="Generate Report By Template"
+          (onHide)="showGenerateReportDialog.set(false)">
+  <report-generate-form/>
+</p-dialog>
+
+<div class="h-full w-full">
   <ng-container *ngIf="instanceId() != null">
-    <div class="flex">
+    <div class="flex h-full">
       <!-- Sidebar -->
-      <div class="rounded h-screen sticky top-0 w-50 dark:bg-surface-950 bg-surface-50 dark:text-primary dark:text-primary text-primary-50 p-4 flex flex-col">
-        <div
-          *ngFor="let type of workspacesPart"
-          class="w-full p-2 my-1 bg-surface-500 rounded hover:cursor-pointer text-center text-l"
-          [class.bg-surface-600]="selectedWorkspace() === type"
-          (click)="selectWorkspace(type)"
-        >
+      <div
+        class="rounded sticky top-0 w-52 dark:bg-surface-950 bg-surface-50 dark:text-primary dark:text-primary text-primary-50 p-4 flex flex-col">
+        <div *ngFor="let type of workspacesPart"
+             class="w-full p-2 my-1 bg-surface-500 rounded hover:cursor-pointer text-center text-l"
+             [class.bg-surface-600]="selectedWorkspace() === type" (click)="selectWorkspace(type)">
           {{ getWorkspaceName(type) }}
         </div>
 
         <div [class]="'mt-6 rounded' + (selectedWorkspace() === WorkspaceType.DataType ? ' bg-surface-500' : '')">
-          <div
-            class="w-full p-2 bg-surface-500 rounded hover:cursor-pointer text-center text-l"
-            [class.bg-surface-600]="selectedWorkspace() === WorkspaceType.DataType"
-            (click)="selectWorkspace(WorkspaceType.DataType)"
-          >
+          <div class="w-full p-2 bg-surface-500 rounded hover:cursor-pointer text-center text-l"
+               [class.bg-surface-600]="selectedWorkspace() === WorkspaceType.DataType"
+               (click)="selectWorkspace(WorkspaceType.DataType)">
             {{ getWorkspaceName(WorkspaceType.DataType) }}
           </div>
 
           <div *ngIf="selectedWorkspace() === WorkspaceType.DataType" class="mt-4">
-            <p-select
-              [(ngModel)]="selectedDataType"
-              [options]="dataTypes.value() || []"
-              (onChange)="selectDataType($event.value)"
-              optionLabel="name"
-              placeholder="Select..."
-              class="m-1 w-40 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-            />
+            <p-select [(ngModel)]="selectedDataType" [options]="dataTypes.value() || []" (onChange)="selectDataType($event.value)"
+                      optionLabel="name" placeholder="Select..."
+                      class="m-1 w-40 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
           </div>
         </div>
 
-        <div class="mt-8 bg-surface-500 mt-2 p-2 border rounded shadow">
+        <div class="mt-8 p-2 bg-surface-500 border rounded shadow">
           <label for="htmlFileInput" class="block text-sm font-semibold">Upload HTML</label>
-          <input
-            id="htmlFileInput"
-            type="file"
-            accept=".html"
-            (change)="selectFile($event)"
-            class="mt-2 block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border file:text-sm file:font-semibold"
-          />
+          <input id="htmlFileInput" type="file" accept=".html" (change)="selectFile($event)"
+                 class="mt-2 block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border file:text-sm file:font-semibold"/>
         </div>
+
+        <p-button label="Generate Report" class="mt-4 w-full" styleClass="w-full" icon="pi pi-file-pdf"
+                  (onClick)="showGenerateReportDialog.set(true)"/>
       </div>
 
       <!-- Main Content -->
-      <div class="flex-grow flex-col p-6">
+      <div class="h-full flex flex-col p-4">
         <ng-container *ngIf="selectedWorkspace() === WorkspaceType.DataType">
           <h1 class="text-xl font-bold">{{ selectedDataType()?.name }}</h1>
 
-          <data-entry-showcase
-            *ngIf="selectedDataType() !== undefined"
-            [dataEntries]="dataEntries.value() || []"
-            [dataType]="selectedDataType()!"
-          />
+          <data-entry-showcase *ngIf="selectedDataType() !== undefined" [dataEntries]="dataEntries.value() || []"
+                               [dataType]="selectedDataType()!"/>
 
           <div class="mt-2">
             <p-message *ngIf="!selectedDataType()" severity="warn">
@@ -65,28 +56,18 @@
 
         <ng-container *ngIf="selectedWorkspace() === WorkspaceType.Customer">
           <h1 class="text-xl font-bold">Customers</h1>
-          <customer-showcase
-            [instanceId]="instanceId()!"
-            [customers]="customers()"
-          />
+          <customer-showcase [instanceId]="instanceId()!" [customers]="customers()"/>
         </ng-container>
 
         <ng-container *ngIf="selectedWorkspace() === WorkspaceType.Sale">
           <h1 class="text-xl font-bold">Sales</h1>
-          <sale-showcase
-            [customers]="customers()"
-            [instanceId]="instanceId()!"
-            [sales]="sales.value() || []"
-            [salesmen]="salesmen()"
-          />
+          <sale-showcase [customers]="customers()" [instanceId]="instanceId()!" [sales]="sales.value() || []"
+                         [salesmen]="salesmen()"/>
         </ng-container>
 
         <ng-container *ngIf="selectedWorkspace() === WorkspaceType.Salesman">
           <h1 class="text-xl font-bold">Salesmen</h1>
-          <salesman-showcase
-            [instanceId]="instanceId()!"
-            [salesmen]="salesmen()"
-          />
+          <salesman-showcase [instanceId]="instanceId()!" [salesmen]="salesmen()"/>
         </ng-container>
       </div>
     </div>

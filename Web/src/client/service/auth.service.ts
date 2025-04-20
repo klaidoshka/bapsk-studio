@@ -49,7 +49,7 @@ export class AuthService {
   }
 
   changePassword(request: ChangePasswordRequest): Observable<void> {
-    return this.httpClient.post<void>(this.apiRouter.authChangePassword(), request);
+    return this.httpClient.post<void>(this.apiRouter.auth.changePassword(), request);
   }
 
   cleanupCredentials() {
@@ -85,7 +85,7 @@ export class AuthService {
 
   login(request: LoginRequest): Observable<AuthResponse> {
     return this.httpClient.post<AuthResponse>(
-      this.apiRouter.authLogin(),
+      this.apiRouter.auth.login(),
       request
     );
   }
@@ -95,7 +95,7 @@ export class AuthService {
       return of();
     }
 
-    return this.httpClient.post<void>(this.apiRouter.authLogout(), {}).pipe(
+    return this.httpClient.post<void>(this.apiRouter.auth.logout(), {}).pipe(
       finalize(() => {
         this.cleanupCredentials();
       })
@@ -104,7 +104,7 @@ export class AuthService {
 
   register(request: RegisterRequest): Observable<AuthResponse> {
     return this.httpClient.post<AuthResponse>(
-      this.apiRouter.authRegister(),
+      this.apiRouter.auth.register(),
       {
         ...request,
         birthDate: request.birthDate.toISOString() as any
@@ -113,11 +113,11 @@ export class AuthService {
   }
 
   renewAccess(): Observable<AuthResponse> {
-    return this.httpClient.post<AuthResponse>(this.apiRouter.authRefresh(), {});
+    return this.httpClient.post<AuthResponse>(this.apiRouter.auth.refresh(), {});
   }
 
   resetPassword(email: string): Observable<void> {
-    return this.httpClient.post<void>(this.apiRouter.authResetPassword(), { email });
+    return this.httpClient.post<void>(this.apiRouter.auth.resetPassword(), { email });
   }
 
   private toUser(): Signal<User | undefined> {

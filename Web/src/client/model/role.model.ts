@@ -9,5 +9,6 @@ export const roles = [
 ]
 
 export const toRoleLabel = (role: Role): string => {
-  return roles.find((r) => r.value === role)?.label ?? '';
+  return roles.find((r) => r.value === role)?.label
+    ?? roles.find(r => r.value === Role.User)!.label!;
 }

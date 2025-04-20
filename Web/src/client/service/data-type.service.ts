@@ -32,7 +32,7 @@ export class DataTypeService {
 
   create(request: DataTypeCreateRequest): Observable<DataType> {
     return this.httpClient
-      .post<DataType>(this.apiRouter.dataTypeCreate(), this.adjustRequestDateToISO(request))
+      .post<DataType>(this.apiRouter.dataType.create(), this.adjustRequestDateToISO(request))
       .pipe(
         map(dataType => this.updateProperties(dataType)),
         tap(dataType => this.cacheService.set(dataType)),
@@ -42,7 +42,7 @@ export class DataTypeService {
 
   delete(id: number): Observable<void> {
     return this.httpClient
-      .delete<void>(this.apiRouter.dataTypeDelete(id))
+      .delete<void>(this.apiRouter.dataType.delete(id))
       .pipe(
         tap(() => this.cacheService.delete(id))
       );
@@ -50,7 +50,7 @@ export class DataTypeService {
 
   edit(request: DataTypeEditRequest): Observable<void> {
     return this.httpClient
-      .put<void>(this.apiRouter.dataTypeEdit(request.dataTypeId), this.adjustRequestDateToISO(request))
+      .put<void>(this.apiRouter.dataType.edit(request.dataTypeId), this.adjustRequestDateToISO(request))
       .pipe(
         tap(() => {
             this.cacheService.invalidate(request.dataTypeId);
@@ -70,7 +70,7 @@ export class DataTypeService {
     }
 
     return this.httpClient
-      .get<DataType>(this.apiRouter.dataTypeGetById(id))
+      .get<DataType>(this.apiRouter.dataType.getById(id))
       .pipe(
         map(dataType => this.updateProperties(dataType)),
         tap(dataType => this.cacheService.set(dataType)),
@@ -84,7 +84,7 @@ export class DataTypeService {
     }
 
     return this.httpClient
-      .get<DataType[]>(this.apiRouter.dataTypeGetByInstanceId(instanceId))
+      .get<DataType[]>(this.apiRouter.dataType.getByInstanceId(instanceId))
       .pipe(
         map(dataTypes => dataTypes.map(dataType => this.updateProperties(dataType))),
         tap(dataTypes => {

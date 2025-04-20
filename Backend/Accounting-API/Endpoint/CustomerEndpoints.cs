@@ -11,87 +11,81 @@ public static class CustomerEndpoints
     public static void MapCustomerEndpoints(this RouteGroupBuilder builder)
     {
         builder
-            .MapPost(
-                String.Empty,
-                async (
-                    [FromBody] CustomerCreateRequest request,
-                    ICustomerService customerService
-                ) => Results.Json((await customerService.CreateAsync(request)).ToDto())
-            )
-            .RequireAuthorization(
-                it => it.AddRequirements(new CustomerRequirement(CustomerRequirement.CrudOperation.Create))
+            .MapPost(String.Empty, Create)
+            .RequireAuthorization(o =>
+                o.AddRequirements(new CustomerRequirement(CustomerRequirement.CrudOperation.Create))
             );
 
         builder
-            .MapDelete(
-                "{id:int}",
-                async (
-                    int id,
-                    ICustomerService customerService
-                ) =>
-                {
-                    await customerService.DeleteAsync(new CustomerDeleteRequest { CustomerId = id });
-
-                    return Results.Ok();
-                }
-            )
-            .RequireAuthorization(
-                it => it.AddRequirements(new CustomerRequirement(CustomerRequirement.CrudOperation.Delete))
+            .MapDelete("{id:int}", Delete)
+            .RequireAuthorization(o =>
+                o.AddRequirements(new CustomerRequirement(CustomerRequirement.CrudOperation.Delete))
             );
 
         builder
-            .MapPut(
-                "{id:int}",
-                async (
-                    int id,
-                    [FromBody] CustomerEditRequest request,
-                    ICustomerService customerService
-                ) =>
-                {
-                    request.Customer.Id = id;
-
-                    await customerService.EditAsync(request);
-
-                    return Results.Ok();
-                }
-            )
-            .RequireAuthorization(
-                o => o.AddRequirements(new CustomerRequirement(CustomerRequirement.CrudOperation.Edit))
+            .MapPut("{id:int}", Edit)
+            .RequireAuthorization(o =>
+                o.AddRequirements(new CustomerRequirement(CustomerRequirement.CrudOperation.Edit))
             );
 
         builder
-            .MapGet(
-                String.Empty,
-                async (
-                    int instanceId,
-                    HttpContext httpContext,
-                    ICustomerService customerService
-                ) => Results.Json(
-                    (await customerService.GetAsync(
-                        new CustomerGetRequest
-                        {
-                            InstanceId = instanceId,
-                            RequesterId = httpContext.GetUserIdOrThrow()
-                        }
-                    ))
-                    .Select(it => it.ToDto())
-                    .ToList()
-                )
-            )
-            .RequireAuthorization(
-                o => o.AddRequirements(new CustomerRequirement(CustomerRequirement.CrudOperation.Get))
+            .MapGet(String.Empty, GetByInstanceId)
+            .RequireAuthorization(o =>
+                o.AddRequirements(new CustomerRequirement(CustomerRequirement.CrudOperation.Get))
             );
 
         builder
-            .MapGet(
-                "{id:int}",
-                async (
-                    int id,
-                    ICustomerService customerService
-                ) => Results.Json((await customerService.GetByIdAsync(id)).ToDto())
-            )
-            .RequireAuthorization(
-                o => o.AddRequirements(new CustomerRequirement(CustomerRequirement.CrudOperation.GetById))
+            .MapGet("{id:int}", GetById)
+            .RequireAuthorization(o =>
+                o.AddRequirements(new CustomerRequirement(CustomerRequirement.CrudOperation.GetById))
             );
     }
+
+    private static async Task<IResult> Create(
+        [FromBody] CustomerCreateRequest request,
+        ICustomerService customerService
+    ) => Results.Json((await customerService.CreateAsync(request)).ToDto());
+
+    private static async Task<IResult> Delete(
+        int id,
+        ICustomerService customerService
+    )
+    {
+        await customerService.DeleteAsync(new CustomerDeleteRequest { CustomerId = id });
+
+        return Results.Ok();
+    }
+
+    private static async Task<IResult> Edit(
+        int id,
+        [FromBody] CustomerEditRequest request,
+        ICustomerService customerService
+    )
+    {
+        request.Customer.Id = id;
+        await customerService.EditAsync(request);
+
+        return Results.Ok();
+    }
+
+    private static async Task<IResult> GetByInstanceId(
+        int instanceId,
+        HttpContext httpContext,
+        ICustomerService customerService
+    ) => Results.Json(
+        (await customerService.GetAsync(
+            new CustomerGetRequest
+            {
+                InstanceId = instanceId,
+                RequesterId = httpContext.GetUserIdOrThrow()
+            }
+        ))
+        .Select(it => it.ToDto())
+        .ToList()
+    );
+
+    private static async Task<IResult> GetById(
+        int id,
+        ICustomerService customerService
+    ) => Results.Json((await customerService.GetByIdAsync(id)).ToDto());
 }

@@ -14,7 +14,7 @@ public class StiVatReturnDeclarationExport
     /// Navigation property to the associated declaration's export assessment result's conditions.
     /// These conditions indicate how the assessment was done and which conditions were met.
     /// </summary>
-    public ICollection<StiVatReturnDeclarationExportAssessmentCondition> Conditions { get; set; }
+    public ICollection<StiVatReturnDeclarationExportAssessmentCondition> Conditions { get; set; } = new List<StiVatReturnDeclarationExportAssessmentCondition>();
     
     /// <summary>
     /// Date of verification's correction if it was corrected.
@@ -66,5 +66,5 @@ public class StiVatReturnDeclarationExport
     /// <summary>
     /// Information regarding the goods that were verified.
     /// </summary>
-    public ICollection<StiVatReturnDeclarationExportVerifiedGood> VerifiedSoldGoods { get; set; }
+    public ICollection<StiVatReturnDeclarationExportVerifiedGood> VerifiedSoldGoods { get; set; } = new List<StiVatReturnDeclarationExportVerifiedGood>();
 }

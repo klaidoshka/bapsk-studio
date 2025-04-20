@@ -16,11 +16,9 @@ public static class ProgramExtensions
 {
     public static void AddCertificate(this WebApplicationBuilder builder)
     {
-        builder.WebHost.ConfigureKestrel(
-            kestrel =>
+        builder.WebHost.ConfigureKestrel(kestrel =>
             {
-                kestrel.ConfigureHttpsDefaults(
-                    https =>
+                kestrel.ConfigureHttpsDefaults(https =>
                     {
                         var path = builder.Configuration["Certificate:Path"];
 
@@ -62,8 +60,7 @@ public static class ProgramExtensions
         DatabaseOptions databaseOptions
     )
     {
-        services.AddDbContext<AccountingDatabase>(
-            optionsBuilder =>
+        services.AddDbContext<AccountingDatabase>(optionsBuilder =>
             {
                 ServerVersion version = databaseOptions.Dialect.ToLowerInvariant() switch
                 {
@@ -96,15 +93,13 @@ public static class ProgramExtensions
         builder.Services.AddScoped<IAuthorizationHandler, VatReturnAuthorizationHandler>();
 
         builder.Services
-            .AddAuthentication(
-                options =>
+            .AddAuthentication(options =>
                 {
                     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 }
             )
-            .AddJwtBearer(
-                options =>
+            .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
@@ -131,7 +126,7 @@ public static class ProgramExtensions
             .AddPolicy(Policies.AdminOnly, policy => policy.RequireRole(Roles.Admin));
     }
 
-    public static void MapEndpoints(this WebApplication application)
+    public static void MapMinimalApi(this WebApplication application)
     {
         var apiRouteGroup = application
             .MapGroup("/api/v1")
@@ -180,7 +175,11 @@ public static class ProgramExtensions
         accountingRouteGroup
             .MapGroup("/instance")
             .MapInstanceEndpoints();
-        
+
+        accountingRouteGroup
+            .MapGroup("/report")
+            .MapReportEndpoints();
+
         accountingRouteGroup
             .MapGroup("/report-template")
             .MapReportTemplateEndpoints();
@@ -194,6 +193,7 @@ public static class ProgramExtensions
 
         stiRouteGroup
             .MapGroup("/butenta-vat-return")
+            .AllowAnonymous()
             .MapButentaEndpoints();
     }
 }

@@ -183,7 +183,7 @@ public class DataEntryService : IDataEntryService
             .FirstAsync(de => de.Id == request.DataEntryId);
     }
 
-    public async Task<IList<DataEntry>> GetByDataTypeIdAsync(
+    public async Task<IList<DataEntry>> GetAsync(
         DataEntryGetByDataTypeRequest request
     )
     {
@@ -218,6 +218,22 @@ public class DataEntryService : IDataEntryService
         }
 
         return candidates;
+    }
+
+    public async Task<IList<DataEntry>> GetAsync(DataEntryGetWithinIntervalRequest request)
+    {
+        return await _database.DataEntries
+            .Include(de => de.Fields)
+            .Include(de => de.DataType)
+            .ThenInclude(dt => dt.Fields)
+            .AsSplitQuery()
+            .Where(de => !de.IsDeleted &&
+                         de.DataTypeId == request.DataTypeId &&
+                         de.CreatedAt >= request.From &&
+                         de.CreatedAt <= request.To
+            )
+            .OrderBy(de => de.CreatedAt)
+            .ToListAsync();
     }
 
     public async Task<IList<DataEntry>> ImportAsync(DataEntryImportRequest request)

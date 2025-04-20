@@ -12,88 +12,79 @@ public static class UserEndpoints
     public static void MapUserEndpoints(this RouteGroupBuilder builder)
     {
         builder
-            .MapPost(
-                String.Empty,
-                async (
-                    [FromBody] UserCreateRequest request,
-                    IUserService userService
-                ) => Results.Json((await userService.CreateAsync(request)).ToDto())
-            )
+            .MapPost(String.Empty, Create)
             .RequireAuthorization(Policies.AdminOnly);
 
         builder
-            .MapDelete(
-                "{id:int}",
-                async (
-                    int id,
-                    IUserService userService
-                ) =>
-                {
-                    await userService.DeleteAsync(id);
-
-                    return Results.Ok();
-                }
-            )
-            .RequireAuthorization(
-                it => it.AddRequirements(new UserRequirement(UserRequirement.CrudOperation.Delete))
-            );
+            .MapDelete("{id:int}", Delete)
+            .RequireAuthorization(it => it.AddRequirements(new UserRequirement(UserRequirement.CrudOperation.Delete)));
 
         builder
-            .MapPut(
-                "{id:int}",
-                async (
-                    int id,
-                    [FromBody] UserEditRequest request,
-                    IUserService userService
-                ) =>
-                {
-                    request.UserId = id;
+            .MapPut("{id:int}", Edit)
+            .RequireAuthorization(o => o.AddRequirements(new UserRequirement(UserRequirement.CrudOperation.Edit)));
 
-                    await userService.EditAsync(request);
+        builder.MapGet(String.Empty, GetByEmail);
 
-                    return Results.Ok();
-                }
-            )
-            .RequireAuthorization(
-                o => o.AddRequirements(new UserRequirement(UserRequirement.CrudOperation.Edit))
-            );
+        builder
+            .MapGet("{id:int}", GetById)
+            .RequireAuthorization(it => it.AddRequirements(new UserRequirement(UserRequirement.CrudOperation.GetById)));
+    }
 
-        builder.MapGet(
-            String.Empty,
-            async (
-                string? email,
-                bool? returnIdentityOnly,
-                HttpContext httpContext,
-                IUserService userService
-            ) => Results.Json((await userService.GetAsync(
-                    new UserGetRequest
-                    {
-                        Email = email,
-                        RequesterId = httpContext.GetUserIdOrThrow(),
-                        ReturnIdentityOnly = returnIdentityOnly ?? false
-                    }
-                ))
-                .Select(it => (object)((returnIdentityOnly == true) ? it.ToIdentityDto() : it.ToDto()))
-                .ToList())
-        );
+    private static async Task<IResult> Create(
+        [FromBody] UserCreateRequest request,
+        IUserService userService
+    ) => Results.Json((await userService.CreateAsync(request)).ToDto());
 
-        builder.MapGet(
-                "{id:int}",
-                async (
-                    int id,
-                    bool? returnIdentityOnly,
-                    IUserService userService
-                ) =>
-                {
-                    var user = await userService.GetByIdAsync(id);
+    private static async Task<IResult> Delete(
+        int id,
+        IUserService userService
+    )
+    {
+        await userService.DeleteAsync(id);
 
-                    return (returnIdentityOnly ?? false)
-                        ? Results.Json(user.ToIdentityDto())
-                        : Results.Json(user.ToDto());
-                }
-            )
-            .RequireAuthorization(
-                it => it.AddRequirements(new UserRequirement(UserRequirement.CrudOperation.GetById))
-            );
+        return Results.Ok();
+    }
+
+    private static async Task<IResult> Edit(
+        int id,
+        [FromBody] UserEditRequest request,
+        IUserService userService
+    )
+    {
+        request.UserId = id;
+        await userService.EditAsync(request);
+
+        return Results.Ok();
+    }
+
+    private static async Task<IResult> GetByEmail(
+        string? email,
+        bool? returnIdentityOnly,
+        HttpContext httpContext,
+        IUserService userService
+    ) => Results.Json(
+        (await userService.GetAsync(
+            new UserGetRequest
+            {
+                Email = email,
+                RequesterId = httpContext.GetUserIdOrThrow(),
+                ReturnIdentityOnly = returnIdentityOnly ?? false
+            }
+        ))
+        .Select(it => (object)((returnIdentityOnly == true) ? it.ToIdentityDto() : it.ToDto()))
+        .ToList()
+    );
+
+    private static async Task<IResult> GetById(
+        int id,
+        bool? returnIdentityOnly,
+        IUserService userService
+    )
+    {
+        var user = await userService.GetByIdAsync(id);
+
+        return (returnIdentityOnly ?? false)
+            ? Results.Json(user.ToIdentityDto())
+            : Results.Json(user.ToDto());
     }
 }

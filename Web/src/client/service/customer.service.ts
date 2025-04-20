@@ -35,7 +35,7 @@ export class CustomerService {
   }
 
   create(request: CustomerCreateRequest) {
-    return this.httpClient.post<Customer>(this.apiRouter.customerCreate(), {
+    return this.httpClient.post<Customer>(this.apiRouter.customer.create(), {
       ...request,
       customer: {
         ...request.customer,
@@ -47,7 +47,7 @@ export class CustomerService {
   }
 
   delete(instanceId: number, id: number) {
-    return this.httpClient.delete<void>(this.apiRouter.customerDelete(id)).pipe(
+    return this.httpClient.delete<void>(this.apiRouter.customer.delete(id)).pipe(
       tap(() => {
         const existingSignal = this.store.get(instanceId);
 
@@ -61,7 +61,7 @@ export class CustomerService {
   }
 
   edit(request: CustomerEditRequest) {
-    return this.httpClient.put<void>(this.apiRouter.customerEdit(request.customer.id!), {
+    return this.httpClient.put<void>(this.apiRouter.customer.edit(request.customer.id!), {
       ...request,
       customer: {
         ...request.customer,
@@ -72,8 +72,14 @@ export class CustomerService {
     );
   }
 
-  get(instanceId: number) {
-    return this.httpClient.get<Customer[]>(this.apiRouter.customerGet(instanceId)).pipe(
+  getById(instanceId: number, id: number) {
+    return this.httpClient.get<Customer>(this.apiRouter.customer.getById(id)).pipe(
+      tap(customer => this.updateSingleInStore(instanceId, this.updateProperties(customer)))
+    );
+  }
+
+  getByInstanceId(instanceId: number) {
+    return this.httpClient.get<Customer[]>(this.apiRouter.customer.getByInstanceId(instanceId)).pipe(
       tap(customers => {
         const existingSignal = this.store.get(instanceId);
 
@@ -83,12 +89,6 @@ export class CustomerService {
           this.store.set(instanceId, signal(customers.map(customer => this.updateProperties(customer))));
         }
       })
-    );
-  }
-
-  getById(instanceId: number, id: number) {
-    return this.httpClient.get<Customer>(this.apiRouter.customerGetById(id)).pipe(
-      tap(customer => this.updateSingleInStore(instanceId, this.updateProperties(customer)))
     );
   }
 
@@ -104,7 +104,7 @@ export class CustomerService {
     if (!this.store.has(instanceId)) {
       this.store.set(instanceId, signal([]));
 
-      new Promise((resolve) => this.get(instanceId).subscribe(resolve));
+      new Promise((resolve) => this.getByInstanceId(instanceId).subscribe(resolve));
     }
 
     return this.store.get(instanceId)!.asReadonly();

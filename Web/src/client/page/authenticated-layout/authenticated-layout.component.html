@@ -1,2 +1,18 @@
-<!-- Main Content -->
-<router-outlet/>
+<div class="h-full w-full flex flex-col">
+  <header class="flex w-full h-12 px-4 py-1 dark:bg-surface-950 bg-surface-50 shadow-md sticky top-0 z-10">
+    <div class="flex items-center space-x-4">
+      <a class="text-xl font-bold cursor-pointer hover:opacity-70" routerLink="/home">Accounting</a>
+      <theme-selector/>
+    </div>
+
+    <div class="flex items-center space-x-4 ml-auto">
+      <instance-selector *ngIf="isAuthenticated()"/>
+
+      <profile-dropdown *ngIf="isAuthenticated()"/>
+    </div>
+  </header>
+
+  <main class="flex-1">
+    <router-outlet/>
+  </main>
+</div>
