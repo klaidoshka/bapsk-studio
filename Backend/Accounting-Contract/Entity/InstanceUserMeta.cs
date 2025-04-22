@@ -13,7 +13,7 @@ public class InstanceUserMeta
     public int Id { get; set; }
 
     /// <summary>
-    /// Navigation property for the instance.
+    /// Navigation property to the instance.
     /// </summary>
     [ForeignKey(nameof(InstanceId))]
     public Instance Instance { get; set; }
@@ -22,6 +22,11 @@ public class InstanceUserMeta
     /// Unique identifier for the instance.
     /// </summary>
     public int InstanceId { get; set; }
+
+    /// <summary>
+    /// Navigation property to the permissions of the user within the instance.
+    /// </summary>
+    public ICollection<InstanceUserPermission> Permissions { get; set; } = new List<InstanceUserPermission>();
 
     /// <summary>
     /// Navigation property for the user.

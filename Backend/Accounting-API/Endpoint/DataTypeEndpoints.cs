@@ -3,6 +3,7 @@ using Accounting.API.Util;
 using Accounting.Contract.Dto.DataType;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
+using DataType = Accounting.Contract.Entity.DataType;
 
 namespace Accounting.API.Endpoint;
 

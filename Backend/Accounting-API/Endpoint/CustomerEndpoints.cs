@@ -3,6 +3,7 @@ using Accounting.API.Util;
 using Accounting.Contract.Dto.Customer;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
+using Customer = Accounting.Contract.Entity.Customer;
 
 namespace Accounting.API.Endpoint;
 

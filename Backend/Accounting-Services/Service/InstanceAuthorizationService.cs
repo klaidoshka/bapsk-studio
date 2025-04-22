@@ -13,10 +13,19 @@ public class InstanceAuthorizationService : IInstanceAuthorizationService
         _database = database;
     }
 
-    public Task<bool> IsAuthorizedAsync(int instanceId, int userId, string permission)
+    public async Task<bool> IsAuthorizedAsync(int instanceId, int userId, string permission)
     {
-        // TODO: Check if the user has the required permission. Creator has all permissions.
-        return IsMemberAsync(instanceId, userId);
+        return await _database.Instances.AnyAsync(i =>
+            !i.IsDeleted &&
+            i.Id == instanceId &&
+            (
+                i.CreatedById == userId ||
+                i.UserMetas.Any(um => um.UserId == userId && um.Permissions
+                    .Select(up => up.Permission)
+                    .Contains(permission)
+                )
+            )
+        );
     }
 
     public async Task<bool> IsCreatorAsync(int instanceId, int userId)
@@ -26,8 +35,8 @@ public class InstanceAuthorizationService : IInstanceAuthorizationService
 
     public async Task<bool> IsMemberAsync(int instanceId, int userId)
     {
-        return await _database.InstanceUserMetas
-            .Include(ium => ium.Instance)
-            .AnyAsync(ium => !ium.Instance.IsDeleted && ium.InstanceId == instanceId && ium.UserId == userId);
+        return await _database.InstanceUserMetas.AnyAsync(ium =>
+            !ium.Instance.IsDeleted && ium.InstanceId == instanceId && ium.UserId == userId
+        );
     }
 }

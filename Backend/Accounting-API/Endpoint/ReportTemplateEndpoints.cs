@@ -3,6 +3,7 @@ using Accounting.API.Util;
 using Accounting.Contract.Dto.ReportTemplate;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
+using ReportTemplate = Accounting.Contract.Entity.ReportTemplate;
 
 namespace Accounting.API.Endpoint;
 

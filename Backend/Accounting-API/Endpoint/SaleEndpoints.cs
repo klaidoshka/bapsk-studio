@@ -3,6 +3,7 @@ using Accounting.API.Util;
 using Accounting.Contract.Dto.Sale;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
+using Sale = Accounting.Contract.Entity.Sale;
 
 namespace Accounting.API.Endpoint;
 
@@ -13,22 +14,22 @@ public static class SaleEndpoints
         builder
             .MapPost(String.Empty, Create)
             .RequireInstancePermission(InstancePermission.Sale.Create);
-        
+
         builder
             .MapDelete("{id:int}", Delete)
             .RequireInstancePermission(InstancePermission.Sale.Delete)
             .RequireInstanceOwnsEntity<Sale>();
-        
+
         builder
             .MapPut("{id:int}", Edit)
             .RequireInstancePermission(InstancePermission.Sale.Edit)
             .RequireInstanceOwnsEntity<Sale>();
-        
+
         builder
             .MapGet("{id:int}", GetById)
             .RequireInstancePermission(InstancePermission.Sale.Preview)
             .RequireInstanceOwnsEntity<Sale>();
-        
+
         builder
             .MapGet(String.Empty, GetByInstanceId)
             .RequireInstancePermission(InstancePermission.Sale.Preview);

@@ -4,7 +4,7 @@ using Accounting.Contract.Dto.ImportConfiguration;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
-using ImportConfiguration = Accounting.Contract.Dto.ImportConfiguration.ImportConfiguration;
+using ImportConfiguration = Accounting.Contract.Entity.ImportConfiguration;
 
 namespace Accounting.API.Endpoint;
 

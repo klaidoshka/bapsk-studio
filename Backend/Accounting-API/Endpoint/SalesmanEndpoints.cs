@@ -3,6 +3,7 @@ using Accounting.API.Util;
 using Accounting.Contract.Dto.Salesman;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
+using Salesman = Accounting.Contract.Entity.Salesman;
 
 namespace Accounting.API.Endpoint;
 
