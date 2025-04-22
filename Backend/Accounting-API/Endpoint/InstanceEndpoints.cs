@@ -14,7 +14,7 @@ public static class InstanceEndpoints
         builder.MapDelete("/{id:int}", Delete);
         
         builder
-            .MapPut("/{id:int}", Edit)
+            .MapPut("/{instanceId:int}", Edit)
             .RequireInstancePermission(InstancePermission.Instance.Edit);
         
         builder.MapGet("/{id:int}", GetById);
@@ -50,14 +50,15 @@ public static class InstanceEndpoints
     }
 
     private static async Task<IResult> Edit(
-        int id,
+        int instanceId,
         [FromBody] InstanceEditRequest request,
         HttpContext httpContext,
         IInstanceService instanceService
     )
     {
-        request.InstanceId = id;
+        request.InstanceId = instanceId;
         request.RequesterId = httpContext.GetUserId();
+        
         await instanceService.EditAsync(request);
 
         return Results.Ok();

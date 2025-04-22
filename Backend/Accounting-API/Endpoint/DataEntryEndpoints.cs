@@ -1,8 +1,10 @@
 using Accounting.API.Configuration;
 using Accounting.API.Util;
 using Accounting.Contract.Dto.DataEntry;
+using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
+using DataEntry = Accounting.Contract.Entity.DataEntry;
 
 namespace Accounting.API.Endpoint;
 
@@ -16,23 +18,28 @@ public static class DataEntryEndpoints
 
         builder
             .MapPost("import", Import)
-            .RequireInstancePermission(InstancePermission.DataEntry.Create);
+            .RequireInstancePermission(InstancePermission.DataEntry.Create)
+            .RequireInstanceOwnsEntity<ImportConfiguration>("importConfigurationId");
 
         builder
             .MapDelete("/{id:int}", Delete)
-            .RequireInstancePermission(InstancePermission.DataEntry.Delete);
+            .RequireInstancePermission(InstancePermission.DataEntry.Delete)
+            .RequireInstanceOwnsEntity<DataEntry>();
 
         builder
             .MapPut("/{id:int}", Edit)
-            .RequireInstancePermission(InstancePermission.DataEntry.Edit);
+            .RequireInstancePermission(InstancePermission.DataEntry.Edit)
+            .RequireInstanceOwnsEntity<DataEntry>();
 
         builder
             .MapGet("/{id:int}", GetById)
-            .RequireInstancePermission(InstancePermission.DataEntry.Preview);
+            .RequireInstancePermission(InstancePermission.DataEntry.Preview)
+            .RequireInstanceOwnsEntity<DataEntry>();
 
         builder
             .MapGet(String.Empty, GetByDataType)
-            .RequireInstancePermission(InstancePermission.DataEntry.Preview);
+            .RequireInstancePermission(InstancePermission.DataEntry.Preview)
+            .RequireInstanceOwnsEntity<DataType>("dataTypeId");
     }
 
     private static async Task<IResult> Create(

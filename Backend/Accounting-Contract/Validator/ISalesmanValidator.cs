@@ -1,15 +1,15 @@
 using Accounting.Contract.Dto;
-using Accounting.Contract.Dto.Salesman;
+using Accounting.Contract.Entity;
 
 namespace Accounting.Contract.Validator;
 
-public interface ISalesmanValidator
+public interface ISalesmanValidator : IInstanceEntityValidator<Salesman>
 {
-    public Validation ValidateSalesman(Salesman salesman);
+    public Validation ValidateSalesman(Dto.Salesman.Salesman salesman);
 
     public Task<Validation> ValidateDeleteRequestAsync(int salesmanId);
 
-    public Task<Validation> ValidateEditRequestAsync(Salesman salesman);
+    public Task<Validation> ValidateEditRequestAsync(Dto.Salesman.Salesman salesman);
 
     public Task<Validation> ValidateExistsAsync(int salesmanId);
 
@@ -17,5 +17,5 @@ public interface ISalesmanValidator
 
     public Task<Validation> ValidateGetRequestAsync(int instanceId);
 
-    public Validation ValidateVatReturnSalesman(Salesman salesman);
+    public Validation ValidateVatReturnSalesman(Dto.Salesman.Salesman salesman);
 }

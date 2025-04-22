@@ -2,34 +2,40 @@ using Accounting.API.Configuration;
 using Accounting.API.Util;
 using Accounting.Contract.Dto.Sti.VatReturn;
 using Accounting.Contract.Dto.Sti.VatReturn.Payment;
+using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Accounting.API.Endpoint;
 
-public static partial class VatReturnEndpoints
+public static class VatReturnEndpoints
 {
     public static void MapVatReturnEndpoints(this RouteGroupBuilder builder)
     {
         builder
             .MapPost(String.Empty, Submit)
-            .RequireInstancePermission(InstancePermission.VatReturn.Create);
+            .RequireInstancePermission(InstancePermission.VatReturn.Create)
+            .RequireInstanceOwnsEntity<Sale>("saleId");
 
         builder
             .MapPost("/{saleId:int}/cancel", Cancel)
-            .RequireInstancePermission(InstancePermission.VatReturn.Cancel);
+            .RequireInstancePermission(InstancePermission.VatReturn.Cancel)
+            .RequireInstanceOwnsEntity<Sale>("saleId");
 
         builder
             .MapPost("/{saleId:int}/update", UpdateInfoBySaleId)
-            .RequireInstancePermission(InstancePermission.VatReturn.Preview);
+            .RequireInstancePermission(InstancePermission.VatReturn.Preview)
+            .RequireInstanceOwnsEntity<Sale>("saleId");
 
         builder
             .MapPost("/{saleId:int}/payment", SubmitPaymentInfo)
-            .RequireInstancePermission(InstancePermission.VatReturn.SubmitPayment);
+            .RequireInstancePermission(InstancePermission.VatReturn.SubmitPayment)
+            .RequireInstanceOwnsEntity<Sale>("saleId");
 
         builder
             .MapGet("{saleId:int}", GetBySaleId)
-            .RequireInstancePermission(InstancePermission.VatReturn.Preview);
+            .RequireInstancePermission(InstancePermission.VatReturn.Preview)
+            .RequireInstanceOwnsEntity<Sale>("saleId");
     }
 
     private static async Task<IResult> Submit(

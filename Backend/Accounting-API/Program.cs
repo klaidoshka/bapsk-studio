@@ -63,12 +63,22 @@ builder.Services.AddScoped<IFieldTypeService, FieldTypeService>();
 builder.Services.AddScoped<IFieldTypeValidator, FieldTypeValidator>();
 builder.Services.AddScoped<IHashService, HashService>();
 builder.Services.AddScoped<IImportConfigurationService, ImportConfigurationService>();
+builder.Services.AddScoped<IImportConfigurationValidator, ImportConfigurationValidator>();
 builder.Services.AddScoped<IInstanceAuthorizationService, InstanceAuthorizationService>();
+builder.Services.AddScoped<IInstanceEntityValidator<Customer>, CustomerValidator>();
+builder.Services.AddScoped<IInstanceEntityValidator<DataEntry>, DataEntryValidator>();
+builder.Services.AddScoped<IInstanceEntityValidator<DataType>, DataTypeValidator>();
+builder.Services.AddScoped<IInstanceEntityValidator<ImportConfiguration>, ImportConfigurationValidator>();
+builder.Services.AddScoped<IInstanceEntityValidator<ReportTemplate>, ReportTemplateValidator>();
+builder.Services.AddScoped<IInstanceEntityValidator<Salesman>, SalesmanValidator>();
+builder.Services.AddScoped<IInstanceEntityValidator<Sale>, SaleValidator>();
+builder.Services.AddScoped<IInstanceEntityValidator<StiVatReturnDeclaration>, VatReturnValidator>();
 builder.Services.AddScoped<IInstanceService, InstanceService>();
 builder.Services.AddScoped<IInstanceValidator, InstanceValidator>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IReportTemplateService, ReportTemplateService>();
+builder.Services.AddScoped<IReportTemplateValidator, ReportTemplateValidator>();
 builder.Services.AddScoped<ISaleService, SaleService>();
 builder.Services.AddScoped<ISaleValidator, SaleValidator>();
 builder.Services.AddScoped<ISalesmanService, SalesmanService>();
@@ -99,6 +109,14 @@ builder.Services.ConfigureHttpJsonOptions(json =>
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 var application = builder.Build();
+
+application.Use(async (context, next) =>
+    {
+        context.Request.EnableBuffering();
+
+        await next(context);
+    }
+);
 
 application.UseAuthentication();
 application.UseAuthorization();

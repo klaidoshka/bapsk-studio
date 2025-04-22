@@ -1,9 +1,10 @@
 using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.DataEntry;
+using DataEntry = Accounting.Contract.Entity.DataEntry;
 
 namespace Accounting.Contract.Validator;
 
-public interface IDataEntryValidator
+public interface IDataEntryValidator : IInstanceEntityValidator<DataEntry>
 {
     public Task<Validation> ValidateDataEntryCreateRequestAsync(DataEntryCreateRequest request);
 

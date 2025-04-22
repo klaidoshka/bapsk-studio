@@ -16,11 +16,13 @@ public static class CustomerEndpoints
 
         builder
             .MapDelete("{id:int}", Delete)
-            .RequireInstancePermission(InstancePermission.Customer.Delete);
+            .RequireInstancePermission(InstancePermission.Customer.Delete)
+            .RequireInstanceOwnsEntity<Customer>();
 
         builder
             .MapPut("{id:int}", Edit)
-            .RequireInstancePermission(InstancePermission.Customer.Edit);
+            .RequireInstancePermission(InstancePermission.Customer.Edit)
+            .RequireInstanceOwnsEntity<Customer>();
 
         builder
             .MapGet(String.Empty, GetByInstanceId)
@@ -28,7 +30,8 @@ public static class CustomerEndpoints
 
         builder
             .MapGet("{id:int}", GetById)
-            .RequireInstancePermission(InstancePermission.Customer.Preview);
+            .RequireInstancePermission(InstancePermission.Customer.Preview)
+            .RequireInstanceOwnsEntity<Customer>();
     }
 
     private static async Task<IResult> Create(

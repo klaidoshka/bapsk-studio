@@ -134,4 +134,11 @@ public class VatReturnValidator : IVatReturnValidator
             ? new Validation("Salesman was not found.")
             : _salesmanValidator.ValidateVatReturnSalesman(salesmanEntity.ToDto());
     }
+
+    public async Task<bool> IsFromInstanceAsync(int id, int instanceId)
+    {
+        var vatReturn = await _database.StiVatReturnDeclarations.FindAsync(id);
+
+        return vatReturn?.InstanceId == instanceId;
+    }
 }

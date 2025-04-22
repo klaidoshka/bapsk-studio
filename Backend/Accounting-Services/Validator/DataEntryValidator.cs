@@ -49,11 +49,10 @@ public class DataEntryValidator : IDataEntryValidator
 
         failures.AddRange(
             dataType.Fields
-                .Where(
-                    f =>
-                        !requestFieldsById.ContainsKey(f.Id) &&
-                        f.IsRequired &&
-                        f.DefaultValue == null
+                .Where(f =>
+                    !requestFieldsById.ContainsKey(f.Id) &&
+                    f.IsRequired &&
+                    f.DefaultValue == null
                 )
                 .Select(field => $"Field '{field.Name}' is required, but not provided.")
                 .ToList()
@@ -195,5 +194,14 @@ public class DataEntryValidator : IDataEntryValidator
         return new Validation(
             (await _fieldTypeValidator.ValidateAsync(dataTypeField, request.Value)).FailureMessages
         );
+    }
+
+    public async Task<bool> IsFromInstanceAsync(int id, int instanceId)
+    {
+        var entry = await _database.DataEntries
+            .Include(de => de.DataType)
+            .FirstOrDefaultAsync(de => de.Id == id);
+
+        return entry?.IsDeleted == false && !entry.DataType.IsDeleted && entry.DataType.InstanceId == instanceId;
     }
 }

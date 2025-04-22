@@ -1,8 +1,10 @@
 using Accounting.API.Configuration;
 using Accounting.API.Util;
 using Accounting.Contract.Dto.ImportConfiguration;
+using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
+using ImportConfiguration = Accounting.Contract.Dto.ImportConfiguration.ImportConfiguration;
 
 namespace Accounting.API.Endpoint;
 
@@ -13,22 +15,26 @@ public static class ImportConfigurationEndpoints
         builder
             .MapPost(String.Empty, Create)
             .RequireInstancePermission(InstancePermission.ImportConfiguration.Create);
-        
+
         builder
             .MapDelete("/{id:int}", Delete)
-            .RequireInstancePermission(InstancePermission.ImportConfiguration.Delete);
-        
+            .RequireInstancePermission(InstancePermission.ImportConfiguration.Delete)
+            .RequireInstanceOwnsEntity<ImportConfiguration>();
+
         builder
             .MapPut("/{id:int}", Edit)
-            .RequireInstancePermission(InstancePermission.ImportConfiguration.Edit);
-        
+            .RequireInstancePermission(InstancePermission.ImportConfiguration.Edit)
+            .RequireInstanceOwnsEntity<ImportConfiguration>();
+
         builder
             .MapGet("/{id:int}", GetById)
-            .RequireInstancePermission(InstancePermission.ImportConfiguration.Preview);
-        
+            .RequireInstancePermission(InstancePermission.ImportConfiguration.Preview)
+            .RequireInstanceOwnsEntity<ImportConfiguration>();
+
         builder
             .MapGet(String.Empty, GetBySomeId)
-            .RequireInstancePermission(InstancePermission.ImportConfiguration.Preview);
+            .RequireInstancePermission(InstancePermission.ImportConfiguration.Preview)
+            .RequireInstanceOwnsEntity<DataType>("dataTypeId", entityIdOptional: true);
     }
 
     private static async Task<IResult> Create(

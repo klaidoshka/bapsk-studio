@@ -190,7 +190,8 @@ public class SaleValidator : ISaleValidator
 
     public Validation ValidateVatReturnSoldGood(SoldGoodCreateEdit soldGood, int? sequenceNo = null)
     {
-        var failuresInitial = ValidateSoldGood(soldGood, sequenceNo).FailureMessages
+        var failuresInitial = ValidateSoldGood(soldGood, sequenceNo)
+            .FailureMessages
             .ToList();
 
         var failures = new List<string>();
@@ -243,5 +244,12 @@ public class SaleValidator : ISaleValidator
         }
 
         return new Validation(failures);
+    }
+
+    public async Task<bool> IsFromInstanceAsync(int id, int instanceId)
+    {
+        var sale = await _database.Sales.FindAsync(id);
+
+        return sale?.IsDeleted == false && sale.InstanceId == instanceId;
     }
 }

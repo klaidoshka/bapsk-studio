@@ -137,4 +137,11 @@ public class CustomerValidator : ICustomerValidator
 
         return new Validation(failures);
     }
+
+    public async Task<bool> IsFromInstanceAsync(int id, int instanceId)
+    {
+        var customer = await _database.Customers.FindAsync(id);
+
+        return customer?.IsDeleted == false && customer.InstanceId == instanceId;
+    }
 }

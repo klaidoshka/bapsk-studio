@@ -1,6 +1,7 @@
 using Accounting.API.Configuration;
 using Accounting.API.Util;
 using Accounting.Contract.Dto.Report;
+using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,11 +13,14 @@ public static class ReportEndpoints
     {
         builder
             .MapPost("/generate-data-entries", GenerateDataEntriesReport)
-            .RequireInstancePermission(InstancePermission.Report.Create);
+            .RequireInstancePermission(InstancePermission.Report.Create)
+            .RequireInstanceOwnsEntity<ReportTemplate>("reportTemplateId");
 
         builder
             .MapPost("/generate-sales", GenerateSalesReport)
-            .RequireInstancePermission(InstancePermission.Report.Create);
+            .RequireInstancePermission(InstancePermission.Report.Create)
+            .RequireInstanceOwnsEntity<Customer>("customerId")
+            .RequireInstanceOwnsEntity<Salesman>("salesmanId");
     }
 
     private static async Task<IResult> GenerateDataEntriesReport(

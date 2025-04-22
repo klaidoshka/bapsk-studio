@@ -13,19 +13,22 @@ public static class ReportTemplateEndpoints
         builder
             .MapPost(String.Empty, Create)
             .RequireInstancePermission(InstancePermission.ReportTemplate.Create);
-        
+
         builder
             .MapDelete("/{id:int}", Delete)
-            .RequireInstancePermission(InstancePermission.ReportTemplate.Delete);
-        
+            .RequireInstancePermission(InstancePermission.ReportTemplate.Delete)
+            .RequireInstanceOwnsEntity<ReportTemplate>();
+
         builder
             .MapPut("/{id:int}", Edit)
-            .RequireInstancePermission(InstancePermission.ReportTemplate.Edit);
-        
+            .RequireInstancePermission(InstancePermission.ReportTemplate.Edit)
+            .RequireInstanceOwnsEntity<ReportTemplate>();
+
         builder
             .MapGet("/{id:int}", GetById)
-            .RequireInstancePermission(InstancePermission.ReportTemplate.Preview);
-        
+            .RequireInstancePermission(InstancePermission.ReportTemplate.Preview)
+            .RequireInstanceOwnsEntity<ReportTemplate>();
+
         builder
             .MapGet(String.Empty, GetByInstanceId)
             .RequireInstancePermission(InstancePermission.ReportTemplate.Preview);

@@ -16,18 +16,21 @@ public static class SaleEndpoints
         
         builder
             .MapDelete("{id:int}", Delete)
-            .RequireInstancePermission(InstancePermission.Sale.Delete);
+            .RequireInstancePermission(InstancePermission.Sale.Delete)
+            .RequireInstanceOwnsEntity<Sale>();
         
         builder
             .MapPut("{id:int}", Edit)
-            .RequireInstancePermission(InstancePermission.Sale.Edit);
-        
-        builder
-            .MapGet(String.Empty, GetByInstanceId)
-            .RequireInstancePermission(InstancePermission.Sale.Preview);
+            .RequireInstancePermission(InstancePermission.Sale.Edit)
+            .RequireInstanceOwnsEntity<Sale>();
         
         builder
             .MapGet("{id:int}", GetById)
+            .RequireInstancePermission(InstancePermission.Sale.Preview)
+            .RequireInstanceOwnsEntity<Sale>();
+        
+        builder
+            .MapGet(String.Empty, GetByInstanceId)
             .RequireInstancePermission(InstancePermission.Sale.Preview);
     }
 
@@ -58,6 +61,11 @@ public static class SaleEndpoints
         return Results.Ok();
     }
 
+    private static async Task<IResult> GetById(
+        int id,
+        ISaleService saleService
+    ) => Results.Json((await saleService.GetByIdAsync(id)).ToDto());
+
     private static async Task<IResult> GetByInstanceId(
         int instanceId,
         HttpContext httpContext,
@@ -73,9 +81,4 @@ public static class SaleEndpoints
         .Select(it => it.ToDto())
         .ToList()
     );
-
-    private static async Task<IResult> GetById(
-        int id,
-        ISaleService saleService
-    ) => Results.Json((await saleService.GetByIdAsync(id)).ToDto());
 }

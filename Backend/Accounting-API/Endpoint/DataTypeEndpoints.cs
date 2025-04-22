@@ -16,15 +16,18 @@ public static class DataTypeEndpoints
 
         builder
             .MapDelete("/{id:int}", Delete)
-            .RequireInstancePermission(InstancePermission.DataType.Delete);
+            .RequireInstancePermission(InstancePermission.DataType.Delete)
+            .RequireInstanceOwnsEntity<DataType>();
 
         builder
             .MapPut("/{id:int}", Edit)
-            .RequireInstancePermission(InstancePermission.DataType.Edit);
+            .RequireInstancePermission(InstancePermission.DataType.Edit)
+            .RequireInstanceOwnsEntity<DataType>();
 
         builder
             .MapGet("/{id:int}", GetById)
-            .RequireInstancePermission(InstancePermission.DataType.Preview);
+            .RequireInstancePermission(InstancePermission.DataType.Preview)
+            .RequireInstanceOwnsEntity<DataType>();
 
         builder
             .MapGet(String.Empty, GetByInstance)

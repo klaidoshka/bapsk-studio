@@ -290,4 +290,11 @@ public class DataTypeValidator : IDataTypeValidator
 
         return new Validation();
     }
+
+    public async Task<bool> IsFromInstanceAsync(int id, int instanceId)
+    {
+        var type = await _database.DataTypes.FindAsync(id);
+
+        return type?.IsDeleted == false && type.InstanceId == instanceId;
+    }
 }
