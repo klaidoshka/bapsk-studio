@@ -19,6 +19,7 @@ import {SaleService} from './sale.service';
 import {UnitOfMeasureType} from '../model/unit-of-measure-type.model';
 import {DateUtil} from '../util/date.util';
 import {CacheService} from './cache.service';
+import {InstanceService} from './instance.service';
 
 @Injectable({
   providedIn: 'root'
@@ -26,15 +27,17 @@ import {CacheService} from './cache.service';
 export class VatReturnService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly httpClient = inject(HttpClient);
+  private readonly instanceService = inject(InstanceService);
   private readonly saleService = inject(SaleService);
   private readonly userService = inject(UserService);
 
   private readonly cacheBySaleIdService = new CacheService<number, VatReturnDeclaration | null>();
   private readonly cacheByCodeService = new CacheService<string, VatReturnDeclarationWithSale | null>();
+  private readonly instanceId = this.instanceService.getActiveInstanceId();
 
   cancel(saleId: number): Observable<void> {
     return this.httpClient
-      .post<void>(this.apiRouter.vatReturn.cancel(saleId), {})
+      .post<void>(this.apiRouter.vatReturn.cancel(this.instanceId()!, saleId), {})
       .pipe(
         tap(() => {
           this.cacheBySaleIdService.invalidate(saleId);
@@ -57,7 +60,7 @@ export class VatReturnService {
     }
 
     return this.httpClient
-      .get<VatReturnDeclaration | null>(this.apiRouter.vatReturn.getBySaleId(saleId))
+      .get<VatReturnDeclaration | null>(this.apiRouter.vatReturn.getBySaleId(this.instanceId()!, saleId))
       .pipe(
         map(declaration => declaration ? this.updateProperties(declaration) : undefined),
         tap(declaration => {
@@ -134,7 +137,7 @@ export class VatReturnService {
 
   submit(request: VatReturnDeclarationSubmitRequest): Observable<VatReturnDeclaration> {
     return this.httpClient
-      .post<VatReturnDeclaration>(this.apiRouter.vatReturn.submit(), request)
+      .post<VatReturnDeclaration>(this.apiRouter.vatReturn.submit(this.instanceId()!), request)
       .pipe(
         map(declaration => this.updateProperties(declaration)),
         tap(declaration => {
@@ -158,7 +161,7 @@ export class VatReturnService {
 
   submitPayments(saleId: number, payments: VatReturnDeclarationPaymentInfo[]): Observable<void> {
     return this.httpClient
-      .post<void>(this.apiRouter.vatReturn.payment(saleId), payments)
+      .post<void>(this.apiRouter.vatReturn.payment(this.instanceId()!, saleId), payments)
       .pipe(
         tap(() => {
           this.cacheBySaleIdService.invalidate(saleId);
@@ -173,7 +176,7 @@ export class VatReturnService {
 
   update(saleId: number): Observable<void> {
     return this.httpClient
-      .post<void>(this.apiRouter.vatReturn.update(saleId), {})
+      .post<void>(this.apiRouter.vatReturn.update(this.instanceId()!, saleId), {})
       .pipe(
         tap(() => {
             this.cacheBySaleIdService.invalidate(saleId);

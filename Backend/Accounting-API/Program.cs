@@ -25,7 +25,7 @@ var databaseOptions = builder.AddConfiguration<DatabaseOptions>("DatabaseOptions
 
 builder.Services.AddDbContext(databaseOptions);
 builder.Services.AddSingleton<ExceptionHandlingMiddleware>();
-builder.Services.AddSingleton<UserIdExtractorMiddleware>();
+builder.Services.AddSingleton<JwtExtractorMiddleware>();
 builder.Services.AddScoped<CheckFieldHandler>();
 builder.Services.AddScoped<CurrencyFieldHandler>();
 builder.Services.AddScoped<DateFieldHandler>();
@@ -100,9 +100,9 @@ Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 var application = builder.Build();
 
-application.UseMiddleware<UserIdExtractorMiddleware>();
 application.UseAuthentication();
 application.UseAuthorization();
+application.UseMiddleware<JwtExtractorMiddleware>();
 application.UseMiddleware<ExceptionHandlingMiddleware>();
 application.MapMinimalApi();
 

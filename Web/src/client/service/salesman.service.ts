@@ -5,6 +5,7 @@ import {HttpClient} from '@angular/common/http';
 import {first, tap} from 'rxjs';
 import {EnumUtil} from '../util/enum.util';
 import {IsoCountryCode} from '../model/iso-country.model';
+import {InstanceService} from './instance.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,9 @@ import {IsoCountryCode} from '../model/iso-country.model';
 export class SalesmanService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly httpClient = inject(HttpClient);
+  private readonly instanceService = inject(InstanceService);
+
+  private readonly instanceId = this.instanceService.getActiveInstanceId();
 
   // Key: InstanceId
   private readonly store = new Map<number, WritableSignal<Salesman[]>>();
@@ -33,13 +37,13 @@ export class SalesmanService {
   }
 
   create(request: SalesmanCreateRequest) {
-    return this.httpClient.post<Salesman>(this.apiRouter.salesman.create(), request).pipe(
+    return this.httpClient.post<Salesman>(this.apiRouter.salesman.create(this.instanceId()!), request).pipe(
       tap(salesman => this.updateSingleInStore(request.instanceId, this.updateProperties(salesman)))
     );
   }
 
   delete(instanceId: number, id: number) {
-    return this.httpClient.delete<void>(this.apiRouter.salesman.delete(id)).pipe(
+    return this.httpClient.delete<void>(this.apiRouter.salesman.delete(this.instanceId()!, id)).pipe(
       tap(() => {
         const existingSignal = this.store.get(instanceId);
 
@@ -53,7 +57,7 @@ export class SalesmanService {
   }
 
   edit(request: SalesmanEditRequest) {
-    return this.httpClient.put<void>(this.apiRouter.salesman.edit(request.salesman.id!), request)
+    return this.httpClient.put<void>(this.apiRouter.salesman.edit(this.instanceId()!, request.salesman.id!), request)
       .pipe(
         tap(() => this.getById(request.instanceId, request.salesman.id!).pipe(first()).subscribe())
       );
@@ -74,7 +78,7 @@ export class SalesmanService {
   }
 
   getById(instanceId: number, id: number) {
-    return this.httpClient.get<Salesman>(this.apiRouter.salesman.getById(id)).pipe(
+    return this.httpClient.get<Salesman>(this.apiRouter.salesman.getById(this.instanceId()!, id)).pipe(
       tap(salesman => this.updateSingleInStore(instanceId, this.updateProperties(salesman)))
     );
   }

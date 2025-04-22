@@ -1,3 +1,4 @@
+using Accounting.API.Configuration;
 using Accounting.API.Util;
 using Accounting.Contract.Dto.Report;
 using Accounting.Contract.Service;
@@ -11,11 +12,11 @@ public static class ReportEndpoints
     {
         builder
             .MapPost("/generate-data-entries", GenerateDataEntriesReport)
-            .RequireAuthorization();
+            .RequireInstancePermission(InstancePermission.Report.Create);
 
         builder
             .MapPost("/generate-sales", GenerateSalesReport)
-            .RequireAuthorization();
+            .RequireInstancePermission(InstancePermission.Report.Create);
     }
 
     private static async Task<IResult> GenerateDataEntriesReport(
@@ -24,7 +25,7 @@ public static class ReportEndpoints
         IReportService reportService
     )
     {
-        request.RequesterId = httpContext.GetUserIdOrThrow();
+        request.RequesterId = httpContext.GetUserId();
 
         return Results.Json(await reportService.GenerateDataEntriesReportAsync(request));
     }
@@ -35,7 +36,7 @@ public static class ReportEndpoints
         IReportService reportService
     )
     {
-        request.RequesterId = httpContext.GetUserIdOrThrow();
+        request.RequesterId = httpContext.GetUserId();
 
         return Results.Json(await reportService.GenerateSalesReportAsync(request));
     }

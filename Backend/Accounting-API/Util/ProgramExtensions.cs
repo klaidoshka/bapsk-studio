@@ -1,11 +1,9 @@
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using Accounting.API.AuthorizationHandler;
 using Accounting.API.Endpoint;
 using Accounting.Contract;
 using Accounting.Contract.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -86,11 +84,6 @@ public static class ProgramExtensions
     public static void AddJwtAuth(this WebApplicationBuilder builder)
     {
         builder.Services.AddHttpContextAccessor();
-        builder.Services.AddScoped<IAuthorizationHandler, CustomerAuthorizationHandler>();
-        builder.Services.AddScoped<IAuthorizationHandler, SaleAuthorizationHandler>();
-        builder.Services.AddScoped<IAuthorizationHandler, SalesmanAuthorizationHandler>();
-        builder.Services.AddScoped<IAuthorizationHandler, UserAuthorizationHandler>();
-        builder.Services.AddScoped<IAuthorizationHandler, VatReturnAuthorizationHandler>();
 
         builder.Services
             .AddAuthentication(options =>
@@ -146,7 +139,21 @@ public static class ProgramExtensions
             .MapGroup("/user")
             .MapUserEndpoints();
 
-        var accountingRouteGroup = apiRouteGroup.MapGroup("/accounting");
+        var vatReturnAnonymousRouteGroup = apiRouteGroup
+            .MapGroup("/accounting/vat-return")
+            .AllowAnonymous();
+
+        vatReturnAnonymousRouteGroup.MapVatReturnAnonymousEndpoints();
+
+        vatReturnAnonymousRouteGroup
+            .MapGroup("/butenta")
+            .MapButentaEndpoints();
+
+        apiRouteGroup
+            .MapGroup("/accounting/instance")
+            .MapInstanceEndpoints();
+
+        var accountingRouteGroup = apiRouteGroup.MapGroup("/accounting/instance/{instanceId:int}");
 
         accountingRouteGroup
             .MapGroup("/customer")
@@ -173,10 +180,6 @@ public static class ProgramExtensions
             .MapImportConfigurationEndpoints();
 
         accountingRouteGroup
-            .MapGroup("/instance")
-            .MapInstanceEndpoints();
-
-        accountingRouteGroup
             .MapGroup("/report")
             .MapReportEndpoints();
 
@@ -184,16 +187,8 @@ public static class ProgramExtensions
             .MapGroup("/report-template")
             .MapReportTemplateEndpoints();
 
-        var stiRouteGroup = accountingRouteGroup
-            .MapGroup("/sti");
-
-        stiRouteGroup
+        accountingRouteGroup
             .MapGroup("/vat-return")
             .MapVatReturnEndpoints();
-
-        stiRouteGroup
-            .MapGroup("/butenta-vat-return")
-            .AllowAnonymous()
-            .MapButentaEndpoints();
     }
 }

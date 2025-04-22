@@ -1,7 +1,17 @@
 import {Injectable} from '@angular/core';
 
+const routePlaceholderRegex = /:([a-zA-Z]+)/g;
+
 const buildRoute = (template: string, parameters: Record<string, string | number> = {}) =>
-  template.replace(/:([a-zA-Z]+)/g, (_, key) => encodeURIComponent(parameters[key]));
+  template.replace(routePlaceholderRegex, (_, key) => {
+    const value = parameters[key];
+
+    if (value === undefined) {
+      throw new Error(`Missing route param: ${key}`);
+    }
+
+    return encodeURIComponent(value);
+  });
 
 const buildUrl = (
   base: string,
@@ -9,8 +19,9 @@ const buildUrl = (
   routeParameters?: Record<string, string | number>,
   queryParameters?: Record<string, string | number | boolean>
 ) => {
-  const route = buildRoute(routeTemplate, routeParameters);
-  const url = new URL(base + route);
+  const baseUrl = buildRoute(base, routeParameters);
+  const routeUrl = buildRoute(routeTemplate, routeParameters);
+  const url = new URL(baseUrl + routeUrl);
 
   if (queryParameters) {
     Object
@@ -27,6 +38,7 @@ const buildUrl = (
 export class ApiRouter {
   private readonly base = 'http://localhost:5125/api/v1';
   private readonly accounting = this.base + '/accounting';
+  private readonly accountingIsolated = this.accounting + '/instance/:instanceId';
 
   readonly auth = {
     changePassword: () => buildUrl(this.base, '/auth/change-password'),
@@ -38,37 +50,48 @@ export class ApiRouter {
   };
 
   readonly customer = {
-    create: () => buildUrl(this.accounting, '/customer'),
-    delete: (id: number) => buildUrl(this.accounting, '/customer/:id', { id }),
-    edit: (id: number) => buildUrl(this.accounting, '/customer/:id', { id }),
-    getById: (id: number) => buildUrl(this.accounting, '/customer/:id', { id }),
-    getByInstanceId: (instanceId: number) => buildUrl(this.accounting, '/customer', {}, { instanceId }),
+    create: (instanceId: number) => buildUrl(this.accountingIsolated, '/customer', { instanceId }),
+    delete: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/customer/:id', { instanceId, id }),
+    edit: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/customer/:id', { instanceId, id }),
+    getById: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/customer/:id', { instanceId, id }),
+    getByInstanceId: (instanceId: number) => buildUrl(this.accountingIsolated, '/customer', { instanceId }),
   };
 
   readonly dataEntry = {
-    create: () => buildUrl(this.accounting, '/data-entry'),
-    delete: (id: number) => buildUrl(this.accounting, '/data-entry/:id', { id }),
-    edit: (id: number) => buildUrl(this.accounting, '/data-entry/:id', { id }),
-    getByDataTypeId: (dataTypeId: number) => buildUrl(this.accounting, '/data-entry', {}, { dataTypeId }),
-    getById: (id: number) => buildUrl(this.accounting, '/data-entry/:id', { id }),
-    import: () => buildUrl(this.accounting, '/data-entry/import'),
+    create: (instanceId: number) => buildUrl(this.accountingIsolated, '/data-entry', { instanceId }),
+    delete: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/data-entry/:id', { instanceId, id }),
+    edit: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/data-entry/:id', { instanceId, id }),
+    getByDataTypeId: (instanceId: number, dataTypeId: number) =>
+      buildUrl(this.accountingIsolated, '/data-entry', { instanceId }, { dataTypeId }),
+    getById: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/data-entry/:id', { instanceId, id }),
+    import: (instanceId: number) => buildUrl(this.accountingIsolated, '/data-entry/import', { instanceId }),
   };
 
   readonly dataType = {
-    create: () => buildUrl(this.accounting, '/data-type'),
-    delete: (id: number) => buildUrl(this.accounting, '/data-type/:id', { id }),
-    edit: (id: number) => buildUrl(this.accounting, '/data-type/:id', { id }),
-    getById: (id: number) => buildUrl(this.accounting, '/data-type/:id', { id }),
-    getByInstanceId: (instanceId: number) => buildUrl(this.accounting, '/data-type', {}, { instanceId }),
+    create: (instanceId: number) => buildUrl(this.accountingIsolated, '/data-type', { instanceId }),
+    delete: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/data-type/:id', { instanceId, id }),
+    edit: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/data-type/:id', { instanceId, id }),
+    getById: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/data-type/:id', { instanceId, id }),
+    getByInstanceId: (instanceId: number) => buildUrl(this.accountingIsolated, '/data-type', { instanceId }),
   };
 
   readonly importConfiguration = {
-    create: () => buildUrl(this.accounting, '/import-configuration'),
-    delete: (id: number) => buildUrl(this.accounting, '/import-configuration/:id', { id }),
-    edit: (id: number) => buildUrl(this.accounting, '/import-configuration/:id', { id }),
-    getById: (id: number) => buildUrl(this.accounting, '/import-configuration/:id', { id }),
-    getByDataTypeId: (dataTypeId: number) => buildUrl(this.accounting, '/import-configuration', {}, { dataTypeId }),
-    getByInstanceId: (instanceId: number) => buildUrl(this.accounting, '/import-configuration', {}, { instanceId }),
+    create: (instanceId: number) => buildUrl(this.accountingIsolated, '/import-configuration', { instanceId }),
+    delete: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/import-configuration/:id', {
+      instanceId,
+      id
+    }),
+    edit: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/import-configuration/:id', {
+      instanceId,
+      id
+    }),
+    getById: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/import-configuration/:id', {
+      instanceId,
+      id
+    }),
+    getByDataTypeId: (instanceId: number, dataTypeId: number) =>
+      buildUrl(this.accountingIsolated, '/import-configuration', { instanceId }, { dataTypeId }),
+    getByInstanceId: (instanceId: number) => buildUrl(this.accountingIsolated, '/import-configuration', { instanceId }),
   };
 
   readonly instance = {
@@ -80,32 +103,34 @@ export class ApiRouter {
   };
 
   readonly report = {
-    generateDataEntries: () => buildUrl(this.accounting, '/report/generate-data-entries'),
-    generateSales: () => buildUrl(this.accounting, '/report/generate-sales'),
+    generateDataEntries: (instanceId: number) =>
+      buildUrl(this.accountingIsolated, '/report/generate-data-entries', { instanceId }),
+    generateSales: (instanceId: number) =>
+      buildUrl(this.accountingIsolated, '/report/generate-sales', { instanceId }),
   };
 
   readonly reportTemplate = {
-    create: () => buildUrl(this.accounting, '/report-template'),
-    delete: (id: number) => buildUrl(this.accounting, '/report-template/:id', { id }),
-    edit: (id: number) => buildUrl(this.accounting, '/report-template/:id', { id }),
-    getById: (id: number) => buildUrl(this.accounting, '/report-template/:id', { id }),
-    getByInstanceId: (id: number) => buildUrl(this.accounting, '/report-template', {}, { instanceId: id }),
+    create: (instanceId: number) => buildUrl(this.accountingIsolated, '/report-template', { instanceId }),
+    delete: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/report-template/:id', { instanceId, id }),
+    edit: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/report-template/:id', { instanceId, id }),
+    getById: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/report-template/:id', { instanceId, id }),
+    getByInstanceId: (instanceId: number) => buildUrl(this.accountingIsolated, '/report-template', { instanceId }),
   };
 
   readonly sale = {
-    create: () => buildUrl(this.accounting, '/sale'),
-    delete: (id: number) => buildUrl(this.accounting, '/sale/:id', { id }),
-    edit: (id: number) => buildUrl(this.accounting, '/sale/:id', { id }),
-    getById: (id: number) => buildUrl(this.accounting, '/sale/:id', { id }),
-    getByInstanceId: (instanceId: number) => buildUrl(this.accounting, '/sale', {}, { instanceId }),
+    create: (instanceId: number) => buildUrl(this.accountingIsolated, '/sale', { instanceId }),
+    delete: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/sale/:id', { instanceId, id }),
+    edit: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/sale/:id', { instanceId, id }),
+    getById: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/sale/:id', { instanceId, id }),
+    getByInstanceId: (instanceId: number) => buildUrl(this.accountingIsolated, '/sale', { instanceId }),
   };
 
   readonly salesman = {
-    create: () => buildUrl(this.accounting, '/salesman'),
-    delete: (id: number) => buildUrl(this.accounting, '/salesman/:id', { id }),
-    edit: (id: number) => buildUrl(this.accounting, '/salesman/:id', { id }),
-    getById: (id: number) => buildUrl(this.accounting, '/salesman/:id', { id }),
-    getByInstanceId: (instanceId: number) => buildUrl(this.accounting, '/salesman', {}, { instanceId }),
+    create: (instanceId: number) => buildUrl(this.accountingIsolated, '/salesman', { instanceId }),
+    delete: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/salesman/:id', { instanceId, id }),
+    edit: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/salesman/:id', { instanceId, id }),
+    getById: (instanceId: number, id: number) => buildUrl(this.accountingIsolated, '/salesman/:id', { instanceId, id }),
+    getByInstanceId: (instanceId: number) => buildUrl(this.accountingIsolated, '/salesman', { instanceId }),
   };
 
   readonly session = {
@@ -119,16 +144,23 @@ export class ApiRouter {
     edit: (id: number) => buildUrl(this.base, '/user/:id', { id }),
     get: (returnIdentityOnly = false) => buildUrl(this.base, '/user', {}, { returnIdentityOnly }),
     getByEmail: (email: string, returnIdentityOnly = false) => buildUrl(this.base, '/user', {}, { email, returnIdentityOnly }),
-    getById: (id: number, returnIdentityOnly = false) => buildUrl(this.base, '/user/:id', { id }, { returnIdentityOnly }),
+    getById: (id: number, returnIdentityOnly = false) =>
+      buildUrl(this.base, '/user/:id', { id }, { returnIdentityOnly }),
   };
 
   readonly vatReturn = {
-    cancel: (saleId: number) => buildUrl(this.accounting, '/sti/vat-return/:saleId/cancel', { saleId }),
-    submit: () => buildUrl(this.accounting, '/sti/vat-return'),
-    getBySaleId: (saleId: number) => buildUrl(this.accounting, '/sti/vat-return/:saleId', { saleId }),
-    getByCode: (code: string) => buildUrl(this.accounting, '/sti/vat-return', {}, { code }),
-    payment: (saleId: number) => buildUrl(this.accounting, '/sti/vat-return/:saleId/payment', { saleId }),
-    update: (saleId: number) => buildUrl(this.accounting, '/sti/vat-return/:saleId/update', { saleId }),
-    updateByCode: (code: string) => buildUrl(this.accounting, '/sti/vat-return/update', {}, { code }),
+    cancel: (instanceId: number, saleId: number) =>
+      buildUrl(this.accountingIsolated, '/vat-return/:saleId/cancel', { instanceId, saleId }),
+    submit: (instanceId: number) => buildUrl(this.accountingIsolated, '/vat-return', { instanceId }),
+    getBySaleId: (instanceId: number, saleId: number) =>
+      buildUrl(this.accountingIsolated, '/vat-return/:saleId', { instanceId, saleId }),
+    getByCode: (code: string) =>
+      buildUrl(this.accounting, '/vat-return', {}, { code }),
+    payment: (instanceId: number, saleId: number) =>
+      buildUrl(this.accountingIsolated, '/vat-return/:saleId/payment', { instanceId, saleId }),
+    update: (instanceId: number, saleId: number) =>
+      buildUrl(this.accountingIsolated, '/vat-return/:saleId/update', { instanceId, saleId }),
+    updateByCode: (code: string) =>
+      buildUrl(this.accounting, '/vat-return/update', {}, { code }),
   };
 }

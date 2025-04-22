@@ -1,3 +1,4 @@
+using Accounting.API.Configuration;
 using Accounting.API.Util;
 using Accounting.Contract.Dto.DataEntry;
 using Accounting.Contract.Service;
@@ -9,12 +10,29 @@ public static class DataEntryEndpoints
 {
     public static void MapDataEntryEndpoints(this RouteGroupBuilder builder)
     {
-        builder.MapPost(String.Empty, Create);
-        builder.MapPost("import", Import);
-        builder.MapDelete("/{id:int}", Delete);
-        builder.MapPut("/{id:int}", Edit);
-        builder.MapGet("/{id:int}", GetById);
-        builder.MapGet(String.Empty, GetByDataType);
+        builder
+            .MapPost(String.Empty, Create)
+            .RequireInstancePermission(InstancePermission.DataEntry.Create);
+
+        builder
+            .MapPost("import", Import)
+            .RequireInstancePermission(InstancePermission.DataEntry.Create);
+
+        builder
+            .MapDelete("/{id:int}", Delete)
+            .RequireInstancePermission(InstancePermission.DataEntry.Delete);
+
+        builder
+            .MapPut("/{id:int}", Edit)
+            .RequireInstancePermission(InstancePermission.DataEntry.Edit);
+
+        builder
+            .MapGet("/{id:int}", GetById)
+            .RequireInstancePermission(InstancePermission.DataEntry.Preview);
+
+        builder
+            .MapGet(String.Empty, GetByDataType)
+            .RequireInstancePermission(InstancePermission.DataEntry.Preview);
     }
 
     private static async Task<IResult> Create(
@@ -23,7 +41,7 @@ public static class DataEntryEndpoints
         HttpContext httpContext
     )
     {
-        request.RequesterId = httpContext.GetUserIdOrThrow();
+        request.RequesterId = httpContext.GetUserId();
 
         return Results.Json((await dataEntryService.CreateAsync(request)).ToDto());
     }
@@ -50,7 +68,7 @@ public static class DataEntryEndpoints
                     FileExtension = "." + file.FileName.Split(".").Last(),
                     FileStream = fileStream,
                     ImportConfigurationId = importConfigurationId,
-                    RequesterId = httpContext.GetUserIdOrThrow(),
+                    RequesterId = httpContext.GetUserId(),
                     SkipHeader = skipHeader
                 }
             ))
@@ -69,7 +87,7 @@ public static class DataEntryEndpoints
             new DataEntryDeleteRequest
             {
                 DataEntryId = id,
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         );
 
@@ -84,7 +102,7 @@ public static class DataEntryEndpoints
     )
     {
         request.DataEntryId = id;
-        request.RequesterId = httpContext.GetUserIdOrThrow();
+        request.RequesterId = httpContext.GetUserId();
 
         await dataEntryService.EditAsync(request);
 
@@ -100,7 +118,7 @@ public static class DataEntryEndpoints
             new DataEntryGetRequest
             {
                 DataEntryId = id,
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         )).ToDto()
     );
@@ -114,7 +132,7 @@ public static class DataEntryEndpoints
             new DataEntryGetByDataTypeRequest
             {
                 DataTypeId = dataTypeId,
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         ))
         .Select(i => i.ToDto())

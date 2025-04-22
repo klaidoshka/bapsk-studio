@@ -22,7 +22,7 @@ public static class SessionEndpoints
         await sessionService.DeleteAsync(
             new SessionDeleteRequest
             {
-                RequesterId = httpContext.GetUserIdOrThrow(),
+                RequesterId = httpContext.GetUserId(),
                 SessionId = id
             }
         );
@@ -38,7 +38,7 @@ public static class SessionEndpoints
         (await sessionService.GetAsync(
             new SessionGetRequest
             {
-                RequesterId = httpContext.GetUserIdOrThrow(),
+                RequesterId = httpContext.GetUserId(),
                 SessionId = id
             }
         )).ToDto()
@@ -51,7 +51,7 @@ public static class SessionEndpoints
         (await sessionService.GetAsync(
             new SessionGetByUserRequest
             {
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         ))
         .Select(s => s.ToDto())

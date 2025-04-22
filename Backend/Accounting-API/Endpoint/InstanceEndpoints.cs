@@ -1,3 +1,4 @@
+using Accounting.API.Configuration;
 using Accounting.API.Util;
 using Accounting.Contract.Dto.Instance;
 using Accounting.Contract.Service;
@@ -11,7 +12,11 @@ public static class InstanceEndpoints
     {
         builder.MapPost(String.Empty, Create);
         builder.MapDelete("/{id:int}", Delete);
-        builder.MapPut("/{id:int}", Edit);
+        
+        builder
+            .MapPut("/{id:int}", Edit)
+            .RequireInstancePermission(InstancePermission.Instance.Edit);
+        
         builder.MapGet("/{id:int}", GetById);
         builder.MapGet(String.Empty, GetByUser);
     }
@@ -22,7 +27,7 @@ public static class InstanceEndpoints
         IInstanceService instanceService
     )
     {
-        request.RequesterId = httpContext.GetUserIdOrThrow();
+        request.RequesterId = httpContext.GetUserId();
 
         return Results.Json((await instanceService.CreateAsync(request)).ToDto());
     }
@@ -37,7 +42,7 @@ public static class InstanceEndpoints
             new InstanceDeleteRequest
             {
                 InstanceId = id,
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         );
 
@@ -52,7 +57,7 @@ public static class InstanceEndpoints
     )
     {
         request.InstanceId = id;
-        request.RequesterId = httpContext.GetUserIdOrThrow();
+        request.RequesterId = httpContext.GetUserId();
         await instanceService.EditAsync(request);
 
         return Results.Ok();
@@ -67,7 +72,7 @@ public static class InstanceEndpoints
             new InstanceGetRequest
             {
                 InstanceId = id,
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         )).ToDto()
     );
@@ -79,7 +84,7 @@ public static class InstanceEndpoints
         (await instanceService.GetAsync(
             new InstanceGetByUserRequest
             {
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         ))
         .Select(i => i.ToDto())

@@ -1,4 +1,3 @@
-using Accounting.API.AuthorizationHandler.Requirement;
 using Accounting.API.Util;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Dto.User;
@@ -15,19 +14,10 @@ public static class UserEndpoints
             .MapPost(String.Empty, Create)
             .RequireAuthorization(Policies.AdminOnly);
 
-        builder
-            .MapDelete("{id:int}", Delete)
-            .RequireAuthorization(it => it.AddRequirements(new UserRequirement(UserRequirement.CrudOperation.Delete)));
-
-        builder
-            .MapPut("{id:int}", Edit)
-            .RequireAuthorization(o => o.AddRequirements(new UserRequirement(UserRequirement.CrudOperation.Edit)));
-
+        builder.MapDelete("{id:int}", Delete);
+        builder.MapPut("{id:int}", Edit);
         builder.MapGet(String.Empty, GetByEmail);
-
-        builder
-            .MapGet("{id:int}", GetById)
-            .RequireAuthorization(it => it.AddRequirements(new UserRequirement(UserRequirement.CrudOperation.GetById)));
+        builder.MapGet("{id:int}", GetById);
     }
 
     private static async Task<IResult> Create(
@@ -67,7 +57,7 @@ public static class UserEndpoints
             new UserGetRequest
             {
                 Email = email,
-                RequesterId = httpContext.GetUserIdOrThrow(),
+                RequesterId = httpContext.GetUserId(),
                 ReturnIdentityOnly = returnIdentityOnly ?? false
             }
         ))

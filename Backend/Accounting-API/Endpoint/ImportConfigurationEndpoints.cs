@@ -1,3 +1,4 @@
+using Accounting.API.Configuration;
 using Accounting.API.Util;
 using Accounting.Contract.Dto.ImportConfiguration;
 using Accounting.Contract.Service;
@@ -9,11 +10,25 @@ public static class ImportConfigurationEndpoints
 {
     public static void MapImportConfigurationEndpoints(this RouteGroupBuilder builder)
     {
-        builder.MapPost(String.Empty, Create);
-        builder.MapDelete("/{id:int}", Delete);
-        builder.MapPut("/{id:int}", Edit);
-        builder.MapGet("/{id:int}", GetById);
-        builder.MapGet(String.Empty, GetBySomeId);
+        builder
+            .MapPost(String.Empty, Create)
+            .RequireInstancePermission(InstancePermission.ImportConfiguration.Create);
+        
+        builder
+            .MapDelete("/{id:int}", Delete)
+            .RequireInstancePermission(InstancePermission.ImportConfiguration.Delete);
+        
+        builder
+            .MapPut("/{id:int}", Edit)
+            .RequireInstancePermission(InstancePermission.ImportConfiguration.Edit);
+        
+        builder
+            .MapGet("/{id:int}", GetById)
+            .RequireInstancePermission(InstancePermission.ImportConfiguration.Preview);
+        
+        builder
+            .MapGet(String.Empty, GetBySomeId)
+            .RequireInstancePermission(InstancePermission.ImportConfiguration.Preview);
     }
 
     private static async Task<IResult> Create(
@@ -22,7 +37,7 @@ public static class ImportConfigurationEndpoints
         HttpContext httpContext
     )
     {
-        request.RequesterId = httpContext.GetUserIdOrThrow();
+        request.RequesterId = httpContext.GetUserId();
 
         return Results.Json((await importConfigurationService.CreateAsync(request)).ToDto());
     }
@@ -37,7 +52,7 @@ public static class ImportConfigurationEndpoints
             new ImportConfigurationDeleteRequest
             {
                 ImportConfigurationId = id,
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         );
 
@@ -52,7 +67,7 @@ public static class ImportConfigurationEndpoints
     )
     {
         request.ImportConfiguration.Id = id;
-        request.RequesterId = httpContext.GetUserIdOrThrow();
+        request.RequesterId = httpContext.GetUserId();
         await importConfigurationService.EditAsync(request);
 
         return Results.Ok();
@@ -67,7 +82,7 @@ public static class ImportConfigurationEndpoints
             new ImportConfigurationGetRequest
             {
                 ImportConfigurationId = id,
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         )).ToDto()
     );
@@ -83,7 +98,7 @@ public static class ImportConfigurationEndpoints
             {
                 DataTypeId = dataTypeId,
                 InstanceId = instanceId,
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         ))
         .Select(i => i.ToDto())

@@ -1,4 +1,4 @@
-using Accounting.API.AuthorizationHandler.Requirement;
+using Accounting.API.Configuration;
 using Accounting.API.Util;
 using Accounting.Contract.Dto.Salesman;
 using Accounting.Contract.Service;
@@ -12,23 +12,23 @@ public static class SalesmanEndpoints
     {
         builder
             .MapPost(String.Empty, Create)
-            .RequireAuthorization(it => it.AddRequirements(new SalesmanRequirement(SalesmanRequirement.CrudOperation.Create)));
+            .RequireInstancePermission(InstancePermission.Customer.Create);
 
         builder
             .MapDelete("{id:int}", Delete)
-            .RequireAuthorization(it => it.AddRequirements(new SalesmanRequirement(SalesmanRequirement.CrudOperation.Delete)));
+            .RequireInstancePermission(InstancePermission.Customer.Delete);
 
         builder
             .MapPut("{id:int}", Edit)
-            .RequireAuthorization(o => o.AddRequirements(new SalesmanRequirement(SalesmanRequirement.CrudOperation.Edit)));
+            .RequireInstancePermission(InstancePermission.Customer.Edit);
 
         builder
             .MapGet(String.Empty, GetByInstanceId)
-            .RequireAuthorization(o => o.AddRequirements(new SalesmanRequirement(SalesmanRequirement.CrudOperation.Get)));
+            .RequireInstancePermission(InstancePermission.Customer.Preview);
 
         builder
             .MapGet("{id:int}", GetById)
-            .RequireAuthorization(o => o.AddRequirements(new SalesmanRequirement(SalesmanRequirement.CrudOperation.GetById)));
+            .RequireInstancePermission(InstancePermission.Customer.Preview);
     }
 
     private static async Task<IResult> Create(
@@ -67,7 +67,7 @@ public static class SalesmanEndpoints
             new SalesmanGetRequest
             {
                 InstanceId = instanceId,
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         ))
         .Select(it => it.ToDto())
