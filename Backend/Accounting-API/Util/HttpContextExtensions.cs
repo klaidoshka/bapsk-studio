@@ -5,6 +5,8 @@ namespace Accounting.API.Util;
 
 public static class HttpContextExtensions
 {
+    /// Also caches the value in the context items upon first access.
+    /// In case of Post, Put, or Patch requests, it will cache the entire request body under the key "json_{key}".
     public static async Task<object?> FindValueAsync(this HttpContext context, string key)
     {
         if (String.IsNullOrEmpty(key))
@@ -12,24 +14,30 @@ public static class HttpContextExtensions
             return null;
         }
 
+        if (context.Items.TryGetValue(key, out var itemValue))
+        {
+            return itemValue;
+        }
+
         if (context.Request.RouteValues.TryGetValue(key, out var routeValue))
         {
+            context.Items.Add(key, routeValue);
+
             return routeValue;
         }
 
         if (context.Request.Query.TryGetValue(key, out var queryValue))
         {
+            context.Items.Add(key, queryValue);
+
             return queryValue.ToString();
         }
 
         if (context.Request.HasFormContentType && context.Request.Form.TryGetValue(key, out var formValue))
         {
-            return formValue.ToString();
-        }
+            context.Items.Add(key, formValue.ToString());
 
-        if (context.Items.TryGetValue(key, out var itemValue))
-        {
-            return itemValue;
+            return formValue.ToString();
         }
 
         if (
@@ -60,7 +68,7 @@ public static class HttpContextExtensions
         if (!context.Items.TryGetValue($"json_{key}", out var jsonBody))
         {
             context.Request.Body.Position = 0;
-            
+
             element = await context.Request.ReadFromJsonAsync<JsonElement>();
 
             context.Items[$"json_{key}"] = element;

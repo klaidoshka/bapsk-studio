@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using Accounting.API.Configuration;
+using Accounting.API.Util;
 using Accounting.Contract.Service;
 
 namespace Accounting.API.Filter;
@@ -17,7 +17,7 @@ public class InstanceAuthorizationFilter : IEndpointFilter
 
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
-        var instanceIdAsString = context.HttpContext.Request.RouteValues["instanceId"]?.ToString();
+        var instanceIdAsString = (await context.HttpContext.FindValueAsync("instanceId"))?.ToString();
 
         if (!Int32.TryParse(instanceIdAsString, out var instanceId))
         {
@@ -42,8 +42,6 @@ public class InstanceAuthorizationFilter : IEndpointFilter
         {
             return Results.Forbid();
         }
-
-        context.HttpContext.Items[HttpContextItem.InstanceId] = instanceId;
 
         return await next(context);
     }

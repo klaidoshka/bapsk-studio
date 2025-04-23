@@ -1,4 +1,3 @@
-using Accounting.API.Configuration;
 using Accounting.API.Util;
 using Accounting.Contract.Validator;
 
@@ -35,8 +34,14 @@ public class InstanceOwnsEntityFilter<T> : IEndpointFilter where T : class
             return await next(context);
         }
 
+        var instanceIdAsString = (await context.HttpContext.FindValueAsync("instanceId"))?.ToString();
+
+        if (!Int32.TryParse(instanceIdAsString, out var instanceId))
+        {
+            return Results.BadRequest("Invalid or missing instance id.");
+        }
+
         var entityId = Int32.Parse(entityIdAsString);
-        var instanceId = (int)context.HttpContext.Items[HttpContextItem.InstanceId]!;
 
         if (!await _validator.IsFromInstanceAsync(entityId, instanceId))
         {
