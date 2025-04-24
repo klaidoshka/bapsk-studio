@@ -6,9 +6,9 @@
     </div>
 
     <div class="flex items-center space-x-4 ml-auto">
-      <instance-selector *ngIf="isAuthenticated()"/>
+      <instance-selector *ngIf="isAuthenticated.value()"/>
 
-      <profile-dropdown *ngIf="isAuthenticated()"/>
+      <profile-dropdown *ngIf="isAuthenticated.value()"/>
     </div>
   </header>
 

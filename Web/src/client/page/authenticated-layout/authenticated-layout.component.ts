@@ -5,6 +5,7 @@ import {InstanceSelectorComponent} from '../../component/instance-selector/insta
 import {NgIf} from '@angular/common';
 import {ProfileDropdownComponent} from '../../component/profile-dropdown/profile-dropdown.component';
 import {ThemeSelectorComponent} from '../../component/theme-selector/theme-selector.component';
+import {rxResource} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: "authenticated-layout",
@@ -15,5 +16,5 @@ import {ThemeSelectorComponent} from '../../component/theme-selector/theme-selec
 export class AuthenticatedLayoutComponent {
   private readonly authService = inject(AuthService);
 
-  isAuthenticated = this.authService.isAuthenticated();
+  isAuthenticated = rxResource({ loader: () => this.authService.isAuthenticated() });
 }

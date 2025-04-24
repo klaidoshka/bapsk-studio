@@ -1,4 +1,4 @@
-import {Component, inject, Signal, viewChild} from '@angular/core';
+import {Component, inject, viewChild} from '@angular/core';
 import {TableModule} from "primeng/table";
 import {SessionService} from '../../service/session.service';
 import Session from '../../model/session.model';
@@ -8,6 +8,7 @@ import {AuthService} from '../../service/auth.service';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
 import {MessageService} from 'primeng/api';
 import {Toast} from 'primeng/toast';
+import {rxResource} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'session-showcase',
@@ -27,9 +28,9 @@ export class SessionShowcaseComponent {
   private readonly messageService = inject(MessageService);
   private readonly sessionService = inject(SessionService);
 
-  currentSessionId = this.authService.getSessionId();
-  sessions = this.sessionService.getByUserAsSignal();
   confirmationComponent = viewChild.required(ConfirmationComponent);
+  currentSessionId = rxResource({ loader: () => this.authService.getSessionId() });
+  sessions = rxResource({ loader: () => this.sessionService.getByUser() });
 
   revoke(session: Session) {
     this.confirmationComponent().request(() => {

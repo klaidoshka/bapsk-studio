@@ -4,8 +4,8 @@
 
 <p-table
   styleClass="w-fit shadow-lg mt-2 dark:bg-primary-950! bg-primary-50!"
-        paginatorStyleClass="dark:bg-primary-950! bg-primary-50!"
-  [value]="sessions()"
+  paginatorStyleClass="dark:bg-primary-950! bg-primary-50!"
+  [value]="sessions.value() || []"
 >
   <ng-template #header>
     <tr>
@@ -28,7 +28,7 @@
       <td>{{ session.location }}</td>
       <td>
         <p-button
-          [disabled]="session.id === currentSessionId()"
+          [disabled]="session.id === currentSessionId.value()"
           icon="pi pi-ban"
           type="button"
           variant="text"

@@ -26,6 +26,7 @@ import {FormInputErrorComponent} from "../form-input-error/form-input-error.comp
 import {instanceUserPermissions} from '../../constant/instance-user.permissions';
 import {NgForOf, NgIf} from '@angular/common';
 import {Badge} from 'primeng/badge';
+import {rxResource} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'instance-management',
@@ -81,6 +82,8 @@ export class InstanceManagementComponent {
   messages = signal<Messages>({});
   messagesUsers = signal<Messages>({});
 
+  user = rxResource({ loader: () => this.authService.getUser() });
+
   customErrorMessages = {
     'emailExists': () => 'User with this email already exists in the list.'
   };
@@ -91,7 +94,7 @@ export class InstanceManagementComponent {
   }
 
   private addUserInForm(user: UserIdentity, email: string, permissions?: string[]) {
-    const isOwnerOrSelf = this.instance()?.createdById === user.id || this.authService.getUser()()!.id === user.id;
+    const isOwnerOrSelf = this.instance()?.createdById === user.id || this.user.value()!.id === user.id;
 
     const permissionsToAdd = isOwnerOrSelf ? [] : this.allPermissions.map(p => ({
       ...p,
@@ -219,7 +222,7 @@ export class InstanceManagementComponent {
       this.form.patchValue({ ...instance as any });
       instance.users.forEach(um => this.addUserInForm(um.user, um.user.email, um.permissions));
     } else {
-      this.addUser(this.authService.getUser()()!.email);
+      this.addUser(this.user.value()!.email);
     }
 
     this.isShown.set(true);

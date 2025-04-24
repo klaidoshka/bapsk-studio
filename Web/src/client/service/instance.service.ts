@@ -1,8 +1,8 @@
-import {computed, effect, inject, Injectable, signal, Signal, WritableSignal} from '@angular/core';
+import {computed, inject, Injectable, signal, Signal, WritableSignal} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import Instance, {InstanceCreateRequest, InstanceEditRequest} from '../model/instance.model';
 import {ApiRouter} from './api-router.service';
-import {first, Observable, tap} from 'rxjs';
+import {first, Observable, of, switchMap, tap} from 'rxjs';
 import {AuthService} from './auth.service';
 import {DateUtil} from '../util/date.util';
 
@@ -18,29 +18,36 @@ export class InstanceService {
   private readonly store = signal<Instance[]>([]);
 
   constructor() {
-    if (this.authService.isAuthenticated()()) {
-      this.getAll().pipe(first()).subscribe(instances => this.refreshActiveInstance(instances));
-    }
+    this.authService
+      .getUser()
+      .pipe(
+        switchMap(user => {
+          if (user == null) {
+            this.activeInstance.set(undefined);
+            this.store.set([]);
+            return of([]);
+          }
 
-    effect(() => {
-      const user = this.authService.getUser()();
+          return this
+            .getAll()
+            .pipe(first());
+        })
+      )
+      .subscribe(instances => {
+        if (instances.length > 0) {
+          const activeInstanceId = this.activeInstance()?.id;
 
-      if (user == null) {
-        this.activeInstance.set(undefined);
-        this.store.set([]);
-        return;
-      }
-
-      this.getAll().pipe(first()).subscribe(instances => this.refreshActiveInstance(instances));
-    });
-  }
-
-  private refreshActiveInstance(instances: Instance[]) {
-    if (instances.length > 0) {
-      this.activeInstance.set(instances[0]);
-    } else if (this.activeInstance() != null) {
-      this.activeInstance.set(undefined);
-    }
+          if (
+            activeInstanceId === undefined ||
+            instances.findIndex(instance => instance.id === activeInstanceId) === -1
+          ) {
+            this.activeInstance.set(instances[0]);
+          }
+          this.activeInstance.set(instances[0]);
+        } else if (this.activeInstance() !== undefined) {
+          this.activeInstance.set(undefined);
+        }
+      });
   }
 
   create(request: InstanceCreateRequest): Observable<Instance> {

@@ -1,7 +1,7 @@
 <div class="h-full w-full flex flex-col p-4">
-  <div *ngIf="user()">
+  <div *ngIf="user.value()">
     <h1 class="text-2xl font-bold mb-4">Profile</h1>
-    <profile-showcase [user]="user()!"/>
+    <profile-showcase [user]="user.value()!"/>
   </div>
   <h1 class="text-2xl font-bold my-4">Sessions</h1>
   <session-showcase/>

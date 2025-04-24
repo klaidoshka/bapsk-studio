@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, signal, untracked, viewChild, ViewEncapsulation} from '@angular/core';
+import {Component, inject, viewChild, ViewEncapsulation} from '@angular/core';
 import {ButtonModule} from 'primeng/button';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {AuthService} from '../../service/auth.service';
@@ -7,7 +7,8 @@ import {Router} from '@angular/router';
 import {ToastModule} from 'primeng/toast';
 import {Menubar} from 'primeng/menubar';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
-import {Role} from '../../model/role.model';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {map} from 'rxjs';
 
 @Component({
   selector: 'profile-dropdown',
@@ -29,85 +30,24 @@ export class ProfileDropdownComponent {
 
   confirmationComponent = viewChild.required(ConfirmationComponent);
 
-  displayName = computed(() => {
-    const user = this.authService.getUser()();
-    return user != null ? user.firstName + ' ' + user.lastName : 'Profile';
+  displayName = rxResource({
+    loader: () => this.authService
+      .getUser()
+      .pipe(
+        map(user => user != null ? user.firstName + ' ' + user.lastName : 'Profile')
+      )
   });
-
-  entries = signal<MenuItem[]>(this.getEmptyEntries());
-
-  constructor() {
-    effect(() => {
-      const user = this.authService.getUser()();
-
-      untracked(() => {
-          if (user === null && this.entries().length > 0) {
-            this.entries.set(this.getEmptyEntries());
-          } else if (user !== null) {
-            this.entries.set(this.getEntries());
-          }
-        }
-      );
-    });
-  }
-
-  private getEmptyEntries(): MenuItem[] {
-    return [
-      {
-        label: 'Profile',
-        icon: 'pi pi-user',
-        items: [
-          {
-            label: 'Logout',
-            icon: 'pi pi-sign-out',
-            command: () => this.logout()
-          }
-        ]
-      }
-    ]
-  }
 
   private getEntries(): MenuItem[] {
     return [
       {
-        label: this.displayName(),
+        label: this.displayName.value(),
         icon: 'pi pi-user',
         items: [
           {
             label: 'Profile',
             icon: 'pi pi-user-edit',
             routerLink: "/home/profile"
-          },
-          {
-            label: 'Instances',
-            icon: 'pi pi-server',
-            routerLink: "/home/instance"
-          },
-          {
-            label: 'Data Types',
-            icon: 'pi pi-table',
-            routerLink: "/home/data-type"
-          },
-          {
-            label: 'Import Configurations',
-            icon: 'pi pi-file-import',
-            routerLink: "/home/import-configuration"
-          },
-          {
-            label: 'Report Templates',
-            icon: 'pi pi-file',
-            routerLink: "/home/report-template"
-          },
-          {
-            label: 'Workspace',
-            icon: 'pi pi-desktop',
-            routerLink: "/home/workspace"
-          },
-          {
-            visible: this.authService.getUser()()?.role == Role.Admin,
-            label: 'Users',
-            icon: 'pi pi-users',
-            routerLink: "/home/user"
           },
           {
             label: 'Logout',

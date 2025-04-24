@@ -3,6 +3,7 @@ import {ProfileShowcaseComponent} from '../../component/profile-showcase/profile
 import {SessionShowcaseComponent} from '../../component/session-showcase/session-showcase.component';
 import {AuthService} from '../../service/auth.service';
 import {NgIf} from '@angular/common';
+import {rxResource} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'profile-page',
@@ -17,5 +18,5 @@ import {NgIf} from '@angular/common';
 export class ProfilePageComponent {
   private readonly authService = inject(AuthService);
 
-  user = this.authService.getUser();
+  user = rxResource({ loader: () => this.authService.getUser() });
 }
