@@ -27,14 +27,6 @@ public class DataEntryValidator : IDataEntryValidator
             .FirstAsync(dt => dt.Id == request.DataTypeId);
 
         var failures = new List<string>();
-
-        foreach (var field in request.Fields)
-        {
-            failures.AddRange(
-                (await ValidateDataEntryFieldCreateRequestAsync(field)).FailureMessages
-            );
-        }
-
         var requestFieldsById = request.Fields.ToDictionary(f => f.DataTypeFieldId);
 
         failures.AddRange(
@@ -47,6 +39,13 @@ public class DataEntryValidator : IDataEntryValidator
                 .Select(field => $"Field '{field.Name}' is required, but not provided.")
                 .ToList()
         );
+
+        foreach (var field in request.Fields)
+        {
+            failures.AddRange(
+                (await ValidateDataEntryFieldCreateRequestAsync(field)).FailureMessages
+            );
+        }
 
         return new Validation(failures);
     }

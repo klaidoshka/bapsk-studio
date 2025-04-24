@@ -2,6 +2,7 @@ using System.Text.Json;
 using Accounting.Contract.Dto;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Validator;
+using Accounting.Services.Util;
 
 namespace Accounting.Services.Validator;
 
@@ -16,6 +17,8 @@ public class FieldTypeValidator : IFieldTypeValidator
 
     public async Task<Validation> ValidateAsync(DataTypeField field, JsonElement value)
     {
+        value = value.IsNullOrEmpty() ? JsonSerializer.SerializeToElement(field.DefaultValue) : value;
+
         var validation = await ValidateAsync(field.Type, value);
 
         if (validation.IsValid)

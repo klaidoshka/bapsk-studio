@@ -72,7 +72,7 @@ export class DataEntryManagementComponent {
 
           return this.formBuilder.group({
             name: [tf.name, [Validators.required]],
-            value: [entryField?.value, [tf.isRequired ? Validators.required : null]]
+            value: [entryField?.value, tf.isRequired ? [Validators.required] : []]
           });
         }) || []
       )

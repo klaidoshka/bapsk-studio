@@ -138,7 +138,7 @@ export class DataTypeManagementComponent {
   }
 
   addField(dataType?: DataType, field?: DataTypeField) {
-    const isRequiredControl = this.formBuilder.control(field?.isRequired || true, Validators.required);
+    const isRequiredControl = this.formBuilder.control(field?.isRequired === undefined ? true : field.isRequired, Validators.required);
     const isReference = field?.type === FieldType.Reference;
 
     if (isReference) {
