@@ -21,8 +21,8 @@
   <div class="card mt-4">
     <p-table
       styleClass="w-fit shadow-lg mt-2 dark:bg-primary-950! bg-primary-50!"
-        paginatorStyleClass="dark:bg-primary-950! bg-primary-50!"
-      [value]="instances()"
+      paginatorStyleClass="dark:bg-primary-950! bg-primary-50!"
+      [value]="instances.value() || []"
       [paginator]="true"
       [rows]="10"
       [rowsPerPageOptions]="[10, 20, 50]"

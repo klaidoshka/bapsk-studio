@@ -1,12 +1,4 @@
-import {
-  Component,
-  effect,
-  inject,
-  Signal,
-  viewChild,
-  ViewEncapsulation,
-  WritableSignal
-} from '@angular/core';
+import {Component, effect, inject, viewChild, ViewEncapsulation} from '@angular/core';
 import {DropdownModule} from "primeng/dropdown";
 import Instance from '../../model/instance.model';
 import {InstanceService} from '../../service/instance.service';
@@ -14,6 +6,7 @@ import {Button} from 'primeng/button';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {InstanceManagementComponent} from '../instance-management/instance-management.component';
 import {Select} from 'primeng/select';
+import {rxResource} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'instance-selector',
@@ -32,14 +25,14 @@ import {Select} from 'primeng/select';
 export class InstanceSelectorComponent {
   private readonly instanceService = inject(InstanceService);
 
-  instances = this.instanceService.getAsSignal();
+  instances = rxResource({ loader: () => this.instanceService.getAll() });
   managementMenu = viewChild.required(InstanceManagementComponent);
   selectedInstance = this.instanceService.getActiveInstance();
 
   constructor() {
     effect(() => {
-      if (this.instances().length == 1) {
-        this.selectInstance(this.instances()[0]);
+      if (this.instances.value()?.length == 1) {
+        this.selectInstance(this.instances.value()![0]);
       }
     });
   }

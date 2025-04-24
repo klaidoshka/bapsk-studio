@@ -1,24 +1,13 @@
-@switch (instances().length) {
+@switch (instances.value()?.length) {
   @case (0) {
-    <instance-management />
+    <instance-management/>
 
-    <p-button
-      label="Create Instance"
-      icon="pi pi-plus"
-      styleClass="w-42 h-8 text-center"
-      (onClick)="showManagementMenu()"
-    />
+    <p-button label="Create Instance" icon="pi pi-plus" styleClass="w-42 h-8 text-center" (onClick)="showManagementMenu()"/>
   }
   @default {
-      @if (selectedInstance() != null) {
-        <p-select
-          id="instance-selector"
-          inputId="instance"
-          [(ngModel)]="selectedInstance"
-          [options]="instances()"
-          optionLabel="name"
-          placeholder="Select an instance"
-        />
-      }
+    @if (selectedInstance() !== undefined) {
+      <p-select id="instance-selector" inputId="instance" [(ngModel)]="selectedInstance" [options]="instances.value() || []"
+                optionLabel="name" placeholder="Select an instance" class="w-48"/>
+    }
   }
 }
