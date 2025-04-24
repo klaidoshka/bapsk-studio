@@ -2,6 +2,7 @@ import {IsoCountryCode} from './iso-country.model';
 
 export default interface Salesman {
   id?: number;
+  instanceId?: number;
   name: string;
   vatPayerCode: SalesmanVatPayerCode;
 }

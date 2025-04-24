@@ -48,12 +48,12 @@
         <ng-container *ngIf="selectedWorkspace() === WorkspaceType.Sale">
           <h1 class="text-xl font-bold">Sales</h1>
           <sale-showcase [customers]="customers.value() || []" [instanceId]="instanceId()!" [sales]="sales.value() || []"
-                         [salesmen]="salesmen()"/>
+                         [salesmen]="salesmen.value() || []"/>
         </ng-container>
 
         <ng-container *ngIf="selectedWorkspace() === WorkspaceType.Salesman">
           <h1 class="text-xl font-bold">Salesmen</h1>
-          <salesman-showcase [instanceId]="instanceId()!" [salesmen]="salesmen()"/>
+          <salesman-showcase [instanceId]="instanceId()!" [salesmen]="salesmen.value() || []"/>
         </ng-container>
       </div>
     </div>

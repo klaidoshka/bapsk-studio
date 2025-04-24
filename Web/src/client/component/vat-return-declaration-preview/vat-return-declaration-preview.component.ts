@@ -55,7 +55,7 @@ export class VatReturnDeclarationPreviewComponent {
       saleId: this.sale()?.id
     }),
     loader: ({ request }) => request.saleId
-      ? this.vatReturnService.getWithDeclarerBySaleId(request.saleId)
+      ? this.vatReturnService.getWithDeclarerBySaleId(this.instanceId(), request.saleId)
       : of(undefined)
   })
 
@@ -76,10 +76,13 @@ export class VatReturnDeclarationPreviewComponent {
     this.cancelConfirmationComponent()?.request(() => {
       this.isCanceling.set(true);
 
-      this.vatReturnService.cancel(this.declaration.value()!.saleId).pipe(first()).subscribe({
-        next: () => this.isCanceling.set(false),
-        error: () => this.isCanceling.set(false)
-      });
+      this.vatReturnService
+        .cancel(this.instanceId(), this.declaration.value()!.saleId)
+        .pipe(first())
+        .subscribe({
+          next: () => this.isCanceling.set(false),
+          error: () => this.isCanceling.set(false)
+        });
     });
   }
 
@@ -97,10 +100,13 @@ export class VatReturnDeclarationPreviewComponent {
   refresh() {
     this.isRefreshing.set(true);
 
-    this.vatReturnService.update(this.declaration.value()!.saleId).pipe(first()).subscribe({
-      next: () => this.isRefreshing.set(false),
-      error: () => this.isRefreshing.set(false)
-    });
+    this.vatReturnService
+      .update(this.instanceId(), this.declaration.value()!.saleId)
+      .pipe(first())
+      .subscribe({
+        next: () => this.isRefreshing.set(false),
+        error: () => this.isRefreshing.set(false)
+      });
   }
 
   show(sale: SaleWithVatReturnDeclaration) {

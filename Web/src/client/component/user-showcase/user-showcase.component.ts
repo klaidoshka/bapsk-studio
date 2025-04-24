@@ -12,6 +12,7 @@ import {first} from 'rxjs';
 import {getUserIsoCountryLabel} from '../../model/iso-country.model';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {DatePipe} from '@angular/common';
+import {rxResource} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'user-showcase',
@@ -35,14 +36,14 @@ export class UserShowcaseComponent {
   managementMenu = viewChild.required(UserManagementComponent);
   messages = signal<Messages>({});
   previewMenu = viewChild.required(UserPreviewComponent);
-  users = this.userService.getAsSignal();
+  users = rxResource({ loader: () => this.userService.getAll() });
 
   protected readonly getCountryName = getUserIsoCountryLabel;
 
   delete(user: User) {
     this.confirmationComponent().request(() => {
       this.userService.delete(user.id!!).pipe(first()).subscribe({
-        next: () => this.messages.set({success: ['User deleted successfully']}),
+        next: () => this.messages.set({ success: ['User deleted successfully'] }),
         error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
       });
     });

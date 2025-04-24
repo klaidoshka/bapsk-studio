@@ -21,13 +21,14 @@ export class ImportConfigurationService {
   private readonly dataTypeService = inject(DataTypeService);
   private readonly httpClient = inject(HttpClient);
   private readonly instanceService = inject(InstanceService);
-
   private readonly cacheService = new CacheService<number, ImportConfigurationJoined>(configuration => configuration.id!);
   private readonly dataTypesFetched = new Set<number>();
   private readonly instancesFetched = new Set<number>();
   private readonly instanceId = this.instanceService.getActiveInstanceId();
 
-  private adjustRequestDateToISO<T extends ImportConfigurationCreateRequest | ImportConfigurationEditRequest>(request: T, fieldTypes: Map<number, FieldType>): T {
+  private adjustRequestDateToISO<T extends ImportConfigurationCreateRequest | ImportConfigurationEditRequest>(
+    request: T, fieldTypes: Map<number, FieldType>
+  ): T {
     return {
       ...request,
       importConfiguration: {

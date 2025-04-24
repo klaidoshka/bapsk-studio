@@ -142,7 +142,7 @@ export class ApiRouter {
     create: () => buildUrl(this.base, '/user'),
     delete: (id: number) => buildUrl(this.base, '/user/:id', { id }),
     edit: (id: number) => buildUrl(this.base, '/user/:id', { id }),
-    get: (returnIdentityOnly = false) => buildUrl(this.base, '/user', {}, { returnIdentityOnly }),
+    getAll: (returnIdentityOnly = false) => buildUrl(this.base, '/user', {}, { returnIdentityOnly }),
     getByEmail: (email: string, returnIdentityOnly = false) => buildUrl(this.base, '/user', {}, { email, returnIdentityOnly }),
     getById: (id: number, returnIdentityOnly = false) =>
       buildUrl(this.base, '/user/:id', { id }, { returnIdentityOnly }),

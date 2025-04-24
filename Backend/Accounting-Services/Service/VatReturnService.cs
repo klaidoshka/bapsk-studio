@@ -260,9 +260,10 @@ public class VatReturnService : IVatReturnService
 
     public async Task<string> GenerateDeclarationIdAsync()
     {
-        var nextId = await _database.StiVatReturnDeclarations.CountAsync() + 1;
+        var now = DateTime.UtcNow.Date;
+        var nextId = await _database.StiVatReturnDeclarations.CountAsync(d => d.SubmitDate.Date == now) + 1;
 
-        return $"{_stiVatReturn.Sender.Id}/VAT.R/{nextId}";
+        return $"{_stiVatReturn.Sender.Id}/VAT.R/{now.ToShortDateString()}/{nextId}";
     }
 
     public string GeneratePreviewCode(StiVatReturnDeclaration declaration)

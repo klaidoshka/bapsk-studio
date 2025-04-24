@@ -1,4 +1,4 @@
-import {Component, computed, effect, inject, signal, untracked} from '@angular/core';
+import {Component, effect, inject, signal, untracked} from '@angular/core';
 import {DataEntryShowcaseComponent} from '../../component/data-entry-showcase/data-entry-showcase.component';
 import {DataTypeService} from '../../service/data-type.service';
 import {InstanceService} from '../../service/instance.service';
@@ -19,7 +19,7 @@ import {VatReturnService} from '../../service/vat-return.service';
 import {DataEntryService} from '../../service/data-entry.service';
 import {HttpClient} from '@angular/common/http';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {combineLatest, map, of} from 'rxjs';
+import {of} from 'rxjs';
 
 @Component({
   selector: 'workspace-page',
@@ -39,29 +39,21 @@ export class WorkspacePageComponent {
   private vatReturnService = inject(VatReturnService);
 
   customers = rxResource({
-    request: () => ({
-      instanceId: this.instanceId()
-    }),
+    request: () => ({ instanceId: this.instanceId() }),
     loader: ({ request }) => request.instanceId
-      ? this.customerService.getByInstanceId(request.instanceId)
+      ? this.customerService.getAllByInstanceId(request.instanceId)
       : of([])
   })
 
-  error = computed(() => this.dataEntries.error() || this.dataTypes.error());
-
   dataEntries = rxResource({
-    request: () => ({
-      dataTypeId: this.selectedDataType()?.id
-    }),
+    request: () => ({ dataTypeId: this.selectedDataType()?.id }),
     loader: ({ request }) => request.dataTypeId
       ? this.dataEntryService.getAllByDataTypeId(request.dataTypeId)
       : of([])
   });
 
   dataTypes = rxResource({
-    request: () => ({
-      instanceId: this.instanceId()
-    }),
+    request: () => ({ instanceId: this.instanceId() }),
     loader: ({ request }) => request.instanceId
       ? this.dataTypeService.getAllByInstanceId(request.instanceId)
       : of([])
@@ -70,33 +62,22 @@ export class WorkspacePageComponent {
   instanceId = this.instanceService.getActiveInstanceId();
 
   sales = rxResource({
-    request: () => ({
-      sales: this.instanceId() != null ? this.saleService.getAsSignal(this.instanceId()!)() : []
-    }),
-    loader: ({ request }) => combineLatest(
-      request.sales.map(sale => this.vatReturnService
-        .getBySaleId(sale.id)
-        .pipe(
-          map(declaration => ({
-            ...sale,
-            vatReturnDeclaration: declaration
-          }))
-        )
-      )
-    )
+    request: () => ({ instanceId: this.instanceId() }),
+    loader: ({ request }) => request.instanceId
+      ? this.saleService.getAllWithVatDeclarationByInstanceId(request.instanceId)
+      : of([])
   });
 
-  salesmen = computed(() => {
-    const instanceId = this.instanceId();
-    return instanceId != null ? this.salesmanService.getAsSignal(instanceId)() : [];
+  salesmen = rxResource({
+    request: () => ({ instanceId: this.instanceId() }),
+    loader: ({ request }) => request.instanceId
+      ? this.salesmanService.getAllByInstanceId(request.instanceId)
+      : of([])
   });
 
   selectedDataType = signal<DataType | undefined>(undefined);
   selectedWorkspace = signal<WorkspaceType>(WorkspaceType.DataType);
-
-  workspacesPart = [
-    WorkspaceType.Customer, WorkspaceType.Salesman, WorkspaceType.Sale
-  ];
+  workspacesPart = [WorkspaceType.Customer, WorkspaceType.Salesman, WorkspaceType.Sale];
 
   constructor() {
     effect(() => {

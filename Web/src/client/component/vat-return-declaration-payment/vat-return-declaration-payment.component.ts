@@ -39,6 +39,7 @@ export class VatReturnDeclarationPaymentComponent {
 
   confirmation = viewChild.required(ConfirmationComponent);
   messages = signal<Messages>({});
+  instanceId = input.required<number>();
   saleId = input.required<number>();
 
   form = this.formBuilder.group({
@@ -74,23 +75,26 @@ export class VatReturnDeclarationPaymentComponent {
     }
 
     const payments = this
-      .getFormPayments()
-      .controls.map(control => ({
+      .getFormPayments().controls
+      .map(control => ({
         amount: control.get('amount')!.value!,
         date: control.get('date')!.value!,
         type: control.get('type')!.value!
       }));
 
     this.confirmation().request(() => {
-      this.vatReturnService.submitPayments(this.saleId(), payments).pipe(first()).subscribe({
-        next: () => this.messageService.add({
-          key: 'root',
-          summary: 'Payment Successful',
-          detail: 'You have successfully submitted the payment info.',
-          severity: 'success'
-        }),
-        error: response => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
-      });
+      this.vatReturnService
+        .submitPayments(this.instanceId(), this.saleId(), payments)
+        .pipe(first())
+        .subscribe({
+          next: () => this.messageService.add({
+            key: 'root',
+            summary: 'Payment Successful',
+            detail: 'You have successfully submitted the payment info.',
+            severity: 'success'
+          }),
+          error: response => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+        });
     });
   }
 }

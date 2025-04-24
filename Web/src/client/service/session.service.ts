@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, signal} from '@angular/core';
 import Session from '../model/session.model';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
@@ -16,16 +16,15 @@ export class SessionService {
   private readonly authService = inject(AuthService);
   private readonly httpClient = inject(HttpClient);
   private readonly router = inject(Router);
-
   private readonly cacheService = new CacheService<string, Session>(s => s.id);
-  private readonly userFetched = false;
+  private readonly userFetched = signal<boolean>(false);
 
   constructor() {
     this.getByUser().subscribe();
   }
 
   getByUser(): Observable<Session[]> {
-    if (this.userFetched) {
+    if (this.userFetched()) {
       return this.cacheService.getAll();
     }
 
@@ -36,7 +35,12 @@ export class SessionService {
           .map(session => this.updateProperties(session))
           .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
         ),
-        tap(sessions => sessions.forEach(session => this.cacheService.set(session)))
+        tap(sessions => {
+          this.userFetched.set(true);
+          sessions.forEach(session => this.cacheService.set(session));
+        }),
+        // No other way to get sessions, only for current user. So it means all sessions are user's.
+        switchMap(_ => this.cacheService.getAll())
       );
   }
 

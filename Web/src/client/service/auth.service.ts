@@ -16,7 +16,6 @@ export class AuthService {
   private readonly httpClient = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly userService = inject(UserService);
-
   private readonly access = new BehaviorSubject<AuthResponse | undefined>(this.getAccess());
 
   constructor() {

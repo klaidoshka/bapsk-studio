@@ -19,7 +19,6 @@ import {SaleService} from './sale.service';
 import {UnitOfMeasureType} from '../model/unit-of-measure-type.model';
 import {DateUtil} from '../util/date.util';
 import {CacheService} from './cache.service';
-import {InstanceService} from './instance.service';
 
 @Injectable({
   providedIn: 'root'
@@ -27,30 +26,34 @@ import {InstanceService} from './instance.service';
 export class VatReturnService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly httpClient = inject(HttpClient);
-  private readonly instanceService = inject(InstanceService);
-  private readonly saleService = inject(SaleService);
   private readonly userService = inject(UserService);
-
   private readonly cacheBySaleIdService = new CacheService<number, VatReturnDeclaration | null>();
   private readonly cacheByCodeService = new CacheService<string, VatReturnDeclarationWithSale | null>();
-  private readonly instanceId = this.instanceService.getActiveInstanceId();
+  private _saleService?: SaleService;
 
-  cancel(saleId: number): Observable<void> {
+  private get saleService(): SaleService {
+    if (!this._saleService) {
+      this._saleService = inject(SaleService);
+    }
+    return this._saleService;
+  }
+
+  cancel(instanceId: number, saleId: number): Observable<void> {
     return this.httpClient
-      .post<void>(this.apiRouter.vatReturn.cancel(this.instanceId()!, saleId), {})
+      .post<void>(this.apiRouter.vatReturn.cancel(instanceId, saleId), {})
       .pipe(
         tap(() => {
           this.cacheBySaleIdService.invalidate(saleId);
 
           this
-            .getBySaleId(saleId)
+            .getBySaleId(instanceId, saleId)
             .pipe((first()))
             .subscribe();
         })
       );
   }
 
-  getBySaleId(saleId: number): Observable<VatReturnDeclaration | undefined> {
+  getBySaleId(instanceId: number, saleId: number): Observable<VatReturnDeclaration | undefined> {
     if (this.cacheBySaleIdService.has(saleId)) {
       return this.cacheBySaleIdService
         .get(saleId)
@@ -60,7 +63,7 @@ export class VatReturnService {
     }
 
     return this.httpClient
-      .get<VatReturnDeclaration | null>(this.apiRouter.vatReturn.getBySaleId(this.instanceId()!, saleId))
+      .get<VatReturnDeclaration | null>(this.apiRouter.vatReturn.getBySaleId(instanceId, saleId))
       .pipe(
         map(declaration => declaration ? this.updateProperties(declaration) : undefined),
         tap(declaration => {
@@ -79,9 +82,9 @@ export class VatReturnService {
       );
   }
 
-  getWithDeclarerBySaleId(saleId: number): Observable<VatReturnDeclarationWithDeclarer | undefined> {
+  getWithDeclarerBySaleId(instanceId: number, saleId: number): Observable<VatReturnDeclarationWithDeclarer | undefined> {
     return this
-      .getBySaleId(saleId)
+      .getBySaleId(instanceId, saleId)
       .pipe(
         switchMap(declaration => {
           if (!declaration?.declaredById) {
@@ -137,19 +140,19 @@ export class VatReturnService {
 
   submit(request: VatReturnDeclarationSubmitRequest): Observable<VatReturnDeclaration> {
     return this.httpClient
-      .post<VatReturnDeclaration>(this.apiRouter.vatReturn.submit(this.instanceId()!), request)
+      .post<VatReturnDeclaration>(this.apiRouter.vatReturn.submit(request.instanceId), request)
       .pipe(
         map(declaration => this.updateProperties(declaration)),
         tap(declaration => {
           this.cacheBySaleIdService.invalidate(declaration.saleId);
-          this.cacheBySaleIdService.set(declaration);
+          this.cacheBySaleIdService.setToKey(declaration.saleId, declaration);
         }),
         catchError(response => {
           if (containsFailureCode(response, FailureCode.VatReturnDeclarationSubmitRejectedButUpdated)) {
             this.cacheBySaleIdService.invalidate(request.sale.id);
 
             this
-              .getBySaleId(request.sale.id)
+              .getBySaleId(request.instanceId, request.sale.id)
               .pipe(first())
               .subscribe();
           }
@@ -159,30 +162,30 @@ export class VatReturnService {
       );
   }
 
-  submitPayments(saleId: number, payments: VatReturnDeclarationPaymentInfo[]): Observable<void> {
+  submitPayments(instanceId: number, saleId: number, payments: VatReturnDeclarationPaymentInfo[]): Observable<void> {
     return this.httpClient
-      .post<void>(this.apiRouter.vatReturn.payment(this.instanceId()!, saleId), payments)
+      .post<void>(this.apiRouter.vatReturn.payment(instanceId, saleId), payments)
       .pipe(
         tap(() => {
           this.cacheBySaleIdService.invalidate(saleId);
 
           this
-            .getBySaleId(saleId)
+            .getBySaleId(instanceId, saleId)
             .pipe(first())
             .subscribe();
         })
       );
   }
 
-  update(saleId: number): Observable<void> {
+  update(instanceId: number, saleId: number): Observable<void> {
     return this.httpClient
-      .post<void>(this.apiRouter.vatReturn.update(this.instanceId()!, saleId), {})
+      .post<void>(this.apiRouter.vatReturn.update(instanceId, saleId), {})
       .pipe(
         tap(() => {
             this.cacheBySaleIdService.invalidate(saleId);
 
             this
-              .getBySaleId(saleId)
+              .getBySaleId(instanceId, saleId)
               .pipe(first())
               .subscribe();
           }

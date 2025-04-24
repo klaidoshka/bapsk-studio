@@ -17,7 +17,6 @@ export class ReportService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly httpClient = inject(HttpClient);
   private readonly instanceService = inject(InstanceService);
-
   private readonly instanceId = this.instanceService.getActiveInstanceId();
 
   private adjustRequestDateToISO<T extends GenerateDataEntriesReportRequest | GenerateSalesReportsRequest>(request: T): T {

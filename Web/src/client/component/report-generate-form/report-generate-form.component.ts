@@ -58,7 +58,7 @@ export class ReportGenerateFormComponent {
     }),
     loader: ({ request }) => request.instanceId
       ? this.customerService
-        .getByInstanceId(request.instanceId)
+        .getAllByInstanceId(request.instanceId)
         .pipe(
           map(customers => customers.map(customer => ({
             id: customer.id,
@@ -94,7 +94,7 @@ export class ReportGenerateFormComponent {
     }),
     loader: ({ request }) => request.instanceId
       ? this.salesmanService
-        .getByInstanceId(request.instanceId)
+        .getAllByInstanceId(request.instanceId)
         .pipe(
           map(salesmen => salesmen.map(salesman => ({
             id: salesman.id,

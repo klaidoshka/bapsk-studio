@@ -9,6 +9,7 @@ public class Sale
     public Customer.Customer Customer { get; set; } = new();
     public DateTime Date { get; set; } = DateTime.UtcNow;
     public int? Id { get; set; }
+    public int? InstanceId { get; set; }
     public string? InvoiceNo { get; set; }
     public Salesman.Salesman Salesman { get; set; } = new();
     public IList<SoldGood> SoldGoods { get; set; } = new List<SoldGood>();
@@ -30,6 +31,7 @@ public static class SaleExtensions
             Customer = sale.Customer.ToDto(),
             Date = sale.Date,
             Id = sale.Id,
+            InstanceId = sale.InstanceId,
             InvoiceNo = sale.InvoiceNo,
             Salesman = sale.Salesman.ToDto(),
             SoldGoods = sale.SoldGoods

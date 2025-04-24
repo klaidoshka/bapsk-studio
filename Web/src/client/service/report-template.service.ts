@@ -21,7 +21,6 @@ export class ReportTemplateService {
   private readonly httpClient = inject(HttpClient);
   private readonly instanceService = inject(InstanceService);
   private readonly userService = inject(UserService);
-
   private readonly cacheService = new CacheService<number, ReportTemplate>(template => template.id);
   private readonly instancesFetched = new Set<number>();
   private readonly instanceId = this.instanceService.getActiveInstanceId();

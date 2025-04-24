@@ -15,7 +15,6 @@ import {CacheService} from './cache.service';
 export class CustomerService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly httpClient = inject(HttpClient);
-
   private readonly cacheService = new CacheService<number, Customer>(c => c.id!);
   private readonly instancesFetched = new Set<number>();
 
@@ -75,7 +74,7 @@ export class CustomerService {
     }
 
     return this.httpClient
-      .get<Customer>(this.apiRouter.customer.getById(instanceId!, id))
+      .get<Customer>(this.apiRouter.customer.getById(instanceId, id))
       .pipe(
         map(customer => this.updateProperties(customer)),
         tap(customer => this.cacheService.set(customer)),
@@ -83,7 +82,7 @@ export class CustomerService {
       );
   }
 
-  getByInstanceId(instanceId: number): Observable<Customer[]> {
+  getAllByInstanceId(instanceId: number): Observable<Customer[]> {
     if (this.instancesFetched.has(instanceId)) {
       return this.cacheService.getAllWhere(customer => customer.instanceId === instanceId);
     }

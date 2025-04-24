@@ -27,7 +27,6 @@ export class DataEntryService {
   private readonly httpClient = inject(HttpClient);
   private readonly instanceService = inject(InstanceService);
   private readonly userService = inject(UserService);
-
   private readonly cacheService = new CacheService<number, DataEntryJoined>(dataEntry => dataEntry.id);
   private readonly dataTypesFetched = new Set<number>();
   private readonly instanceId = this.instanceService.getActiveInstanceId();

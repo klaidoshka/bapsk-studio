@@ -233,7 +233,7 @@
           <vat-return-payment-table [payments]="declaration.value()!.payments"/>
         </div>
       } @else if (!declaration.value()!.isCancelled) {
-        <vat-return-declaration-payment [saleId]="sale()!.id"/>
+        <vat-return-declaration-payment [instanceId]="instanceId()" [saleId]="sale()!.id"/>
       } @else {
         <p>Because this declaration is cancelled, the payment fact cannot be submitted.</p>
       }

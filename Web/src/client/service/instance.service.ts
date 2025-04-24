@@ -16,8 +16,7 @@ export class InstanceService {
   private readonly authService = inject(AuthService);
   private readonly httpClient = inject(HttpClient);
   private readonly userService = inject(UserService);
-
-  private readonly cacheService = new CacheService<number, Instance>(i => i.id!);
+  private readonly cacheService = new CacheService<number, Instance>(instance => instance.id!);
   private readonly instancesFetched = signal<boolean>(false);
   private readonly activeInstance = signal<Instance | undefined>(undefined);
 

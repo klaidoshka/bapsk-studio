@@ -16,7 +16,6 @@ export class DataTypeService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly httpClient = inject(HttpClient);
   private readonly instanceService = inject(InstanceService);
-
   private readonly cacheService = new CacheService<number, DataType>(it => it.id!);
   private readonly instancesFetched = new Set<number>();
   private readonly instanceId = this.instanceService.getActiveInstanceId();
