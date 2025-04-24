@@ -6,7 +6,7 @@ export default interface Instance {
   description: string | null;
   id?: number;
   name: string;
-  userMetas: InstanceUserMeta[];
+  users: InstanceUser[];
 }
 
 export interface InstanceWithUsers {
@@ -15,32 +15,34 @@ export interface InstanceWithUsers {
   description: string | null;
   id?: number;
   name: string;
-  userMetas: InstanceUserMetaWithUser[];
+  users: InstanceUserWithUser[];
 }
 
-export interface InstanceUserMeta {
+export interface InstanceUser {
   id: number;
   instanceId: number;
+  permissions: string[];
   userId: number;
 }
 
-export interface InstanceUserMetaCreateEdit {
+export interface InstanceUserCreateEdit {
   userId: number;
+  permissions: string[];
 }
 
-export interface InstanceUserMetaWithUser extends InstanceUserMeta {
+export interface InstanceUserWithUser extends InstanceUser {
   user: User;
 }
 
 export interface InstanceCreateRequest {
   description: string | null;
   name: string;
-  userMetas: InstanceUserMetaCreateEdit[];
+  users: InstanceUserCreateEdit[];
 }
 
 export interface InstanceEditRequest {
   description: string | null;
   instanceId: number;
   name: string;
-  userMetas: InstanceUserMetaCreateEdit[];
+  users: InstanceUserCreateEdit[];
 }

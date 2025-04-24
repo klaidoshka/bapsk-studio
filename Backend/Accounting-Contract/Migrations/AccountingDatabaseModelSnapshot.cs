@@ -339,7 +339,7 @@ namespace Accounting.Contract.Migrations
                     b.ToTable("Instances");
                 });
 
-            modelBuilder.Entity("Accounting.Contract.Entity.InstanceUserMeta", b =>
+            modelBuilder.Entity("Accounting.Contract.Entity.InstanceUser", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -359,7 +359,20 @@ namespace Accounting.Contract.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("InstanceUserMetas");
+                    b.ToTable("InstanceUsers");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.InstanceUserPermission", b =>
+                {
+                    b.Property<int>("InstanceUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Permission")
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("InstanceUserId", "Permission");
+
+                    b.ToTable("InstanceUserPermissions");
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.ReportTemplate", b =>
@@ -951,16 +964,16 @@ namespace Accounting.Contract.Migrations
                     b.Navigation("CreatedBy");
                 });
 
-            modelBuilder.Entity("Accounting.Contract.Entity.InstanceUserMeta", b =>
+            modelBuilder.Entity("Accounting.Contract.Entity.InstanceUser", b =>
                 {
                     b.HasOne("Accounting.Contract.Entity.Instance", "Instance")
-                        .WithMany("UserMetas")
+                        .WithMany("Users")
                         .HasForeignKey("InstanceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Accounting.Contract.Entity.User", "User")
-                        .WithMany("InstanceUserMetas")
+                        .WithMany("InstanceUsers")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -968,6 +981,17 @@ namespace Accounting.Contract.Migrations
                     b.Navigation("Instance");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.InstanceUserPermission", b =>
+                {
+                    b.HasOne("Accounting.Contract.Entity.InstanceUser", "InstanceUser")
+                        .WithMany("Permissions")
+                        .HasForeignKey("InstanceUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("InstanceUser");
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.ReportTemplate", b =>
@@ -1156,7 +1180,12 @@ namespace Accounting.Contract.Migrations
 
             modelBuilder.Entity("Accounting.Contract.Entity.Instance", b =>
                 {
-                    b.Navigation("UserMetas");
+                    b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("Accounting.Contract.Entity.InstanceUser", b =>
+                {
+                    b.Navigation("Permissions");
                 });
 
             modelBuilder.Entity("Accounting.Contract.Entity.Sale", b =>
@@ -1187,7 +1216,7 @@ namespace Accounting.Contract.Migrations
 
             modelBuilder.Entity("Accounting.Contract.Entity.User", b =>
                 {
-                    b.Navigation("InstanceUserMetas");
+                    b.Navigation("InstanceUsers");
 
                     b.Navigation("InstancesCreated");
 

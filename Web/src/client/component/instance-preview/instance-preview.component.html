@@ -19,17 +19,17 @@
   <p>{{ instance()!.createdAt | date:'mediumDate' }}</p>
 
   <h1 class="mt-4 font-bold">Users</h1>
-  <p-table [value]="instance()!.userMetas">
+  <p-table [value]="instance()!.users">
     <ng-template #header>
       <tr>
         <th>Name</th>
         <th>Email</th>
       </tr>
     </ng-template>
-    <ng-template #body let-userMeta>
+    <ng-template #body let-instanceUser>
       <tr>
-        <td>{{ toUserFullName(userMeta.user) }}</td>
-        <td>{{ userMeta.user.email }}</td>
+        <td>{{ toUserFullName(instanceUser.user) }}</td>
+        <td>{{ instanceUser.user.email }}</td>
       </tr>
     </ng-template>
   </p-table>

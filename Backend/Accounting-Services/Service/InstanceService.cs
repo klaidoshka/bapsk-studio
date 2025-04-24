@@ -1,10 +1,11 @@
 using Accounting.Contract;
 using Accounting.Contract.Dto.Instance;
+using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
 using Microsoft.EntityFrameworkCore;
 using Instance = Accounting.Contract.Entity.Instance;
-using InstanceUserMeta = Accounting.Contract.Entity.InstanceUserMeta;
+using InstanceUser = Accounting.Contract.Entity.InstanceUser;
 
 namespace Accounting.Services.Service;
 
@@ -34,16 +35,27 @@ public class InstanceService : IInstanceService
             Name = request.Name
         };
 
-        instance.UserMetas.Add(new InstanceUserMeta { UserId = request.RequesterId });
+        instance.Users.Add(new InstanceUser { UserId = request.RequesterId });
 
-        var userIds = request.UserMetas
+        var users = request.Users
             .Where(it => it.UserId != request.RequesterId)
-            .Select(it => it.UserId)
             .ToList();
 
-        foreach (var userId in userIds)
+        foreach (var user in users)
         {
-            instance.UserMetas.Add(new InstanceUserMeta { UserId = userId });
+            instance.Users.Add(
+                new InstanceUser
+                {
+                    Permissions = user.Permissions
+                        .Select(p => new InstanceUserPermission
+                            {
+                                Permission = p
+                            }
+                        )
+                        .ToList(),
+                    UserId = user.UserId
+                }
+            );
         }
 
         instance = (await _database.Instances.AddAsync(instance)).Entity;
@@ -69,46 +81,69 @@ public class InstanceService : IInstanceService
         (await _instanceValidator.ValidateEditRequestAsync(request)).AssertValid();
 
         var instance = await _database.Instances
-            .Include(it => it.UserMetas)
+            .Include(it => it.Users)
+            .ThenInclude(it => it.Permissions)
             .FirstAsync(it => it.Id == request.InstanceId);
 
         instance.Description = request.Description;
         instance.Name = request.Name;
 
-        var existingUserIds = instance.UserMetas
-            .Select(it => it.UserId)
-            .ToHashSet();
+        var existingUsers = instance.Users.ToDictionary(it => it.UserId);
+        var providedUsers = request.Users.ToDictionary(it => it.UserId);
 
-        var providedUserIds = request.UserMetas
-            .Select(it => it.UserId)
-            .ToHashSet();
-
-        var missingUserIds = existingUserIds
-            .Except(providedUserIds)
-            .Where(it => it != instance.CreatedById)
+        var removedUsers = existingUsers.Keys
+            .Except(providedUsers.Keys)
+            .Where(userId => userId != instance.CreatedById)
             .ToList();
 
-        foreach (var missingUserId in missingUserIds)
+        foreach (var missingUserId in removedUsers)
         {
-            instance.UserMetas
+            instance.Users
                 .Where(it => it.UserId == missingUserId)
                 .ToList()
-                .ForEach(
-                    it =>
-                    {
-                        _database.Remove(it);
-                        instance.UserMetas.Remove(it);
-                    }
-                );
+                .ForEach(it => instance.Users.Remove(it));
         }
 
-        var newUserIds = providedUserIds
-            .Except(existingUserIds)
+        var addedUsers = providedUsers
+            .Where(user => !existingUsers.ContainsKey(user.Key))
             .ToList();
 
-        foreach (var newUserId in newUserIds)
+        foreach (var user in addedUsers)
         {
-            instance.UserMetas.Add(new InstanceUserMeta { UserId = newUserId });
+            instance.Users.Add(
+                new InstanceUser
+                {
+                    Permissions = user.Value.Permissions
+                        .Select(p => new InstanceUserPermission
+                            {
+                                Permission = p
+                            }
+                        )
+                        .ToList(),
+                    UserId = user.Key
+                }
+            );
+        }
+
+        var updatedUsers = providedUsers
+            .Where(user => instance.CreatedById != user.Key && existingUsers.ContainsKey(user.Key))
+            .ToList();
+
+        foreach (var user in updatedUsers)
+        {
+            var existingUser = existingUsers[user.Key];
+
+            existingUser.Permissions.Clear();
+
+            foreach (var permission in user.Value.Permissions)
+            {
+                existingUser.Permissions.Add(
+                    new InstanceUserPermission
+                    {
+                        Permission = permission
+                    }
+                );
+            }
         }
 
         await _database.SaveChangesAsync();
@@ -119,20 +154,22 @@ public class InstanceService : IInstanceService
         (await _instanceValidator.ValidateGetRequestAsync(request)).AssertValid();
 
         return await _database.Instances
-            .Include(i => i.UserMetas)
+            .Include(i => i.Users)
+            .ThenInclude(u => u.Permissions)
             .FirstAsync(it => it.Id == request.InstanceId && !it.IsDeleted);
     }
 
     public async Task<IList<Instance>> GetAsync(InstanceGetByUserRequest request)
     {
         return await _database.Instances
-            .Include(i => i.UserMetas)
-            .ThenInclude(um => um.User)
-            .Where(
-                i => i.UserMetas.Any(
-                         um => um.UserId == request.RequesterId && !um.User.IsDeleted
-                     ) &&
-                     !i.IsDeleted
+            .Include(i => i.Users)
+            .ThenInclude(u => u.Permissions)
+            .Where(i =>
+                !i.IsDeleted &&
+                i.Users.Any(um =>
+                    um.UserId == request.RequesterId &&
+                    !um.User.IsDeleted
+                )
             )
             .ToListAsync();
     }

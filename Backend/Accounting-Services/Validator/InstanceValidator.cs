@@ -43,7 +43,7 @@ public class InstanceValidator : IInstanceValidator
             return new Validation("You already have created an instance with this name.");
         }
 
-        var userIds = request.UserMetas
+        var userIds = request.Users
             .Select(it => it.UserId)
             .ToHashSet();
 
@@ -68,24 +68,28 @@ public class InstanceValidator : IInstanceValidator
 
     public async Task<Validation> ValidateEditRequestAsync(InstanceEditRequest request)
     {
-        var instance = await _database.Instances.FindAsync(request.InstanceId);
-
-        if (instance == null || instance.IsDeleted)
-        {
-            return new Validation("Instance was not found.");
-        }
-
-        if (instance.CreatedById != request.RequesterId)
-        {
-            return new Validation("You cannot edit an instance you did not create.");
-        }
-
+        var instance = await _database.Instances
+            .Include(i => i.CreatedBy)
+            .ThenInclude(u => u.InstancesCreated)
+            .FirstAsync(i => i.Id == request.InstanceId);
+        
         if (String.IsNullOrWhiteSpace(request.Name))
         {
             return new Validation("Instance must have a name.");
         }
 
-        var users = request.UserMetas
+        if (
+            instance.CreatedBy.InstancesCreated.Any(ic => ic.Name.Equals(
+                    request.Name,
+                    StringComparison.OrdinalIgnoreCase
+                ) && ic.Id != request.InstanceId
+            )
+        )
+        {
+            return new Validation("You already have created an instance with this name.");
+        }
+
+        var users = request.Users
             .Select(it => it.UserId)
             .ToHashSet()
             .Select(async id => await _database.Users.FindAsync(id))
@@ -107,7 +111,7 @@ public class InstanceValidator : IInstanceValidator
     public async Task<Validation> ValidateGetRequestAsync(InstanceGetRequest request)
     {
         var instance = await _database.Instances
-            .Include(i => i.UserMetas)
+            .Include(i => i.Users)
             .FirstOrDefaultAsync(i => i.Id == request.InstanceId);
 
         if (instance == null || instance.IsDeleted)
@@ -115,7 +119,7 @@ public class InstanceValidator : IInstanceValidator
             return new Validation("Instance was not found.");
         }
 
-        return instance.UserMetas.All(um => um.UserId != request.RequesterId)
+        return instance.Users.All(um => um.UserId != request.RequesterId)
             ? new Validation("You do not have access to this instance.")
             : new Validation();
     }

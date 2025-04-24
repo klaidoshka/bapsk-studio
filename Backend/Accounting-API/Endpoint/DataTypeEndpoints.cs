@@ -1,7 +1,9 @@
+using Accounting.API.Configuration;
 using Accounting.API.Util;
 using Accounting.Contract.Dto.DataType;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
+using DataType = Accounting.Contract.Entity.DataType;
 
 namespace Accounting.API.Endpoint;
 
@@ -9,11 +11,28 @@ public static class DataTypeEndpoints
 {
     public static void MapDataTypeEndpoints(this RouteGroupBuilder builder)
     {
-        builder.MapPost(String.Empty, Create);
-        builder.MapDelete("/{id:int}", Delete);
-        builder.MapPut("/{id:int}", Edit);
-        builder.MapGet("/{id:int}", GetById);
-        builder.MapGet(String.Empty, GetByInstance);
+        builder
+            .MapPost(String.Empty, Create)
+            .RequireInstancePermission(InstancePermission.DataType.Create);
+
+        builder
+            .MapDelete("/{id:int}", Delete)
+            .RequireInstancePermission(InstancePermission.DataType.Delete)
+            .RequireInstanceOwnsEntity<DataType>();
+
+        builder
+            .MapPut("/{id:int}", Edit)
+            .RequireInstancePermission(InstancePermission.DataType.Edit)
+            .RequireInstanceOwnsEntity<DataType>();
+
+        builder
+            .MapGet("/{id:int}", GetById)
+            .RequireInstancePermission(InstancePermission.DataType.Preview)
+            .RequireInstanceOwnsEntity<DataType>();
+
+        builder
+            .MapGet(String.Empty, GetByInstance)
+            .RequireInstancePermission(InstancePermission.DataType.Preview);
     }
 
     private static async Task<IResult> Create(
@@ -22,7 +41,7 @@ public static class DataTypeEndpoints
         HttpContext httpContext
     )
     {
-        request.RequesterId = httpContext.GetUserIdOrThrow();
+        request.RequesterId = httpContext.GetUserId();
 
         return Results.Json((await dataTypeService.CreateAsync(request)).ToDto());
     }
@@ -37,7 +56,7 @@ public static class DataTypeEndpoints
             new DataTypeDeleteRequest
             {
                 DataTypeId = id,
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         );
 
@@ -52,7 +71,7 @@ public static class DataTypeEndpoints
     )
     {
         request.DataTypeId = id;
-        request.RequesterId = httpContext.GetUserIdOrThrow();
+        request.RequesterId = httpContext.GetUserId();
         await dataTypeService.EditAsync(request);
 
         return Results.Ok();
@@ -67,7 +86,7 @@ public static class DataTypeEndpoints
             new DataTypeGetRequest
             {
                 DataTypeId = id,
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         )).ToDto()
     );
@@ -81,7 +100,7 @@ public static class DataTypeEndpoints
             new DataTypeGetByInstanceRequest
             {
                 InstanceId = instanceId,
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         ))
         .Select(i => i.ToDto())

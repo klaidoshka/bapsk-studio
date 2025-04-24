@@ -126,8 +126,6 @@ public class DataEntryService : IDataEntryService
 
     public async Task DeleteAsync(DataEntryDeleteRequest request)
     {
-        (await _dataEntryValidator.ValidateDataEntryDeleteRequestAsync(request)).AssertValid();
-
         var entry = await _database.DataEntries.FirstAsync(de => de.Id == request.DataEntryId);
 
         entry.IsDeleted = true;
@@ -173,8 +171,6 @@ public class DataEntryService : IDataEntryService
 
     public async Task<DataEntry> GetAsync(DataEntryGetRequest request)
     {
-        (await _dataEntryValidator.ValidateDataEntryGetRequestAsync(request)).AssertValid();
-
         return await _database.DataEntries
             .Include(de => de.Fields)
             .Include(de => de.DataType)
@@ -187,9 +183,6 @@ public class DataEntryService : IDataEntryService
         DataEntryGetByDataTypeRequest request
     )
     {
-        (await _dataEntryValidator.ValidateDataEntryGetByDataTypeRequestAsync(request))
-            .AssertValid();
-
         var candidates = await _database.DataEntries
             .Include(de => de.Fields)
             .Include(de => de.DataType)
@@ -247,7 +240,7 @@ public class DataEntryService : IDataEntryService
 
         var instanceId = configuration?.DataType?.InstanceId;
 
-        var user = await _database.InstanceUserMetas.FirstOrDefaultAsync(
+        var user = await _database.InstanceUsers.FirstOrDefaultAsync(
             it => it.UserId == request.RequesterId && it.InstanceId == instanceId
         );
 

@@ -15,7 +15,8 @@ public class AccountingDatabase : DbContext
     public DbSet<ImportConfiguration> ImportConfigurations { get; set; }
     public DbSet<ImportConfigurationField> ImportConfigurationFields { get; set; }
     public DbSet<Instance> Instances { get; set; }
-    public DbSet<InstanceUserMeta> InstanceUserMetas { get; set; }
+    public DbSet<InstanceUser> InstanceUsers { get; set; }
+    public DbSet<InstanceUserPermission> InstanceUserPermissions { get; set; }
     public DbSet<ReportTemplate> ReportTemplates { get; set; }
     public DbSet<Sale> Sales { get; set; }
     public DbSet<Salesman> Salesmen { get; set; }
@@ -46,7 +47,11 @@ public class AccountingDatabase : DbContext
             .HasOne(it => it.Reference)
             .WithMany()
             .HasForeignKey(it => it.ReferenceId);
-        
+
+        modelBuilder
+            .Entity<InstanceUserPermission>()
+            .HasKey(p => new { p.InstanceUserId, p.Permission });
+
         modelBuilder
             .Entity<ReportTemplate>()
             .HasMany(it => it.Fields)

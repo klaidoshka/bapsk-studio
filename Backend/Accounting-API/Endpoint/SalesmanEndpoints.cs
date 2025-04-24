@@ -1,8 +1,9 @@
-using Accounting.API.AuthorizationHandler.Requirement;
+using Accounting.API.Configuration;
 using Accounting.API.Util;
 using Accounting.Contract.Dto.Salesman;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
+using Salesman = Accounting.Contract.Entity.Salesman;
 
 namespace Accounting.API.Endpoint;
 
@@ -12,23 +13,26 @@ public static class SalesmanEndpoints
     {
         builder
             .MapPost(String.Empty, Create)
-            .RequireAuthorization(it => it.AddRequirements(new SalesmanRequirement(SalesmanRequirement.CrudOperation.Create)));
+            .RequireInstancePermission(InstancePermission.Customer.Create);
 
         builder
             .MapDelete("{id:int}", Delete)
-            .RequireAuthorization(it => it.AddRequirements(new SalesmanRequirement(SalesmanRequirement.CrudOperation.Delete)));
+            .RequireInstancePermission(InstancePermission.Customer.Delete)
+            .RequireInstanceOwnsEntity<Salesman>();
 
         builder
             .MapPut("{id:int}", Edit)
-            .RequireAuthorization(o => o.AddRequirements(new SalesmanRequirement(SalesmanRequirement.CrudOperation.Edit)));
-
-        builder
-            .MapGet(String.Empty, GetByInstanceId)
-            .RequireAuthorization(o => o.AddRequirements(new SalesmanRequirement(SalesmanRequirement.CrudOperation.Get)));
+            .RequireInstancePermission(InstancePermission.Customer.Edit)
+            .RequireInstanceOwnsEntity<Salesman>();
 
         builder
             .MapGet("{id:int}", GetById)
-            .RequireAuthorization(o => o.AddRequirements(new SalesmanRequirement(SalesmanRequirement.CrudOperation.GetById)));
+            .RequireInstancePermission(InstancePermission.Customer.Preview)
+            .RequireInstanceOwnsEntity<Salesman>();
+        
+        builder
+            .MapGet(String.Empty, GetByInstanceId)
+            .RequireInstancePermission(InstancePermission.Customer.Preview);
     }
 
     private static async Task<IResult> Create(
@@ -58,6 +62,11 @@ public static class SalesmanEndpoints
         return Results.Ok();
     }
 
+    private static async Task<IResult> GetById(
+        int id,
+        ISalesmanService salesmanService
+    ) => Results.Json((await salesmanService.GetByIdAsync(id)).ToDto());
+
     private static async Task<IResult> GetByInstanceId(
         int instanceId,
         HttpContext httpContext,
@@ -67,15 +76,10 @@ public static class SalesmanEndpoints
             new SalesmanGetRequest
             {
                 InstanceId = instanceId,
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         ))
         .Select(it => it.ToDto())
         .ToList()
     );
-
-    private static async Task<IResult> GetById(
-        int id,
-        ISalesmanService salesmanService
-    ) => Results.Json((await salesmanService.GetByIdAsync(id)).ToDto());
 }

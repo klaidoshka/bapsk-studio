@@ -6,6 +6,7 @@ import {User} from "../model/user.model";
 import {ApiRouter} from "./api-router.service";
 import {UserService} from './user.service';
 import {Router} from "@angular/router";
+import {LocalStorageKeys} from '../constant/local-storage.keys';
 
 @Injectable({
   providedIn: "root"
@@ -15,9 +16,6 @@ export class AuthService {
   private readonly httpClient = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly userService = inject(UserService);
-
-  private readonly accessKey: string = "__accounting_access__";
-  private readonly userKey: string = "__accounting_user__";
 
   private readonly access = signal<AuthResponse | null>(this.getAccess());
   private readonly user = this.toUser();
@@ -42,8 +40,32 @@ export class AuthService {
     });
   }
 
+  private toUser(): Signal<User | undefined> {
+    return computed(() => {
+      const userId = this.access()?.userId;
+
+      if (userId == null) {
+        const value = localStorage.getItem(LocalStorageKeys.userKey);
+
+        return value !== null ? this.userService.updateProperties(JSON.parse(value)) : undefined;
+      }
+
+      const user = this.userService.getByIdAsSignal(userId)();
+
+      if (user == null) {
+        const value = localStorage.getItem(LocalStorageKeys.userKey);
+
+        return value !== null ? this.userService.updateProperties(JSON.parse(value)) : undefined;
+      }
+
+      localStorage.setItem(LocalStorageKeys.userKey, JSON.stringify(user));
+
+      return user;
+    })
+  }
+
   acceptAuthResponse(response: AuthResponse) {
-    localStorage.setItem(this.accessKey, JSON.stringify(response));
+    localStorage.setItem(LocalStorageKeys.accessKey, JSON.stringify(response));
 
     this.access.set(response);
   }
@@ -53,8 +75,8 @@ export class AuthService {
   }
 
   cleanupCredentials() {
-    localStorage.removeItem(this.accessKey);
-    localStorage.removeItem(this.userKey);
+    localStorage.removeItem(LocalStorageKeys.accessKey);
+    localStorage.removeItem(LocalStorageKeys.userKey);
 
     if (this.access() != null) {
       this.access.set(null);
@@ -62,7 +84,7 @@ export class AuthService {
   }
 
   private getAccess(): AuthResponse | null {
-    const access = localStorage.getItem(this.accessKey);
+    const access = localStorage.getItem(LocalStorageKeys.accessKey);
 
     return access !== null ? JSON.parse(access) : null;
   }
@@ -118,29 +140,5 @@ export class AuthService {
 
   resetPassword(email: string): Observable<void> {
     return this.httpClient.post<void>(this.apiRouter.auth.resetPassword(), { email });
-  }
-
-  private toUser(): Signal<User | undefined> {
-    return computed(() => {
-      const userId = this.access()?.userId;
-
-      if (userId == null) {
-        const value = localStorage.getItem(this.userKey);
-
-        return value !== null ? this.userService.updateProperties(JSON.parse(value)) : undefined;
-      }
-
-      const user = this.userService.getByIdAsSignal(userId)();
-
-      if (user == null) {
-        const value = localStorage.getItem(this.userKey);
-
-        return value !== null ? this.userService.updateProperties(JSON.parse(value)) : undefined;
-      }
-
-      localStorage.setItem(this.userKey, JSON.stringify(user));
-
-      return user;
-    })
   }
 }

@@ -1,7 +1,8 @@
-using Accounting.API.AuthorizationHandler.Requirement;
+using Accounting.API.Configuration;
 using Accounting.API.Util;
 using Accounting.Contract.Dto.Sti.VatReturn;
 using Accounting.Contract.Dto.Sti.VatReturn.Payment;
+using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,37 +14,28 @@ public static class VatReturnEndpoints
     {
         builder
             .MapPost(String.Empty, Submit)
-            .RequireAuthorization(it => it.AddRequirements(new VatReturnRequirement(VatReturnRequirement.CrudOperation.Create)));
+            .RequireInstancePermission(InstancePermission.VatReturn.Create)
+            .RequireInstanceOwnsEntity<Sale>("saleId");
 
         builder
             .MapPost("/{saleId:int}/cancel", Cancel)
-            .RequireAuthorization(it => it.AddRequirements(new VatReturnRequirement(VatReturnRequirement.CrudOperation.Cancel)));
+            .RequireInstancePermission(InstancePermission.VatReturn.Cancel)
+            .RequireInstanceOwnsEntity<Sale>("saleId");
 
         builder
             .MapPost("/{saleId:int}/update", UpdateInfoBySaleId)
-            .RequireAuthorization(o =>
-                o.AddRequirements(new VatReturnRequirement(VatReturnRequirement.CrudOperation.UpdateInfo))
-            );
+            .RequireInstancePermission(InstancePermission.VatReturn.Preview)
+            .RequireInstanceOwnsEntity<Sale>("saleId");
 
         builder
             .MapPost("/{saleId:int}/payment", SubmitPaymentInfo)
-            .RequireAuthorization(o =>
-                o.AddRequirements(new VatReturnRequirement(VatReturnRequirement.CrudOperation.SubmitPayment))
-            );
+            .RequireInstancePermission(InstancePermission.VatReturn.SubmitPayment)
+            .RequireInstanceOwnsEntity<Sale>("saleId");
 
         builder
             .MapGet("{saleId:int}", GetBySaleId)
-            .RequireAuthorization(o =>
-                o.AddRequirements(new VatReturnRequirement(VatReturnRequirement.CrudOperation.GetBySaleId))
-            );
-
-        builder
-            .MapGet(String.Empty, GetByPreviewCode)
-            .AllowAnonymous();
-
-        builder
-            .MapPost("/update", UpdateInfoByPreviewCode)
-            .AllowAnonymous();
+            .RequireInstancePermission(InstancePermission.VatReturn.Preview)
+            .RequireInstanceOwnsEntity<Sale>("saleId");
     }
 
     private static async Task<IResult> Submit(
@@ -52,7 +44,7 @@ public static class VatReturnEndpoints
         IVatReturnService vatReturnService
     )
     {
-        request.RequesterId = httpContext.GetUserIdOrThrow();
+        request.RequesterId = httpContext.GetUserId();
 
         return Results.Json((await vatReturnService.SubmitAsync(request)).ToDto());
     }
@@ -92,19 +84,4 @@ public static class VatReturnEndpoints
         int saleId,
         IVatReturnService vatReturnService
     ) => Results.Json((await vatReturnService.GetBySaleIdAsync(saleId))?.ToDto());
-
-    private static async Task<IResult> GetByPreviewCode(
-        string code,
-        IVatReturnService vatReturnService
-    ) => Results.Json((await vatReturnService.GetByPreviewCodeAsync(code))?.ToDtoWithSale());
-
-    private static async Task<IResult> UpdateInfoByPreviewCode(
-        string code,
-        IVatReturnService vatReturnService
-    )
-    {
-        await vatReturnService.UpdateInfoAsync(new StiVatReturnDeclarationUpdateInfoRequest { PreviewCode = code });
-
-        return Results.Ok();
-    }
 }

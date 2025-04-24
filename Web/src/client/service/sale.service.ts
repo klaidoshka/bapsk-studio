@@ -8,6 +8,7 @@ import {SalesmanService} from './salesman.service';
 import {EnumUtil} from '../util/enum.util';
 import {UnitOfMeasureType} from '../model/unit-of-measure-type.model';
 import {DateUtil} from '../util/date.util';
+import {InstanceService} from './instance.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,10 @@ export class SaleService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly customerService = inject(CustomerService);
   private readonly httpClient = inject(HttpClient);
+  private readonly instanceService = inject(InstanceService);
   private readonly salesmanService = inject(SalesmanService);
+
+  private readonly instanceId = this.instanceService.getActiveInstanceId();
 
   // Key: InstanceId
   private readonly store = new Map<number, WritableSignal<Sale[]>>();
@@ -38,7 +42,7 @@ export class SaleService {
   }
 
   create(request: SaleCreateRequest) {
-    return this.httpClient.post<Sale>(this.apiRouter.sale.create(), {
+    return this.httpClient.post<Sale>(this.apiRouter.sale.create(this.instanceId()!), {
       ...request,
       sale: {
         ...request.sale,
@@ -50,7 +54,7 @@ export class SaleService {
   }
 
   delete(instanceId: number, id: number) {
-    return this.httpClient.delete<void>(this.apiRouter.sale.delete(id)).pipe(
+    return this.httpClient.delete<void>(this.apiRouter.sale.delete(this.instanceId()!, id)).pipe(
       tap(() => {
         const existingSignal = this.store.get(instanceId);
 
@@ -64,7 +68,7 @@ export class SaleService {
   }
 
   edit(request: SaleEditRequest) {
-    return this.httpClient.put<void>(this.apiRouter.sale.edit(request.sale.id!), {
+    return this.httpClient.put<void>(this.apiRouter.sale.edit(this.instanceId()!, request.sale.id!), {
       ...request,
       sale: {
         ...request.sale,
@@ -90,7 +94,7 @@ export class SaleService {
   }
 
   getById(instanceId: number, id: number) {
-    return this.httpClient.get<Sale>(this.apiRouter.sale.getById(id)).pipe(
+    return this.httpClient.get<Sale>(this.apiRouter.sale.getById(this.instanceId()!, id)).pipe(
       tap(sale => this.updateSingleInStore(instanceId, this.updateProperties(sale)))
     );
   }

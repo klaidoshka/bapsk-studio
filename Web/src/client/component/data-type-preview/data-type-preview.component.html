@@ -39,14 +39,10 @@
         <td><p [ngClass]="{'mt-7': isReferenceField}">{{ field.name }}</p></td>
         <td><p [ngClass]="{'mt-7': isReferenceField}">{{ toFieldTypeLabel(field.type) }}</p></td>
         <td>
-          <p
-            [ngClass]="{
-            'mt-7': isReferenceField,
-            'text-green-500': field.isRequired,
-            'text-red-500': !field.isRequired}"
-          >
-            {{ field.isRequired ? 'Yes' : 'No' }}
-          </p>
+          <p-badge
+            [value]="field.isRequired ? 'Required' : 'Optional'"
+            severity="secondary"
+          />
         </td>
         <td>
           @if (isReferenceField) {

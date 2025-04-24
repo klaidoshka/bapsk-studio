@@ -73,8 +73,6 @@ public class DataTypeService : IDataTypeService
 
     public async Task DeleteAsync(DataTypeDeleteRequest request)
     {
-        (await _dataTypeValidator.ValidateDataTypeDeleteRequestAsync(request)).AssertValid();
-
         var dataType = await _database.DataTypes
             .Include(dt => dt.Fields)
             .Include(dt => dt.Instance)
@@ -170,8 +168,6 @@ public class DataTypeService : IDataTypeService
 
     public async Task<DataType> GetAsync(DataTypeGetRequest request)
     {
-        (await _dataTypeValidator.ValidateDataTypeGetRequestAsync(request)).AssertValid();
-
         return await _database.DataTypes
             .Include(dt => dt.Fields)
             .FirstAsync(dt => dt.Id == request.DataTypeId);
@@ -181,8 +177,6 @@ public class DataTypeService : IDataTypeService
         DataTypeGetByInstanceRequest request
     )
     {
-        (await _dataTypeValidator.ValidateDataTypeGetByInstanceRequestAsync(request)).AssertValid();
-
         return await _database.DataTypes
             .Include(dt => dt.Fields)
             .Where(dt => dt.InstanceId == request.InstanceId && !dt.IsDeleted)

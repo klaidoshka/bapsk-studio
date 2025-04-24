@@ -10,6 +10,7 @@ import ReportTemplate, {
 } from '../model/report-template.model';
 import {first, map, Observable, switchMap, tap} from 'rxjs';
 import {CacheService} from './cache.service';
+import {InstanceService} from './instance.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,15 +19,17 @@ export class ReportTemplateService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly templateService = inject(DataTypeService);
   private readonly httpClient = inject(HttpClient);
+  private readonly instanceService = inject(InstanceService);
   private readonly userService = inject(UserService);
 
   private readonly cacheService = new CacheService<number, ReportTemplate>(template => template.id);
   private readonly instancesFetched = new Set<number>();
+  private readonly instanceId = this.instanceService.getActiveInstanceId();
   private readonly templateInstanceId = new Map<number, number>();
 
   create(request: ReportTemplateCreateRequest): Observable<ReportTemplate> {
     return this.httpClient
-      .post<ReportTemplate>(this.apiRouter.reportTemplate.create(), request)
+      .post<ReportTemplate>(this.apiRouter.reportTemplate.create(this.instanceId()!), request)
       .pipe(
         map(template => this.updateProperties(template)),
         tap(template => {
@@ -39,7 +42,7 @@ export class ReportTemplateService {
 
   delete(id: number): Observable<void> {
     return this.httpClient
-      .delete<void>(this.apiRouter.reportTemplate.delete(id))
+      .delete<void>(this.apiRouter.reportTemplate.delete(this.instanceId()!, id))
       .pipe(
         tap(() => this.cacheService.delete(id))
       );
@@ -47,7 +50,7 @@ export class ReportTemplateService {
 
   edit(request: ReportTemplateEditRequest): Observable<void> {
     return this.httpClient
-      .put<void>(this.apiRouter.reportTemplate.edit(request.reportTemplate.id), request)
+      .put<void>(this.apiRouter.reportTemplate.edit(this.instanceId()!, request.reportTemplate.id), request)
       .pipe(
         tap(() => {
             this.cacheService.invalidate(request.reportTemplate.id);
@@ -67,7 +70,7 @@ export class ReportTemplateService {
     }
 
     return this.httpClient
-      .get<ReportTemplate>(this.apiRouter.reportTemplate.getById(id))
+      .get<ReportTemplate>(this.apiRouter.reportTemplate.getById(this.instanceId()!, id))
       .pipe(
         map(template => this.updateProperties(template)),
         tap(template => this.cacheService.set(template)),

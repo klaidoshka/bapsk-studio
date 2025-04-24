@@ -83,12 +83,12 @@ public class UserService : IUserService
                 .ToListAsync();
         }
         
-        return await _database.InstanceUserMetas
+        return await _database.InstanceUsers
             .Include(u => u.Instance)
-            .ThenInclude(u => u.UserMetas)
+            .ThenInclude(u => u.Users)
             .ThenInclude(u => u.User)
             .Where(u => u.UserId == requester.Id)
-            .SelectMany(u => u.Instance.UserMetas)
+            .SelectMany(u => u.Instance.Users)
             .Select(u => u.User)
             .Where(u => u.IsDeleted == false && (request.Email == null || u.Email == request.Email))
             .ToListAsync();

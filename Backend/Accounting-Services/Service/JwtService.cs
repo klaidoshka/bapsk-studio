@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Accounting.Contract;
 using Accounting.Contract.Configuration;
+using Accounting.Contract.Dto;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Microsoft.EntityFrameworkCore;
@@ -69,7 +70,7 @@ public class JwtService : IJwtService
     {
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(Claims.UserId, user.Id.ToString()),
             new(Claims.SessionId, sessionId.ToString())
         };
 
@@ -77,11 +78,11 @@ public class JwtService : IJwtService
         {
             Role.Admin => Roles.Admin,
             Role.User => Roles.User,
-            _ => throw new ArgumentOutOfRangeException()
+            _ => throw new ValidationException("Invalid user role.")
         };
-        
-        claims.Add(new Claim(ClaimTypes.Role, role));
-        
+
+        claims.Add(new Claim(Claims.Role, role));
+
         return claims;
     }
 

@@ -6,7 +6,7 @@ import {providePrimeNG} from "primeng/config";
 import {routes} from "./app.routes";
 import {authInterceptor} from "../interceptor/auth.interceptor";
 import {AuthService} from "../service/auth.service";
-import {ThemePreset} from './theme-preset';
+import {ThemePreset} from './theme.preset';
 import {ThemeService} from '../service/theme.service';
 
 export const appConfig: ApplicationConfig = {

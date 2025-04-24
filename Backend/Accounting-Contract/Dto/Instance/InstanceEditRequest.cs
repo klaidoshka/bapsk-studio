@@ -6,5 +6,5 @@ public class InstanceEditRequest
     public int InstanceId { get; set; }
     public string Name { get; set; }
     public int RequesterId { get; set; }
-    public IList<InstanceUserMetaCreateEdit> UserMetas { get; set; }
+    public IList<InstanceUserCreateEdit> Users { get; set; }
 }

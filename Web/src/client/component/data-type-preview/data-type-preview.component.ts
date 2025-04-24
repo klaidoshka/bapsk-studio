@@ -7,11 +7,10 @@ import DataTypeField, {FieldType, toFieldTypeLabel} from '../../model/data-type-
 import {DataTypeService} from '../../service/data-type.service';
 import {InstanceService} from '../../service/instance.service';
 import {NgClass, NgIf} from '@angular/common';
-import {
-  DataTypeEntryFieldDisplayComponent
-} from '../data-type-entry-field-display/data-type-entry-field-display.component';
+import {DataTypeEntryFieldDisplayComponent} from '../data-type-entry-field-display/data-type-entry-field-display.component';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {of} from 'rxjs';
+import {Badge} from 'primeng/badge';
 
 @Component({
   selector: 'data-type-preview',
@@ -21,7 +20,8 @@ import {of} from 'rxjs';
     TableModule,
     NgClass,
     DataTypeEntryFieldDisplayComponent,
-    NgIf
+    NgIf,
+    Badge
   ],
   templateUrl: './data-type-preview.component.html',
   styles: ``

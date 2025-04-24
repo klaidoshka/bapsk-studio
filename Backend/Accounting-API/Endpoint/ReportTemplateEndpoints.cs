@@ -1,7 +1,9 @@
+using Accounting.API.Configuration;
 using Accounting.API.Util;
 using Accounting.Contract.Dto.ReportTemplate;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
+using ReportTemplate = Accounting.Contract.Entity.ReportTemplate;
 
 namespace Accounting.API.Endpoint;
 
@@ -9,11 +11,28 @@ public static class ReportTemplateEndpoints
 {
     public static void MapReportTemplateEndpoints(this RouteGroupBuilder builder)
     {
-        builder.MapPost(String.Empty, Create);
-        builder.MapDelete("/{id:int}", Delete);
-        builder.MapPut("/{id:int}", Edit);
-        builder.MapGet("/{id:int}", GetById);
-        builder.MapGet(String.Empty, GetByInstanceId);
+        builder
+            .MapPost(String.Empty, Create)
+            .RequireInstancePermission(InstancePermission.ReportTemplate.Create);
+
+        builder
+            .MapDelete("/{id:int}", Delete)
+            .RequireInstancePermission(InstancePermission.ReportTemplate.Delete)
+            .RequireInstanceOwnsEntity<ReportTemplate>();
+
+        builder
+            .MapPut("/{id:int}", Edit)
+            .RequireInstancePermission(InstancePermission.ReportTemplate.Edit)
+            .RequireInstanceOwnsEntity<ReportTemplate>();
+
+        builder
+            .MapGet("/{id:int}", GetById)
+            .RequireInstancePermission(InstancePermission.ReportTemplate.Preview)
+            .RequireInstanceOwnsEntity<ReportTemplate>();
+
+        builder
+            .MapGet(String.Empty, GetByInstanceId)
+            .RequireInstancePermission(InstancePermission.ReportTemplate.Preview);
     }
 
     private static async Task<IResult> Create(
@@ -22,7 +41,7 @@ public static class ReportTemplateEndpoints
         HttpContext httpContext
     )
     {
-        request.RequesterId = httpContext.GetUserIdOrThrow();
+        request.RequesterId = httpContext.GetUserId();
 
         return Results.Json((await importConfigurationService.CreateAsync(request)).ToDto());
     }
@@ -37,7 +56,7 @@ public static class ReportTemplateEndpoints
             new ReportTemplateDeleteRequest
             {
                 ReportTemplateId = id,
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         );
 
@@ -52,7 +71,7 @@ public static class ReportTemplateEndpoints
     )
     {
         request.ReportTemplate.Id = id;
-        request.RequesterId = httpContext.GetUserIdOrThrow();
+        request.RequesterId = httpContext.GetUserId();
 
         await importConfigurationService.EditAsync(request);
 
@@ -68,7 +87,7 @@ public static class ReportTemplateEndpoints
             new ReportTemplateGetRequest
             {
                 ReportTemplateId = id,
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         )).ToDto()
     );
@@ -82,7 +101,7 @@ public static class ReportTemplateEndpoints
             new ReportTemplateGetByInstanceIdRequest
             {
                 InstanceId = instanceId,
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         ))
         .Select(it => it.ToDto())

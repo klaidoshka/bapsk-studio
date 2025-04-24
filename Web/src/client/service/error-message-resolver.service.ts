@@ -6,10 +6,22 @@ import ErrorResponse, {ErrorResponseDetails} from '../model/error-response.model
   providedIn: 'root'
 })
 export class ErrorMessageResolverService {
-  private readonly defaultErrorMessage = 'Extremely rare error occurred, please try again later.';
+  private readonly defaultErrorMessage = 'Unknown error occurred, please try again later.';
 
-  resolveHttpErrorResponseTo(response: any, messages: WritableSignal<Messages>) {
-    messages.set({error: this.resolveError(response)});
+  private readonly statusCodeMessages: Record<number, string> = {
+    400: 'Bad Request. Please check your inputs.',
+    401: 'Unauthorized. Please log in again.',
+    403: 'Forbidden. Please check your permissions.',
+    404: 'Not Found. The requested resource could not be found.',
+    500: this.defaultErrorMessage
+  }
+
+  private isErrorResponse(obj: any): obj is ErrorResponse {
+    return obj?.error?.messages !== undefined;
+  }
+
+  private isErrorResponseDetails(obj: any): obj is ErrorResponseDetails {
+    return obj?.messages !== undefined && !obj?.error;
   }
 
   resolveError(error: any): string[] {
@@ -17,20 +29,22 @@ export class ErrorMessageResolverService {
       return [error.message];
     } else if (typeof error === 'string') {
       return [error];
+    } else if (this.isErrorResponse(error)) {
+      return error.error.messages;
+    } else if (this.isErrorResponseDetails(error)) {
+      return error.messages;
     } else {
-      const errorResponse = error as ErrorResponse | null;
+      const statusCode = error?.status as number | undefined || 400;
 
-      if (errorResponse != null) {
-        return errorResponse.error?.messages || [this.defaultErrorMessage];
-      } else {
-        const errorResponseDetails = error as ErrorResponseDetails | null;
-
-        if (errorResponseDetails != null) {
-          return errorResponseDetails.messages || [this.defaultErrorMessage];
-        }
+      if (statusCode && this.statusCodeMessages[statusCode]) {
+        return [this.statusCodeMessages[statusCode]];
       }
-
-      return [this.defaultErrorMessage];
     }
+
+    return [this.defaultErrorMessage];
+  }
+
+  resolveHttpErrorResponseTo(response: any, messages: WritableSignal<Messages>) {
+    messages.set({ error: this.resolveError(response) });
   }
 }

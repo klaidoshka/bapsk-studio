@@ -1,8 +1,9 @@
-using Accounting.API.AuthorizationHandler.Requirement;
+using Accounting.API.Configuration;
 using Accounting.API.Util;
 using Accounting.Contract.Dto.Customer;
 using Accounting.Contract.Service;
 using Microsoft.AspNetCore.Mvc;
+using Customer = Accounting.Contract.Entity.Customer;
 
 namespace Accounting.API.Endpoint;
 
@@ -12,33 +13,26 @@ public static class CustomerEndpoints
     {
         builder
             .MapPost(String.Empty, Create)
-            .RequireAuthorization(o =>
-                o.AddRequirements(new CustomerRequirement(CustomerRequirement.CrudOperation.Create))
-            );
+            .RequireInstancePermission(InstancePermission.Customer.Create);
 
         builder
             .MapDelete("{id:int}", Delete)
-            .RequireAuthorization(o =>
-                o.AddRequirements(new CustomerRequirement(CustomerRequirement.CrudOperation.Delete))
-            );
+            .RequireInstancePermission(InstancePermission.Customer.Delete)
+            .RequireInstanceOwnsEntity<Customer>();
 
         builder
             .MapPut("{id:int}", Edit)
-            .RequireAuthorization(o =>
-                o.AddRequirements(new CustomerRequirement(CustomerRequirement.CrudOperation.Edit))
-            );
+            .RequireInstancePermission(InstancePermission.Customer.Edit)
+            .RequireInstanceOwnsEntity<Customer>();
 
         builder
             .MapGet(String.Empty, GetByInstanceId)
-            .RequireAuthorization(o =>
-                o.AddRequirements(new CustomerRequirement(CustomerRequirement.CrudOperation.Get))
-            );
+            .RequireInstancePermission(InstancePermission.Customer.Preview);
 
         builder
             .MapGet("{id:int}", GetById)
-            .RequireAuthorization(o =>
-                o.AddRequirements(new CustomerRequirement(CustomerRequirement.CrudOperation.GetById))
-            );
+            .RequireInstancePermission(InstancePermission.Customer.Preview)
+            .RequireInstanceOwnsEntity<Customer>();
     }
 
     private static async Task<IResult> Create(
@@ -77,7 +71,7 @@ public static class CustomerEndpoints
             new CustomerGetRequest
             {
                 InstanceId = instanceId,
-                RequesterId = httpContext.GetUserIdOrThrow()
+                RequesterId = httpContext.GetUserId()
             }
         ))
         .Select(it => it.ToDto())

@@ -97,12 +97,12 @@ public class UserValidator : IUserValidator
             return new Validation();
         }
 
-        var userIds = await _database.InstanceUserMetas
+        var userIds = await _database.InstanceUsers
             .Include(u => u.Instance)
-            .ThenInclude(u => u.UserMetas)
+            .ThenInclude(u => u.Users)
             .ThenInclude(u => u.User)
             .Where(u => u.UserId == requesterId)
-            .SelectMany(u => u.Instance.UserMetas)
+            .SelectMany(u => u.Instance.Users)
             .Select(u => u.User)
             .Where(u => u.IsDeleted == false)
             .Select(u => u.Id)

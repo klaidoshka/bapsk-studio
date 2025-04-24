@@ -16,6 +16,7 @@ import {FieldType} from '../model/data-type-field.model';
 import {FieldTypeUtil} from '../util/field-type.util';
 import {CacheService} from './cache.service';
 import DataType from '../model/data-type.model';
+import {InstanceService} from './instance.service';
 
 @Injectable({
   providedIn: 'root'
@@ -24,10 +25,12 @@ export class DataEntryService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly dataTypeService = inject(DataTypeService);
   private readonly httpClient = inject(HttpClient);
+  private readonly instanceService = inject(InstanceService);
   private readonly userService = inject(UserService);
 
   private readonly cacheService = new CacheService<number, DataEntryJoined>(dataEntry => dataEntry.id);
   private readonly dataTypesFetched = new Set<number>();
+  private readonly instanceId = this.instanceService.getActiveInstanceId();
 
   private adjustRequestDateToISO<T extends DataEntryCreateRequest | DataEntryEditRequest>(request: T, dataType: DataType): T {
     return {
@@ -38,7 +41,7 @@ export class DataEntryService {
         if (dataTypeField.type === FieldType.Date) {
           return {
             ...request,
-            value: request.value.toISOString()
+            value: request.value?.toISOString()
           }
         }
 
@@ -82,7 +85,7 @@ export class DataEntryService {
       .pipe(
         switchMap(dataType =>
           this.httpClient.post<DataEntry>(
-            this.apiRouter.dataEntry.create(),
+            this.apiRouter.dataEntry.create(this.instanceId()!),
             this.adjustRequestDateToISO(request, dataType)
           )
         ),
@@ -95,7 +98,7 @@ export class DataEntryService {
 
   delete(id: number): Observable<void> {
     return this.httpClient
-      .delete<void>(this.apiRouter.dataEntry.delete(id))
+      .delete<void>(this.apiRouter.dataEntry.delete(this.instanceId()!, id))
       .pipe(
         tap(() => this.cacheService.delete(id))
       );
@@ -107,7 +110,7 @@ export class DataEntryService {
       .pipe(
         switchMap(dataType =>
           this.httpClient.put<void>(
-            this.apiRouter.dataEntry.edit(request.dataEntryId),
+            this.apiRouter.dataEntry.edit(this.instanceId()!, request.dataEntryId),
             this.adjustRequestDateToISO(request, dataType)
           )
         ),
@@ -129,7 +132,7 @@ export class DataEntryService {
     }
 
     return this.httpClient
-      .get<DataEntry>(this.apiRouter.dataEntry.getById(id))
+      .get<DataEntry>(this.apiRouter.dataEntry.getById(this.instanceId()!, id))
       .pipe(
         switchMap(dataEntry => this.updateProperties(dataEntry)),
         switchMap(dataEntry => this.joinOntoDataEntry(dataEntry)),
@@ -144,7 +147,7 @@ export class DataEntryService {
     }
 
     return this.httpClient
-      .get<DataEntry[]>(this.apiRouter.dataEntry.getByDataTypeId(dataTypeId))
+      .get<DataEntry[]>(this.apiRouter.dataEntry.getByDataTypeId(this.instanceId()!, dataTypeId))
       .pipe(
         switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.updateProperties(dataEntry)))),
         switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.joinOntoDataEntry(dataEntry)))),
@@ -194,7 +197,7 @@ export class DataEntryService {
 
     return this.httpClient
       .post<DataEntry[]>(
-        this.apiRouter.dataEntry.import(),
+        this.apiRouter.dataEntry.import(this.instanceId()!),
         data
       )
       .pipe(

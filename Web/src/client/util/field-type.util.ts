@@ -7,18 +7,19 @@ export class FieldTypeUtil {
   public static updateValue = (value: any, type: FieldType): any => {
     switch (type) {
       case FieldType.Check:
-        return value.toLowerCase() === 'true';
+        const lowerValue = value?.toLowerCase();
+        return lowerValue === 'true' || lowerValue === 'yes' || lowerValue === '1';
 
       case FieldType.Currency:
       case FieldType.Number:
       case FieldType.Reference:
-        return Number(value);
+        return value != null ? Number(value) : undefined;
 
       case FieldType.Date:
-        return DateUtil.adjustToLocalDate(value);
+        return value != null ? DateUtil.adjustToLocalDate(value) : undefined;
 
       case FieldType.IsoCountryCode:
-        return EnumUtil.toEnumOrThrow(value, IsoCountryCode);
+        return value != null ? EnumUtil.toEnumOrThrow(value, IsoCountryCode) : undefined;
 
       default:
         return value;

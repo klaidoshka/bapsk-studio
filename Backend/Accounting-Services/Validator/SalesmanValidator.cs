@@ -93,4 +93,16 @@ public class SalesmanValidator : ISalesmanValidator
 
         return new Validation(failures);
     }
+
+    public async Task<bool> IsFromInstanceAsync(int id, int instanceId)
+    {
+        var salesman = await _database.Salesmen.FindAsync(id);
+
+        if (salesman?.IsDeleted == true)
+        {
+            throw new KeyNotFoundException("Salesman was not found.");
+        }
+
+        return salesman?.IsDeleted == false && salesman.InstanceId == instanceId;
+    }
 }

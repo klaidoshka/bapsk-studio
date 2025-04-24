@@ -52,7 +52,7 @@ public static class AuthEndpoints
     {
         if (String.IsNullOrWhiteSpace(request.ResetPasswordToken))
         {
-            request.RequesterId = httpContext.GetUserIdOrThrow();
+            request.RequesterId = httpContext.GetUserId();
         }
 
         await authService.ChangePasswordAsync(request);

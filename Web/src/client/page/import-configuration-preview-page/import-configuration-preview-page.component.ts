@@ -28,7 +28,7 @@ export class ImportConfigurationPreviewPageComponent {
     request: () => ({
       configurationId: +this.configurationId()
     }),
-    loader: ({request}) => this.importConfigurationService.getById(request.configurationId)
+    loader: ({ request }) => this.importConfigurationService.getById(request.configurationId)
   });
 
   configurationId = input.required<string>();

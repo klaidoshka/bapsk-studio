@@ -8,7 +8,7 @@
   }
   @case (FieldType.Date) {
     <p-datepicker (onSelect)="callOnChange()" (blur)="markAsTouched()" [(ngModel)]="value" hideOnDateTimeSelect="true"
-                  appendTo="body" [showTime]="true" [showIcon]="true" [showClear]="true" class="w-full"/>
+                  appendTo="body" [showTime]="true" [showIcon]="true" [showClear]="true" class="w-full" (onClear)="value.set(undefined); callOnChange();"/>
   }
   @case (FieldType.IsoCountryCode) {
     <p-select (onChange)="callOnChange()" (blur)="markAsTouched()" [(ngModel)]="value" [options]="IsoCountries" optionLabel="name"

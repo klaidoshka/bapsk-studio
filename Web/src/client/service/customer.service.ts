@@ -7,6 +7,7 @@ import {EnumUtil} from '../util/enum.util';
 import {IsoCountryCode} from '../model/iso-country.model';
 import {IdentityDocumentType} from '../model/identity-document-type.model';
 import {DateUtil} from '../util/date.util';
+import {InstanceService} from './instance.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,9 @@ import {DateUtil} from '../util/date.util';
 export class CustomerService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly httpClient = inject(HttpClient);
+  private readonly instanceService = inject(InstanceService);
+
+  private readonly instanceId = this.instanceService.getActiveInstanceId();
 
   // Key: InstanceId
   private readonly store = new Map<number, WritableSignal<Customer[]>>();
@@ -35,7 +39,7 @@ export class CustomerService {
   }
 
   create(request: CustomerCreateRequest) {
-    return this.httpClient.post<Customer>(this.apiRouter.customer.create(), {
+    return this.httpClient.post<Customer>(this.apiRouter.customer.create(this.instanceId()!), {
       ...request,
       customer: {
         ...request.customer,
@@ -47,7 +51,7 @@ export class CustomerService {
   }
 
   delete(instanceId: number, id: number) {
-    return this.httpClient.delete<void>(this.apiRouter.customer.delete(id)).pipe(
+    return this.httpClient.delete<void>(this.apiRouter.customer.delete(this.instanceId()!, id)).pipe(
       tap(() => {
         const existingSignal = this.store.get(instanceId);
 
@@ -61,7 +65,7 @@ export class CustomerService {
   }
 
   edit(request: CustomerEditRequest) {
-    return this.httpClient.put<void>(this.apiRouter.customer.edit(request.customer.id!), {
+    return this.httpClient.put<void>(this.apiRouter.customer.edit(this.instanceId()!, request.customer.id!), {
       ...request,
       customer: {
         ...request.customer,
@@ -73,7 +77,7 @@ export class CustomerService {
   }
 
   getById(instanceId: number, id: number) {
-    return this.httpClient.get<Customer>(this.apiRouter.customer.getById(id)).pipe(
+    return this.httpClient.get<Customer>(this.apiRouter.customer.getById(this.instanceId()!, id)).pipe(
       tap(customer => this.updateSingleInStore(instanceId, this.updateProperties(customer)))
     );
   }

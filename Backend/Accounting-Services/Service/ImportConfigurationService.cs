@@ -296,7 +296,7 @@ public class ImportConfigurationService : IImportConfigurationService
 
         var dataType = await _database.DataTypes
             .Include(it => it.Instance)
-            .ThenInclude(it => it.UserMetas)
+            .ThenInclude(it => it.Users)
             .FirstOrDefaultAsync(it => it.Id == request.DataTypeId);
 
         if (dataType is null || dataType.IsDeleted || dataType.Instance.IsDeleted)
