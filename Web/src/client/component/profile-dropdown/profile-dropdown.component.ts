@@ -1,14 +1,14 @@
-import {Component, inject, viewChild, ViewEncapsulation} from '@angular/core';
+import {Component, inject, signal, viewChild, ViewEncapsulation} from '@angular/core';
 import {ButtonModule} from 'primeng/button';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {AuthService} from '../../service/auth.service';
 import {MenuItem, MessageService} from 'primeng/api';
-import {Router} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {ToastModule} from 'primeng/toast';
-import {Menubar} from 'primeng/menubar';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {map} from 'rxjs';
+import {NgIf} from '@angular/common';
 
 @Component({
   selector: 'profile-dropdown',
@@ -16,8 +16,9 @@ import {map} from 'rxjs';
     ButtonModule,
     ConfirmDialogModule,
     ToastModule,
-    Menubar,
-    ConfirmationComponent
+    ConfirmationComponent,
+    NgIf,
+    RouterLink
   ],
   templateUrl: './profile-dropdown.component.html',
   styleUrl: './profile-dropdown.component.scss',
@@ -29,6 +30,7 @@ export class ProfileDropdownComponent {
   private readonly router = inject(Router);
 
   confirmationComponent = viewChild.required(ConfirmationComponent);
+  isProfileMenuOpen = signal<boolean>(false);
 
   displayName = rxResource({
     loader: () => this.authService

@@ -1,8 +1,3 @@
-<p-dialog [closable]="true" [modal]="true" [(visible)]="showGenerateReportDialog" header="Generate Report By Template"
-          (onHide)="showGenerateReportDialog.set(false)">
-  <report-generate-form/>
-</p-dialog>
-
 <div class="h-full w-full">
   <ng-container *ngIf="instanceId() != null">
     <div class="flex h-full">
@@ -28,15 +23,6 @@
                       class="m-1 w-40 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
           </div>
         </div>
-
-        <div class="mt-8 p-2 bg-surface-500 border rounded shadow">
-          <label for="htmlFileInput" class="block text-sm font-semibold">Upload HTML</label>
-          <input id="htmlFileInput" type="file" accept=".html" (change)="selectFile($event)"
-                 class="mt-2 block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded file:border file:text-sm file:font-semibold"/>
-        </div>
-
-        <p-button label="Generate Report" class="mt-4 w-full" styleClass="w-full" icon="pi pi-file-pdf"
-                  (onClick)="showGenerateReportDialog.set(true)"/>
       </div>
 
       <!-- Main Content -->
@@ -56,12 +42,12 @@
 
         <ng-container *ngIf="selectedWorkspace() === WorkspaceType.Customer">
           <h1 class="text-xl font-bold">Customers</h1>
-          <customer-showcase [instanceId]="instanceId()!" [customers]="customers()"/>
+          <customer-showcase [instanceId]="instanceId()!" [customers]="customers.value() || []"/>
         </ng-container>
 
         <ng-container *ngIf="selectedWorkspace() === WorkspaceType.Sale">
           <h1 class="text-xl font-bold">Sales</h1>
-          <sale-showcase [customers]="customers()" [instanceId]="instanceId()!" [sales]="sales.value() || []"
+          <sale-showcase [customers]="customers.value() || []" [instanceId]="instanceId()!" [sales]="sales.value() || []"
                          [salesmen]="salesmen()"/>
         </ng-container>
 

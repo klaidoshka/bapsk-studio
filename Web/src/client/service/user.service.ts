@@ -1,7 +1,7 @@
 import {computed, inject, Injectable, Signal, signal} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {toUserIdentity, User, UserCreateRequest, UserEditRequest, UserIdentity} from '../model/user.model';
-import {first, Observable, of, switchMap, tap} from 'rxjs';
+import {first, map, Observable, of, switchMap, tap} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {EnumUtil} from '../util/enum.util';
 import {Role} from '../model/role.model';
@@ -94,9 +94,12 @@ export class UserService {
   };
 
   getById(id: number): Observable<User> {
-    return this.httpClient.get<User>(this.apiRouter.user.getById(id)).pipe(
-      tap(user => this.updateCachedUser(user))
-    );
+    return this.httpClient
+      .get<User>(this.apiRouter.user.getById(id))
+      .pipe(
+        map(user => this.updateProperties(user)),
+        tap(user => this.updateCachedUser(user))
+      );
   };
 
   getIdentityById(id: number): Observable<UserIdentity> {

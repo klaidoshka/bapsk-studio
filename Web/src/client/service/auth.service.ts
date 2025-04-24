@@ -40,8 +40,7 @@ export class AuthService {
 
   private resolveUser(userId?: number): Observable<User | undefined> {
     if (userId === undefined) {
-      const value = localStorage.getItem(LocalStorageKeys.userKey);
-      return value != null ? of(this.userService.updateProperties(JSON.parse(value))) : of(undefined);
+      return of(this.resolveUserFromStorage());
     }
 
     return this.userService
@@ -49,6 +48,11 @@ export class AuthService {
       .pipe(
         tap(user => localStorage.setItem(LocalStorageKeys.userKey, JSON.stringify(user)))
       );
+  }
+
+  private resolveUserFromStorage(): User | undefined {
+    const value = localStorage.getItem(LocalStorageKeys.userKey);
+    return value != null ? this.userService.updateProperties(JSON.parse(value)) : undefined;
   }
 
   acceptAuthResponse(response: AuthResponse) {

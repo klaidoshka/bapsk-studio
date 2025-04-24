@@ -9,6 +9,7 @@ public class Customer
     public string FirstName { get; set; } = String.Empty;
     public int? Id { get; set; }
     public CustomerIdentityDocument IdentityDocument { get; set; } = new();
+    public int? InstanceId { get; set; }
     public string LastName { get; set; } = String.Empty;
     public IList<CustomerOtherDocument> OtherDocuments { get; set; } = new List<CustomerOtherDocument>();
     public IsoCountryCode ResidenceCountry { get; set; } = IsoCountryCode.LT;
@@ -31,6 +32,7 @@ public static class CustomerExtensions
                 Type = customer.IdentityDocumentType,
                 Value = customer.IdentityDocumentValue
             },
+            InstanceId = customer.InstanceId,
             LastName = customer.LastName,
             OtherDocuments = customer.OtherDocuments
                 .Select(it => it.ToDto())

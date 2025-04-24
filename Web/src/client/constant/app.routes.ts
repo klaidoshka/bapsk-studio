@@ -27,6 +27,7 @@ import {
 import {ReportTemplatePreviewPageComponent} from '../page/report-template-preview-page/report-template-preview-page.component';
 import {ReportPreviewPageComponent} from '../page/report-preview-page/report-preview-page.component';
 import {MiscLayoutComponent} from '../page/misc-layout/misc-layout.component';
+import {ReportGeneratePageComponent} from '../page/report-generate-page/report-generate-page.component';
 
 export const routes: Routes = [
   {
@@ -38,6 +39,10 @@ export const routes: Routes = [
       {
         path: "data-type",
         loadComponent: () => DataTypePageComponent
+      },
+      {
+        path: "generate-report",
+        loadComponent: () => ReportGeneratePageComponent
       },
       {
         path: "import-configuration",
@@ -92,10 +97,6 @@ export const routes: Routes = [
         ]
       },
       {
-        path: "user",
-        loadComponent: () => UserPageComponent
-      },
-      {
         path: "workspace",
         loadComponent: () => WorkspacePageComponent
       }
@@ -114,6 +115,16 @@ export const routes: Routes = [
       {
         path: "register",
         loadComponent: () => RegisterComponent
+      }
+    ]
+  },
+  {
+    path: "admin",
+    loadComponent: () => AuthenticatedLayoutComponent,
+    loadChildren: () => [
+      {
+        path: "user",
+        loadComponent: () => UserPageComponent
       }
     ]
   },

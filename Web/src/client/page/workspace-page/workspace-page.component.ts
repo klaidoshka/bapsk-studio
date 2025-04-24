@@ -20,14 +20,11 @@ import {DataEntryService} from '../../service/data-entry.service';
 import {HttpClient} from '@angular/common/http';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {combineLatest, map, of} from 'rxjs';
-import {Button} from 'primeng/button';
-import {Dialog} from 'primeng/dialog';
-import {ReportGenerateFormComponent} from '../../component/report-generate-form/report-generate-form.component';
 
 @Component({
   selector: 'workspace-page',
   templateUrl: './workspace-page.component.html',
-  imports: [DataEntryShowcaseComponent, Message, CustomerShowcaseComponent, SalesmanShowcaseComponent, NgIf, NgForOf, DropdownModule, FormsModule, SaleShowcaseComponent, Select, Button, Dialog, ReportGenerateFormComponent],
+  imports: [DataEntryShowcaseComponent, Message, CustomerShowcaseComponent, SalesmanShowcaseComponent, NgIf, NgForOf, DropdownModule, FormsModule, SaleShowcaseComponent, Select],
   providers: []
 })
 export class WorkspacePageComponent {
@@ -41,12 +38,14 @@ export class WorkspacePageComponent {
   private salesmanService = inject(SalesmanService);
   private vatReturnService = inject(VatReturnService);
 
-  showGenerateReportDialog = signal<boolean>(false);
-
-  customers = computed(() => {
-    const instanceId = this.instanceId();
-    return instanceId != null ? this.customerService.getAsSignal(instanceId)() : [];
-  });
+  customers = rxResource({
+    request: () => ({
+      instanceId: this.instanceId()
+    }),
+    loader: ({ request }) => request.instanceId
+      ? this.customerService.getByInstanceId(request.instanceId)
+      : of([])
+  })
 
   error = computed(() => this.dataEntries.error() || this.dataTypes.error());
 
@@ -54,7 +53,7 @@ export class WorkspacePageComponent {
     request: () => ({
       dataTypeId: this.selectedDataType()?.id
     }),
-    loader: ({request}) => request.dataTypeId
+    loader: ({ request }) => request.dataTypeId
       ? this.dataEntryService.getAllByDataTypeId(request.dataTypeId)
       : of([])
   });
@@ -63,7 +62,7 @@ export class WorkspacePageComponent {
     request: () => ({
       instanceId: this.instanceId()
     }),
-    loader: ({request}) => request.instanceId
+    loader: ({ request }) => request.instanceId
       ? this.dataTypeService.getAllByInstanceId(request.instanceId)
       : of([])
   });
@@ -71,10 +70,10 @@ export class WorkspacePageComponent {
   instanceId = this.instanceService.getActiveInstanceId();
 
   sales = rxResource({
-    request: () =>({
+    request: () => ({
       sales: this.instanceId() != null ? this.saleService.getAsSignal(this.instanceId()!)() : []
     }),
-    loader: ({request}) => combineLatest(
+    loader: ({ request }) => combineLatest(
       request.sales.map(sale => this.vatReturnService
         .getBySaleId(sale.id)
         .pipe(
@@ -163,7 +162,7 @@ export class WorkspacePageComponent {
           responseType: 'text'
         })
         .subscribe((result) => {
-          const blob = new Blob([result as string], {type: 'text/html'});
+          const blob = new Blob([result as string], { type: 'text/html' });
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
 
@@ -196,9 +195,5 @@ export class WorkspacePageComponent {
     }
 
     this.selectedWorkspace.set(workspace);
-  }
-
-  generateReport() {
-
   }
 }
