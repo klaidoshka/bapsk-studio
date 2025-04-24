@@ -236,23 +236,7 @@ public class DataEntryService : IDataEntryService
             .Include(it => it.DataType)
             .ThenInclude(it => it.Fields)
             .AsSplitQuery()
-            .FirstOrDefaultAsync(it => it.Id == request.ImportConfigurationId);
-
-        var instanceId = configuration?.DataType?.InstanceId;
-
-        var user = await _database.InstanceUsers.FirstOrDefaultAsync(
-            it => it.UserId == request.RequesterId && it.InstanceId == instanceId
-        );
-
-        if (user is null)
-        {
-            throw new ValidationException("You are not authorized to import data.");
-        }
-
-        if (configuration is null)
-        {
-            throw new ValidationException("Import configuration was not found.");
-        }
+            .FirstAsync(it => it.Id == request.ImportConfigurationId);
 
         if (!_csvService.IsSupportedFileExtension(request.FileExtension))
         {

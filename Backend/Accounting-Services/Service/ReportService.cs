@@ -30,7 +30,6 @@ public class ReportService : IReportService
     private readonly ICustomerService _customerService;
     private readonly IDataEntryService _dataEntryService;
     private readonly IDataTypeService _dataTypeService;
-    private readonly IInstanceAuthorizationService _instanceAuthorizationService;
     private readonly IReportTemplateService _reportTemplateService;
     private readonly ISalesmanService _salesmanService;
     private readonly ISaleService _saleService;
@@ -39,7 +38,6 @@ public class ReportService : IReportService
         ICustomerService customerService,
         IDataEntryService dataEntryService,
         IDataTypeService dataTypeService,
-        IInstanceAuthorizationService instanceAuthorizationService,
         IReportTemplateService reportTemplateService,
         ISalesmanService salesmanService,
         ISaleService saleService
@@ -48,7 +46,6 @@ public class ReportService : IReportService
         _customerService = customerService;
         _dataEntryService = dataEntryService;
         _dataTypeService = dataTypeService;
-        _instanceAuthorizationService = instanceAuthorizationService;
         _reportTemplateService = reportTemplateService;
         _salesmanService = salesmanService;
         _saleService = saleService;
@@ -189,13 +186,6 @@ public class ReportService : IReportService
 
     public async Task<Report> GenerateDataEntriesReportAsync(ReportByDataEntriesGenerateRequest request)
     {
-        var instanceId = await _reportTemplateService.GetInstanceIdAsync(request.ReportTemplateId);
-
-        if (!await _instanceAuthorizationService.IsMemberAsync(instanceId, request.RequesterId))
-        {
-            throw new ValidationException("You are not authorized to generate this report.");
-        }
-
         var template = await _reportTemplateService.GetAsync(
             new ReportTemplateGetRequest
             {
@@ -308,14 +298,6 @@ public class ReportService : IReportService
         if (customer.InstanceId != salesman.InstanceId)
         {
             throw new ValidationException("Customer and salesman must belong to the same instance.");
-        }
-
-        if (
-            customer.InstanceId is not null &&
-            !await _instanceAuthorizationService.IsMemberAsync(customer.InstanceId!.Value, request.RequesterId)
-        )
-        {
-            throw new ValidationException("You are not authorized to generate this report.");
         }
 
         var sales = await _saleService.GetAsync(

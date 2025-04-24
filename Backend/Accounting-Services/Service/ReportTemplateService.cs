@@ -44,16 +44,9 @@ public class ReportTemplateService : IReportTemplateService
             throw new ValidationException("All fields must be from the same instance.");
         }
 
-        if (!await _instanceAuthorizationService.IsMemberAsync(
-                dataTypeFieldsByInstanceId.First().Key,
-                request.RequesterId
-            )
-           )
-        {
-            throw new ValidationException("You are not authorized to create a report template.");
-        }
-
-        if (await _database.ReportTemplates.AnyAsync(it => String.Equals(
+        if (await _database.ReportTemplates.AnyAsync(it =>
+                it.Fields.First().DataType.InstanceId == dataTypeFieldsByInstanceId.First().Key &&
+                String.Equals(
                     it.Name,
                     request.ReportTemplate.Name,
                     StringComparison.OrdinalIgnoreCase
@@ -83,21 +76,7 @@ public class ReportTemplateService : IReportTemplateService
             .Include(it => it.Fields)
             .ThenInclude(it => it.DataType)
             .AsSplitQuery()
-            .FirstOrDefaultAsync(it => it.Id == request.ReportTemplateId);
-
-        if (template is null || template.IsDeleted)
-        {
-            throw new ValidationException("Report template was not found.");
-        }
-
-        if (!await _instanceAuthorizationService.IsMemberAsync(
-                template.Fields.First().DataType.InstanceId,
-                request.RequesterId
-            )
-           )
-        {
-            throw new ValidationException("You are not authorized to delete this report template.");
-        }
+            .FirstAsync(it => it.Id == request.ReportTemplateId);
 
         template.IsDeleted = true;
 
@@ -106,29 +85,15 @@ public class ReportTemplateService : IReportTemplateService
 
     public async Task EditAsync(ReportTemplateEditRequest request)
     {
-        // Should throw if request contains fields that are deleted
-
         var template = await _database.ReportTemplates
             .Include(it => it.Fields)
             .ThenInclude(it => it.DataType)
             .AsSplitQuery()
-            .FirstOrDefaultAsync(it => it.Id == request.ReportTemplate.Id);
+            .FirstAsync(it => it.Id == request.ReportTemplate.Id);
 
-        if (template is null || template.IsDeleted)
-        {
-            throw new ValidationException("Report template was not found.");
-        }
-
-        if (!await _instanceAuthorizationService.IsMemberAsync(
-                template.Fields.First().DataType.InstanceId,
-                request.RequesterId
-            )
-           )
-        {
-            throw new ValidationException("You are not authorized to edit this report template.");
-        }
-
-        if (await _database.ReportTemplates.AnyAsync(it => String.Equals(
+        if (await _database.ReportTemplates.AnyAsync(it =>
+                it.Fields.First().DataType.InstanceId == template.Fields.First().DataType.InstanceId &&
+                String.Equals(
                     it.Name,
                     request.ReportTemplate.Name,
                     StringComparison.OrdinalIgnoreCase
@@ -140,37 +105,30 @@ public class ReportTemplateService : IReportTemplateService
 
         template.Name = request.ReportTemplate.Name;
 
-        template.Fields = await _database.DataTypeFields
+        var fields = await _database.DataTypeFields
             .Include(it => it.DataType)
             .Where(it => !it.DataType.IsDeleted && request.ReportTemplate.Fields.Contains(it.Id))
             .ToListAsync();
+
+        var dataTypeFieldsByInstanceId = fields.ToDictionary(it => it.DataType.InstanceId);
+
+        if (dataTypeFieldsByInstanceId.Count != 1)
+        {
+            throw new ValidationException("All fields must be from the same instance.");
+        }
+
+        template.Fields = fields;
 
         await _database.SaveChangesAsync();
     }
 
     public async Task<ReportTemplate> GetAsync(ReportTemplateGetRequest request)
     {
-        var template = await _database.ReportTemplates
+        return await _database.ReportTemplates
             .Include(it => it.Fields)
             .ThenInclude(it => it.DataType)
             .AsSplitQuery()
-            .FirstOrDefaultAsync(it => it.Id == request.ReportTemplateId);
-
-        if (template is null || template.IsDeleted)
-        {
-            throw new ValidationException("Report template was not found.");
-        }
-
-        if (!await _instanceAuthorizationService.IsMemberAsync(
-                template.Fields.First().DataType.InstanceId,
-                request.RequesterId
-            )
-           )
-        {
-            throw new ValidationException("You are not authorized to get this report template.");
-        }
-
-        return template;
+            .FirstAsync(it => it.Id == request.ReportTemplateId);
     }
 
     public async Task<int> GetInstanceIdAsync(int templateId)
@@ -178,19 +136,12 @@ public class ReportTemplateService : IReportTemplateService
         return (await _database.ReportTemplates.Include(rt => rt.Fields)
                 .ThenInclude(f => f.DataType)
                 .FirstAsync(rt => rt.Id == templateId)).Fields
-            .First().DataType.InstanceId;
+            .First()
+            .DataType.InstanceId;
     }
 
     public async Task<IList<ReportTemplate>> GetAsync(ReportTemplateGetByInstanceIdRequest request)
     {
-        if (!await _instanceAuthorizationService.IsMemberAsync(
-                request.InstanceId,
-                request.RequesterId
-            ))
-        {
-            throw new ValidationException("You are not authorized to get these report templates.");
-        }
-
         return await _database.ReportTemplates
             .Include(it => it.Fields)
             .ThenInclude(it => it.DataType)
