@@ -1,6 +1,5 @@
 import {Component, effect, inject, viewChild, ViewEncapsulation} from '@angular/core';
 import {DropdownModule} from "primeng/dropdown";
-import Instance from '../../model/instance.model';
 import {InstanceService} from '../../service/instance.service';
 import {Button} from 'primeng/button';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -32,15 +31,13 @@ export class InstanceSelectorComponent {
   constructor() {
     effect(() => {
       if (this.instances.value()?.length == 1) {
-        this.selectInstance(this.instances.value()![0]);
+        const instance = this.instances.value()![0];
+
+        if (this.selectedInstance() !== instance && instance !== undefined) {
+          this.instanceService.setActiveInstance(instance);
+        }
       }
     });
-  }
-
-  selectInstance(instance: Instance | null) {
-    if (this.selectedInstance() !== instance && instance !== null) {
-      this.instanceService.setActiveInstance(instance);
-    }
   }
 
   showManagementMenu() {

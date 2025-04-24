@@ -38,7 +38,6 @@ export class InstanceService {
         })
       )
       .subscribe(instances => {
-        console.log('current instance id is', this.activeInstance()?.id);
         if (instances.length > 0) {
           const activeInstanceId = this.activeInstance()?.id;
 
@@ -51,7 +50,6 @@ export class InstanceService {
         } else if (this.activeInstance() !== undefined) {
           this.activeInstance.set(undefined);
         }
-        console.log('now instance id is', this.activeInstance()?.id);
       });
   }
 
@@ -115,7 +113,8 @@ export class InstanceService {
         tap(instances => {
           this.instancesFetched.set(true);
           this.cacheService.update(instances, () => true);
-        })
+        }),
+        switchMap(_ => this.cacheService.getAll())
       );
   }
 
