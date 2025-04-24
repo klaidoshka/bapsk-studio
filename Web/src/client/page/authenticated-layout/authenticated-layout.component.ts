@@ -7,10 +7,11 @@ import {ProfileDropdownComponent} from '../../component/profile-dropdown/profile
 import {ThemeSelectorComponent} from '../../component/theme-selector/theme-selector.component';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {Role} from '../../model/role.model';
+import {ClickOutsideDirective} from '../../directive/click-outside.directive';
 
 @Component({
   selector: "authenticated-layout",
-  imports: [RouterModule, InstanceSelectorComponent, NgIf, ProfileDropdownComponent, ThemeSelectorComponent],
+  imports: [RouterModule, InstanceSelectorComponent, NgIf, ProfileDropdownComponent, ThemeSelectorComponent, ClickOutsideDirective],
   templateUrl: "./authenticated-layout.component.html",
   providers: []
 })

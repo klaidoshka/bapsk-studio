@@ -9,6 +9,7 @@ import {ConfirmationComponent} from '../confirmation/confirmation.component';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {map} from 'rxjs';
 import {NgIf} from '@angular/common';
+import {ClickOutsideDirective} from '../../directive/click-outside.directive';
 
 @Component({
   selector: 'profile-dropdown',
@@ -18,7 +19,8 @@ import {NgIf} from '@angular/common';
     ToastModule,
     ConfirmationComponent,
     NgIf,
-    RouterLink
+    RouterLink,
+    ClickOutsideDirective
   ],
   templateUrl: './profile-dropdown.component.html',
   styleUrl: './profile-dropdown.component.scss',
