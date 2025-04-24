@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, inject, signal} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import Instance, {InstanceCreateRequest, InstanceEditRequest, InstanceWithUsers} from '../../model/instance.model';
 import {Dialog} from 'primeng/dialog';
 import {
@@ -19,10 +19,13 @@ import {InputText} from 'primeng/inputtext';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {UserService} from '../../service/user.service';
-import {toUserIdentityFullName} from '../../model/user.model';
+import {toUserIdentityFullName, UserIdentity} from '../../model/user.model';
 import {AuthService} from '../../service/auth.service';
 import {TableModule} from 'primeng/table';
 import {FormInputErrorComponent} from "../form-input-error/form-input-error.component";
+import {instanceUserPermissions} from '../../constant/instance-user.permissions';
+import {NgForOf, NgIf} from '@angular/common';
+import {Badge} from 'primeng/badge';
 
 @Component({
   selector: 'instance-management',
@@ -35,37 +38,83 @@ import {FormInputErrorComponent} from "../form-input-error/form-input-error.comp
     MessagesShowcaseComponent,
     ReactiveFormsModule,
     TableModule,
-    FormInputErrorComponent
+    FormInputErrorComponent,
+    Badge,
+    NgForOf,
+    NgIf
   ],
   templateUrl: './instance-management.component.html',
   styles: ``
 })
 export class InstanceManagementComponent {
+  private readonly allPermissions = instanceUserPermissions;
   private readonly authService = inject(AuthService);
-  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly instanceService = inject(InstanceService);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly userService = inject(UserService);
 
   form = this.formBuilder.group({
     name: ["", Validators.required],
     description: ["No description set."],
-    userMetas: this.formBuilder.array([])
+    users: this.formBuilder.array([
+      this.formBuilder.group({
+        email: ["", [Validators.required, Validators.email]],
+        id: [undefined as number | undefined],
+        isOwnerOrSelf: [false],
+        name: [""],
+        permissions: [this.allPermissions.map(p => ({
+          ...p,
+          toggled: true
+        }))],
+        showPermissions: [false]
+      })
+    ])
   });
 
   formUser = this.formBuilder.group({
-    email: ["", [Validators.required, Validators.email, this.validateEmailExists(this.formUsers())]]
+    email: ["", [Validators.required, Validators.email, this.validateEmailExists(this.form.controls.users)]]
   });
 
   instance = signal<Instance | undefined>(undefined);
   isShown = signal<boolean>(false);
   messages = signal<Messages>({});
-  messagesUserMetas = signal<Messages>({});
+  messagesUsers = signal<Messages>({});
 
   customErrorMessages = {
     'emailExists': () => 'User with this email already exists in the list.'
   };
+
+  constructor() {
+    // Remove initial invalid user
+    this.form.controls.users.clear();
+  }
+
+  private addUserInForm(user: UserIdentity, email: string, permissions?: string[]) {
+    const isOwnerOrSelf = this.instance()?.createdById === user.id || this.authService.getUser()()!.id === user.id;
+
+    const permissionsToAdd = isOwnerOrSelf ? [] : this.allPermissions.map(p => ({
+      ...p,
+      toggled: true as boolean
+    }));
+
+    if (permissions) {
+      permissionsToAdd.forEach(p => {
+        p.toggled = permissions.includes(p.value);
+      });
+    }
+
+    this.form.controls.users.push(this.formBuilder.group({
+      email: [email, [Validators.required, Validators.email]],
+      id: [user?.id || undefined],
+      isOwnerOrSelf: [isOwnerOrSelf],
+      name: [toUserIdentityFullName(user!)],
+      permissions: [permissionsToAdd],
+      showPermissions: [false as boolean]
+    }));
+
+    this.form.markAsDirty();
+  }
 
   private create(request: InstanceCreateRequest) {
     this.instanceService.create(request).pipe(first()).subscribe({
@@ -82,7 +131,7 @@ export class InstanceManagementComponent {
   }
 
   private onSuccess(message: string) {
-    this.messages.set({success: [message]});
+    this.messages.set({ success: [message] });
     this.form.markAsPristine();
   }
 
@@ -95,7 +144,7 @@ export class InstanceManagementComponent {
       }
 
       if (formArray.controls.some(um => um.value.email.trim().toLowerCase() === email)) {
-        return {emailExists: true};
+        return { emailExists: true };
       }
 
       return null;
@@ -109,28 +158,16 @@ export class InstanceManagementComponent {
 
     this.formUser.reset();
 
-    this.userService.getIdentityByEmail(email!).subscribe(user => {
+    this.userService.getIdentityByEmail(email!).pipe(first()).subscribe(user => {
       if (!user) {
-        this.messagesUserMetas.set({error: [`User with email '${email}' does not exist.`]});
+        this.messagesUsers.set({ error: [`User with email '${email}' does not exist.`] });
         return;
-      } else if (this.messagesUserMetas().error) {
-        this.messagesUserMetas.set({});
+      } else if (this.messagesUsers().error) {
+        this.messagesUsers.set({});
       }
 
-      this.formUsers().push(this.formBuilder.group({
-        id: [user?.id],
-        email: [email],
-        name: [toUserIdentityFullName(user)],
-        isOwnerOrSelf: [this.instance()?.createdById === user?.id || this.authService.getUser()()!.id === user?.id]
-      }));
-
-      this.form.markAsDirty();
-      this.cdr.detectChanges();
+      this.addUserInForm(user, email!);
     });
-  }
-
-  formUsers() {
-    return this.form.controls["userMetas"] as FormArray;
   }
 
   hide() {
@@ -138,26 +175,29 @@ export class InstanceManagementComponent {
     this.isShown.set(false);
     this.form.reset();
     this.formUser.reset();
-    this.formUsers().clear();
+    this.form.controls.users.clear();
   }
 
   removeUser(index: number) {
-    this.formUsers().removeAt(index);
+    this.form.controls.users.removeAt(index);
 
     this.form.markAsDirty();
   }
 
   save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill out the form."]});
+      this.messages.set({ error: ["Please fill out the form."] });
       return;
     }
 
     const request: InstanceCreateRequest = {
       name: this.form.value.name!,
       description: this.form.value.description || null,
-      userMetas: this.form.value.userMetas?.map((um: any) => ({
-        userId: um.id
+      users: this.form.value.users?.map(u => ({
+        permissions: u.permissions!
+          .filter(p => p.toggled)
+          .map(p => p.value),
+        userId: u.id!
       })) || []
     }
 
@@ -173,15 +213,25 @@ export class InstanceManagementComponent {
 
   show(instance?: InstanceWithUsers) {
     this.instance.set(instance);
-    this.form.reset({description: "No description set."});
+    this.form.reset({ description: "No description set." });
 
     if (instance) {
-      this.form.patchValue({...instance});
-      instance.userMetas.forEach(um => this.addUser(um.user.email));
+      this.form.patchValue({ ...instance as any });
+      instance.users.forEach(um => this.addUserInForm(um.user, um.user.email, um.permissions));
     } else {
       this.addUser(this.authService.getUser()()!.email);
     }
 
     this.isShown.set(true);
+  }
+
+  togglePermission(userIndex: number, permissionIndex: number) {
+    const permissionsControl = this.form.controls.users.at(userIndex).controls.permissions;
+    const permission = permissionsControl.value![permissionIndex];
+
+    if (permission) {
+      permission.toggled = !permission.toggled;
+      permissionsControl.markAsDirty();
+    }
   }
 }

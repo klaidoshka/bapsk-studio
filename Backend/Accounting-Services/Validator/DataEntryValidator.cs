@@ -24,17 +24,7 @@ public class DataEntryValidator : IDataEntryValidator
         var dataType = await _database.DataTypes
             .Include(dt => dt.Instance)
             .Include(dt => dt.Fields)
-            .FirstOrDefaultAsync(dt => dt.Id == request.DataTypeId);
-
-        if (dataType == null || dataType.IsDeleted)
-        {
-            return new Validation("Data type was not found.");
-        }
-
-        if (dataType.Instance.CreatedById != request.RequesterId)
-        {
-            return new Validation("You are not authorized to create data entries in this instance.");
-        }
+            .FirstAsync(dt => dt.Id == request.DataTypeId);
 
         var failures = new List<string>();
 
@@ -59,25 +49,6 @@ public class DataEntryValidator : IDataEntryValidator
         );
 
         return new Validation(failures);
-    }
-
-    public async Task<Validation> ValidateDataEntryDeleteRequestAsync(
-        DataEntryDeleteRequest request
-    )
-    {
-        var dataEntry = await _database.DataEntries
-            .Include(de => de.DataType)
-            .ThenInclude(dt => dt.Instance)
-            .FirstOrDefaultAsync(de => de.Id == request.DataEntryId);
-
-        if (dataEntry == null || dataEntry.IsDeleted)
-        {
-            return new Validation("Data entry was not found.");
-        }
-
-        return dataEntry.DataType.Instance.CreatedById != request.RequesterId
-            ? new Validation("You are not authorized to delete this data entry.")
-            : new Validation();
     }
 
     public async Task<Validation> ValidateDataEntryEditRequestAsync(DataEntryEditRequest request)
@@ -107,43 +78,6 @@ public class DataEntryValidator : IDataEntryValidator
         }
 
         return new Validation(failures);
-    }
-
-    public async Task<Validation> ValidateDataEntryGetRequestAsync(DataEntryGetRequest request)
-    {
-        var dataEntry = await _database.DataEntries
-            .Include(de => de.DataType)
-            .ThenInclude(dt => dt.Instance)
-            .ThenInclude(i => i.UserMetas)
-            .FirstOrDefaultAsync(de => de.Id == request.DataEntryId);
-
-        if (dataEntry == null || dataEntry.IsDeleted)
-        {
-            return new Validation("Data entry was not found.");
-        }
-
-        return dataEntry.DataType.Instance.UserMetas.All(um => um.UserId != request.RequesterId)
-            ? new Validation("You are not authorized to view this data entry.")
-            : new Validation();
-    }
-
-    public async Task<Validation> ValidateDataEntryGetByDataTypeRequestAsync(
-        DataEntryGetByDataTypeRequest request
-    )
-    {
-        var dataType = await _database.DataTypes
-            .Include(dt => dt.Instance)
-            .ThenInclude(i => i.UserMetas)
-            .FirstOrDefaultAsync(dt => dt.Id == request.DataTypeId);
-
-        if (dataType == null || dataType.IsDeleted)
-        {
-            return new Validation("Data type was not found.");
-        }
-
-        return dataType.Instance.UserMetas.All(um => um.UserId != request.RequesterId)
-            ? new Validation("You are not authorized to view data entries in this instance.")
-            : new Validation();
     }
 
     public async Task<Validation> ValidateDataEntryFieldCreateRequestAsync(
@@ -198,10 +132,15 @@ public class DataEntryValidator : IDataEntryValidator
 
     public async Task<bool> IsFromInstanceAsync(int id, int instanceId)
     {
-        var entry = await _database.DataEntries
+        var dataEntry = await _database.DataEntries
             .Include(de => de.DataType)
             .FirstOrDefaultAsync(de => de.Id == id);
 
-        return entry?.IsDeleted == false && !entry.DataType.IsDeleted && entry.DataType.InstanceId == instanceId;
+        if (dataEntry?.IsDeleted == true)
+        {
+            throw new KeyNotFoundException("Data entry was not found.");
+        }
+
+        return dataEntry?.IsDeleted == false && !dataEntry.DataType.IsDeleted && dataEntry.DataType.InstanceId == instanceId;
     }
 }

@@ -20,6 +20,11 @@ public class ReportTemplateValidator : IReportTemplateValidator
             .ThenInclude(rt => rt.DataType)
             .FirstOrDefaultAsync(rt => rt.Id == id);
 
+        if (template?.IsDeleted == true)
+        {
+            throw new KeyNotFoundException("Report template was not found.");
+        }
+
         return template?.IsDeleted == false && template.Fields.All(f => f.DataType.InstanceId == instanceId);
     }
 }

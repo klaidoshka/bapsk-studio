@@ -137,8 +137,13 @@ public class VatReturnValidator : IVatReturnValidator
 
     public async Task<bool> IsFromInstanceAsync(int id, int instanceId)
     {
-        var vatReturn = await _database.StiVatReturnDeclarations.FindAsync(id);
+        var declaration = await _database.StiVatReturnDeclarations.FindAsync(id);
 
-        return vatReturn?.InstanceId == instanceId;
+        if (declaration == null)
+        {
+            throw new KeyNotFoundException("VAT return declaration was not found.");
+        }
+
+        return declaration.InstanceId == instanceId;
     }
 }

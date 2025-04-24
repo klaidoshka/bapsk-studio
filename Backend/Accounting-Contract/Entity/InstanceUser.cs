@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Accounting.Contract.Entity;
 
-public class InstanceUserMeta
+public class InstanceUser
 {
     /// <summary>
     /// Unique identifier for the instance user meta.

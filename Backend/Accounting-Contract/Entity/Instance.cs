@@ -49,8 +49,7 @@ public class Instance
     public string Name { get; set; } = String.Empty;
 
     /// <summary>
-    /// Navigation property for the user metas of the instance.
-    /// Metas hold users and their data who can access the instance.
+    /// Navigation property to the users of the instance.
     /// </summary>
-    public ICollection<InstanceUserMeta> UserMetas { get; set; } = new List<InstanceUserMeta>();
+    public ICollection<InstanceUser> Users { get; set; } = new List<InstanceUser>();
 }

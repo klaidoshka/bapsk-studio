@@ -58,7 +58,7 @@ public class User
     /// Navigation property to instances user metas associated with the user.
     /// These metas define which instances the user has access to.
     /// </summary>
-    public ICollection<InstanceUserMeta> InstanceUserMetas { get; set; } = new List<InstanceUserMeta>();
+    public ICollection<InstanceUser> InstanceUsers { get; set; } = new List<InstanceUser>();
 
     /// <summary>
     /// Last name of the user.

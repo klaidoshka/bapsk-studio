@@ -39,7 +39,7 @@ export class InstanceShowcaseComponent {
       .getAsSignal()()
       .map(it => ({
         ...it,
-        userMetas: it.userMetas.map((it) => ({
+        users: it.users.map((it) => ({
           ...it,
           user: this.userService.getByIdAsSignal(it.userId)()!
         }))

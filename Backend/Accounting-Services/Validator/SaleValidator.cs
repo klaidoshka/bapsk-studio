@@ -250,6 +250,11 @@ public class SaleValidator : ISaleValidator
     {
         var sale = await _database.Sales.FindAsync(id);
 
+        if (sale?.IsDeleted == true)
+        {
+            throw new KeyNotFoundException("Sale was not found.");
+        }
+
         return sale?.IsDeleted == false && sale.InstanceId == instanceId;
     }
 }

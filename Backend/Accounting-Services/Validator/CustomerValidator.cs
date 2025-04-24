@@ -142,6 +142,11 @@ public class CustomerValidator : ICustomerValidator
     {
         var customer = await _database.Customers.FindAsync(id);
 
+        if (customer?.IsDeleted == true)
+        {
+            throw new KeyNotFoundException("Customer was not found.");
+        }
+
         return customer?.IsDeleted == false && customer.InstanceId == instanceId;
     }
 }

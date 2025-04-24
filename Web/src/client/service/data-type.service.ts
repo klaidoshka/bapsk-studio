@@ -27,7 +27,7 @@ export class DataTypeService {
       fields: request.fields.map(request => ({
         ...request,
         defaultValue: request.type === FieldType.Date
-          ? request.defaultValue.toISOString()
+          ? request.defaultValue?.toISOString()
           : request.defaultValue
       }))
     };

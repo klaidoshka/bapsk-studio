@@ -47,7 +47,7 @@ export class DataTypeEntryFieldDisplayComponent {
       ? this.dataEntryService
         .getAllByDataTypeId(request.referenceId)
         .pipe(
-          map(entries => entries.find(it => it.id === request.value))
+          map(entries => entries.find(it => it.id === request.value)),
         )
       : of(undefined)
   });

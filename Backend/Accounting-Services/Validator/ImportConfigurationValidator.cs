@@ -19,6 +19,11 @@ public class ImportConfigurationValidator : IImportConfigurationValidator
             .Include(c => c.DataType)
             .FirstOrDefaultAsync(c => c.Id == id);
 
+        if (configuration == null)
+        {
+            throw new KeyNotFoundException("Import configuration was not found.");
+        }
+
         return configuration?.DataType.IsDeleted == false && configuration.DataType.InstanceId == instanceId;
     }
 }

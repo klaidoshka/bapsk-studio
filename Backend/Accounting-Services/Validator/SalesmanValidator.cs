@@ -98,6 +98,11 @@ public class SalesmanValidator : ISalesmanValidator
     {
         var salesman = await _database.Salesmen.FindAsync(id);
 
+        if (salesman?.IsDeleted == true)
+        {
+            throw new KeyNotFoundException("Salesman was not found.");
+        }
+
         return salesman?.IsDeleted == false && salesman.InstanceId == instanceId;
     }
 }

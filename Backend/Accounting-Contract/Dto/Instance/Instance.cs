@@ -7,7 +7,7 @@ public class Instance
     public string? Description { get; set; }
     public int Id { get; set; }
     public string Name { get; set; }
-    public IList<InstanceUserMeta> UserMetas { get; set; }
+    public IList<InstanceUser> Users { get; set; }
 }
 
 public static class InstanceMappings
@@ -21,7 +21,7 @@ public static class InstanceMappings
             Description = entity.Description,
             Id = entity.Id,
             Name = entity.Name,
-            UserMetas = entity.UserMetas
+            Users = entity.Users
                 .Select(it => it.ToDto())
                 .ToList()
         };

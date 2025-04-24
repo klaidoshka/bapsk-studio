@@ -196,7 +196,7 @@ export class DataTypeManagementComponent {
       name: this.form.value.name || '',
       description: this.form.value.description || null,
       displayFieldIndex: this.form.value.displayField === null ? undefined : this.form.value.displayField,
-      dataTypeId: this.dataType()!.id!,
+      dataTypeId: this.dataType()?.id || 0,
       fields: this.formFields.controls.map((field: FormGroup) => {
         const fieldType = field.value.type;
         const isReference = fieldType === FieldType.Reference;

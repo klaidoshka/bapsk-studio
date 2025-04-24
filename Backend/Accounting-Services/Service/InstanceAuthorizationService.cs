@@ -20,7 +20,7 @@ public class InstanceAuthorizationService : IInstanceAuthorizationService
             i.Id == instanceId &&
             (
                 i.CreatedById == userId ||
-                i.UserMetas.Any(um => um.UserId == userId && um.Permissions
+                i.Users.Any(um => um.UserId == userId && um.Permissions
                     .Select(up => up.Permission)
                     .Contains(permission)
                 )
@@ -35,7 +35,7 @@ public class InstanceAuthorizationService : IInstanceAuthorizationService
 
     public async Task<bool> IsMemberAsync(int instanceId, int userId)
     {
-        return await _database.InstanceUserMetas.AnyAsync(ium =>
+        return await _database.InstanceUsers.AnyAsync(ium =>
             !ium.Instance.IsDeleted && ium.InstanceId == instanceId && ium.UserId == userId
         );
     }

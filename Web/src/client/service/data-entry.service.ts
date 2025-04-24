@@ -41,7 +41,7 @@ export class DataEntryService {
         if (dataTypeField.type === FieldType.Date) {
           return {
             ...request,
-            value: request.value.toISOString()
+            value: request.value?.toISOString()
           }
         }
 
