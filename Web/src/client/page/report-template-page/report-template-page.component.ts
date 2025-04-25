@@ -1,4 +1,4 @@
-import {Component, inject, signal, viewChild} from '@angular/core';
+import {Component, inject, input, signal, viewChild} from '@angular/core';
 import {ReportTemplateService} from '../../service/report-template.service';
 import {InstanceService} from '../../service/instance.service';
 import {Router} from '@angular/router';
@@ -28,15 +28,23 @@ export class ReportTemplatePageComponent {
   private router = inject(Router);
 
   confirmationComponent = viewChild.required(ConfirmationComponent);
+  dataTypeId = input<string>();
   messages = signal<Messages>({});
 
   templates = rxResource({
     request: () => ({
+      dataTypeId: this.dataTypeId() === undefined ? undefined : +this.dataTypeId()!,
       instanceId: this.instanceId() === undefined ? undefined : +this.instanceId()!
     }),
-    loader: ({ request }) => request.instanceId
-      ? this.reportTemplateService.getAllByInstanceId(request.instanceId)
-      : of([])
+    loader: ({ request }) => {
+      if (request.dataTypeId && request.instanceId) {
+        return this.reportTemplateService.getAllByDataTypeId(request.instanceId, request.dataTypeId);
+      }
+
+      return request.instanceId
+        ? this.reportTemplateService.getAllByInstanceId(request.instanceId)
+        : of([])
+    }
   });
 
   instanceId = this.instanceService.getActiveInstanceId();

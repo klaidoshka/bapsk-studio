@@ -12,14 +12,18 @@
 
       <!-- Workspace -->
       <div class="relative inline-block" (clickOutside)="isWorkspaceMenuOpen.set(false)">
-        <button [disabled]="!instanceId()" (click)="isWorkspaceMenuOpen.set(!isWorkspaceMenuOpen())" class="hover:opacity-70 font-medium cursor-pointer">
+        <button [disabled]="!instanceId()" (click)="isWorkspaceMenuOpen.set(!isWorkspaceMenuOpen())"
+                class="font-medium cursor-pointer" [class.hover:opacity-70]="instanceId()" [class.opacity-70]="!instanceId()">
           Workspace
         </button>
-        <div *ngIf="isWorkspaceMenuOpen()" class="absolute left-0 mt-1 w-38 bg-surface-50 dark:bg-surface-800 rounded shadow-lg z-20"
+        <div *ngIf="isWorkspaceMenuOpen()"
+             class="absolute left-0 mt-1 w-38 bg-surface-50 dark:bg-surface-800 rounded shadow-lg z-20"
              (click)="isWorkspaceMenuOpen.set(false)">
-          <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700" routerLink="/home/data-type">Data Types</a>
-          <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700" routerLink="/home/workspace">Data Entries</a>
-          <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700" routerLink="/home/generate-report">Generate
+          <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700" routerLink="/home/workspace/data-type">Data
+            Types</a>
+          <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700" routerLink="/home/workspace/data-entry">Data
+            Entries</a>
+          <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700" routerLink="/home/workspace/generate-report">Generate
             Report</a>
         </div>
       </div>
@@ -30,9 +34,10 @@
           <button (click)="isAdminMenuOpen.set(!isAdminMenuOpen())" class="hover:opacity-70 font-medium cursor-pointer">
             Admin
           </button>
-          <div *ngIf="isAdminMenuOpen()" class="absolute left-0 mt-1 w-48 bg-surface-50 dark:bg-surface-800 rounded shadow-lg z-20"
-               (click)="isAdminMenuOpen.set(false)">
-            <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700" routerLink="/admin/user">Users</a>
+          <div *ngIf="isAdminMenuOpen()"
+               class="absolute left-0 mt-1 w-48 bg-surface-50 dark:bg-surface-800 rounded shadow-lg z-20">
+            <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700" routerLink="/admin/user"
+               (click)="isAdminMenuOpen.set(false)">Users</a>
             <p-fileUpload
               styleClass="flex flex-col items-start!"
               chooseStyleClass="dark:bg-surface-800! bg-surface-50! dark:text-primary-50! text-primary-900! border-none! px-4! py-2!"

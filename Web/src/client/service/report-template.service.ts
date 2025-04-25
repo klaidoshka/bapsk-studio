@@ -93,6 +93,16 @@ export class ReportTemplateService {
       );
   }
 
+  getAllByDataTypeId(instanceId: number, dataTypeId: number): Observable<ReportTemplate[]> {
+    return this
+      .getAllByInstanceId(instanceId)
+      .pipe(
+        // If any of the fields are within the data-type, think as this template is that data-type's
+        // because templates are created only within one data-type's context
+        map(templates => templates.filter(template => template.fields.some(field => field.dataTypeId === dataTypeId)))
+      );
+  }
+
   getAllByInstanceId(instanceId: number): Observable<ReportTemplate[]> {
     if (this.instancesFetched.has(instanceId)) {
       return this.cacheService.getAllWhere(template => this.templateInstanceId.get(template.id) === instanceId);

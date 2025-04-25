@@ -28,77 +28,18 @@ import {ReportTemplatePreviewPageComponent} from '../page/report-template-previe
 import {ReportPreviewPageComponent} from '../page/report-preview-page/report-preview-page.component';
 import {MiscLayoutComponent} from '../page/misc-layout/misc-layout.component';
 import {ReportGeneratePageComponent} from '../page/report-generate-page/report-generate-page.component';
+import {AdminOnlyChildGuard, AdminOnlyGuard} from '../guard/admin-only.guard';
 
 export const routes: Routes = [
   {
-    path: "home",
+    path: "admin",
+    canActivate: [AdminOnlyGuard],
+    canActivateChild: [AdminOnlyChildGuard],
     loadComponent: () => AuthenticatedLayoutComponent,
-    canActivate: [AuthenticatedOnlyGuard],
-    canActivateChild: [AuthenticatedOnlyChildGuard],
     loadChildren: () => [
       {
-        path: "data-type",
-        loadComponent: () => DataTypePageComponent
-      },
-      {
-        path: "generate-report",
-        loadComponent: () => ReportGeneratePageComponent
-      },
-      {
-        path: "import-configuration",
-        loadChildren: () => [
-          {
-            path: "",
-            pathMatch: "full",
-            loadComponent: () => ImportConfigurationPageComponent
-          },
-          {
-            path: "create",
-            loadComponent: () => ImportConfigurationManagementPageComponent
-          },
-          {
-            path: ":configurationId/edit",
-            loadComponent: () => ImportConfigurationManagementPageComponent
-          },
-          {
-            path: ":configurationId",
-            loadComponent: () => ImportConfigurationPreviewPageComponent
-          }
-        ]
-      },
-      {
-        path: "instance",
-        loadComponent: () => InstancePageComponent
-      },
-      {
-        path: "profile",
-        loadComponent: () => ProfilePageComponent
-      },
-      {
-        path: "report-template",
-        loadChildren: () => [
-          {
-            path: "",
-            pathMatch: "full",
-            loadComponent: () => ReportTemplatePageComponent
-          },
-          {
-            path: "create",
-            loadComponent: () => ReportTemplateManagementPageComponent
-          },
-          {
-            path: ":templateId/edit",
-            loadComponent: () => ReportTemplateManagementPageComponent
-          },
-          {
-            path: ":templateId",
-            loadComponent: () => ReportTemplatePreviewPageComponent
-          }
-        ]
-      },
-      {
-        path: "workspace",
-        loadComponent: () => WorkspacePageComponent
+        path: "user",
+        loadComponent: () => UserPageComponent
       }
     ]
   },
@@ -119,12 +60,79 @@ export const routes: Routes = [
     ]
   },
   {
-    path: "admin",
+    path: "home",
     loadComponent: () => AuthenticatedLayoutComponent,
+    canActivate: [AuthenticatedOnlyGuard],
+    canActivateChild: [AuthenticatedOnlyChildGuard],
     loadChildren: () => [
       {
-        path: "user",
-        loadComponent: () => UserPageComponent
+        path: "instance",
+        loadComponent: () => InstancePageComponent
+      },
+      {
+        path: "profile",
+        loadComponent: () => ProfilePageComponent
+      },
+      {
+        path: "workspace",
+        loadChildren: () => [
+          {
+            path: "data-entry",
+            loadComponent: () => WorkspacePageComponent
+          },
+          {
+            path: "data-type",
+            loadComponent: () => DataTypePageComponent
+          },
+          {
+            path: "generate-report",
+            loadComponent: () => ReportGeneratePageComponent
+          },
+          {
+            path: "import-configuration",
+            loadChildren: () => [
+              {
+                path: "",
+                pathMatch: "full",
+                loadComponent: () => ImportConfigurationPageComponent
+              },
+              {
+                path: "create",
+                loadComponent: () => ImportConfigurationManagementPageComponent
+              },
+              {
+                path: ":configurationId/edit",
+                loadComponent: () => ImportConfigurationManagementPageComponent
+              },
+              {
+                path: ":configurationId",
+                loadComponent: () => ImportConfigurationPreviewPageComponent
+              }
+            ]
+          },
+          {
+            path: "report-template",
+            loadChildren: () => [
+              {
+                path: "",
+                pathMatch: "full",
+                loadComponent: () => ReportTemplatePageComponent
+              },
+              {
+                path: "create",
+                loadComponent: () => ReportTemplateManagementPageComponent
+              },
+              {
+                path: ":templateId/edit",
+                loadComponent: () => ReportTemplateManagementPageComponent
+              },
+              {
+                path: ":templateId",
+                loadComponent: () => ReportTemplatePreviewPageComponent
+              }
+            ]
+          },
+        ]
       }
     ]
   },
