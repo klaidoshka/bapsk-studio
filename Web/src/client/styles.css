@@ -1,0 +1,2 @@
+/* Workaround to enable TailwindCSS language support, since it does not support Sass */
+@import "tailwindcss";
