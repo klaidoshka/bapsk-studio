@@ -7,4 +7,6 @@ public interface IReportService
     public Task<Report> GenerateDataEntriesReportAsync(ReportByDataEntriesGenerateRequest request);
 
     public Task<IList<Report>> GenerateSalesReportAsync(ReportBySalesGenerateRequest request);
+    
+    public Task<string> UpdateHtmlAsync(string html);
 }

@@ -1,5 +1,6 @@
 using Accounting.Contract.Dto.Sti.VatReturn;
 using Accounting.Contract.Service;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Accounting.API.Endpoint;
 
@@ -10,6 +11,7 @@ public static class ButentaEndpoints
         builder.MapPost("submit-trade/{tradeId:int}", SubmitTrade);
         builder.MapPost("update-trade/{tradeId:int}", UpdateTrade);
         builder.MapGet("trade-declaration/{tradeId:int}", GetTradeDeclaration);
+        builder.MapPost("update-html", UpdateHtml);
     }
 
     private static async Task<IResult> SubmitTrade(
@@ -36,4 +38,9 @@ public static class ButentaEndpoints
         int tradeId,
         IButentaService butentaService
     ) => Results.Json(await butentaService.GetVatReturnDeclarationByTradeId(tradeId));
+
+    private static async Task<IResult> UpdateHtml(
+        [FromBody] string html,
+        IReportService reportService
+    ) => Results.Content(await reportService.UpdateHtmlAsync(html), contentType: "text/html");
 }

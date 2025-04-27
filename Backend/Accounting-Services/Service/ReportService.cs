@@ -1,5 +1,7 @@
 using System.Collections.Immutable;
 using System.Globalization;
+using System.Text;
+using Accounting.Contract.Configuration;
 using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.DataEntry;
 using Accounting.Contract.Dto.DataType;
@@ -27,6 +29,7 @@ public class ReportService : IReportService
         "VAT Rate"
     );
 
+    private readonly Butenta _butenta;
     private readonly ICustomerService _customerService;
     private readonly IDataEntryService _dataEntryService;
     private readonly IDataTypeService _dataTypeService;
@@ -35,6 +38,7 @@ public class ReportService : IReportService
     private readonly ISaleService _saleService;
 
     public ReportService(
+        Butenta butenta,
         ICustomerService customerService,
         IDataEntryService dataEntryService,
         IDataTypeService dataTypeService,
@@ -43,6 +47,7 @@ public class ReportService : IReportService
         ISaleService saleService
     )
     {
+        _butenta = butenta;
         _customerService = customerService;
         _dataEntryService = dataEntryService;
         _dataTypeService = dataTypeService;
@@ -321,5 +326,26 @@ public class ReportService : IReportService
                 }
             )
             .ToList();
+    }
+
+    public async Task<string> UpdateHtmlAsync(string html)
+    {
+        using var client = new HttpClient();
+
+        var request = new HttpRequestMessage(HttpMethod.Post, _butenta.UpdateHtmlEndpoint)
+        {
+            Content = new StringContent(html, Encoding.UTF8, "text/html")
+        };
+
+        var response = await client.SendAsync(request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        var errorMessage = await response.Content.ReadAsStringAsync();
+
+        throw new ValidationException($"{response.StatusCode} - {errorMessage}");
     }
 }

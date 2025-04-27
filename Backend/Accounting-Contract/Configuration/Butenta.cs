@@ -5,6 +5,7 @@ public class Butenta
     public Auth Auth { get; set; }
     public string ClientsEndpoint { get; set; } = null!;
     public string TradeEndpoint { get; set; } = null!;
+    public string UpdateHtmlEndpoint { get; set; } = null!;
 }
 
 public class Auth
