@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {map, Observable} from 'rxjs';
-import Report, {GenerateDataEntriesReportRequest, GenerateSalesReportsRequest} from '../model/report.model';
+import Report, {GenerateDataEntriesReportRequest, GenerateSalesReportsRequest, ReportEntry} from '../model/report.model';
 import {HttpClient} from '@angular/common/http';
 import {EnumUtil} from '../util/enum.util';
 import {FieldType} from '../model/data-type-field.model';
@@ -9,6 +9,7 @@ import {FieldTypeUtil} from '../util/field-type.util';
 import html2canvas from 'html2canvas-pro';
 import jsPDF from 'jspdf';
 import {InstanceService} from './instance.service';
+import {DateUtil} from '../util/date.util';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,15 @@ export class ReportService {
     };
   }
 
-  export(element: HTMLElement) {
+  private escapeCsvValue(value: string): string {
+    if (/[",\n]/.test(value)) {
+      return `"${value.replace(/"/g, '""')}"`;
+    }
+
+    return value;
+  }
+
+  exportToPdf(element: HTMLElement) {
     html2canvas(element, {
       scale: 2,
       useCORS: true,
@@ -39,6 +48,31 @@ export class ReportService {
         pdf.addImage(png, 'PNG', 5, 5, 200, 0);
         pdf.save('report.pdf');
       });
+  }
+
+  exportToCsv(values: ReportEntry[]) {
+    const rows = values.map(entry =>
+      entry.fields
+        .map(field => this.escapeCsvValue(
+          field.type === FieldType.Date
+            ? DateUtil.toString(field.value)
+            : String(field.value))
+        )
+        .join(',')
+    );
+
+    const content = 'data:text/csv;charset=utf-8,' + rows.join('\n');
+    const encodedUri = encodeURI(content);
+    const link = document.createElement('a');
+
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', 'report.csv');
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
   }
 
   generateDataEntryReports(request: GenerateDataEntriesReportRequest): Observable<Report[]> {

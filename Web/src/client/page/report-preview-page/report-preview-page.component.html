@@ -7,7 +7,10 @@
   <ng-template #hasReports>
     <div *ngFor="let report of reports?.reports!; let i = index; let count = count" class="flex flex-col gap-4">
       <div class="flex flex-row justify-between items-center" [ngClass]="{'mt-16': i > 0}">
-        <p-button label="Export" icon="pi pi-file-export" (onClick)="export(i)"/>
+        <div class="space-x-2">
+          <p-button label="Export PDF" icon="pi pi-file-export" (onClick)="export(i, 'pdf')"/>
+          <p-button label="Export CSV" icon="pi pi-file-export" (onClick)="export(i, 'csv')"/>
+        </div>
         <p class="self-end font-semibold">{{ i + 1 }} / {{ count }}</p>
       </div>
 

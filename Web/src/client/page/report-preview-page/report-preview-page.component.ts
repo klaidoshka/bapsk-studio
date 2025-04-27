@@ -29,13 +29,23 @@ export class ReportPreviewPageComponent {
   reports = this.router.lastSuccessfulNavigation?.extras?.state as Reports | undefined;
   reportContainers = viewChildren<ElementRef>('reportContainer');
 
-  export(index: number) {
-    const element = this.reportContainers()?.at(index)?.nativeElement;
+  export(index: number, type: 'pdf' | 'csv') {
+    if (type === 'pdf') {
+      const element = this.reportContainers()?.at(index)?.nativeElement;
 
-    if (!element) {
-      return;
+      if (!element) {
+        return;
+      }
+
+      this.reportService.exportToPdf(element);
+    } else if (type === 'csv') {
+      const values = this.reports?.reports?.at(index)?.entries;
+
+      if (!values) {
+        return;
+      }
+
+      this.reportService.exportToCsv(values);
     }
-
-    this.reportService.export(element);
   }
 }
