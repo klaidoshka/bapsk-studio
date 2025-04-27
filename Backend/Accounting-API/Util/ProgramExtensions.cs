@@ -138,16 +138,16 @@ public static class ProgramExtensions
         apiRouteGroup
             .MapGroup("/user")
             .MapUserEndpoints();
-
-        var vatReturnAnonymousRouteGroup = apiRouteGroup
-            .MapGroup("/accounting/vat-return")
-            .AllowAnonymous();
-
-        vatReturnAnonymousRouteGroup.MapVatReturnAnonymousEndpoints();
-
-        vatReturnAnonymousRouteGroup
-            .MapGroup("/butenta")
+        
+        apiRouteGroup
+            .MapGroup("/accounting/butenta")
+            .AllowAnonymous()
             .MapButentaEndpoints();
+
+        apiRouteGroup
+            .MapGroup("/accounting/vat-return")
+            .AllowAnonymous()
+            .MapVatReturnAnonymousEndpoints();
 
         apiRouteGroup
             .MapGroup("/accounting/instance")

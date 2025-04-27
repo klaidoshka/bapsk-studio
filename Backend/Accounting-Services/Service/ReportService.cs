@@ -337,15 +337,22 @@ public class ReportService : IReportService
             Content = new StringContent(html, Encoding.UTF8, "text/html")
         };
 
-        var response = await client.SendAsync(request);
-
-        if (response.IsSuccessStatusCode)
+        try
         {
-            return await response.Content.ReadAsStringAsync();
+            var response = await client.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+
+            var errorMessage = await response.Content.ReadAsStringAsync();
+
+            throw new ValidationException($"{response.StatusCode} - {errorMessage}");
         }
-
-        var errorMessage = await response.Content.ReadAsStringAsync();
-
-        throw new ValidationException($"{response.StatusCode} - {errorMessage}");
+        catch (HttpRequestException ex)
+        {
+            throw new ValidationException(ex.Message);
+        }
     }
 }

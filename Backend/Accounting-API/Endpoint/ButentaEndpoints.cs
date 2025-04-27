@@ -1,6 +1,5 @@
 using Accounting.Contract.Dto.Sti.VatReturn;
 using Accounting.Contract.Service;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Accounting.API.Endpoint;
 
@@ -40,7 +39,15 @@ public static class ButentaEndpoints
     ) => Results.Json(await butentaService.GetVatReturnDeclarationByTradeId(tradeId));
 
     private static async Task<IResult> UpdateHtml(
-        [FromBody] string html,
+        HttpRequest request,
         IReportService reportService
-    ) => Results.Content(await reportService.UpdateHtmlAsync(html), contentType: "text/html");
+    )
+    {
+        using var reader = new StreamReader(request.Body);
+        var html = await reader.ReadToEndAsync();
+
+        return String.IsNullOrWhiteSpace(html)
+            ? Results.BadRequest("HTML content is empty.")
+            : Results.Content(await reportService.UpdateHtmlAsync(html), contentType: "text/html");
+    }
 }
