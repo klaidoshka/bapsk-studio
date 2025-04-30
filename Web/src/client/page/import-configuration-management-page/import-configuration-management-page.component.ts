@@ -20,10 +20,13 @@ import Messages from '../../model/messages.model';
 import {first, of} from 'rxjs';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {DataEntryService} from '../../service/data-entry.service';
-import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
+import {
+  MessagesShowcaseComponent
+} from '../../component/messages-showcase/messages-showcase.component';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {TableModule} from 'primeng/table';
 import {FormInputErrorComponent} from '../../component/form-input-error/form-input-error.component';
+import {NumberUtil} from '../../util/number.util';
 
 @Component({
   selector: 'import-configuration-management-page',
@@ -42,26 +45,28 @@ import {FormInputErrorComponent} from '../../component/form-input-error/form-inp
   styles: ``
 })
 export class ImportConfigurationManagementPageComponent {
-  protected readonly FieldType = FieldType;
   private readonly dataEntryService = inject(DataEntryService);
   private readonly dataTypeService = inject(DataTypeService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly importConfigurationService = inject(ImportConfigurationService);
   private readonly instanceService = inject(InstanceService);
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  protected readonly FieldType = FieldType;
+  protected readonly configurationId = input<string>();
+  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  protected readonly messages = signal<Messages>({});
 
-  configuration = rxResource({
+  protected readonly configuration = rxResource({
     request: () => ({
-      configurationId: this.configurationId() === undefined ? undefined : +this.configurationId()!
+      configurationId: NumberUtil.parse(this.configurationId()),
+      instanceId: this.instanceId()
     }),
-    loader: ({ request }) => request.configurationId
-      ? this.importConfigurationService.getById(request.configurationId)
+    loader: ({request}) => request.configurationId && request.instanceId
+      ? this.importConfigurationService.getById(request.instanceId, request.configurationId)
       : of(undefined)
   });
 
-  configurationId = input<string>();
-
-  dataEntries = rxResource({
+  protected readonly dataEntries = rxResource({
     request: () => {
       let dataTypeIds = this.configuration
         .value()?.dataType.fields
@@ -72,31 +77,31 @@ export class ImportConfigurationManagementPageComponent {
         dataTypeIds = this.dataTypes.value()?.map(dataType => dataType.id);
       }
 
-      return { dataTypeIds: dataTypeIds || [] };
+      return {
+        dataTypeIds: dataTypeIds,
+        instanceId: this.instanceId()
+      };
     },
-    loader: ({ request }) => request.dataTypeIds.length > 0
-      ? this.dataEntryService.getAllByDataTypeIds(request.dataTypeIds)
+    loader: ({request}) => request.dataTypeIds && request.instanceId
+      ? this.dataEntryService.getAllByDataTypeIds(request.instanceId, request.dataTypeIds)
       : of(undefined)
   });
 
-  dataTypes = rxResource({
+  protected readonly dataTypes = rxResource({
     request: () => ({
       instanceId: this.instanceId()
     }),
-    loader: ({ request }) => request.instanceId
+    loader: ({request}) => request.instanceId
       ? this.dataTypeService.getAllByInstanceId(request.instanceId)
       : of([])
   });
 
-  form = this.formBuilder.group({
+  protected readonly form = this.formBuilder.group({
     dataTypeId: [this.configuration.value()?.dataTypeId, [Validators.required]],
     fields: this.formBuilder.array([]),
     id: [this.configuration.value()?.id],
     name: [this.configuration.value()?.name, [Validators.required]]
   });
-
-  instanceId = this.instanceService.getActiveInstanceId();
-  messages = signal<Messages>({});
 
   constructor() {
     const effectRef = effect(() => {
@@ -132,7 +137,7 @@ export class ImportConfigurationManagementPageComponent {
   }
 
   private changeMessages(message: string, success: boolean = true) {
-    this.messages.set(success ? { success: [message] } : { error: [message] });
+    this.messages.set(success ? {success: [message]} : {error: [message]});
   }
 
   private create(request: ImportConfigurationCreateRequest) {
@@ -149,7 +154,7 @@ export class ImportConfigurationManagementPageComponent {
     });
   }
 
-  changeFormFields(dataTypeId: number) {
+  protected changeFormFields(dataTypeId: number) {
     this.formFields().clear();
 
     const dataType = this.configuration.value()?.dataType || this.dataTypes
@@ -164,11 +169,11 @@ export class ImportConfigurationManagementPageComponent {
     });
   }
 
-  formFields() {
+  protected formFields() {
     return this.form.get('fields') as FormArray<FormGroup>;
   }
 
-  getDataEntries(index: number): Signal<{ id: number, label: string }[]> {
+  protected getDataEntries(index: number): Signal<{ id: number, label: string }[]> {
     return computed(() => {
       const dataTypeId = this.form.value.dataTypeId;
       let dataType = this.configuration.value()?.dataType;
@@ -202,14 +207,14 @@ export class ImportConfigurationManagementPageComponent {
     });
   }
 
-  getFieldType(index: number) {
+  protected getFieldType(index: number) {
     return this
       .formFields()
       .at(index)
       .get('type')!.value as FieldType;
   }
 
-  getFieldName(index: number) {
+  protected getFieldName(index: number) {
     const field = this.formFields()
       .at(index)
       .get('dataTypeFieldId')!.value;
@@ -221,7 +226,7 @@ export class ImportConfigurationManagementPageComponent {
     return dataType.fields.find(df => df.id === field)?.name || "";
   }
 
-  moveField(index: number, value: number) {
+  protected moveField(index: number, value: number) {
     const fields = this.formFields();
     const field = fields.at(index);
 
@@ -234,7 +239,7 @@ export class ImportConfigurationManagementPageComponent {
     fields.markAsDirty();
   }
 
-  save() {
+  protected save() {
     if (!this.form.valid) {
       this.changeMessages("Please fill out the form.", false);
     }
@@ -250,7 +255,8 @@ export class ImportConfigurationManagementPageComponent {
         })),
         id: this.form.value.id || 0,
         name: this.form.value.name!
-      }
+      },
+      instanceId: this.instanceId()!
     };
 
     if (this.configurationId()) {

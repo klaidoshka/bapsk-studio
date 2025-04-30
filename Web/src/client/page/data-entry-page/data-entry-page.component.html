@@ -1,0 +1,34 @@
+@if (dataType.isLoading()) {
+  Loading...
+} @else if (!dataType.value()) {
+  Unknown data type provided
+} @else {
+  <p-dialog header="Data Entry Import" closeOnEscape="true" modal="true" styleClass="min-w-128" closable="true"
+            [(visible)]="showImporting" (onHide)="showImporting.set(false)" (close)="showImporting.set(false)">
+    <data-entry-import-form [clearImportedValues]="showImporting()" [dataType]="dataType.value()!"/>
+  </p-dialog>
+
+  <confirmation [key]='"data-entry-delete-confirmation"' [header]='"Are you sure about deleting this data entry?"'/>
+
+  <messages-showcase [messages]="messages()"/>
+
+  <div class="mt-4">
+    <p-button label="Create" icon="pi pi-plus" (onClick)="manage()"/>
+
+    <p-button class="ml-4" label="Import" icon="pi pi-file-import" (onClick)="showImporting.set(true)"/>
+
+    <p-button class="ml-1" label="Import Configurations" icon="pi pi-file-excel" routerLink="../import-configuration"
+              [queryParams]="{dataTypeId: dataType.value()!.id}"/>
+
+    <p-button class="ml-4" label="Generate Report" icon="pi pi-file-pdf" routerLink="../generate-report"/>
+
+    <p-button class="ml-1" label="Report Templates" icon="pi pi-file" routerLink="../report-template"
+              [queryParams]="{dataTypeId: dataType.value()!.id}"/>
+  </div>
+
+  <div class="card mt-4">
+    <data-entry-table [dataEntries]="dataEntries.value() || []" [dataType]="dataType.value()!" [delete]="onDelete"
+                      [manage]="onManage"
+                      [preview]="onPreview"/>
+  </div>
+}

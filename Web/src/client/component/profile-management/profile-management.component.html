@@ -36,7 +36,7 @@
     <div class="flex-1 min-w-48 w-full">
       <label for="country" class="block text-sm font-medium">Country</label>
       <p-autocomplete inputId="country" formControlName="country" optionLabel="name" optionValue="code" placeholder="Select acountry"
-                      [dropdown]="true" [suggestions]="filteredCountries" (completeMethod)="filterCountries($event)"
+                      [dropdown]="true" [suggestions]="filteredCountries()" (completeMethod)="filterCountries($event)"
                       class="mt-1 block w-full" styleClass="w-full" appendTo="body"/>
       <form-input-error [control]="form.controls.country"/>
     </div>

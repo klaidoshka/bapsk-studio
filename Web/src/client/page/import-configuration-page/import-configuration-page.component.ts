@@ -3,13 +3,17 @@ import {ImportConfigurationService} from '../../service/import-configuration.ser
 import {ImportConfigurationJoined} from '../../model/import-configuration.model';
 import {InstanceService} from '../../service/instance.service';
 import {Button} from 'primeng/button';
-import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
+import {
+  MessagesShowcaseComponent
+} from '../../component/messages-showcase/messages-showcase.component';
 import {TableModule} from 'primeng/table';
 import Messages from '../../model/messages.model';
 import {ConfirmationComponent} from '../../component/confirmation/confirmation.component';
 import {Router} from '@angular/router';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {of} from 'rxjs';
+import {first, of} from 'rxjs';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {NumberUtil} from '../../util/number.util';
 
 @Component({
   selector: 'import-configuration-page',
@@ -23,51 +27,56 @@ import {of} from 'rxjs';
   styles: ``
 })
 export class ImportConfigurationPageComponent {
-  private importConfigurationService = inject(ImportConfigurationService);
-  private instanceService = inject(InstanceService);
-  private router = inject(Router);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly importConfigurationService = inject(ImportConfigurationService);
+  private readonly instanceService = inject(InstanceService);
+  private readonly router = inject(Router);
+  protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
+  protected readonly dataTypeId = input<string>();
+  protected readonly messages = signal<Messages>({});
+  protected readonly instanceId = this.instanceService.getActiveInstanceId();
 
-  confirmationComponent = viewChild.required(ConfirmationComponent);
-  dataTypeId = input<string>();
-  messages = signal<Messages>({});
-
-  configurations = rxResource({
+  protected readonly configurations = rxResource({
     request: () => ({
-      dataTypeId: this.dataTypeId() === undefined ? undefined : +this.dataTypeId()!,
-      instanceId: this.instanceId() === undefined ? undefined : +this.instanceId()!
+      dataTypeId: NumberUtil.parse(this.dataTypeId),
+      instanceId: this.instanceId()
     }),
-    loader: ({ request }) => {
-      if (request.dataTypeId) {
-        return this.importConfigurationService.getAllByDataTypeId(request.dataTypeId);
+    loader: ({request}) => {
+      if (!request.instanceId) {
+        return of([]);
       }
 
-      return request.instanceId
-        ? this.importConfigurationService.getAllByInstanceId(request.instanceId)
-        : of([])
+      if (request.dataTypeId) {
+        return this.importConfigurationService.getAllByDataTypeId(request.instanceId, request.dataTypeId);
+      }
+
+      return this.importConfigurationService.getAllByInstanceId(request.instanceId);
     }
   });
 
-  instanceId = this.instanceService.getActiveInstanceId();
-
   private changeMessages(message: string, success: boolean = true) {
-    this.messages.set(success ? { success: [message] } : { error: [message] });
+    this.messages.set(success ? {success: [message]} : {error: [message]});
   }
 
-  delete(configuration: ImportConfigurationJoined) {
+  protected delete(configuration: ImportConfigurationJoined) {
     this.confirmationComponent().request(() => {
-      this.importConfigurationService.delete(configuration.id!).subscribe(() =>
-        this.changeMessages("Import configuration deleted successfully")
-      );
+      this.importConfigurationService
+        .delete(this.instanceId()!, configuration.id!)
+        .pipe(first())
+        .subscribe({
+          next: () => this.changeMessages("Import configuration deleted successfully"),
+          error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+        });
     });
   }
 
-  manage(configuration?: ImportConfigurationJoined) {
+  protected manage(configuration?: ImportConfigurationJoined) {
     this.router.navigate(
-      ['home/import-configuration/' + (configuration ? `${configuration.id}/edit` : 'create')]
+      ['home/workspace/import-configuration/' + (configuration ? `${configuration.id}/edit` : 'create')]
     );
   }
 
-  preview(configuration: ImportConfigurationJoined) {
-    this.router.navigate([`home/import-configuration/${configuration.id}`]);
+  protected preview(configuration: ImportConfigurationJoined) {
+    this.router.navigate([`home/workspace/import-configuration/${configuration.id}`]);
   }
 }

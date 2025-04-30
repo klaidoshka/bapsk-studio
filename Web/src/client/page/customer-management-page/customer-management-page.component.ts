@@ -1,0 +1,179 @@
+import {Component, inject, input, signal} from '@angular/core';
+import {Button} from "primeng/button";
+import {DatePicker} from "primeng/datepicker";
+import {FormInputErrorComponent} from "../../component/form-input-error/form-input-error.component";
+import {InputText} from "primeng/inputtext";
+import {
+  MessagesShowcaseComponent
+} from "../../component/messages-showcase/messages-showcase.component";
+import {NgForOf} from "@angular/common";
+import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
+import {Select} from "primeng/select";
+import {getDefaultIsoCountry, IsoCountries} from '../../model/iso-country.model';
+import {CustomerService} from '../../service/customer.service';
+import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import Customer, {
+  CustomerCreateRequest,
+  CustomerEditRequest,
+  CustomerOtherDocument
+} from '../../model/customer.model';
+import {IdentityDocumentType} from '../../model/identity-document-type.model';
+import Messages from '../../model/messages.model';
+import {first, of, tap} from 'rxjs';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {InstanceService} from '../../service/instance.service';
+
+@Component({
+  selector: 'customer-management-page',
+  imports: [
+    Button,
+    DatePicker,
+    FormInputErrorComponent,
+    InputText,
+    MessagesShowcaseComponent,
+    NgForOf,
+    ReactiveFormsModule,
+    Select
+  ],
+  templateUrl: './customer-management-page.component.html',
+  styles: ``
+})
+export class CustomerManagementPageComponent {
+  private readonly customerService = inject(CustomerService);
+  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly instanceService = inject(InstanceService);
+  protected readonly IsoCountries = IsoCountries;
+  protected readonly customerId = input<string>();
+  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  protected readonly messages = signal<Messages>({});
+
+  protected readonly customer = rxResource({
+    request: () => ({
+      customerId: this.customerId() ? +this.customerId()! : undefined,
+      instanceId: this.instanceId()
+    }),
+    loader: ({request}) => request.customerId && request.instanceId
+      ? this.customerService
+        .getById(request.instanceId, request.customerId)
+        .pipe(
+          first(),
+          tap(customer => this.updateForm(customer))
+        )
+      : of(undefined)
+  });
+
+  protected readonly form = this.formBuilder.group({
+    birthdate: [new Date(), [Validators.required]],
+    email: [""],
+    firstName: ["", [Validators.required, Validators.maxLength(200)]],
+    identityDocument: this.formBuilder.group({
+      issuedBy: [getDefaultIsoCountry().code, [Validators.required]],
+      number: ["", [Validators.required, Validators.maxLength(50)]],
+      type: [IdentityDocumentType.Passport, [Validators.required]],
+      value: [null, [Validators.maxLength(50)]]
+    }),
+    lastName: ["", [Validators.required, Validators.maxLength(200)]],
+    otherDocuments: this.formBuilder.array([
+      this.formBuilder.group({
+        issuedBy: [getDefaultIsoCountry().code, [Validators.required]],
+        type: ["", [Validators.required, Validators.maxLength(70)]],
+        value: ["", [Validators.required, Validators.maxLength(70)]]
+      })
+    ]),
+    residenceCountry: [getDefaultIsoCountry().code, [Validators.required]]
+  });
+
+  protected readonly identityDocumentTypes = [
+    {label: 'ID Card', value: IdentityDocumentType.NationalId},
+    {label: 'Passport', value: IdentityDocumentType.Passport}
+  ]
+
+  private create(request: CustomerCreateRequest) {
+    this.customerService.create(request).pipe(first()).subscribe({
+      next: () => this.onSuccess("Customer has been created successfully."),
+      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+    });
+  }
+
+  private edit(request: CustomerEditRequest) {
+    this.customerService.edit(request).pipe(first()).subscribe({
+      next: () => this.onSuccess("Customer has been edited successfully."),
+      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+    });
+  }
+
+  private onSuccess(message: string) {
+    this.messages.set({success: [message]});
+    this.form.markAsUntouched();
+    this.form.markAsPristine();
+  }
+
+  private updateForm(customer?: Customer) {
+    this.form.reset();
+
+    if (customer) {
+      this.form.patchValue({...customer as any});
+
+      if (customer.otherDocuments.length > 0) {
+        customer.otherDocuments.forEach(it => this.addOtherDocument(it));
+      }
+    }
+  }
+
+  protected addOtherDocument(document?: CustomerOtherDocument) {
+    this.otherDocuments().push(this.formBuilder.group({
+      issuedBy: [document?.issuedBy || getDefaultIsoCountry().code, [Validators.required]],
+      type: [document?.type || "", [Validators.required, Validators.maxLength(70)]],
+      value: [document?.value || "", [Validators.required, Validators.maxLength(70)]]
+    }));
+
+    this.form.markAsDirty();
+  }
+
+  protected otherDocuments() {
+    return this.form.controls.otherDocuments;
+  }
+
+  protected removeOtherDocument(index: number) {
+    this.otherDocuments().removeAt(index);
+    this.form.markAsDirty();
+  }
+
+  protected save() {
+    if (!this.form.valid) {
+      this.messages.set({error: ["Please fill out the form."]});
+      return;
+    }
+
+    const request: CustomerCreateRequest = {
+      customer: {
+        birthdate: this.form.value.birthdate!,
+        email: this.form.value.email || undefined,
+        firstName: this.form.value.firstName!,
+        lastName: this.form.value.lastName!,
+        identityDocument: {
+          issuedBy: this.form.value.identityDocument!.issuedBy!,
+          number: this.form.value.identityDocument!.number!,
+          type: this.form.value.identityDocument!.type!,
+          value: this.form.value.identityDocument!.value || undefined
+        },
+        otherDocuments: this.form.value.otherDocuments as any,
+        residenceCountry: this.form.value.residenceCountry!
+      },
+      instanceId: this.instanceId()!
+    };
+
+    if (this.customer.value()) {
+      this.edit({
+        ...request,
+        customer: {
+          ...request.customer,
+          id: this.customer.value()!.id
+        }
+      });
+    } else {
+      this.create(request);
+    }
+  }
+}

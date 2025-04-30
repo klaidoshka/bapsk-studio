@@ -1,0 +1,26 @@
+<div class="min-w-128">
+  <messages-showcase [messages]="messages()"/>
+
+  <form class="grid grid-cols-1 gap-4" [formGroup]="form">
+    @for (field of formFields; track $index) {
+      @let isReferenceField = field.type === FieldType.Reference;
+
+      <div class="flex flex-col gap-1">
+        <label [for]="field.field" class="block text-sm font-medium">{{ field.field }}</label>
+        @if (isReferenceField) {
+          <p-select placeholder="Select a referenced entry" [options]="getDataEntries(field.referenceId)()"
+                    optionLabel="label" optionValue="id" appendTo="body" [formControl]="field.control.controls.value"
+                    class="w-full" [required]="field.isRequired!"/>
+        } @else {
+          <data-type-entry-field-input [formControl]="field.control.controls.value" [type]="field.type!"/>
+        }
+        <form-input-error [control]="field.control.controls.value"/>
+      </div>
+    }
+
+    <div class="flex justify-end mt-4">
+      <p-button [label]="dataEntry.value() ? 'Create' : 'Save'" [disabled]="form.invalid || !form.dirty"
+                (onClick)="save()" type="submit"/>
+    </div>
+  </form>
+</div>

@@ -11,7 +11,6 @@ import {FieldType} from '../model/data-type-field.model';
 import {FieldTypeUtil} from '../util/field-type.util';
 import {DataTypeService} from './data-type.service';
 import {CacheService} from './cache.service';
-import {InstanceService} from './instance.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,11 +19,9 @@ export class ImportConfigurationService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly dataTypeService = inject(DataTypeService);
   private readonly httpClient = inject(HttpClient);
-  private readonly instanceService = inject(InstanceService);
   private readonly cacheService = new CacheService<number, ImportConfigurationJoined>(configuration => configuration.id!);
   private readonly dataTypesFetched = new Set<number>();
   private readonly instancesFetched = new Set<number>();
-  private readonly instanceId = this.instanceService.getActiveInstanceId();
 
   private adjustRequestDateToISO<T extends ImportConfigurationCreateRequest | ImportConfigurationEditRequest>(
     request: T, fieldTypes: Map<number, FieldType>
@@ -45,21 +42,21 @@ export class ImportConfigurationService {
 
   create(request: ImportConfigurationCreateRequest): Observable<ImportConfigurationJoined> {
     return this.dataTypeService
-      .getById(request.importConfiguration.dataTypeId)
+      .getById(request.instanceId, request.importConfiguration.dataTypeId)
       .pipe(
         switchMap(dataType =>
           this.httpClient.post<ImportConfiguration>(
-            this.apiRouter.importConfiguration.create(this.instanceId()!),
+            this.apiRouter.importConfiguration.create(request.instanceId),
             this.adjustRequestDateToISO(
               request,
               new Map<number, FieldType>(dataType.fields.map(f => [f.id, f.type]))
             )
           )),
         switchMap(configuration => this
-          .updateProperties(configuration)
+          .updateProperties(configuration, request.instanceId)
           .pipe(
             switchMap(configuration => this.dataTypeService
-              .getById(configuration.dataTypeId)
+              .getById(request.instanceId, configuration.dataTypeId)
               .pipe(
                 map(dataType => ({
                   ...configuration,
@@ -74,9 +71,9 @@ export class ImportConfigurationService {
       );
   }
 
-  delete(id: number): Observable<void> {
+  delete(instanceId: number, id: number): Observable<void> {
     return this.httpClient
-      .delete<void>(this.apiRouter.importConfiguration.delete(this.instanceId()!, id))
+      .delete<void>(this.apiRouter.importConfiguration.delete(instanceId, id))
       .pipe(
         tap(() => this.cacheService.delete(id))
       );
@@ -84,11 +81,11 @@ export class ImportConfigurationService {
 
   edit(request: ImportConfigurationEditRequest): Observable<void> {
     return this.dataTypeService
-      .getById(request.importConfiguration.dataTypeId)
+      .getById(request.instanceId, request.importConfiguration.dataTypeId)
       .pipe(
         switchMap(dataType =>
           this.httpClient.put<void>(
-            this.apiRouter.importConfiguration.edit(this.instanceId()!, request.importConfiguration.id!),
+            this.apiRouter.importConfiguration.edit(request.instanceId, request.importConfiguration.id!),
             this.adjustRequestDateToISO(
               request,
               new Map<number, FieldType>(dataType.fields.map(f => [f.id, f.type]))
@@ -98,7 +95,7 @@ export class ImportConfigurationService {
             this.cacheService.invalidate(request.importConfiguration.id!);
 
             this
-              .getById(request.importConfiguration.id!)
+              .getById(request.instanceId, request.importConfiguration.id!)
               .pipe(first())
               .subscribe();
           }
@@ -106,19 +103,19 @@ export class ImportConfigurationService {
       );
   }
 
-  getById(id: number): Observable<ImportConfigurationJoined> {
+  getById(instanceId: number, id: number): Observable<ImportConfigurationJoined> {
     if (this.cacheService.has(id)) {
       return this.cacheService.get(id);
     }
 
     return this.httpClient
-      .get<ImportConfiguration>(this.apiRouter.importConfiguration.getById(this.instanceId()!, id))
+      .get<ImportConfiguration>(this.apiRouter.importConfiguration.getById(instanceId, id))
       .pipe(
         switchMap(configuration => this
-          .updateProperties(configuration)
+          .updateProperties(configuration, instanceId)
           .pipe(
             switchMap(configuration => this.dataTypeService
-              .getById(configuration.dataTypeId)
+              .getById(instanceId, configuration.dataTypeId)
               .pipe(
                 map(dataType => ({
                   ...configuration,
@@ -133,7 +130,7 @@ export class ImportConfigurationService {
       );
   }
 
-  getAllByDataTypeId(dataTypeId: number): Observable<ImportConfigurationJoined[]> {
+  getAllByDataTypeId(instanceId: number, dataTypeId: number): Observable<ImportConfigurationJoined[]> {
     if (this.dataTypesFetched.has(dataTypeId)) {
       return this.cacheService.getAllWhere(configuration =>
         configuration.dataTypeId === dataTypeId
@@ -141,13 +138,13 @@ export class ImportConfigurationService {
     }
 
     return this.httpClient
-      .get<ImportConfiguration[]>(this.apiRouter.importConfiguration.getByDataTypeId(this.instanceId()!, dataTypeId))
+      .get<ImportConfiguration[]>(this.apiRouter.importConfiguration.getByDataTypeId(instanceId, dataTypeId))
       .pipe(
         switchMap(configurations => combineLatest(configurations.map(configuration => this
-          .updateProperties(configuration)
+          .updateProperties(configuration, instanceId)
           .pipe(
             switchMap(configuration => this.dataTypeService
-              .getById(configuration.dataTypeId)
+              .getById(instanceId, configuration.dataTypeId)
               .pipe(
                 map(dataType => ({
                   ...configuration,
@@ -182,10 +179,10 @@ export class ImportConfigurationService {
       .get<ImportConfiguration[]>(this.apiRouter.importConfiguration.getByInstanceId(instanceId))
       .pipe(
         switchMap(configurations => combineLatest(configurations.map(configuration => this
-          .updateProperties(configuration)
+          .updateProperties(configuration, instanceId)
           .pipe(
             switchMap(configuration => this.dataTypeService
-              .getById(configuration.dataTypeId)
+              .getById(instanceId, configuration.dataTypeId)
               .pipe(
                 map(dataType => ({
                   ...configuration,
@@ -209,9 +206,9 @@ export class ImportConfigurationService {
       );
   }
 
-  updateProperties(configuration: ImportConfiguration): Observable<ImportConfiguration> {
+  updateProperties(configuration: ImportConfiguration, instanceId: number): Observable<ImportConfiguration> {
     return this.dataTypeService
-      .getById(configuration.dataTypeId)
+      .getById(instanceId, configuration.dataTypeId)
       .pipe(
         map(dataType => {
           const fieldTypes = new Map(dataType.fields.map(field => [field.id, field.type]));

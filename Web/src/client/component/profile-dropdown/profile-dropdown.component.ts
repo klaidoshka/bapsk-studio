@@ -2,7 +2,7 @@ import {Component, inject, signal, viewChild, ViewEncapsulation} from '@angular/
 import {ButtonModule} from 'primeng/button';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {AuthService} from '../../service/auth.service';
-import {MenuItem, MessageService} from 'primeng/api';
+import {MessageService} from 'primeng/api';
 import {Router, RouterLink} from '@angular/router';
 import {ToastModule} from 'primeng/toast';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
@@ -30,11 +30,10 @@ export class ProfileDropdownComponent {
   private readonly authService = inject(AuthService);
   private readonly messageService = inject(MessageService);
   private readonly router = inject(Router);
+  protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
+  protected readonly isProfileMenuOpen = signal<boolean>(false);
 
-  confirmationComponent = viewChild.required(ConfirmationComponent);
-  isProfileMenuOpen = signal<boolean>(false);
-
-  displayName = rxResource({
+  protected readonly displayName = rxResource({
     loader: () => this.authService
       .getUser()
       .pipe(
@@ -42,28 +41,7 @@ export class ProfileDropdownComponent {
       )
   });
 
-  private getEntries(): MenuItem[] {
-    return [
-      {
-        label: this.displayName.value(),
-        icon: 'pi pi-user',
-        items: [
-          {
-            label: 'Profile',
-            icon: 'pi pi-user-edit',
-            routerLink: "/home/profile"
-          },
-          {
-            label: 'Logout',
-            icon: 'pi pi-sign-out',
-            command: () => this.logout()
-          }
-        ]
-      }
-    ]
-  }
-
-  logout() {
+  protected logout() {
     this.confirmationComponent().request(() => {
       this.authService.logout().subscribe({
         next: () => {

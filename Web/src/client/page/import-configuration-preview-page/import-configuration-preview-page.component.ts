@@ -9,6 +9,10 @@ import {
 } from '../../component/data-type-entry-field-display/data-type-entry-field-display.component';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {FieldType} from '../../model/data-type-field.model';
+import {DateUtil} from '../../util/date.util';
+import {NumberUtil} from '../../util/number.util';
+import {InstanceService} from '../../service/instance.service';
+import {of} from 'rxjs';
 
 @Component({
   selector: 'import-configuration-preview-page',
@@ -22,18 +26,22 @@ import {FieldType} from '../../model/data-type-field.model';
   styles: ``
 })
 export class ImportConfigurationPreviewPageComponent {
-  private importConfigurationService = inject(ImportConfigurationService);
+  private readonly importConfigurationService = inject(ImportConfigurationService);
+  private readonly instanceService = inject(InstanceService);
+  protected readonly configurationId = input.required<string>();
+  protected readonly instanceId = this.instanceService.getActiveInstanceId();
 
-  configuration = rxResource({
+  protected readonly configuration = rxResource({
     request: () => ({
-      configurationId: +this.configurationId()
+      configurationId: NumberUtil.parse(this.configurationId()),
+      instanceId: this.instanceId()
     }),
-    loader: ({ request }) => this.importConfigurationService.getById(request.configurationId)
+    loader: ({request}) => request.configurationId && request.instanceId
+      ? this.importConfigurationService.getById(request.instanceId, request.configurationId)
+      : of(undefined)
   });
 
-  configurationId = input.required<string>();
-
-  getExampleCSV() {
+  protected getExampleCSV() {
     const fields = this.configuration
       .value()!.fields
       .sort((a, b) => a.order > b.order ? 1 : -1)
@@ -50,8 +58,8 @@ export class ImportConfigurationPreviewPageComponent {
       .join(",");
 
     const values = fields
-      .map(value => value.dataTypeField.type === FieldType.Date
-        ? value.field.defaultValue.toISOString()
+      .map(value => value.dataTypeField.type === FieldType.Date && value.field.defaultValue
+        ? DateUtil.toString(value.field.defaultValue)
         : value.field.defaultValue
       )
       .join(",");
@@ -62,7 +70,7 @@ export class ImportConfigurationPreviewPageComponent {
     };
   }
 
-  resolveDataTypeField(field: ImportConfigurationField) {
+  protected resolveDataTypeField(field: ImportConfigurationField) {
     return this.configuration.value()!.dataType.fields.find(dataTypeField =>
       dataTypeField.id === field.dataTypeFieldId
     )!;

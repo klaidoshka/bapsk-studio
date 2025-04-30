@@ -65,11 +65,11 @@ export class ReportTemplatePageComponent {
 
   manage(template?: ReportTemplate) {
     this.router.navigate(
-      ['home/report-template/' + (template ? `${template.id}/edit` : 'create')]
+      ['home/workspace/report-template/' + (template ? `${template.id}/edit` : 'create')]
     );
   }
 
   preview(template: ReportTemplate) {
-    this.router.navigate([`home/report-template/${template.id}`]);
+    this.router.navigate([`home/workspace/report-template/${template.id}`]);
   }
 }

@@ -1,30 +1,27 @@
 import {Component, effect, inject, signal, untracked} from '@angular/core';
-import {DataEntryShowcaseComponent} from '../../component/data-entry-showcase/data-entry-showcase.component';
 import {DataTypeService} from '../../service/data-type.service';
 import {InstanceService} from '../../service/instance.service';
 import DataType from '../../model/data-type.model';
-import {Message} from 'primeng/message';
 import {CustomerService} from '../../service/customer.service';
 import {SaleService} from '../../service/sale.service';
 import {SalesmanService} from '../../service/salesman.service';
 import {WorkspaceType} from './workspace-selector.model';
-import {CustomerShowcaseComponent} from '../../component/customer-showcase/customer-showcase.component';
-import {SalesmanShowcaseComponent} from '../../component/salesman-showcase/salesman-showcase.component';
 import {NgForOf, NgIf} from '@angular/common';
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
-import {SaleShowcaseComponent} from '../../component/sale-showcase/sale-showcase.component';
 import {Select} from 'primeng/select';
-import {VatReturnService} from '../../service/vat-return.service';
 import {DataEntryService} from '../../service/data-entry.service';
-import {HttpClient} from '@angular/common/http';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {of} from 'rxjs';
+import {RouterOutlet} from '@angular/router';
+import {
+  InstanceSelectorComponent
+} from '../../component/instance-selector/instance-selector.component';
 
 @Component({
   selector: 'workspace-page',
   templateUrl: './workspace-page.component.html',
-  imports: [DataEntryShowcaseComponent, Message, CustomerShowcaseComponent, SalesmanShowcaseComponent, NgIf, NgForOf, DropdownModule, FormsModule, SaleShowcaseComponent, Select],
+  imports: [NgIf, NgForOf, DropdownModule, FormsModule, Select, RouterOutlet, InstanceSelectorComponent],
   providers: []
 })
 export class WorkspacePageComponent {
@@ -32,29 +29,30 @@ export class WorkspacePageComponent {
   private customerService = inject(CustomerService);
   private dataEntryService = inject(DataEntryService);
   private dataTypeService = inject(DataTypeService);
-  private httpClient = inject(HttpClient);
   private instanceService = inject(InstanceService);
   private saleService = inject(SaleService);
   private salesmanService = inject(SalesmanService);
-  private vatReturnService = inject(VatReturnService);
 
   customers = rxResource({
-    request: () => ({ instanceId: this.instanceId() }),
-    loader: ({ request }) => request.instanceId
+    request: () => ({instanceId: this.instanceId()}),
+    loader: ({request}) => request.instanceId
       ? this.customerService.getAllByInstanceId(request.instanceId)
       : of([])
   })
 
   dataEntries = rxResource({
-    request: () => ({ dataTypeId: this.selectedDataType()?.id }),
-    loader: ({ request }) => request.dataTypeId
-      ? this.dataEntryService.getAllByDataTypeId(request.dataTypeId)
+    request: () => ({
+      dataTypeId: this.selectedDataType()?.id,
+      instanceId: this.instanceId()
+    }),
+    loader: ({request}) => request.dataTypeId && request.instanceId
+      ? this.dataEntryService.getAllByDataTypeId(request.instanceId, request.dataTypeId)
       : of([])
   });
 
   dataTypes = rxResource({
-    request: () => ({ instanceId: this.instanceId() }),
-    loader: ({ request }) => request.instanceId
+    request: () => ({instanceId: this.instanceId()}),
+    loader: ({request}) => request.instanceId
       ? this.dataTypeService.getAllByInstanceId(request.instanceId)
       : of([])
   });
@@ -62,15 +60,15 @@ export class WorkspacePageComponent {
   instanceId = this.instanceService.getActiveInstanceId();
 
   sales = rxResource({
-    request: () => ({ instanceId: this.instanceId() }),
-    loader: ({ request }) => request.instanceId
+    request: () => ({instanceId: this.instanceId()}),
+    loader: ({request}) => request.instanceId
       ? this.saleService.getAllWithVatDeclarationByInstanceId(request.instanceId)
       : of([])
   });
 
   salesmen = rxResource({
-    request: () => ({ instanceId: this.instanceId() }),
-    loader: ({ request }) => request.instanceId
+    request: () => ({instanceId: this.instanceId()}),
+    loader: ({request}) => request.instanceId
       ? this.salesmanService.getAllByInstanceId(request.instanceId)
       : of([])
   });

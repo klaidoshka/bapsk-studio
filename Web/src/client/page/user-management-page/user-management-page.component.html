@@ -1,0 +1,58 @@
+<div class="min-w-128">
+  <messages-showcase [messages]="messages()"/>
+
+  <form class="grid grid-cols-1 md:grid-cols-2 gap-4" [formGroup]="form">
+    <!-- First Name -->
+    <div class="form-field">
+      <label for="firstName" class="block text-sm font-medium">First Name</label>
+      <input type="text" id="firstName" formControlName="firstName" pInputText class="mt-1 block w-full"/>
+      <form-input-error [control]="form.controls.firstName"/>
+    </div>
+
+    <!-- Last Name -->
+    <div class="form-field">
+      <label for="lastName" class="block text-sm font-medium">Last Name</label>
+      <input type="text" id="lastName" formControlName="lastName" pInputText class="mt-1 block w-full"/>
+      <form-input-error [control]="form.controls.lastName"/>
+    </div>
+
+    <!-- Birth Date -->
+    <div class="form-field">
+      <label for="birthDate" class="block text-sm font-medium">Birthdate</label>
+      <p-datepicker inputId="birthDate" formControlName="birthDate" [showIcon]="true" variant="filled"
+                    inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-inherit!" class="mt-1 block w-full"
+                    appendTo="body"/>
+      <form-input-error [control]="form.controls.birthDate"/>
+    </div>
+
+    <!-- Email -->
+    <div class="form-field">
+      <label for="email" class="block text-sm font-medium">Email</label>
+      <input type="email" id="email" formControlName="email" pInputText class="mt-1 block w-full"/>
+      <form-input-error [control]="form.controls.email"/>
+    </div>
+
+    @if (!user.value()) {
+      <!-- Password -->
+      <div class="form-field">
+        <label for="password" class="block text-sm font-medium">Password</label>
+        <input type="password" id="password" formControlName="password" pInputText class="mt-1 block w-full"/>
+        <form-input-error [control]="form.controls.password"/>
+      </div>
+    }
+
+    <!-- Country Dropdown -->
+    <div class="form-field">
+      <label for="country" class="block text-sm font-medium">Country</label>
+      <p-autocomplete inputId="country" formControlName="country" optionLabel="name" placeholder="Select a country"
+                      [dropdown]="true" [suggestions]="filteredCountries()" (completeMethod)="filterCountries($event)"
+                      class="mt-1 block w-full" appendTo="body"/>
+      <form-input-error [control]="form.controls.country"/>
+    </div>
+
+    <div class="flex justify-end mt-4">
+      <p-button [label]="!user.value() ? 'Create' : 'Save'" [disabled]="!form.valid || !form.dirty" (onClick)="save()"
+                type="submit"/>
+    </div>
+  </form>
+</div>

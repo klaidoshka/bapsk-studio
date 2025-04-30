@@ -33,16 +33,16 @@ export class DataTypeEntryFieldInputComponent implements ControlValueAccessor {
   protected readonly FieldType = FieldType;
   protected readonly IsoCountries = IsoCountries;
 
-  type = input.required<FieldType>();
-  oldType = signal<FieldType | undefined>(undefined);
+  readonly type = input.required<FieldType>();
+  protected readonly oldType = signal<FieldType | undefined>(undefined);
 
-  onChange = signal<(value: string) => void>(() => {
+  protected readonly onChange = signal<(value: string) => void>(() => {
   });
-  onTouched = signal<() => void>(() => {
+  protected readonly onTouched = signal<() => void>(() => {
   });
-  touched = signal<boolean>(false);
-  disabled = signal<boolean>(false);
-  value = signal<any>(undefined);
+  protected readonly touched = signal<boolean>(false);
+  protected readonly disabled = signal<boolean>(false);
+  protected readonly value = signal<any>(undefined);
 
   constructor() {
     effect(() => {

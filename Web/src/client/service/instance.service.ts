@@ -1,6 +1,10 @@
 import {computed, inject, Injectable, signal, Signal, WritableSignal} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import Instance, {InstanceCreateRequest, InstanceEditRequest, InstanceWithUsers} from '../model/instance.model';
+import Instance, {
+  InstanceCreateRequest,
+  InstanceEditRequest,
+  InstanceWithUsers
+} from '../model/instance.model';
 import {ApiRouter} from './api-router.service';
 import {combineLatest, first, map, Observable, of, switchMap, tap} from 'rxjs';
 import {AuthService} from './auth.service';
@@ -146,8 +150,33 @@ export class InstanceService {
       );
   }
 
-  getActiveInstance(): WritableSignal<Instance | undefined> {
-    return this.activeInstance;
+  getWithUsersById(id: number): Observable<InstanceWithUsers> {
+    return this.httpClient
+      .get<InstanceWithUsers>(this.apiRouter.instance.getById(id))
+      .pipe(
+        switchMap(instance =>
+          combineLatest(instance.users
+            .map(instanceUser => this.userService
+              .getById(instanceUser.userId)
+              .pipe(
+                map(user => ({
+                  ...instanceUser,
+                  user
+                }))
+              )
+            ))
+            .pipe(
+              map(users => ({
+                ...instance,
+                users
+              }))
+            )
+        )
+      );
+  }
+
+  getActiveInstance(): Signal<Instance | undefined> {
+    return this.activeInstance.asReadonly();
   }
 
   getActiveInstanceId(): Signal<number | undefined> {

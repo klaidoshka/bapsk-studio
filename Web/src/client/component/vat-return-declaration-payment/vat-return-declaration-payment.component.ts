@@ -36,13 +36,12 @@ export class VatReturnDeclarationPaymentComponent {
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly messageService = inject(MessageService);
   private readonly vatReturnService = inject(VatReturnService);
+  protected readonly confirmation = viewChild.required(ConfirmationComponent);
+  protected readonly messages = signal<Messages>({});
+  readonly instanceId = input.required<number>();
+  readonly saleId = input.required<number>();
 
-  confirmation = viewChild.required(ConfirmationComponent);
-  messages = signal<Messages>({});
-  instanceId = input.required<number>();
-  saleId = input.required<number>();
-
-  form = this.formBuilder.group({
+  protected readonly form = this.formBuilder.group({
     payments: this.formBuilder.array([this.createFormPaymentInfo()])
   })
 
@@ -54,23 +53,23 @@ export class VatReturnDeclarationPaymentComponent {
     });
   }
 
-  addFormPaymentInfo() {
+  protected addFormPaymentInfo() {
     this.getFormPayments().push(this.createFormPaymentInfo());
   }
 
-  getFormPayments() {
+  protected getFormPayments() {
     return this.form.controls.payments;
   }
 
-  removePaymentInfo(index: number) {
+  protected removePaymentInfo(index: number) {
     if (this.getFormPayments().length > 1) {
       this.getFormPayments().removeAt(index);
     }
   }
 
-  submit() {
+  protected submit() {
     if (this.form.invalid) {
-      this.messages.set({ error: ['Please fill in all required fields'] });
+      this.messages.set({error: ['Please fill in all required fields']});
       return;
     }
 

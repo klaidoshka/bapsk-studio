@@ -27,12 +27,11 @@ export class SessionShowcaseComponent {
   private readonly authService = inject(AuthService);
   private readonly messageService = inject(MessageService);
   private readonly sessionService = inject(SessionService);
+  protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
+  protected readonly currentSessionId = rxResource({loader: () => this.authService.getSessionId()});
+  protected readonly sessions = rxResource({loader: () => this.sessionService.getByUser()});
 
-  confirmationComponent = viewChild.required(ConfirmationComponent);
-  currentSessionId = rxResource({ loader: () => this.authService.getSessionId() });
-  sessions = rxResource({ loader: () => this.sessionService.getByUser() });
-
-  revoke(session: Session) {
+  protected revoke(session: Session) {
     this.confirmationComponent().request(() => {
       this.sessionService.revoke(session.id).subscribe(() =>
         this.messageService.add({
@@ -42,6 +41,6 @@ export class SessionShowcaseComponent {
           detail: "Session has been successfully revoked"
         })
       );
-    })
+    });
   }
 }

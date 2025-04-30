@@ -1,0 +1,128 @@
+<form [formGroup]="form" class="min-w-128 flex flex-col">
+  <messages-showcase [messages]="messages()"/>
+
+  <div class="flex flex-wrap gap-4 space-y-4">
+    <div class="flex-1 min-w-32">
+      <label for="customerId" class="block text-sm font-medium">Customer</label>
+      <p-select formControlName="customerId" id="customerId" [options]="customersLabeled.value()" optionValue="value"
+                optionLabel="label" class="mt-1 block w-full"/>
+      <form-input-error [control]="form.controls.customerId"/>
+    </div>
+
+    <div class="flex-1 min-w-32">
+      <label for="salesmanId" class="block text-sm font-medium">Salesman</label>
+      <p-select formControlName="salesmanId" id="salesmanId" [options]="salesmenLabeled.value()" optionValue="value"
+                optionLabel="label" class="mt-1 block w-full"/>
+      <form-input-error [control]="form.controls.salesmanId"/>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap gap-4 space-y-4">
+    <div class="flex-1 min-w-32">
+      <label for="date" class="block text-sm font-medium">Date</label>
+      <p-datepicker inputId="date" formControlName="date" [showIcon]="true" [showTime]="true" variant="filled"
+                    inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-inherit!" styleClass="w-full"
+                    class="mt-1 block"
+                    required appendTo="body"/>
+      <form-input-error [control]="form.controls.date"/>
+    </div>
+
+    <div class="flex-1 min-w-32 w-fit">
+      <label for="saleReceiptType" class="block text-sm font-medium">Sale Receipt Type</label>
+      <p-select id="saleReceiptType" [(ngModel)]="selectedSaleReceiptType" [ngModelOptions]="{ standalone: true }"
+                [options]="saleReceiptTypes" optionValue="value" optionLabel="label" class="mt-1 block w-full"/>
+    </div>
+  </div>
+
+  <div class="flex-1 min-w-32">
+    <div *ngIf="selectedSaleReceiptType() === SaleReceiptType.Invoice" class="w-1/2 pr-2">
+      <label for="invoiceNo" class="block text-sm font-medium">Invoice No</label>
+      <input formControlName="invoiceNo" pInputText type="text" id="invoiceNo" class="mt-1 block w-full"/>
+      <form-input-error [control]="form.controls.invoiceNo"/>
+    </div>
+
+    <div *ngIf="selectedSaleReceiptType() === SaleReceiptType.CashRegister" class="flex flex-wrap gap-4"
+         formGroupName="cashRegister">
+      <div class="flex-1 min-w-32">
+        <label for="cashRegisterNo" class="block text-sm font-medium">Cash Register No</label>
+        <input formControlName="cashRegisterNo" pInputText type="text" id="cashRegisterNo" class="mt-1 block w-full"/>
+      </div>
+
+      <div class="flex-1 min-w-32">
+        <label for="receiptNo" class="block text-sm font-medium">Receipt No</label>
+        <input formControlName="receiptNo" pInputText type="text" id="receiptNo" class="mt-1 block w-full"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sold Goods Section -->
+  <div class="mt-4">
+    <label class="block text-sm font-medium">Sold Goods</label>
+    <div formArrayName="soldGoods" class="flex flex-col gap-4">
+      <div *ngFor="let soldGood of form.controls.soldGoods.controls; let i = index" [formGroupName]="i"
+           class="border border-surface-300 p-4 rounded-md shadow-md bg-surface">
+        <div class="flex flex-wrap gap-4">
+          <div class="min-w-[250px]">
+            <label class="block text-sm font-medium">Description</label>
+            <input formControlName="description" pInputText type="text" class="mt-1 block w-full"/>
+            <form-input-error [control]="soldGood.controls.description"/>
+          </div>
+
+          <div class="max-w-[100px]">
+            <label class="block text-sm font-medium">Quantity</label>
+            <input formControlName="quantity" pInputText type="number" class="mt-1 block w-[100px]"/>
+            <form-input-error [control]="soldGood.controls.quantity"/>
+          </div>
+
+          <div class="max-w-[150px]">
+            <label class="block text-sm font-medium">Unit Price</label>
+            <input formControlName="unitPrice" pInputText type="number" class="mt-1 block w-[150px]"/>
+            <form-input-error [control]="soldGood.controls.unitPrice"/>
+          </div>
+
+          <div class="max-w-[150px]">
+            <label class="block text-sm font-medium">Measure Type</label>
+            <p-select styleClass="mt-1 w-[150px]" formControlName="unitOfMeasureType" optionValue="value"
+                      optionLabel="label"
+                      [options]="measurementUnits" (onChange)="clearMeasurement(i, $event.value)"/>
+            <form-input-error [control]="soldGood.controls.unitOfMeasureType"/>
+          </div>
+
+          <div class="max-w-[120px]">
+            <label class="block text-sm font-medium">Measure Unit</label>
+            @if (getMeasurementUnit(i) == UnitOfMeasureType.UnitOfMeasureOther) {
+              <input formControlName="unitOfMeasure" pInputText type="text" class="mt-1 block w-full"/>
+            } @else {
+              <p-select formControlName="unitOfMeasure" [options]="standardMeasurements" optionValue="code"
+                        optionLabel="label"
+                        styleClass="min-w-[120px]" class="mt-1 block w-full" appendTo="body"/>
+            }
+            <form-input-error [control]="soldGood.controls.unitOfMeasure"/>
+          </div>
+
+          <div class="max-w-[80px]">
+            <label class="block text-sm font-medium">VAT Rate (%)</label>
+            <input formControlName="vatRate" pInputText type="number" [min]="0" [max]="100" [step]="1"
+                   class="mt-1 block w-[80px]"/>
+            <form-input-error [control]="soldGood.controls.vatRate"/>
+          </div>
+
+          <div class="mt-3 flex justify-end">
+            <p-button label="Remove" (onClick)="removeSoldGood(i)"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Button -->
+      <div class="mt-4">
+        <p-button label="Add Sold Good" (onClick)="addSoldGood()"/>
+      </div>
+    </div>
+
+    <!-- Save Button -->
+    <div class="flex justify-end mt-4">
+      <p-button [label]="!sale.value() ? 'Create' : 'Save'" [disabled]="!form.valid || !form.dirty" (onClick)="save()"
+                type="submit"/>
+    </div>
+  </div>
+</form>

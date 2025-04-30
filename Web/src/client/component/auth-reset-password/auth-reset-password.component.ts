@@ -25,14 +25,13 @@ export class AuthResetPasswordComponent {
   private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  protected readonly messages = signal<Messages>({});
 
-  messages = signal<Messages>({});
-
-  form = this.formBuilder.group({
+  protected readonly form = this.formBuilder.group({
     email: ['', [Validators.email]],
   });
 
-  resetPassword() {
+  protected resetPassword() {
     if (this.form.invalid) {
       this.messages.set({ error: ["Please fill in a valid email address."] });
       return;

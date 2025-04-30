@@ -12,4 +12,5 @@ import {ToastModule} from "primeng/toast";
   providers: [ConfirmationService, MessageService]
 })
 export class AppComponent {
+
 }

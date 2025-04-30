@@ -1,0 +1,14 @@
+@if (salesman.isLoading()) {
+  <p>Loading...</p>
+} @else if (!salesman.value()) {
+  <p>Unknown salesman value</p>
+} @else {
+  @let salesmanValue = salesman.value()!;
+
+  <p class="font-bold">Name</p>
+  <p>{{ salesmanValue.name }}</p>
+
+  <p class="font-bold mt-4">Vat Payer Code</p>
+  <p>Issued By: {{ getIsoCountryLabel(salesmanValue.vatPayerCode.issuedBy) }}</p>
+  <p>Code: {{ salesmanValue.vatPayerCode.value }}</p>
+}

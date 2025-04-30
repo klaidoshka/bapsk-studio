@@ -12,14 +12,10 @@ import {ConfirmationService} from 'primeng/api';
 })
 export class ConfirmationComponent {
   private readonly confirmationService = inject(ConfirmationService);
+  readonly key = input.required<string>();
+  readonly header = input<string>("Are you sure about this action?");
 
-  key = input.required<string>();
-  header = input<string>("Are you sure about this action?");
-
-  request(
-    accept: () => void,
-    reject: () => void = () => {}
-  ) {
+  request(accept: () => void, reject: () => void = () => {}) {
     this.confirmationService.confirm({
       key: this.key(),
       accept: () => accept(),

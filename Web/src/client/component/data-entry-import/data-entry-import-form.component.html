@@ -2,38 +2,20 @@
   <messages-showcase [messages]="messages()"/>
 
   <div class="mb-4" *ngIf="importedEntries().length">
-    <data-entry-table
-      [dataEntries]="importedEntries()"
-      [dataType]="dataType()"
-    />
+    <data-entry-table [dataEntries]="importedEntries()" [dataType]="dataType()"/>
   </div>
 
-  <div
-    class="flex flex-col gap-4"
-    [formGroup]="form"
-  >
+  <div class="flex flex-col gap-4" [formGroup]="form">
     <div class="flex flex-col gap-1">
-      <label
-        for="importConfigurationId"
-        class="block text-sm font-medium"
-      >Import Configuration</label>
+      <label for="importConfigurationId" class="block text-sm font-medium">Import Configuration</label>
 
-      <p-select
-        formControlName="importConfigurationId"
-        placeholder="Select an import configuration"
-        [options]="importConfigurations.value()"
-        optionLabel="label"
-        optionValue="id"
-        appendTo="body"
-        class="w-full"
-      />
+      <p-select formControlName="importConfigurationId" placeholder="Select an import configuration"
+                [options]="importConfigurations.value()" optionLabel="label" optionValue="id" appendTo="body"
+                class="w-full"/>
     </div>
 
     <div class="flex flex-col gap-1">
-      <label
-        for="file"
-        class="block text-sm font-medium"
-      >File</label>
+      <label for="file" class="block text-sm font-medium">File</label>
 
       <div class="flex flex-col w-fit justify-start">
         <p *ngIf="form.value.file" class="mb-1">
@@ -42,36 +24,19 @@
           </span>
         </p>
 
-        <p-fileUpload
-          styleClass="flex flex-col items-start!"
-          accept=".csv, .xlsx, .xls, .xlsb"
-          name="file"
-          mode="basic"
-          auto="true"
-          (onSelect)="onSelect($event.currentFiles)"
-        />
+        <p-fileUpload styleClass="flex flex-col items-start!" accept=".csv, .xlsx, .xls, .xlsb" name="file" mode="basic"
+                      auto="true" (onSelect)="onSelect($event.currentFiles)"/>
       </div>
     </div>
 
     <div class="flex flex-col gap-1">
-      <label
-        for="skipHeader"
-        class="block text-sm font-medium"
-      >Skip Header (First Row)</label>
+      <label for="skipHeader" class="block text-sm font-medium">Skip Header (First Row)</label>
 
-      <p-checkbox
-        formControlName="skipHeader"
-        inputId="skipHeader"
-        binary
-      />
+      <p-checkbox formControlName="skipHeader" inputId="skipHeader" binary/>
     </div>
   </div>
 
   <div class="flex justify-end mt-4">
-    <p-button
-      label="Import"
-      [disabled]="form.invalid || !form.dirty"
-      (onClick)="import()"
-    />
+    <p-button label="Import" [disabled]="form.invalid || !form.dirty" (onClick)="import()"/>
   </div>
 </div>

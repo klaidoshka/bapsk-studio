@@ -47,16 +47,15 @@ export class ReportGenerateFormComponent {
   private readonly reportTemplateService = inject(ReportTemplateService);
   private readonly router = inject(Router);
   private readonly salesmanService = inject(SalesmanService);
+  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  protected readonly messages = signal<Messages>({});
+  protected readonly selectedType = signal<number>(1);
 
-  instanceId = this.instanceService.getActiveInstanceId();
-  messages = signal<Messages>({});
-  selectedType = signal<number>(1);
-
-  customers = rxResource({
+  protected readonly customers = rxResource({
     request: () => ({
-      instanceId: this.instanceId(),
+      instanceId: this.instanceId()
     }),
-    loader: ({ request }) => request.instanceId
+    loader: ({request}) => request.instanceId
       ? this.customerService
         .getAllByInstanceId(request.instanceId)
         .pipe(
@@ -68,15 +67,15 @@ export class ReportGenerateFormComponent {
       : of([])
   });
 
-  customErrorMessages = {
+  protected readonly customErrorMessages = {
     reportTypeRequired: () => 'Please fill in all fields.'
   };
 
-  reportTemplates = rxResource({
+  protected readonly reportTemplates = rxResource({
     request: () => ({
-      instanceId: this.instanceId(),
+      instanceId: this.instanceId()
     }),
-    loader: ({ request }) => request.instanceId
+    loader: ({request}) => request.instanceId
       ? this.reportTemplateService
         .getAllByInstanceId(request.instanceId)
         .pipe(
@@ -88,11 +87,11 @@ export class ReportGenerateFormComponent {
       : of([])
   });
 
-  salesmen = rxResource({
+  protected readonly salesmen = rxResource({
     request: () => ({
-      instanceId: this.instanceId(),
+      instanceId: this.instanceId()
     }),
-    loader: ({ request }) => request.instanceId
+    loader: ({request}) => request.instanceId
       ? this.salesmanService
         .getAllByInstanceId(request.instanceId)
         .pipe(
@@ -104,26 +103,26 @@ export class ReportGenerateFormComponent {
       : of([])
   });
 
-  readonly form = this.formBuilder.group({
+  protected readonly form = this.formBuilder.group({
     from: [new Date(), [Validators.required]],
     dataEntry: this.formBuilder.group({
-      templateId: [null as number | null],
+      templateId: [null as number | null]
     }),
     sale: this.formBuilder.group({
       customerId: [null as number | null],
-      salesmanId: [null as number | null],
+      salesmanId: [null as number | null]
     }),
     to: [new Date(), [Validators.required]]
-  }, { validators: this.validateFilledReportType() });
+  }, {validators: this.validateFilledReportType()});
 
-  readonly reportTypes = [
-    { label: 'Data Entry', id: 1 },
-    { label: 'Sale', id: 2 }
+  protected readonly reportTypes = [
+    {label: 'Data Entry', id: 1},
+    {label: 'Sale', id: 2}
   ]
 
   private generateDataEntriesReport() {
     if (this.form.invalid) {
-      this.messages.set({ error: ['Please fill all required fields'] });
+      this.messages.set({error: ['Please fill all required fields']});
       return;
     }
 
@@ -135,13 +134,13 @@ export class ReportGenerateFormComponent {
       })
       .pipe(first())
       .subscribe(reports => this.router.navigate(['/misc/report-preview'], {
-        state: { reports }
+        state: {reports}
       }));
   }
 
   private generateSalesReport() {
     if (this.form.invalid) {
-      this.messages.set({ error: ['Please fill all required fields'] });
+      this.messages.set({error: ['Please fill all required fields']});
       return;
     }
 
@@ -154,7 +153,7 @@ export class ReportGenerateFormComponent {
       })
       .pipe(first())
       .subscribe(reports => this.router.navigate(['/misc/report-preview'], {
-        state: { reports }
+        state: {reports}
       }));
   }
 
@@ -169,11 +168,11 @@ export class ReportGenerateFormComponent {
         return null;
       }
 
-      return { reportTypeRequired: true };
+      return {reportTypeRequired: true};
     };
   }
 
-  generate() {
+  protected generate() {
     switch (this.selectedType()) {
       case 1:
         this.generateDataEntriesReport();

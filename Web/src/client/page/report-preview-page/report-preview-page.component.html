@@ -1,6 +1,7 @@
 <div class="w-full h-full p-4">
   <!-- No Reports -->
-  <div *ngIf="!reports; else hasReports" class="flex flex-col gap-4 p-4 dark:bg-surface-950 bg-surface-50 rounded shadow-lg">
+  <div *ngIf="!reports; else hasReports"
+       class="flex flex-col gap-4 p-4 dark:bg-surface-950 bg-surface-50 rounded shadow-lg">
     <p class="text-lg font-semibold">No reports available</p>
   </div>
 
@@ -26,11 +27,8 @@
               </p>
             </div>
             <div class="flex flex-col gap-4 items-start w-fit">
-              <data-type-entry-field-display
-                *ngFor="let field of report.info.fields"
-                [value]="field.value"
-                [type]="field.type"
-              />
+              <data-type-entry-field-display *ngFor="let field of report.info.fields" [value]="field.value"
+                                             [type]="field.type"/>
             </div>
           </div>
         </div>

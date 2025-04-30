@@ -20,16 +20,19 @@ export interface DataEntryJoined extends DataEntry {
 export interface DataEntryCreateRequest {
   dataTypeId: number;
   fields: DataEntryFieldCreateRequest[];
+  instanceId: number;
 }
 
 export interface DataEntryEditRequest {
   dataEntryId: number;
   dataTypeId: number;
   fields: DataEntryFieldEditRequest[];
+  instanceId: number;
 }
 
 export interface DataEntryImportRequest {
   file: File;
   importConfigurationId: number;
+  instanceId: number;
   skipHeader: boolean;
 }

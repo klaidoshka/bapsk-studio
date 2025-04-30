@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import {inject, Injectable, Injector} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
 import VatReturnDeclaration, {
@@ -26,6 +26,7 @@ import {CacheService} from './cache.service';
 export class VatReturnService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly httpClient = inject(HttpClient);
+  private readonly injector = inject(Injector);
   private readonly userService = inject(UserService);
   private readonly cacheBySaleIdService = new CacheService<number, VatReturnDeclaration | null>();
   private readonly cacheByCodeService = new CacheService<string, VatReturnDeclarationWithSale | null>();
@@ -33,7 +34,7 @@ export class VatReturnService {
 
   private get saleService(): SaleService {
     if (!this._saleService) {
-      this._saleService = inject(SaleService);
+      this._saleService = this.injector.get(SaleService);
     }
     return this._saleService;
   }
@@ -86,20 +87,17 @@ export class VatReturnService {
     return this
       .getBySaleId(instanceId, saleId)
       .pipe(
-        switchMap(declaration => {
-          if (!declaration?.declaredById) {
-            return of(declaration);
-          }
-
-          return this.userService
+        switchMap(declaration => declaration && declaration.declaredById
+          ? this.userService
             .getIdentityById(declaration.declaredById)
             .pipe(
               map(user => ({
                 ...declaration,
                 declaredBy: user
               }))
-            );
-        }),
+            )
+          : of(declaration)
+        )
       );
   }
 

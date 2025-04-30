@@ -18,43 +18,19 @@
           </div>
 
           <div *ngIf="selectedWorkspace() === WorkspaceType.DataType" class="mt-4">
-            <p-select [(ngModel)]="selectedDataType" [options]="dataTypes.value() || []" (onChange)="selectDataType($event.value)"
-                      optionLabel="name" placeholder="Select..."
+            <p-select [(ngModel)]="selectedDataType" [options]="dataTypes.value() || []"
+                      (onChange)="selectDataType($event.value)" optionLabel="name" placeholder="Select..."
                       class="m-1 w-40 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
           </div>
         </div>
       </div>
 
       <!-- Main Content -->
-      <div class="h-full flex flex-col p-4">
-        <ng-container *ngIf="selectedWorkspace() === WorkspaceType.DataType">
-          <h1 class="text-xl font-bold">{{ selectedDataType()?.name }}</h1>
-
-          <data-entry-showcase *ngIf="selectedDataType() !== undefined" [dataEntries]="dataEntries.value() || []"
-                               [dataType]="selectedDataType()!"/>
-
-          <div class="mt-2">
-            <p-message *ngIf="!selectedDataType()" severity="warn">
-              Please select a data type to view and manage its data.
-            </p-message>
-          </div>
-        </ng-container>
-
-        <ng-container *ngIf="selectedWorkspace() === WorkspaceType.Customer">
-          <h1 class="text-xl font-bold">Customers</h1>
-          <customer-showcase [instanceId]="instanceId()!" [customers]="customers.value() || []"/>
-        </ng-container>
-
-        <ng-container *ngIf="selectedWorkspace() === WorkspaceType.Sale">
-          <h1 class="text-xl font-bold">Sales</h1>
-          <sale-showcase [customers]="customers.value() || []" [instanceId]="instanceId()!" [sales]="sales.value() || []"
-                         [salesmen]="salesmen.value() || []"/>
-        </ng-container>
-
-        <ng-container *ngIf="selectedWorkspace() === WorkspaceType.Salesman">
-          <h1 class="text-xl font-bold">Salesmen</h1>
-          <salesman-showcase [instanceId]="instanceId()!" [salesmen]="salesmen.value() || []"/>
-        </ng-container>
+      <div class="h-full flex-grow flex-col p-4">
+        <div class="flex flex-row w-full justify-end mb-4">
+          <instance-selector/>
+        </div>
+        <router-outlet/>
       </div>
     </div>
   </ng-container>

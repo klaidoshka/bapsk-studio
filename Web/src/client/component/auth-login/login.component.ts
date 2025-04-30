@@ -14,11 +14,12 @@ import {Password} from 'primeng/password';
 import {MessageService} from 'primeng/api';
 import {Dialog} from 'primeng/dialog';
 import {AuthResetPasswordComponent} from '../auth-reset-password/auth-reset-password.component';
+import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
 
 @Component({
   selector: "auth-login",
   templateUrl: "./login.component.html",
-  imports: [Button, ReactiveFormsModule, FormsModule, RouterLink, InputText, MessagesShowcaseComponent, Password, Dialog, AuthResetPasswordComponent],
+  imports: [Button, ReactiveFormsModule, FormsModule, RouterLink, InputText, MessagesShowcaseComponent, Password, Dialog, AuthResetPasswordComponent, FormInputErrorComponent],
   providers: []
 })
 export class LoginComponent {
@@ -28,35 +29,16 @@ export class LoginComponent {
   private readonly messageService = inject(MessageService);
   private readonly router = inject(Router);
   private readonly textService = inject(TextService);
+  protected readonly isSubmitting = signal<boolean>(false);
+  protected readonly messages = signal<Messages>({});
+  protected readonly showResetDialog = signal<boolean>(false);
 
-  isSubmitting = signal<boolean>(false);
-  messages = signal<Messages>({});
-  showResetDialog = signal<boolean>(false);
-
-  loginForm = this.formBuilder.group({
+  protected readonly loginForm = this.formBuilder.group({
     email: ["", [Validators.required, Validators.email]],
     password: ["", [Validators.required]]
   });
 
-  getErrorMessage(field: string): string | null {
-    const control = this.loginForm.get(field);
-
-    if (!control || !control.touched || !control.invalid) {
-      return "";
-    }
-
-    if (control.errors?.["required"]) {
-      return `${this.textService.capitalize(field)} is required.`;
-    }
-
-    if (control.errors?.["email"]) {
-      return "Please enter a valid email address.";
-    }
-
-    return null;
-  }
-
-  async onSubmit(): Promise<void> {
+  protected async onSubmit(): Promise<void> {
     if (this.isSubmitting()) {
       return;
     }

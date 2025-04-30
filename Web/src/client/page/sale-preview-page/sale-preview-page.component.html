@@ -1,0 +1,61 @@
+@if (sale.isLoading()) {
+  <p>Loading...</p>
+} @else if (!sale.value()) {
+  <p>Unknown sale value</p>
+} @else {
+  @let saleValue = sale.value()!;
+
+  <div class="flex flex-col">
+    <div class="flex flex-col md:flex-row">
+      <div class="flex flex-col md:w-1/2">
+        <p>
+          <strong>Invoice No:</strong> {{ saleValue.invoiceNo || '-' }}
+        </p>
+        <p>
+          <strong>Sale Date:</strong> {{ saleValue.date | date: 'medium' }}
+        </p>
+        <p>
+          <strong>Customer:</strong> {{ saleValue.customer.firstName + ' ' + saleValue.customer.lastName }}
+        </p>
+        <p>
+          <strong>Salesman:</strong> {{ saleValue.salesman.name }}
+        </p>
+      </div>
+      <div class="flex flex-col md:w-1/2">
+        <p>
+          <strong>Cash Register No:</strong> {{ saleValue.cashRegister?.cashRegisterNo || '-' }}
+        </p>
+        <p>
+          <strong>Receipt No:</strong> {{ saleValue.cashRegister?.receiptNo || '-' }}
+        </p>
+      </div>
+    </div>
+    <div class="card mt-4">
+      <p-table [value]="saleValue.soldGoods">
+        <ng-template #header>
+          <tr>
+            <th>Sequence No</th>
+            <th>Description</th>
+            <th>Quantity</th>
+            <th>Measure Unit</th>
+            <th>Unit Price</th>
+            <th>VAT Amount</th>
+            <th>Total Amount</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-soldGood>
+          <tr>
+            <td>{{ soldGood.sequenceNo }}</td>
+            <td>{{ soldGood.description }}</td>
+            <td>{{ soldGood.quantity }}</td>
+            <td>{{ soldGood.unitOfMeasure }}</td>
+            <td>{{ soldGood.taxableAmount / soldGood.quantity | round:2 | currency:'EUR':'symbol':'1.2-2' }}</td>
+            <td>{{ soldGood.vatAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }} ({{ soldGood.vatRate | round:2 }}%)
+            </td>
+            <td>{{ soldGood.totalAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+}

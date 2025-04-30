@@ -2,7 +2,12 @@ import {Component, inject, input, OnInit, signal} from '@angular/core';
 import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {UserService} from '../../service/user.service';
-import {getDefaultIsoCountry, getIsoCountryByCode, IsoCountries, IsoCountry} from '../../model/iso-country.model';
+import {
+  getDefaultIsoCountry,
+  getIsoCountryByCode,
+  IsoCountries,
+  IsoCountry
+} from '../../model/iso-country.model';
 import Messages from '../../model/messages.model';
 import {User} from '../../model/user.model';
 import {first} from 'rxjs';
@@ -32,12 +37,11 @@ export class ProfileManagementComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly userService = inject(UserService);
+  protected readonly messages = signal<Messages>({});
+  protected readonly filteredCountries = signal<IsoCountry[]>([]);
+  readonly user = input.required<User>();
 
-  messages = signal<Messages>({});
-  user = input.required<User>();
-  filteredCountries: IsoCountry[] = [];
-
-  form = this.formBuilder.group({
+  protected readonly form = this.formBuilder.group({
     birthDate: [new Date(), Validators.required],
     country: [getDefaultIsoCountry(), Validators.required],
     email: ["", [Validators.required, Validators.email]],
@@ -49,24 +53,23 @@ export class ProfileManagementComponent implements OnInit {
     this.reset();
   }
 
-  filterCountries(event: AutoCompleteCompleteEvent) {
+  protected filterCountries(event: AutoCompleteCompleteEvent) {
     const query = event.query.toLowerCase();
-
-    this.filteredCountries = IsoCountries.filter((country) =>
+    this.filteredCountries.set(IsoCountries.filter((country) =>
       country.name.toLowerCase().startsWith(query)
-    );
+    ));
   }
 
-  reset() {
+  protected reset() {
     this.form.patchValue({
       ...this.user(),
       country: getIsoCountryByCode(this.user().country)
     });
   }
 
-  save() {
+  protected save() {
     if (!this.form.valid) {
-      this.messages.set({ error: ["Please fill out the form."] });
+      this.messages.set({error: ["Please fill out the form."]});
       return;
     }
 
@@ -82,7 +85,7 @@ export class ProfileManagementComponent implements OnInit {
       .pipe(first())
       .subscribe({
         next: () => {
-          this.messages.set({ success: ["Your profile has been saved successfully."] });
+          this.messages.set({success: ["Your profile has been saved successfully."]});
           this.form.markAsUntouched();
           this.form.markAsPristine();
         },

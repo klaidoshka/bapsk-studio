@@ -14,7 +14,6 @@ import {CurrencyPipe, DatePipe} from '@angular/common';
   styles: ``
 })
 export class VatReturnPaymentTableComponent {
-  payments = input.required<VatReturnDeclarationPaymentInfo[]>();
-
   protected readonly toPaymentTypeLabel = toPaymentTypeLabel;
+  readonly payments = input.required<VatReturnDeclarationPaymentInfo[]>();
 }

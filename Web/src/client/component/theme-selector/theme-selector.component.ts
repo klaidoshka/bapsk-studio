@@ -11,10 +11,9 @@ import {FormsModule} from '@angular/forms';
 })
 export class ThemeSelectorComponent {
   private readonly themeService = inject(ThemeService);
+  protected readonly isDarkTheme = this.themeService.isDarkTheme();
 
-  isDarkTheme = this.themeService.isDarkTheme();
-
-  toggleTheme() {
+  protected toggleTheme() {
     this.themeService.toggleTheme();
   }
 }

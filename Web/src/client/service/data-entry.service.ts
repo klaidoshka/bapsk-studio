@@ -16,7 +16,6 @@ import {FieldType} from '../model/data-type-field.model';
 import {FieldTypeUtil} from '../util/field-type.util';
 import {CacheService} from './cache.service';
 import DataType from '../model/data-type.model';
-import {InstanceService} from './instance.service';
 
 @Injectable({
   providedIn: 'root'
@@ -25,11 +24,9 @@ export class DataEntryService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly dataTypeService = inject(DataTypeService);
   private readonly httpClient = inject(HttpClient);
-  private readonly instanceService = inject(InstanceService);
   private readonly userService = inject(UserService);
   private readonly cacheService = new CacheService<number, DataEntryJoined>(dataEntry => dataEntry.id);
   private readonly dataTypesFetched = new Set<number>();
-  private readonly instanceId = this.instanceService.getActiveInstanceId();
 
   private adjustRequestDateToISO<T extends DataEntryCreateRequest | DataEntryEditRequest>(request: T, dataType: DataType): T {
     return {
@@ -49,11 +46,11 @@ export class DataEntryService {
     };
   }
 
-  private joinOntoDataEntry(dataEntry: DataEntry): Observable<DataEntryJoined> {
+  private joinOntoDataEntry(instanceId: number, dataEntry: DataEntry): Observable<DataEntryJoined> {
     return combineLatest([
       this.userService.getIdentityById(dataEntry.createdById),
       this.userService.getIdentityById(dataEntry.modifiedById),
-      this.dataTypeService.getById(dataEntry.dataTypeId)
+      this.dataTypeService.getById(instanceId, dataEntry.dataTypeId)
     ])
       .pipe(
         map(([createdBy, modifiedBy, dataType]) => ({
@@ -80,24 +77,24 @@ export class DataEntryService {
 
   create(request: DataEntryCreateRequest): Observable<DataEntryJoined> {
     return this.dataTypeService
-      .getById(request.dataTypeId)
+      .getById(request.instanceId, request.dataTypeId)
       .pipe(
         switchMap(dataType =>
           this.httpClient.post<DataEntry>(
-            this.apiRouter.dataEntry.create(this.instanceId()!),
+            this.apiRouter.dataEntry.create(request.instanceId),
             this.adjustRequestDateToISO(request, dataType)
           )
         ),
-        switchMap(dataEntry => this.updateProperties(dataEntry)),
-        switchMap(dataEntry => this.joinOntoDataEntry(dataEntry)),
+        switchMap(dataEntry => this.updateProperties(request.instanceId, dataEntry)),
+        switchMap(dataEntry => this.joinOntoDataEntry(request.instanceId, dataEntry)),
         tap(dataEntry => this.cacheService.set(dataEntry)),
         switchMap(dataEntry => this.cacheService.get(dataEntry.id))
       );
   }
 
-  delete(id: number): Observable<void> {
+  delete(instanceId: number, id: number): Observable<void> {
     return this.httpClient
-      .delete<void>(this.apiRouter.dataEntry.delete(this.instanceId()!, id))
+      .delete<void>(this.apiRouter.dataEntry.delete(instanceId, id))
       .pipe(
         tap(() => this.cacheService.delete(id))
       );
@@ -105,11 +102,11 @@ export class DataEntryService {
 
   edit(request: DataEntryEditRequest): Observable<void> {
     return this.dataTypeService
-      .getById(request.dataTypeId)
+      .getById(request.instanceId, request.dataTypeId)
       .pipe(
         switchMap(dataType =>
           this.httpClient.put<void>(
-            this.apiRouter.dataEntry.edit(this.instanceId()!, request.dataEntryId),
+            this.apiRouter.dataEntry.edit(request.instanceId, request.dataEntryId),
             this.adjustRequestDateToISO(request, dataType)
           )
         ),
@@ -117,7 +114,7 @@ export class DataEntryService {
             this.cacheService.invalidate(request.dataEntryId);
 
             this
-              .getById(request.dataEntryId)
+              .getById(request.instanceId, request.dataEntryId)
               .pipe(first())
               .subscribe();
           }
@@ -125,31 +122,31 @@ export class DataEntryService {
       );
   }
 
-  getById(id: number): Observable<DataEntryJoined> {
+  getById(instanceId: number, id: number): Observable<DataEntryJoined> {
     if (this.cacheService.has(id)) {
       return this.cacheService.get(id);
     }
 
     return this.httpClient
-      .get<DataEntry>(this.apiRouter.dataEntry.getById(this.instanceId()!, id))
+      .get<DataEntry>(this.apiRouter.dataEntry.getById(instanceId, id))
       .pipe(
-        switchMap(dataEntry => this.updateProperties(dataEntry)),
-        switchMap(dataEntry => this.joinOntoDataEntry(dataEntry)),
+        switchMap(dataEntry => this.updateProperties(instanceId, dataEntry)),
+        switchMap(dataEntry => this.joinOntoDataEntry(instanceId, dataEntry)),
         tap(dataEntry => this.cacheService.set(dataEntry)),
         switchMap(dataEntry => this.cacheService.get(dataEntry.id))
       );
   }
 
-  getAllByDataTypeId(dataTypeId: number): Observable<DataEntryJoined[]> {
+  getAllByDataTypeId(instanceId: number, dataTypeId: number): Observable<DataEntryJoined[]> {
     if (this.dataTypesFetched.has(dataTypeId)) {
       return this.cacheService.getAllWhere(dataEntry => dataEntry.dataTypeId === dataTypeId);
     }
 
     return this.httpClient
-      .get<DataEntry[]>(this.apiRouter.dataEntry.getByDataTypeId(this.instanceId()!, dataTypeId))
+      .get<DataEntry[]>(this.apiRouter.dataEntry.getByDataTypeId(instanceId, dataTypeId))
       .pipe(
-        switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.updateProperties(dataEntry)))),
-        switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.joinOntoDataEntry(dataEntry)))),
+        switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.updateProperties(instanceId, dataEntry)))),
+        switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.joinOntoDataEntry(instanceId, dataEntry)))),
         tap(dataEntries => {
           this.dataTypesFetched.add(dataTypeId);
 
@@ -162,10 +159,10 @@ export class DataEntryService {
       );
   }
 
-  getAllByDataTypeIds(dataTypeIds: number[]): Observable<Map<number, DataEntryJoined[]>> {
+  getAllByDataTypeIds(instanceId: number, dataTypeIds: number[]): Observable<Map<number, DataEntryJoined[]>> {
     return combineLatest(dataTypeIds.map(id =>
       this
-        .getAllByDataTypeId(id)
+        .getAllByDataTypeId(instanceId, id)
         .pipe(
           map(dataEntries => ({
             dataTypeId: id,
@@ -196,12 +193,12 @@ export class DataEntryService {
 
     return this.httpClient
       .post<DataEntry[]>(
-        this.apiRouter.dataEntry.import(this.instanceId()!),
+        this.apiRouter.dataEntry.import(request.instanceId),
         data
       )
       .pipe(
-        switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.updateProperties(dataEntry)))),
-        switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.joinOntoDataEntry(dataEntry)))),
+        switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.updateProperties(request.instanceId, dataEntry)))),
+        switchMap(dataEntries => combineLatest(dataEntries.map(dataEntry => this.joinOntoDataEntry(request.instanceId, dataEntry)))),
         tap(dataEntries => dataEntries.map(dataEntry => this.cacheService.set(dataEntry))),
         switchMap(dataEntries => this.cacheService.getAllWhere(dataEntry =>
           dataEntries.findIndex(dataEntryNew => dataEntryNew.id === dataEntry.id) !== -1
@@ -209,9 +206,9 @@ export class DataEntryService {
       );
   }
 
-  updateProperties(dataEntry: DataEntry): Observable<DataEntry> {
+  updateProperties(instanceId: number, dataEntry: DataEntry): Observable<DataEntry> {
     return combineLatest(
-      dataEntry.fields.map(field => this.updateFieldProperty(field, dataEntry.dataTypeId))
+      dataEntry.fields.map(field => this.updateFieldProperty(field, instanceId, dataEntry.dataTypeId))
     )
       .pipe(
         map(fields => ({
@@ -223,9 +220,9 @@ export class DataEntryService {
       );
   }
 
-  updateFieldProperty(field: DataEntryField, dataTypeId: number): Observable<DataEntryField> {
+  updateFieldProperty(field: DataEntryField, instanceId: number, dataTypeId: number): Observable<DataEntryField> {
     return this.dataTypeService
-      .getById(dataTypeId)
+      .getById(instanceId, dataTypeId)
       .pipe(
         map(dataType => dataType.fields.find(dataTypeField => dataTypeField.id === field.dataTypeFieldId)),
         map(dataTypeField => ({

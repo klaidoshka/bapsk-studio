@@ -1,0 +1,43 @@
+<div>
+  <confirmation [key]='"customer-delete-confirmation"' [header]='"Are you sure about deleting this customer?"'/>
+
+  <messages-showcase [messages]="messages()"/>
+
+  <p-button styleClass="mt-4" label="Create" icon="pi pi-plus" type="button" (onClick)="manage()"/>
+
+  <div class="card mt-4">
+    <p-table styleClass="w-fit shadow-lg mt-2 dark:bg-primary-950! bg-primary-50!"
+             paginatorStyleClass="dark:bg-primary-950! bg-primary-50!" [value]="customers.value() || []"
+             [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+      <ng-template #header>
+        <tr>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Email</th>
+          <th>Birthdate</th>
+          <th>Reside In</th>
+          <th>Identity Document</th>
+          <th>Personal Code</th>
+          <th></th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-customer>
+        <tr>
+          <td>{{ customer.firstName }}</td>
+          <td>{{ customer.lastName }}</td>
+          <td>{{ customer.email }}</td>
+          <td>{{ customer.birthdate | date:'mediumDate' }}</td>
+          <td>{{ getIsoCountryLabel(customer.residenceCountry) }}</td>
+          <td>{{ getIdentityDocumentTypeLabel(customer.identityDocument.type) }}</td>
+          <td>{{ customer.identityDocument.value || 'Unprovided' }}</td>
+          <td class="flex flex-nowrap items-center">
+            <p-button icon="pi pi-eye" type="button" variant="text" (onClick)="preview(customer)"/>
+            <p-button icon="pi pi-pencil" type="button" variant="text" (onClick)="manage(customer)"/>
+            <p-button icon="pi pi-trash" type="button" variant="text" (onClick)="delete(customer)"/>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

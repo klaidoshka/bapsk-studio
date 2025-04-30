@@ -1,13 +1,11 @@
 @switch (instances.value()?.length) {
   @case (0) {
-    <instance-management/>
-
-    <p-button label="Create Instance" icon="pi pi-plus" styleClass="w-42 h-8 text-center" (onClick)="showManagementMenu()"/>
+    <p-button label="Create Instance" icon="pi pi-plus" styleClass="w-42 h-8 text-center" (onClick)="manage()"/>
   }
   @default {
     @if (selectedInstance() !== undefined) {
-      <p-select id="instance-selector" inputId="instance" [(ngModel)]="selectedInstance" [options]="instances.value() || []"
-                optionLabel="name" placeholder="Select an instance" class="w-48"/>
+      <p-select (onChange)="onChange($event.value)" [options]="instances.value() || []" optionLabel="name"
+                placeholder="Select an instance" class="w-48"/>
     }
   }
 }

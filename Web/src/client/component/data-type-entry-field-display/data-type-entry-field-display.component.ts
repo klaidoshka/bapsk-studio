@@ -7,6 +7,7 @@ import {CurrencyPipe, DatePipe} from '@angular/common';
 import {getIsoCountryLabel} from '../../model/iso-country.model';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {map, of} from 'rxjs';
+import {InstanceService} from '../../service/instance.service';
 
 @Component({
   selector: 'data-type-entry-field-display',
@@ -19,17 +20,22 @@ import {map, of} from 'rxjs';
   styles: ``
 })
 export class DataTypeEntryFieldDisplayComponent {
-  protected readonly FieldType = FieldType;
   private readonly dataEntryService = inject(DataEntryService);
+  private readonly instanceService = inject(InstanceService);
+  protected readonly FieldType = FieldType;
+  protected readonly getIsoCountryLabel = getIsoCountryLabel;
+  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  readonly dataType = input<DataType>();
+  readonly dataTypeFieldId = input<number>();
+  readonly type = input<FieldType>();
+  protected readonly typeResolved = computed(() => this.type() || this.dataTypeField()?.type || FieldType.Text)
+  readonly value = input.required<any>();
 
-  dataType = input<DataType>();
-  dataTypeField = computed(() => this.dataType()?.fields.find(it => it.id === this.dataTypeFieldId()));
-  dataTypeFieldId = input<number>();
-  type = input<FieldType>();
-  typeResolved = computed(() => this.type() || this.dataTypeField()?.type || FieldType.Text)
-  value = input.required<any>();
+  protected readonly dataTypeField = computed(() => this.dataType()
+    ?.fields.find(it => it.id === this.dataTypeFieldId())
+  );
 
-  referencedDataEntry = rxResource({
+  protected readonly referencedDataEntry = rxResource({
     request: () => {
       const referenceId = this.dataTypeField()?.referenceId;
       const value = this.value();
@@ -39,18 +45,17 @@ export class DataTypeEntryFieldDisplayComponent {
       }
 
       return {
+        instanceId: this.instanceId(),
         referenceId: +referenceId,
         value
       };
     },
-    loader: ({ request }) => request
+    loader: ({request}) => request?.instanceId
       ? this.dataEntryService
-        .getAllByDataTypeId(request.referenceId)
+        .getAllByDataTypeId(request.instanceId, request.referenceId)
         .pipe(
-          map(entries => entries.find(it => it.id === request.value)),
+          map(entries => entries.find(it => it.id === request.value))
         )
       : of(undefined)
   });
-
-  protected readonly getIsoCountryLabel = getIsoCountryLabel;
 }

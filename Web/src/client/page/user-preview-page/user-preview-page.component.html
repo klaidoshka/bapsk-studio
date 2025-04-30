@@ -1,0 +1,19 @@
+@if (user.isLoading()) {
+  <p>Loading...</p>
+} @else if (!user.value()) {
+  <p>Unknown user value</p>
+} @else {
+  @let userValue = user.value()!;
+
+  <p class="font-bold">Name</p>
+  <p>{{ userValue.firstName + ' ' + userValue.lastName }}</p>
+
+  <p class="font-bold mt-4">Email</p>
+  <p>{{ userValue.email }}</p>
+
+  <p class="font-bold mt-4">Birthdate</p>
+  <p>{{ userValue.birthDate | date:'mediumDate' }}</p>
+
+  <p class="font-bold mt-4">Country</p>
+  <p>{{ getCountryName(userValue) }}</p>
+}

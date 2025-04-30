@@ -12,18 +12,21 @@
 
       <!-- Workspace -->
       <div class="relative inline-block" (clickOutside)="isWorkspaceMenuOpen.set(false)">
-        <button [disabled]="!instanceId()" (click)="isWorkspaceMenuOpen.set(!isWorkspaceMenuOpen())"
-                class="font-medium cursor-pointer" [class.hover:opacity-70]="instanceId()" [class.opacity-70]="!instanceId()">
+        <button (click)="isWorkspaceMenuOpen.set(!isWorkspaceMenuOpen())"
+                class="hover:opacity-70 font-medium cursor-pointer">
           Workspace
         </button>
         <div *ngIf="isWorkspaceMenuOpen()"
              class="absolute left-0 mt-1 w-38 bg-surface-50 dark:bg-surface-800 rounded shadow-lg z-20"
              (click)="isWorkspaceMenuOpen.set(false)">
-          <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700" routerLink="/home/workspace/data-type">Data
+          <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700"
+             routerLink="/home/workspace/data-type">Data
             Types</a>
-          <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700" routerLink="/home/workspace/data-entry">Data
+          <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700"
+             routerLink="/home/workspace/data-entry">Data
             Entries</a>
-          <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700" routerLink="/home/workspace/generate-report">Generate
+          <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700"
+             routerLink="/home/workspace/generate-report">Generate
             Report</a>
         </div>
       </div>
@@ -38,25 +41,17 @@
                class="absolute left-0 mt-1 w-48 bg-surface-50 dark:bg-surface-800 rounded shadow-lg z-20">
             <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700" routerLink="/admin/user"
                (click)="isAdminMenuOpen.set(false)">Users</a>
-            <p-fileUpload
-              styleClass="flex flex-col items-start!"
-              chooseStyleClass="dark:bg-surface-800! bg-surface-50! dark:text-primary-50! text-primary-900! border-none! px-4! py-2!"
-              chooseLabel="Style HTML Table"
-              chooseIcon="pi pi-upload"
-              accept=".html"
-              name="file"
-              mode="basic"
-              auto="true"
-              (onSelect)="onHtmlSelect($event.currentFiles)"
-            />
+            <p-fileUpload styleClass="flex flex-col items-start!"
+                          chooseStyleClass="dark:bg-surface-800! bg-surface-50! dark:text-primary-50! text-primary-900! border-none! px-4! py-2!"
+                          chooseLabel="Style HTML Table" chooseIcon="pi pi-upload" accept=".html" name="file"
+                          mode="basic" auto="true" (onSelect)="onHtmlSelect($event.currentFiles)"/>
           </div>
         </div>
       }
     </div>
 
-    <!-- Instance + Profile -->
+    <!-- Profile -->
     <div class="flex items-center space-x-4 ml-auto">
-      <instance-selector *ngIf="isAuthenticated.value()"/>
       <profile-dropdown *ngIf="isAuthenticated.value()"/>
     </div>
   </header>

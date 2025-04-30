@@ -1,5 +1,9 @@
 import {inject, Injectable} from '@angular/core';
-import Sale, {SaleCreateRequest, SaleEditRequest, SaleWithVatReturnDeclaration} from '../model/sale.model';
+import Sale, {
+  SaleCreateRequest,
+  SaleEditRequest,
+  SaleWithVatReturnDeclaration
+} from '../model/sale.model';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
 import {combineLatest, first, map, Observable, switchMap, tap} from 'rxjs';
@@ -33,7 +37,7 @@ export class SaleService {
     };
   }
 
-  create(request: SaleCreateRequest) {
+  create(request: SaleCreateRequest): Observable<Sale> {
     return this.httpClient
       .post<Sale>(this.apiRouter.sale.create(request.instanceId), this.adjustRequestDateToISO(request))
       .pipe(
@@ -43,7 +47,7 @@ export class SaleService {
       );
   }
 
-  delete(instanceId: number, id: number) {
+  delete(instanceId: number, id: number): Observable<void> {
     return this.httpClient
       .delete<void>(this.apiRouter.sale.delete(instanceId, id))
       .pipe(
@@ -51,7 +55,7 @@ export class SaleService {
       );
   }
 
-  edit(request: SaleEditRequest) {
+  edit(request: SaleEditRequest): Observable<void> {
     return this.httpClient
       .put<void>(this.apiRouter.sale.edit(request.instanceId, request.sale.id!), this.adjustRequestDateToISO(request))
       .pipe(
@@ -67,7 +71,7 @@ export class SaleService {
       );
   }
 
-  getById(instanceId: number, id: number) {
+  getById(instanceId: number, id: number): Observable<Sale> {
     if (this.cacheService.has(id)) {
       return this.cacheService.get(id);
     }
@@ -81,7 +85,23 @@ export class SaleService {
       );
   }
 
-  getAllByInstanceId(instanceId: number) {
+  getWithVatDeclarationById(instanceId: number, saleId: number): Observable<SaleWithVatReturnDeclaration> {
+    return this
+      .getById(instanceId, saleId)
+      .pipe(
+        switchMap(sale => this.vatReturnService
+          .getBySaleId(instanceId, sale.id!)
+          .pipe(
+            map(declaration => ({
+              ...sale,
+              vatReturnDeclaration: declaration
+            }))
+          )
+        )
+      );
+  }
+
+  getAllByInstanceId(instanceId: number): Observable<Sale[]> {
     if (this.instancesFetched.has(instanceId)) {
       return this.cacheService.getAllWhere(sale => sale.instanceId === instanceId);
     }

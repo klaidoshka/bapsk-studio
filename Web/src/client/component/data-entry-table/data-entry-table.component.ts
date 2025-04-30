@@ -2,7 +2,9 @@ import {Component, computed, input} from '@angular/core';
 import {DataEntryJoined} from '../../model/data-entry.model';
 import DataType from '../../model/data-type.model';
 import {TableModule} from 'primeng/table';
-import {DataTypeEntryFieldDisplayComponent} from '../data-type-entry-field-display/data-type-entry-field-display.component';
+import {
+  DataTypeEntryFieldDisplayComponent
+} from '../data-type-entry-field-display/data-type-entry-field-display.component';
 import {toUserIdentityFullName} from '../../model/user.model';
 import {Button} from 'primeng/button';
 import {DatePipe, NgIf} from '@angular/common';
@@ -20,12 +22,11 @@ import {DatePipe, NgIf} from '@angular/common';
   styles: ``
 })
 export class DataEntryTableComponent {
-  containsActions = computed(() => !!this.delete() || !!this.manage() || !!this.preview());
-  dataEntries = input.required<DataEntryJoined[]>();
-  dataType = input.required<DataType>();
-  delete = input<(entry: DataEntryJoined) => void>();
-  manage = input<(entry: DataEntryJoined) => void>();
-  preview = input<(entry: DataEntryJoined) => void>();
-
   protected readonly toUserIdentityFullName = toUserIdentityFullName;
+  protected readonly containsActions = computed(() => !!this.delete() || !!this.manage() || !!this.preview());
+  readonly dataEntries = input.required<DataEntryJoined[]>();
+  readonly dataType = input.required<DataType>();
+  readonly delete = input<(entry: DataEntryJoined) => void>();
+  readonly manage = input<(entry: DataEntryJoined) => void>();
+  readonly preview = input<(entry: DataEntryJoined) => void>();
 }

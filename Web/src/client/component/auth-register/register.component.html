@@ -8,141 +8,63 @@
     <!-- Email -->
     <div class="form-field">
       <label for="email" class="block text-sm font-medium">Email</label>
-      <input
-        type="email"
-        id="email"
-        formControlName="email"
-        pInputText
-        class="mt-1 block w-full"
-      />
-      @if (getErrorMessage('email'); as emailInvalid) {
-        <div class="text-xs text-red-500 mt-1">
-          {{ emailInvalid }}
-        </div>
-      }
+      <input type="email" id="email" formControlName="email" pInputText class="mt-1 block w-full"/>
+      <form-input-error [control]="registerForm.controls.email"/>
     </div>
 
     <!-- Birth Date -->
     <div class="form-field">
       <label for="birthDate" class="block text-sm font-medium">Birthdate</label>
-      <p-datepicker
-        inputId="birthDate"
-        formControlName="birthDate"
-        [showIcon]="true"
-        variant="filled"
-        inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-white!"
-        class="mt-1 block w-full rounded-md"
-      />
-      @if (getErrorMessage('birthDate'); as birthDateInvalid) {
-        <div class="text-xs text-red-500 mt-1">
-          {{ birthDateInvalid }}
-        </div>
-      }
+      <p-datepicker inputId="birthDate" formControlName="birthDate" [showIcon]="true" variant="filled"
+                    inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-white!"
+                    class="mt-1 block w-full rounded-md"/>
+      <form-input-error [control]="registerForm.controls.birthDate"/>
     </div>
 
     <!-- Password -->
     <div class="form-field">
       <label for="password" class="block text-sm font-medium">Password</label>
-      <p-password
-        id="password"
-        formControlName="password"
-        class="mt-1 block w-full!"
-        inputStyleClass="w-full"
-        styleClass="w-full"
-        toggleMask="true"
-        feedback="false"
-      />
-      @if (getErrorMessage('password'); as passwordInvalid) {
-        <div class="text-xs text-red-500 mt-1">
-          {{ passwordInvalid }}
-        </div>
-      }
+      <p-password id="password" formControlName="password" class="mt-1 block w-full!" inputStyleClass="w-full"
+                  styleClass="w-full" toggleMask="true" feedback="false"/>
+      <form-input-error [control]="registerForm.controls.password"/>
     </div>
 
     <!-- Confirm Password -->
     <div class="form-field">
       <label for="confirmPassword" class="block text-sm font-medium">Confirm Password</label>
-      <p-password
-        id="confirmPassword"
-        formControlName="confirmPassword"
-        class="mt-1 block w-full!"
-        inputStyleClass="w-full"
-        styleClass="w-full"
-        toggleMask="true"
-        feedback="false"
-      />
-      @if (getErrorMessage('confirmPassword'); as passwordInvalid) {
-        <div class="text-xs text-red-500 mt-1">
-          {{ passwordInvalid }}
-        </div>
-      }
+      <p-password id="confirmPassword" formControlName="confirmPassword" class="mt-1 block w-full!"
+                  inputStyleClass="w-full" styleClass="w-full" toggleMask="true" feedback="false"/>
+      <form-input-error [control]="registerForm.controls.confirmPassword" [customErrorMessages]="customErrorsMessages"/>
     </div>
 
     <!-- First Name -->
     <div class="form-field">
       <label for="firstName" class="block text-sm font-medium">First Name</label>
-      <input
-        type="text"
-        id="firstName"
-        formControlName="firstName"
-        pInputText
-        class="mt-1 block w-full"
-      />
-      @if (getErrorMessage('firstName'); as firstNameInvalid) {
-        <div class="text-xs text-red-500 mt-1">
-          {{ firstNameInvalid }}
-        </div>
-      }
+      <input type="text" id="firstName" formControlName="firstName" pInputText class="mt-1 block w-full"/>
+      <form-input-error [control]="registerForm.controls.firstName"/>
     </div>
 
     <!-- Last Name -->
     <div class="form-field">
       <label for="lastName" class="block text-sm font-medium">Last Name</label>
-      <input
-        type="text"
-        id="lastName"
-        formControlName="lastName"
-        pInputText
-        class="mt-1 block w-full"
-      />
-      @if (getErrorMessage('lastName'); as lastNameInvalid) {
-        <div class="text-xs text-red-500 mt-1">
-          {{ lastNameInvalid }}
-        </div>
-      }
+      <input type="text" id="lastName" formControlName="lastName" pInputText class="mt-1 block w-full"/>
+      <form-input-error [control]="registerForm.controls.lastName"/>
     </div>
 
     <!-- Country Dropdown -->
     <div class="form-field">
       <label for="country" class="block text-sm font-medium">Country</label>
-      <p-autocomplete
-        id="country"
-        formControlName="country"
-        optionLabel="name"
-        placeholder="Select a country"
-        [dropdown]="true"
-        [suggestions]="filteredCountries"
-        (completeMethod)="filterCountries($event)"
-        class="mt-1 block w-full"
-      />
-      @if (getErrorMessage('country'); as countryInvalid) {
-        <div class="text-xs text-red-500 mt-1">
-          {{ countryInvalid }}
-        </div>
-      }
+      <p-autocomplete id="country" formControlName="country" optionLabel="name" placeholder="Select a country"
+                      [dropdown]="true" [suggestions]="filteredCountries()" (completeMethod)="filterCountries($event)"
+                      class="mt-1 block w-full"/>
+      <form-input-error [control]="registerForm.controls.country"/>
     </div>
   </div>
 
   <!-- Submit Button -->
   <div class="flex justify-center">
-    <p-button
-      type="submit"
-      label="Register"
-      icon="pi pi-check"
-      iconPos="right"
-      [loading]="isSubmitting()"
-      [disabled]="registerForm.invalid"
-    />
+    <p-button type="submit" label="Register" icon="pi pi-check" iconPos="right" [loading]="isSubmitting()"
+              [disabled]="registerForm.invalid"/>
   </div>
 </form>
 

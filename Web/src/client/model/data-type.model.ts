@@ -21,5 +21,6 @@ export interface DataTypeEditRequest {
   dataTypeId: number;
   displayFieldIndex?: number;
   fields: DataTypeFieldEditRequest[];
+  instanceId: number;
   name: string;
 }
