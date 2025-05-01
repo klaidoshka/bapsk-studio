@@ -1,4 +1,4 @@
-import {Component, inject, signal, viewChild, ViewEncapsulation} from '@angular/core';
+import {Component, inject, signal, viewChild} from '@angular/core';
 import {ButtonModule} from 'primeng/button';
 import {ConfirmDialogModule} from 'primeng/confirmdialog';
 import {AuthService} from '../../service/auth.service';
@@ -8,7 +8,6 @@ import {ToastModule} from 'primeng/toast';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {map} from 'rxjs';
-import {NgIf} from '@angular/common';
 import {ClickOutsideDirective} from '../../directive/click-outside.directive';
 
 @Component({
@@ -18,13 +17,10 @@ import {ClickOutsideDirective} from '../../directive/click-outside.directive';
     ConfirmDialogModule,
     ToastModule,
     ConfirmationComponent,
-    NgIf,
     RouterLink,
     ClickOutsideDirective
   ],
-  templateUrl: './profile-dropdown.component.html',
-  styleUrl: './profile-dropdown.component.scss',
-  encapsulation: ViewEncapsulation.None
+  templateUrl: './profile-dropdown.component.html'
 })
 export class ProfileDropdownComponent {
   private readonly authService = inject(AuthService);

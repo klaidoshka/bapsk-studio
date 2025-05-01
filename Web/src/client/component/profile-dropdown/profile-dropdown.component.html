@@ -1,25 +1,23 @@
 <p-toast key="logout"/>
 
-<confirmation
-  [key]='"logout-confirmation"'
-  [header]='"Are you really leaving now?"'
-/>
+<confirmation [key]='"logout-confirmation"' [header]='"Are you really leaving now?"'/>
 
-<!-- Profile Dropdown -->
-<div class="relative inline-block" (clickOutside)="isProfileMenuOpen.set(false)">
+<div class="relative inline-block items-center" (clickOutside)="isProfileMenuOpen.set(false)">
   <button (click)="isProfileMenuOpen.set(!isProfileMenuOpen())"
-          class="hover:opacity-70 font-medium flex items-center hover:cursor-pointer max-w-32">
-    <i class="pi pi-user mr-2"></i>{{ displayName.value() }}
+          class="text-primary-950 hover:text-primary-950/80 font-medium hover:cursor-pointer max-w-32">
+    {{ displayName.value() }}
   </button>
-  <div *ngIf="isProfileMenuOpen()"
-       class="absolute right-0 mt-1 w-24 bg-surface-50 dark:bg-surface-800 rounded shadow-lg z-20"
-       (click)="isProfileMenuOpen.set(false)">
-    <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700" routerLink="/home/profile">
-      Profile
-    </a>
-    <button class="w-full text-left px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700 hover:cursor-pointer"
-            (click)="logout()">
-      Logout
-    </button>
-  </div>
+
+  @if (isProfileMenuOpen()) {
+    <div class="absolute right-0 mt-1 w-24 bg-surface-50 dark:bg-surface-800 rounded shadow-lg z-20"
+         (click)="isProfileMenuOpen.set(false)">
+      <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700" routerLink="/home/profile">
+        Profile
+      </a>
+      <button class="w-full text-left px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700 hover:cursor-pointer"
+              (click)="logout()">
+        Logout
+      </button>
+    </div>
+  }
 </div>

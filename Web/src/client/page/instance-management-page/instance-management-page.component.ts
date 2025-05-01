@@ -15,9 +15,7 @@ import {InputText} from "primeng/inputtext";
 import {
   MessagesShowcaseComponent
 } from "../../component/messages-showcase/messages-showcase.component";
-import {NgForOf, NgIf} from "@angular/common";
 import {TableModule} from "primeng/table";
-import {Textarea} from "primeng/textarea";
 import {instanceUserPermissions} from '../../constant/instance-user.permissions';
 import {AuthService} from '../../service/auth.service';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
@@ -33,6 +31,17 @@ import {toUserIdentityFullName, UserIdentity} from '../../model/user.model';
 import {first, of, tap} from 'rxjs';
 import {NumberUtil} from '../../util/number.util';
 import {InstanceService} from '../../service/instance.service';
+import {
+  InstancePageHeaderSectionComponent
+} from '../../component/instance-page-header-section/instance-page-header-section.component';
+import {FloatLabel} from 'primeng/floatlabel';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {CardComponent} from '../../component/card/card.component';
+import {Dialog} from 'primeng/dialog';
+import {
+  InstanceUserPermissionTogglerComponent
+} from '../../component/instance-user-permission-toggler/instance-user-permission-toggler.component';
 
 @Component({
   selector: 'instance-management-page',
@@ -43,11 +52,15 @@ import {InstanceService} from '../../service/instance.service';
     FormsModule,
     InputText,
     MessagesShowcaseComponent,
-    NgForOf,
-    NgIf,
     ReactiveFormsModule,
     TableModule,
-    Textarea
+    InstancePageHeaderSectionComponent,
+    FloatLabel,
+    IconField,
+    InputIcon,
+    CardComponent,
+    Dialog,
+    InstanceUserPermissionTogglerComponent
   ],
   templateUrl: './instance-management-page.component.html',
   styles: ``
@@ -78,23 +91,7 @@ export class InstanceManagementPageComponent {
       : of(undefined)
   });
 
-  protected readonly form = this.formBuilder.group({
-    name: ["", Validators.required],
-    description: ["No description set."],
-    users: this.formBuilder.array([
-      this.formBuilder.group({
-        email: ["", [Validators.required, Validators.email]],
-        id: [undefined as number | undefined],
-        isOwnerOrSelf: [false],
-        name: [""],
-        permissions: [this.allPermissions.map(p => ({
-          ...p,
-          toggled: true
-        }))],
-        showPermissions: [false]
-      })
-    ])
-  });
+  protected readonly form = this.createForm();
 
   protected readonly formUser = this.formBuilder.group({
     email: ["", [Validators.required, Validators.email, this.validateEmailExists(this.form.controls.users)]]
@@ -133,6 +130,30 @@ export class InstanceManagementPageComponent {
       next: () => this.onSuccess("Instance has been created successfully."),
       error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
     });
+  }
+
+  private createForm() {
+    const form = this.formBuilder.group({
+      name: ["", Validators.required],
+      description: [""],
+      users: this.formBuilder.array([
+        this.formBuilder.group({
+          email: ["", [Validators.required, Validators.email]],
+          id: [undefined as number | undefined],
+          isOwnerOrSelf: [false],
+          name: [""],
+          permissions: [this.allPermissions.map(p => ({
+            ...p,
+            toggled: true
+          }))],
+          showPermissions: [false]
+        })
+      ])
+    });
+
+    form.controls.users.clear();
+
+    return form;
   }
 
   private edit(request: InstanceEditRequest) {
@@ -199,6 +220,10 @@ export class InstanceManagementPageComponent {
     });
   }
 
+  protected isOldUser(email: string): boolean {
+    return this.instance.value()?.users.find(user => user.user.email === email) !== undefined;
+  }
+
   protected removeUser(index: number) {
     this.form.controls.users.removeAt(index);
     this.form.markAsDirty();
@@ -231,7 +256,7 @@ export class InstanceManagementPageComponent {
     }
   }
 
-  protected togglePermission(userIndex: number, permissionIndex: number) {
+  protected togglePermission = (userIndex: number, permissionIndex: number): void => {
     const permissionsControl = this.form.controls.users.at(userIndex).controls.permissions;
     const permission = permissionsControl.value![permissionIndex];
 

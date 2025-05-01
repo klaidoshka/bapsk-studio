@@ -1,32 +1,67 @@
-@if (instance.isLoading()) {
-  <p>Loading...</p>
-} @else if (!instance.value()) {
-  <p>Unknown instance value</p>
-} @else {
-  @let instanceValue = instance.value()!;
+<div class="h-full w-full container ml-auto mr-auto flex flex-col pb-8">
+  <instance-page-header-section [canGoBack]="true"/>
+  @if (instance.isLoading()) {
+    <p-progress-spinner/>
+  } @else if (!instance.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    @let instanceValue = instance.value()!;
 
-  <p class="font-bold">Name</p>
-  <p>{{ instanceValue.name }}</p>
-
-  <p class="font-bold mt-4">Description</p>
-  <p>{{ instanceValue.description }}</p>
-
-  <p class="font-bold mt-4">Created</p>
-  <p>{{ instanceValue.createdAt | date:'mediumDate' }}</p>
-
-  <h1 class="mt-4 font-bold">Users</h1>
-  <p-table [value]="instanceValue.users">
-    <ng-template #header>
-      <tr>
-        <th>Name</th>
-        <th>Email</th>
-      </tr>
-    </ng-template>
-    <ng-template #body let-instanceUser>
-      <tr>
-        <td>{{ toUserFullName(instanceUser.user) }}</td>
-        <td>{{ instanceUser.user.email }}</td>
-      </tr>
-    </ng-template>
-  </p-table>
-}
+    <card>
+      <p card-header>Instance</p>
+      <div card-body class="flex flex-col gap-4">
+        <card>
+          <p card-header>Details</p>
+          <div card-body class="flex flex-col gap-2">
+            <div class="flex flex-row">
+              <p class="font-semibold mr-2">ID</p>
+              <p>{{ instanceValue.id }}</p>
+            </div>
+            <div class="flex flex-row">
+              <p class="font-semibold mr-2">Name</p>
+              <p>{{ instanceValue.name }}</p>
+            </div>
+            <div class="flex flex-row">
+              <p class="font-semibold mr-2">Description</p>
+              <p>{{ instanceValue.description }}</p>
+            </div>
+            <div class="flex flex-row">
+              <p class="font-semibold mr-2">Created</p>
+              <p>{{ instanceValue.createdAt | date:'mediumDate' }}</p>
+            </div>
+          </div>
+        </card>
+        <card>
+          <p card-header>Users</p>
+          <div card-body>
+            <p-table [value]="instanceValue.users" paginatorStyleClass="rounded-t-none! bg-inherit!"
+                     paginatorDropdownAppendTo="body" [styleClass]="'rounded-md mb-4 border border-primary-950/20 dark:border-primary-50/20 relative w-full overflow-auto ' +
+                     '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'"
+                     [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+              <ng-template #header>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Permissions</th>
+                  <th>Data Entries Created</th>
+                </tr>
+              </ng-template>
+              <ng-template #body let-instanceUser>
+                <tr>
+                  <td>{{ toUserFullName(instanceUser.user) }}</td>
+                  <td>{{ instanceUser.user.email }}</td>
+                  <td>
+                    <badge-contrasted [value]="getPermissionsCount(instanceUser.id) + ' / ' + permissionsCount"/>
+                  </td>
+                  <td>
+                    <badge-contrasted [value]="(getDataEntriesCreated(instanceUser.userId) | async) ?? 0"/>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </card>
+      </div>
+    </card>
+  }
+</div>

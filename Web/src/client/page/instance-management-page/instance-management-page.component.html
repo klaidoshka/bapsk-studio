@@ -1,87 +1,99 @@
-<div class="min-w-128">
-  <messages-showcase [messages]="messages()"/>
-
-  <form class="grid grid-cols-1 gap-4" [formGroup]="form">
-    <div>
-      <label for="name" class="block text-sm font-medium">Name</label>
-      <input formControlName="name" pInputText type="text" id="name" class="mt-1 block w-full"/>
-      <form-input-error [control]="form.controls.name"/>
-    </div>
-
-    <div>
-      <label for="description" class="block text-sm font-medium">Description</label>
-      <textarea formControlName="description" pTextarea id="description" class="mt-1 p-2 block w-full"></textarea>
-      <form-input-error [control]="form.controls.description"/>
-    </div>
-
-    <div>
-      <label for="users" class="block text-l font-bold">Users</label>
-      <p-table [value]="form.controls.users.controls">
-        <ng-template #header>
-          <tr>
-            <th>Email</th>
-            <th>Name</th>
-            <th class="max-w-96">Permissions</th>
-            <th></th>
-          </tr>
-        </ng-template>
-        <ng-template #body let-user let-i="rowIndex">
-          <tr>
-            <td>{{ user.value.email }}</td>
-            <td>{{ user.value.name }}</td>
-            <td>
-              @if (!user.value.isOwnerOrSelf) {
-                <div>
-                  <p-badge *ngIf="!user.value.showPermissions" value="Show permissions" severity="secondary"
-                           class="cursor-pointer px-2 py-1 text-xs" (click)="user.value.showPermissions = true"/>
-
-                  <div *ngIf="user.value.showPermissions" class="rounded p-2 max-h-60 overflow-y-auto">
-                    <div class="flex justify-between items-center mb-2">
-                      <span class="font-semibold">Permissions</span>
-                      <p-badge value="Hide" severity="danger" class="cursor-pointer text-xs"
-                               (click)="user.value.showPermissions = false"/>
-                    </div>
-                    <table class="w-full table-auto text-sm">
-                      <tbody>
-                      <tr *ngFor="let perm of user.value.permissions; let j = index">
-                        <td class="pr-4 py-1">{{ perm.label }}</td>
-                        <td class="py-1">
-                          <p-badge [value]="perm.toggled ? 'Enabled' : 'Disabled'"
-                                   [severity]="perm.toggled ? 'success' : 'danger'"
-                                   class="cursor-pointer px-2 py-1 text-xs" (click)="togglePermission(i, j)"/>
-                        </td>
-                      </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              } @else {
-                <p-badge value="Owner. All granted" severity="success" class="px-2 py-1 text-xs"/>
-              }
-            </td>
-            <td>
-              <p-button [disabled]="user.value.isOwnerOrSelf" variant="text" icon="pi pi-trash"
-                        (onClick)="removeUser(i)"/>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
-
-    <messages-showcase [messages]="messagesUsers()"/>
-
-    <form [formGroup]="formUser" class="flex flex-row gap-x-4 mt-1 max-w-96">
-      <div class="flex flex-col">
-        <input formControlName="email" placeholder="Enter email..." pInputText type="email" id="email"
-               class="mt-1 block w-full"/>
-        <form-input-error [control]="formUser.controls.email" [customErrorMessages]="customErrorMessages"/>
+<div class="h-full w-full container ml-auto mr-auto flex flex-col pb-8">
+  <instance-page-header-section [canGoBack]="true"/>
+  <card>
+    <p card-header>Create Instance</p>
+    <p card-subHeader>Fill in the form below to create a new instance.</p>
+    <form [formGroup]="form" card-body class="flex flex-col gap-4">
+      <div>
+        <p-floatlabel variant="on">
+          <p-iconfield>
+            <p-inputicon class="pi pi-tag"/>
+            <input pInputText id="name" formControlName="name" type="text"/>
+          </p-iconfield>
+          <label for="name">Name</label>
+        </p-floatlabel>
+        <form-input-error [control]="form.controls.name"/>
       </div>
-      <p-button class="mt-1" label="Add user" [disabled]="formUser.invalid" (onClick)="addUser()"/>
-    </form>
-  </form>
 
-  <div class="flex justify-end mt-4">
-    <p-button [label]="instance.value() === undefined ? 'Create' : 'Save'" [disabled]="form.invalid || !form.dirty"
-              (onClick)="save()" type="submit"/>
-  </div>
+      <div>
+        <p-floatlabel variant="on">
+          <p-iconfield>
+            <p-inputicon class="pi pi-comment"/>
+            <input pInputText id="description" formControlName="description" type="text"/>
+          </p-iconfield>
+          <label for="description">Description</label>
+        </p-floatlabel>
+        <form-input-error [control]="form.controls.description"/>
+      </div>
+
+      <card>
+        <div card-header>
+          <div class="font-semibold tracking-tight text-xl">Instance Users</div>
+        </div>
+        <div card-body>
+          @if (form.controls.users.length > 0) {
+            <p-table [value]="form.controls.users.controls" paginatorStyleClass="rounded-t-none! bg-inherit!"
+                     paginatorDropdownAppendTo="body" [styleClass]="'rounded-md mb-4 border border-primary-950/20 dark:border-primary-50/20 relative w-full overflow-auto ' +
+                     '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'"
+                     [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+              <ng-template #header>
+                <tr>
+                  <th>Email</th>
+                  <th>Name</th>
+                  <th class="max-w-96">Permissions</th>
+                  <th>User Since</th>
+                  <th></th>
+                </tr>
+              </ng-template>
+              <ng-template #body let-user let-i="rowIndex">
+                <tr>
+                  <td>{{ user.value.email }}</td>
+                  <td>{{ user.value.name }}</td>
+                  <td>
+                    @if (!user.value.isOwnerOrSelf) {
+                      @if (!user.value.showPermissions) {
+                        <p-button label="Modify permissions" size="small" type="button"
+                                  (click)="user.value.showPermissions = true"/>
+                      }
+                      <p-dialog [(visible)]="user.value.showPermissions" [closable]="true" [modal]="true"
+                                styleClass="w-128 h-128" [header]="user.value.name + ' permissions'">
+                        <instance-user-permission-toggler [permissions]="user.value.permissions"
+                                                          [toggle]="togglePermission" [userIndex]="i"/>
+                      </p-dialog>
+                    } @else {
+                      <p-badge value="Owner. All granted" severity="success" class="px-2 py-1 text-xs"/>
+                    }
+                  </td>
+                  <td>
+                    <p-badge [value]="isOldUser(user.value.email) ? 'Some time ago' : 'Just now'" severity="contrast"
+                             class="px-2 py-1 text-xs"/>
+                  </td>
+                  <td>
+                    <p-button [disabled]="user.value.isOwnerOrSelf" variant="text" icon="pi pi-trash"
+                              (onClick)="removeUser(i)"/>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          }
+          <messages-showcase [messages]="messagesUsers()"/>
+          <form [formGroup]="formUser" class="flex flex-col gap-4">
+            <div class="flex flex-col">
+              <input formControlName="email" placeholder="Enter email..." pInputText type="email" id="email"
+                     class="mt-1 block w-64"/>
+              <form-input-error [control]="formUser.controls.email" [customErrorMessages]="customErrorMessages"/>
+            </div>
+            <p-button class="mt-1" label="Add user" [disabled]="formUser.invalid" (onClick)="addUser()" size="small"/>
+          </form>
+        </div>
+      </card>
+
+      <div>
+        <messages-showcase [messages]="messages()"/>
+
+        <p-button [label]="instance.value() === undefined ? 'Create' : 'Save'" [disabled]="form.invalid || !form.dirty"
+                  (onClick)="save()" size="small" type="submit"/>
+      </div>
+    </form>
+  </card>
 </div>

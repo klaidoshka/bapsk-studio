@@ -1,19 +1,20 @@
-<div class="h-full w-full">
-  <ng-container *ngIf="instanceId() != null">
-    <div class="flex h-full">
-      <!-- Sidebar -->
-      <div
-        class="rounded sticky top-0 w-52 dark:bg-surface-950 bg-surface-50 dark:text-primary dark:text-primary text-primary-50 p-4 flex flex-col">
+@if (!instanceId()) {
+  <instance-selector/>
+} @else {
+  <div class="h-full w-full">
+    <ng-container *ngIf="instanceId() != null">
+      <div class="flex h-full">
+        <!-- Sidebar -->
+        <div
+          class="rounded sticky top-0 w-52 dark:bg-surface-950 bg-surface-50 dark:text-primary dark:text-primary text-primary-50 p-4 flex flex-col">
 
-      </div>
-
-      <!-- Main Content -->
-      <div class="h-full flex-grow flex-col p-4">
-        <div class="flex flex-row w-full justify-end mb-4">
-          <instance-selector/>
         </div>
-        <router-outlet/>
+
+        <!-- Main Content -->
+        <div class="h-full flex-grow flex-col p-4">
+          <router-outlet/>
+        </div>
       </div>
-    </div>
-  </ng-container>
-</div>
+    </ng-container>
+  </div>
+}

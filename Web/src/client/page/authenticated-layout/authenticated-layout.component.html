@@ -1,58 +1,32 @@
 <div class="h-full w-full flex flex-col">
-  <header class="flex w-full h-12 px-4 py-1 dark:bg-surface-950 bg-surface-50 shadow-md sticky top-0 z-10">
-    <div class="flex items-center space-x-6">
-      <!-- Home -->
-      <a class="text-xl font-bold cursor-pointer hover:opacity-70" routerLink="/home">Accounting</a>
+  <header class="sticky top-0 z-50 w-full bg-surface-50/95 backdrop-blur supports-[backdrop-filter]:bg-surface-50/60">
+    <div class="container flex h-14 items-center gap-2 md:gap-4 m-auto">
+      <div class="mr-4 hidden md:flex">
+        <!-- Home -->
+        <a class="mr-4 flex items-center gap-2 lg:mr-6" routerLink="/home">
+          <span class="font-bold lg:inline-block text-primary-950 hover:text-primary-950/80">Bapsk</span>
+        </a>
 
-      <!-- Theme Selector -->
-      <theme-selector/>
-
-      <!-- Instances -->
-      <a class="hover:opacity-70 font-medium cursor-pointer" routerLink="/home/instance">Instances</a>
-
-      <!-- Workspace -->
-      <div class="relative inline-block" (clickOutside)="isWorkspaceMenuOpen.set(false)">
-        <button (click)="isWorkspaceMenuOpen.set(!isWorkspaceMenuOpen())"
-                class="hover:opacity-70 font-medium cursor-pointer">
-          Workspace
-        </button>
-        <div *ngIf="isWorkspaceMenuOpen()"
-             class="absolute left-0 mt-1 w-38 bg-surface-50 dark:bg-surface-800 rounded shadow-lg z-20"
-             (click)="isWorkspaceMenuOpen.set(false)">
-          <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700"
-             routerLink="/home/workspace/data-type">Data
-            Types</a>
-          <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700"
-             routerLink="/home/workspace/data-entry">Data
-            Entries</a>
-          <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700"
-             routerLink="/home/workspace/generate-report">Generate
-            Report</a>
-        </div>
+        <!-- Navigation -->
+        <nav class="flex items-center gap-4 text-sm xl:gap-6">
+          <a class="transition-colors text-primary-950 hover:text-primary-950/80" routerLink="/home/instance"
+             routerLinkActive="underline underline-offset-4">Instances</a>
+          <a class="transition-colors text-primary-950 hover:text-primary-950/80" routerLink="/home/workspace"
+             routerLinkActive="underline underline-offset-4 ">Workspace</a>
+          @if (user.value()?.role === Role.Admin) {
+            <a class="transition-colors text-primary-950 hover:text-primary-950/80" routerLink="/admin"
+               routerLinkActive="underline underline-offset-4">Admin</a>
+          }
+        </nav>
       </div>
 
-      <!-- Admin -->
-      @if (user.value()?.role === Role.Admin) {
-        <div class="relative inline-block" (clickOutside)="isAdminMenuOpen.set(false)">
-          <button (click)="isAdminMenuOpen.set(!isAdminMenuOpen())" class="hover:opacity-70 font-medium cursor-pointer">
-            Admin
-          </button>
-          <div *ngIf="isAdminMenuOpen()"
-               class="absolute left-0 mt-1 w-48 bg-surface-50 dark:bg-surface-800 rounded shadow-lg z-20">
-            <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700" routerLink="/admin/user"
-               (click)="isAdminMenuOpen.set(false)">Users</a>
-            <p-fileUpload styleClass="flex flex-col items-start!"
-                          chooseStyleClass="dark:bg-surface-800! bg-surface-50! dark:text-primary-50! text-primary-900! border-none! px-4! py-2!"
-                          chooseLabel="Style HTML Table" chooseIcon="pi pi-upload" accept=".html" name="file"
-                          mode="basic" auto="true" (onSelect)="onHtmlSelect($event.currentFiles)"/>
-          </div>
-        </div>
-      }
-    </div>
+      <div class="ml-auto flex items-center gap-4 md:flex-1 md:justify-end">
+        <!-- Profile -->
+        <profile-dropdown *ngIf="isAuthenticated.value()"/>
 
-    <!-- Profile -->
-    <div class="flex items-center space-x-4 ml-auto">
-      <profile-dropdown *ngIf="isAuthenticated.value()"/>
+        <!-- Theme Selector -->
+        <theme-selector/>
+      </div>
     </div>
   </header>
 

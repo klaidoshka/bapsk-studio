@@ -8,13 +8,11 @@ import {
 import {ThemeSelectorComponent} from '../../component/theme-selector/theme-selector.component';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {Role} from '../../model/role.model';
-import {ClickOutsideDirective} from '../../directive/click-outside.directive';
 import {HttpClient} from '@angular/common/http';
-import {FileUpload} from 'primeng/fileupload';
 
 @Component({
   selector: "authenticated-layout",
-  imports: [RouterModule, NgIf, ProfileDropdownComponent, ThemeSelectorComponent, ClickOutsideDirective, FileUpload],
+  imports: [RouterModule, NgIf, ProfileDropdownComponent, ThemeSelectorComponent],
   templateUrl: "./authenticated-layout.component.html",
   providers: []
 })
