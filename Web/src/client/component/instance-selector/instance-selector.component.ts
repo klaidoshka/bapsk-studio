@@ -1,4 +1,4 @@
-import {Component, effect, inject, ViewEncapsulation} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {DropdownModule} from "primeng/dropdown";
 import {InstanceService} from '../../service/instance.service';
 import {Button} from 'primeng/button';
@@ -6,8 +6,9 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Select} from 'primeng/select';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router, UrlSegment} from '@angular/router';
-import {NumberUtil} from '../../util/number.util';
 import Instance from '../../model/instance.model';
+import {first} from 'rxjs';
+import {NumberUtil} from '../../util/number.util';
 
 @Component({
   selector: 'instance-selector',
@@ -18,29 +19,28 @@ import Instance from '../../model/instance.model';
     FormsModule,
     Select
   ],
-  templateUrl: './instance-selector.component.html',
-  styleUrl: `./instance-selector.component.scss`,
-  encapsulation: ViewEncapsulation.None
+  templateUrl: './instance-selector.component.html'
 })
 export class InstanceSelectorComponent {
-  private readonly instanceService = inject(InstanceService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly instanceService = inject(InstanceService);
   protected readonly instances = rxResource({loader: () => this.instanceService.getAll()});
   protected readonly selectedInstance = this.instanceService.getActiveInstance();
 
   constructor() {
-    effect(() => {
-      const instanceId = NumberUtil.parse(this.route.snapshot.paramMap.get('instanceId'));
+    this.route.params
+      .pipe(first())
+      .subscribe(params => {
+        const instanceId = NumberUtil.parse(params['instanceId']);
 
-      if (instanceId) {
-        const found = this.instances.value()?.find(i => i.id === instanceId);
-
-        if (found) {
-          this.instanceService.setActiveInstance(found);
+        if (instanceId) {
+          this.instanceService
+            .getById(instanceId)
+            .pipe(first())
+            .subscribe(instance => this.instanceService.setActiveInstance(instance));
         }
-      }
-    });
+      });
   }
 
   protected onChange(instance: Instance) {

@@ -13,7 +13,6 @@ import {
 } from '../../component/data-type-entry-field-input/data-type-entry-field-input.component';
 import {Button} from 'primeng/button';
 import {NgIf} from '@angular/common';
-import {InstanceService} from '../../service/instance.service';
 import {DataTypeService} from '../../service/data-type.service';
 import DataTypeField, {FieldType} from '../../model/data-type-field.model';
 import Messages from '../../model/messages.model';
@@ -49,17 +48,16 @@ export class ImportConfigurationManagementPageComponent {
   private readonly dataTypeService = inject(DataTypeService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly importConfigurationService = inject(ImportConfigurationService);
-  private readonly instanceService = inject(InstanceService);
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   protected readonly FieldType = FieldType;
   protected readonly configurationId = input<string>();
-  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});
 
   protected readonly configuration = rxResource({
     request: () => ({
       configurationId: NumberUtil.parse(this.configurationId()),
-      instanceId: this.instanceId()
+      instanceId: NumberUtil.parse(this.instanceId())
     }),
     loader: ({request}) => request.configurationId && request.instanceId
       ? this.importConfigurationService.getById(request.instanceId, request.configurationId)
@@ -79,7 +77,7 @@ export class ImportConfigurationManagementPageComponent {
 
       return {
         dataTypeIds: dataTypeIds,
-        instanceId: this.instanceId()
+        instanceId: NumberUtil.parse(this.instanceId())!
       };
     },
     loader: ({request}) => request.dataTypeIds && request.instanceId
@@ -89,7 +87,7 @@ export class ImportConfigurationManagementPageComponent {
 
   protected readonly dataTypes = rxResource({
     request: () => ({
-      instanceId: this.instanceId()
+      instanceId: NumberUtil.parse(this.instanceId())
     }),
     loader: ({request}) => request.instanceId
       ? this.dataTypeService.getAllByInstanceId(request.instanceId)
@@ -256,7 +254,7 @@ export class ImportConfigurationManagementPageComponent {
         id: this.form.value.id || 0,
         name: this.form.value.name!
       },
-      instanceId: this.instanceId()!
+      instanceId: NumberUtil.parse(this.instanceId())!
     };
 
     if (this.configurationId()) {

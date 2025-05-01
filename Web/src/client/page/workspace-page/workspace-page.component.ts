@@ -1,132 +1,36 @@
-import {Component, effect, inject, signal, untracked} from '@angular/core';
+import {Component, inject, input} from '@angular/core';
 import {DataTypeService} from '../../service/data-type.service';
-import {InstanceService} from '../../service/instance.service';
 import DataType from '../../model/data-type.model';
-import {CustomerService} from '../../service/customer.service';
-import {SaleService} from '../../service/sale.service';
-import {SalesmanService} from '../../service/salesman.service';
-import {WorkspaceType} from './workspace-selector.model';
-import {NgForOf, NgIf} from '@angular/common';
+import {NgIf} from '@angular/common';
 import {DropdownModule} from 'primeng/dropdown';
 import {FormsModule} from '@angular/forms';
-import {Select} from 'primeng/select';
-import {DataEntryService} from '../../service/data-entry.service';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {of} from 'rxjs';
-import {RouterOutlet} from '@angular/router';
+import {Router, RouterOutlet} from '@angular/router';
 import {
   InstanceSelectorComponent
 } from '../../component/instance-selector/instance-selector.component';
+import {NumberUtil} from '../../util/number.util';
 
 @Component({
   selector: 'workspace-page',
   templateUrl: './workspace-page.component.html',
-  imports: [NgIf, NgForOf, DropdownModule, FormsModule, Select, RouterOutlet, InstanceSelectorComponent],
+  imports: [NgIf, DropdownModule, FormsModule, RouterOutlet, InstanceSelectorComponent],
   providers: []
 })
 export class WorkspacePageComponent {
-  protected readonly WorkspaceType = WorkspaceType;
-  private customerService = inject(CustomerService);
-  private dataEntryService = inject(DataEntryService);
-  private dataTypeService = inject(DataTypeService);
-  private instanceService = inject(InstanceService);
-  private saleService = inject(SaleService);
-  private salesmanService = inject(SalesmanService);
-
-  customers = rxResource({
-    request: () => ({instanceId: this.instanceId()}),
-    loader: ({request}) => request.instanceId
-      ? this.customerService.getAllByInstanceId(request.instanceId)
-      : of([])
-  })
-
-  dataEntries = rxResource({
-    request: () => ({
-      dataTypeId: this.selectedDataType()?.id,
-      instanceId: this.instanceId()
-    }),
-    loader: ({request}) => request.dataTypeId && request.instanceId
-      ? this.dataEntryService.getAllByDataTypeId(request.instanceId, request.dataTypeId)
-      : of([])
-  });
+  private readonly dataTypeService = inject(DataTypeService);
+  private readonly router = inject(Router);
+  protected readonly instanceId = input.required<string>();
 
   dataTypes = rxResource({
-    request: () => ({instanceId: this.instanceId()}),
+    request: () => ({instanceId: NumberUtil.parse(this.instanceId())}),
     loader: ({request}) => request.instanceId
       ? this.dataTypeService.getAllByInstanceId(request.instanceId)
       : of([])
   });
 
-  instanceId = this.instanceService.getActiveInstanceId();
-
-  sales = rxResource({
-    request: () => ({instanceId: this.instanceId()}),
-    loader: ({request}) => request.instanceId
-      ? this.saleService.getAllWithVatDeclarationByInstanceId(request.instanceId)
-      : of([])
-  });
-
-  salesmen = rxResource({
-    request: () => ({instanceId: this.instanceId()}),
-    loader: ({request}) => request.instanceId
-      ? this.salesmanService.getAllByInstanceId(request.instanceId)
-      : of([])
-  });
-
-  selectedDataType = signal<DataType | undefined>(undefined);
-  selectedWorkspace = signal<WorkspaceType>(WorkspaceType.DataType);
-  workspacesPart = [WorkspaceType.Customer, WorkspaceType.Salesman, WorkspaceType.Sale];
-
-  constructor() {
-    effect(() => {
-      const dataTypes = this.dataTypes.value();
-      const selectedDataTypeId = untracked(() => this.selectedDataType()?.id);
-      const workspace = untracked(() => this.selectedWorkspace());
-
-      if (workspace !== WorkspaceType.DataType) {
-        return;
-      }
-
-      untracked(() => {
-        if (dataTypes?.length === 0) {
-          this.selectedWorkspace.set(WorkspaceType.Customer);
-        } else if (dataTypes?.findIndex(it => it.id === selectedDataTypeId) === -1) {
-          this.selectedDataType.set(dataTypes[0]);
-        }
-      });
-    });
-  }
-
-  getWorkspaceName(type: WorkspaceType): string {
-    switch (type) {
-      case WorkspaceType.Customer:
-        return 'Customers';
-      case WorkspaceType.Sale:
-        return 'Sales';
-      case WorkspaceType.Salesman:
-        return 'Salesmen';
-      case WorkspaceType.DataType:
-        return 'Your Data Types';
-    }
-  }
-
-  selectDataType(dataType?: DataType) {
-    if (dataType && this.selectedDataType() !== dataType) {
-      this.selectedDataType.set(dataType);
-    }
-  }
-
-  selectWorkspace(workspace: WorkspaceType) {
-    if (this.selectedWorkspace() === workspace) {
-      return;
-    }
-
-    const targetDataType = this.dataTypes.value()?.at(0);
-
-    if (workspace == WorkspaceType.DataType && this.selectedDataType() !== targetDataType) {
-      this.selectedDataType.set(targetDataType);
-    }
-
-    this.selectedWorkspace.set(workspace);
+  selectDataType(dataType: DataType) {
+    // TODO: Update query params
   }
 }

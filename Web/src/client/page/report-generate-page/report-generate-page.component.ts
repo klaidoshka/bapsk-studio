@@ -1,5 +1,8 @@
-import {Component} from '@angular/core';
-import {ReportGenerateFormComponent} from '../../component/report-generate-form/report-generate-form.component';
+import {Component, computed, input} from '@angular/core';
+import {
+  ReportGenerateFormComponent
+} from '../../component/report-generate-form/report-generate-form.component';
+import {NumberUtil} from '../../util/number.util';
 
 @Component({
   selector: 'report-generate-page',
@@ -10,5 +13,6 @@ import {ReportGenerateFormComponent} from '../../component/report-generate-form/
   styles: ``
 })
 export class ReportGeneratePageComponent {
-
+  protected readonly instanceId = input.required<string>();
+  protected readonly instanceIdAsNumber = computed(() => NumberUtil.parse(this.instanceId()));
 }

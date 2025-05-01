@@ -1,4 +1,4 @@
-import {Component, effect, inject, input, signal} from '@angular/core';
+import {Component, inject, input, signal} from '@angular/core';
 import {DataEntryService} from '../../service/data-entry.service';
 import {DataTypeService} from '../../service/data-type.service';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
@@ -10,7 +10,6 @@ import {
   ValidationErrors,
   Validators
 } from '@angular/forms';
-import {InstanceService} from '../../service/instance.service';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../../model/data-type.model';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {first, of, tap} from 'rxjs';
@@ -54,19 +53,18 @@ export class DataTypeManagementPageComponent {
   private readonly dataTypeService = inject(DataTypeService);
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly instanceService = inject(InstanceService);
   protected readonly customErrorMessages = {'noFields': () => 'At least one field is required.'};
   protected readonly dataTypeId = input<string>();
   protected readonly fieldTypes = fieldTypes;
   protected readonly form = this.createForm();
-  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});
   protected readonly FieldType = FieldType;
 
   protected readonly dataType = rxResource({
     request: () => ({
       dataTypeId: NumberUtil.parse(this.dataTypeId()),
-      instanceId: this.instanceId()
+      instanceId: NumberUtil.parse(this.instanceId())
     }),
     loader: ({request}) =>
       request.dataTypeId && request.instanceId
@@ -81,7 +79,7 @@ export class DataTypeManagementPageComponent {
 
   protected readonly dataTypes = rxResource({
     request: () => ({
-      instanceId: this.instanceId()
+      instanceId: NumberUtil.parse(this.instanceId())
     }),
     loader: ({request}) => request.instanceId
       ? this.dataTypeService.getAllByInstanceId(request.instanceId)
@@ -134,7 +132,7 @@ export class DataTypeManagementPageComponent {
           this.onSuccess("Data type has been edited successfully.");
 
           this.dataEntryService
-            .getAllByDataTypeId(this.instanceId()!, request.dataTypeId)
+            .getAllByDataTypeId(NumberUtil.parse(this.instanceId())!, request.dataTypeId)
             .pipe(first())
             .subscribe();
         },
@@ -250,7 +248,7 @@ export class DataTypeManagementPageComponent {
           isRequired: isReference ? true : field.value.isRequired
         } as DataTypeFieldEditRequest;
       }),
-      instanceId: this.instanceId()!
+      instanceId: NumberUtil.parse(this.instanceId())!
     };
 
     if (this.dataType.value()) {
@@ -258,7 +256,7 @@ export class DataTypeManagementPageComponent {
     } else {
       this.create({
         ...request,
-        instanceId: this.instanceId()!
+        instanceId: NumberUtil.parse(this.instanceId())!
       });
     }
   }

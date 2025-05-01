@@ -16,7 +16,6 @@ import Messages from '../../model/messages.model';
 import Sale, {SaleCreateRequest, SaleEditRequest, SoldGood} from '../../model/sale.model';
 import {first, map, of, tap} from 'rxjs';
 import {NumberUtil} from '../../util/number.util';
-import {InstanceService} from '../../service/instance.service';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {SaleReceiptType, saleReceiptTypes} from './sale-receipt-type.model';
 import {
@@ -48,7 +47,6 @@ export class SaleManagementPageComponent {
   private readonly customerService = inject(CustomerService);
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly instanceService = inject(InstanceService);
   private readonly saleService = inject(SaleService);
   private readonly salesmanService = inject(SalesmanService);
   protected readonly SaleReceiptType = SaleReceiptType;
@@ -57,12 +55,12 @@ export class SaleManagementPageComponent {
   protected readonly saleReceiptTypes = saleReceiptTypes;
   protected readonly measurementUnits = measurementUnits;
   protected readonly saleId = input<string>();
-  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});
   protected readonly selectedSaleReceiptType = signal<SaleReceiptType>(SaleReceiptType.Invoice);
 
   protected readonly customersLabeled = rxResource({
-    request: () => ({instanceId: this.instanceId()}),
+    request: () => ({instanceId: NumberUtil.parse(this.instanceId())}),
     loader: ({request}) => request.instanceId
       ? this.customerService
         .getAllByInstanceId(request.instanceId)
@@ -77,7 +75,7 @@ export class SaleManagementPageComponent {
 
   protected readonly sale = rxResource({
     request: () => ({
-      instanceId: this.instanceId(),
+      instanceId: NumberUtil.parse(this.instanceId()),
       saleId: NumberUtil.parse(this.saleId())
     }),
     loader: ({request}) => request.instanceId && request.saleId
@@ -90,7 +88,7 @@ export class SaleManagementPageComponent {
   });
 
   protected readonly salesmenLabeled = rxResource({
-    request: () => ({instanceId: this.instanceId()}),
+    request: () => ({instanceId: NumberUtil.parse(this.instanceId())}),
     loader: ({request}) => request.instanceId
       ? this.salesmanService
         .getAllByInstanceId(request.instanceId)
@@ -215,7 +213,7 @@ export class SaleManagementPageComponent {
           vatRate: +soldGood.vatRate
         })) || []
       },
-      instanceId: this.instanceId()!
+      instanceId: NumberUtil.parse(this.instanceId())!
     };
 
     if (this.sale.value()) {

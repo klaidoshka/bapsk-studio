@@ -14,7 +14,6 @@ import {CacheService} from './cache.service';
 export class SalesmanService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly httpClient = inject(HttpClient);
-  private readonly instanceService = inject(InstanceService);
   private readonly cacheService = new CacheService<number, Salesman>(salesman => salesman.id!);
   private readonly instancesFetched = new Set<number>();
 

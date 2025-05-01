@@ -1,8 +1,7 @@
-import {Component, inject, signal} from '@angular/core';
+import {Component, inject, input, signal} from '@angular/core';
 import {ReportService} from '../../service/report.service';
 import {ReportTemplateService} from '../../service/report-template.service';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {InstanceService} from '../../service/instance.service';
 import {first, map, of} from 'rxjs';
 import {
   AbstractControl,
@@ -42,12 +41,11 @@ import {FormInputErrorComponent} from '../form-input-error/form-input-error.comp
 export class ReportGenerateFormComponent {
   private readonly customerService = inject(CustomerService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly instanceService = inject(InstanceService);
   private readonly reportService = inject(ReportService);
   private readonly reportTemplateService = inject(ReportTemplateService);
   private readonly router = inject(Router);
   private readonly salesmanService = inject(SalesmanService);
-  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  readonly instanceId = input.required<number>();
   protected readonly messages = signal<Messages>({});
   protected readonly selectedType = signal<number>(1);
 
@@ -64,7 +62,7 @@ export class ReportGenerateFormComponent {
             label: customer.firstName + ' ' + customer.lastName
           })))
         )
-      : of([])
+      : of(undefined)
   });
 
   protected readonly customErrorMessages = {
@@ -129,6 +127,7 @@ export class ReportGenerateFormComponent {
     this.reportService
       .generateDataEntryReports({
         from: this.form.value.from!,
+        instanceId: this.instanceId(),
         reportTemplateId: this.form.value.dataEntry!.templateId!,
         to: this.form.value.to!
       })
@@ -148,6 +147,7 @@ export class ReportGenerateFormComponent {
       .generateSaleReports({
         customerId: this.form.value.sale!.customerId!,
         from: this.form.value.from!,
+        instanceId: this.instanceId(),
         salesmanId: this.form.value.sale!.salesmanId!,
         to: this.form.value.to!
       })

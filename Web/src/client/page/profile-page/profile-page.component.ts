@@ -1,6 +1,10 @@
 import {Component, inject} from '@angular/core';
-import {ProfileShowcaseComponent} from '../../component/profile-showcase/profile-showcase.component';
-import {SessionShowcaseComponent} from '../../component/session-showcase/session-showcase.component';
+import {
+  ProfileShowcaseComponent
+} from '../../component/profile-showcase/profile-showcase.component';
+import {
+  SessionShowcaseComponent
+} from '../../component/session-showcase/session-showcase.component';
 import {AuthService} from '../../service/auth.service';
 import {NgIf} from '@angular/common';
 import {rxResource} from '@angular/core/rxjs-interop';
@@ -17,6 +21,5 @@ import {rxResource} from '@angular/core/rxjs-interop';
 })
 export class ProfilePageComponent {
   private readonly authService = inject(AuthService);
-
-  user = rxResource({ loader: () => this.authService.getUser() });
+  protected readonly user = rxResource({loader: () => this.authService.getUser()});
 }

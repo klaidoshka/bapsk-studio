@@ -4,7 +4,6 @@ import {RoundPipe} from '../../pipe/round.pipe';
 import {TableModule} from 'primeng/table';
 import {SaleService} from '../../service/sale.service';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {InstanceService} from '../../service/instance.service';
 import {NumberUtil} from '../../util/number.util';
 import {of} from 'rxjs';
 
@@ -20,14 +19,13 @@ import {of} from 'rxjs';
   styles: ``
 })
 export class SalePreviewPageComponent {
-  private readonly instanceService = inject(InstanceService);
   private readonly saleService = inject(SaleService);
-  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  protected readonly instanceId = input.required<string>();
   protected readonly saleId = input.required<string>();
 
   protected readonly sale = rxResource({
     request: () => ({
-      instanceId: this.instanceId(),
+      instanceId: NumberUtil.parse(this.instanceId()),
       saleId: NumberUtil.parse(this.saleId())
     }),
     loader: ({request}) => request.instanceId && request.saleId

@@ -6,17 +6,19 @@ import {rxResource} from '@angular/core/rxjs-interop';
 import {first, of} from 'rxjs';
 import Messages from '../../model/messages.model';
 import DataTypeField from '../../model/data-type-field.model';
-import {ReportTemplateEditRequest,} from '../../model/report-template.model';
+import {ReportTemplateEditRequest} from '../../model/report-template.model';
 import {ReportTemplateService} from '../../service/report-template.service';
-import {InstanceService} from '../../service/instance.service';
 import {Button} from 'primeng/button';
 import {FormInputErrorComponent} from '../../component/form-input-error/form-input-error.component';
 import {InputText} from 'primeng/inputtext';
-import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
+import {
+  MessagesShowcaseComponent
+} from '../../component/messages-showcase/messages-showcase.component';
 import {NgIf} from '@angular/common';
 import {Select} from 'primeng/select';
 import {TableModule} from 'primeng/table';
 import DataType from '../../model/data-type.model';
+import {NumberUtil} from '../../util/number.util';
 
 @Component({
   selector: 'report-template-management-page',
@@ -37,32 +39,31 @@ export class ReportTemplateManagementPageComponent {
   private readonly dataTypeService = inject(DataTypeService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly reportTemplateService = inject(ReportTemplateService);
-  private readonly instanceService = inject(InstanceService);
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  protected readonly instanceId = input.required<string>();
+  protected readonly messages = signal<Messages>({});
+  protected readonly templateId = input<string>();
 
-  instanceId = this.instanceService.getActiveInstanceId();
-  messages = signal<Messages>({});
-  templateId = input<string>();
-
-  dataTypes = rxResource({
+  protected readonly dataTypes = rxResource({
     request: () => ({
-      instanceId: this.instanceId()
+      instanceId: NumberUtil.parse(this.instanceId())
     }),
-    loader: ({ request }) => request.instanceId
+    loader: ({request}) => request.instanceId
       ? this.dataTypeService.getAllByInstanceId(request.instanceId)
       : of([])
   });
 
-  template = rxResource({
+  protected readonly template = rxResource({
     request: () => ({
-      templateId: this.templateId() === undefined ? undefined : +this.templateId()!
+      instanceId: NumberUtil.parse(this.instanceId()),
+      templateId: NumberUtil.parse(this.templateId())
     }),
-    loader: ({ request }) => request.templateId
-      ? this.reportTemplateService.getById(request.templateId)
+    loader: ({request}) => request.instanceId && request.templateId
+      ? this.reportTemplateService.getById(request.instanceId, request.templateId)
       : of(undefined)
   });
 
-  form = this.formBuilder.group({
+  protected readonly form = this.formBuilder.group({
     fields: this.formBuilder.array([this.createFormField()], [Validators.required]),
     id: [this.template.value()?.id],
     name: [this.template.value()?.name, [Validators.required]]
@@ -97,10 +98,10 @@ export class ReportTemplateManagementPageComponent {
   }
 
   private changeMessages(message: string, success: boolean = true) {
-    this.messages.set(success ? { success: [message] } : { error: [message] });
+    this.messages.set(success ? {success: [message]} : {error: [message]});
   }
 
-  changeFormFields(dataType?: DataType) {
+  protected changeFormFields(dataType?: DataType) {
     const fields = this.form.controls.fields!;
 
     fields.clear();
@@ -110,12 +111,13 @@ export class ReportTemplateManagementPageComponent {
     });
   }
 
-  save() {
+  protected save() {
     if (!this.form.valid) {
       this.changeMessages("Please fill out the form.", false);
     }
 
     const request: ReportTemplateEditRequest = {
+      instanceId: NumberUtil.parse(this.instanceId())!,
       reportTemplate: {
         fields: this.form.value.fields!.map(field => field.id!),
         id: this.form.value.id || 0,
@@ -133,10 +135,7 @@ export class ReportTemplateManagementPageComponent {
         });
     } else {
       this.reportTemplateService
-        .create({
-          ...request,
-          instanceId: this.instanceId()!
-        })
+        .create({...request})
         .pipe(first())
         .subscribe({
           next: () => this.changeMessages("Report template created successfully."),

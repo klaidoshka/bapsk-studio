@@ -21,7 +21,7 @@
       @for (field of dataEntry.fields; track field.id) {
         <td>
           <data-type-entry-field-display [dataTypeFieldId]="field.dataTypeFieldId" [dataType]="dataType()"
-                                         [value]="field.value"/>
+                                         [value]="field.value" [instanceId]="instanceId()"/>
         </td>
       }
       <td>{{ dataEntry.createdAt | date:'short' }}</td>

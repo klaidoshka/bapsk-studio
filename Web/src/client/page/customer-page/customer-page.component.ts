@@ -1,4 +1,4 @@
-import {Component, inject, signal, viewChild} from '@angular/core';
+import {Component, inject, input, signal, viewChild} from '@angular/core';
 import {Button} from "primeng/button";
 import {ConfirmationComponent} from "../../component/confirmation/confirmation.component";
 import {DatePipe} from "@angular/common";
@@ -14,8 +14,8 @@ import {first, of} from 'rxjs';
 import {getIdentityDocumentTypeLabel} from '../../model/identity-document-type.model';
 import {getIsoCountryLabel} from '../../model/iso-country.model';
 import {Router} from '@angular/router';
-import {InstanceService} from '../../service/instance.service';
 import {rxResource} from '@angular/core/rxjs-interop';
+import {NumberUtil} from '../../util/number.util';
 
 @Component({
   selector: 'customer-page',
@@ -32,16 +32,15 @@ import {rxResource} from '@angular/core/rxjs-interop';
 export class CustomerPageComponent {
   private readonly customerService = inject(CustomerService);
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
-  private readonly instanceService = inject(InstanceService);
   private readonly router = inject(Router);
   protected readonly getIdentityDocumentTypeLabel = getIdentityDocumentTypeLabel;
   protected readonly getIsoCountryLabel = getIsoCountryLabel;
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
-  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});
 
   protected readonly customers = rxResource({
-    request: () => ({instanceId: this.instanceId()}),
+    request: () => ({instanceId: NumberUtil.parse(this.instanceId())}),
     loader: ({request}) => request.instanceId
       ? this.customerService.getAllByInstanceId(request.instanceId)
       : of([])
@@ -50,7 +49,7 @@ export class CustomerPageComponent {
   protected delete(customer: Customer) {
     this.confirmationComponent().request(() => {
       this.customerService
-        .delete(this.instanceId()!, customer.id!!)
+        .delete(NumberUtil.parse(this.instanceId())!, customer.id!!)
         .pipe(first())
         .subscribe({
           next: () => this.messages.set({success: ['Customer deleted successfully']}),

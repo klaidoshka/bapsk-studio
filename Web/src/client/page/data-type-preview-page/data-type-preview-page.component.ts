@@ -1,4 +1,4 @@
-import {Component, inject, input} from '@angular/core';
+import {Component, computed, inject, input} from '@angular/core';
 import {Badge} from 'primeng/badge';
 import {
   DataTypeEntryFieldDisplayComponent
@@ -6,7 +6,6 @@ import {
 import {TableModule} from 'primeng/table';
 import DataTypeField, {FieldType, toFieldTypeLabel} from '../../model/data-type-field.model';
 import {DataTypeService} from '../../service/data-type.service';
-import {InstanceService} from '../../service/instance.service';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {of} from 'rxjs';
 import {NumberUtil} from '../../util/number.util';
@@ -25,16 +24,16 @@ import {NgClass} from '@angular/common';
 })
 export class DataTypePreviewPageComponent {
   private readonly dataTypeService = inject(DataTypeService);
-  private readonly instanceService = inject(InstanceService);
   protected readonly FieldType = FieldType;
   protected readonly toFieldTypeLabel = toFieldTypeLabel;
   protected readonly dataTypeId = input<string>();
-  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  protected readonly instanceId = input.required<string>();
+  protected readonly instanceIdAsNumber = computed(() => NumberUtil.parse(this.instanceId()));
 
   protected readonly dataType = rxResource({
     request: () => ({
       dataTypeId: NumberUtil.parse(this.dataTypeId()),
-      instanceId: this.instanceId()
+      instanceId: this.instanceIdAsNumber()
     }),
     loader: ({request}) => request.dataTypeId && request.instanceId
       ? this.dataTypeService.getById(request.instanceId, request.dataTypeId)
@@ -43,7 +42,7 @@ export class DataTypePreviewPageComponent {
 
   dataTypes = rxResource({
     request: () => ({
-      instanceId: this.instanceId()
+      instanceId: this.instanceIdAsNumber()
     }),
     loader: ({request}) => request.instanceId
       ? this.dataTypeService.getAllByInstanceId(request.instanceId)

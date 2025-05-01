@@ -1,4 +1,4 @@
-import {Component, inject, signal, viewChild} from '@angular/core';
+import {Component, inject, input, signal, viewChild} from '@angular/core';
 import {Button} from 'primeng/button';
 import {ConfirmationComponent} from '../../component/confirmation/confirmation.component';
 import {Message} from 'primeng/message';
@@ -9,11 +9,11 @@ import {Router, RouterLink} from '@angular/router';
 import {TableModule} from 'primeng/table';
 import {DataTypeService} from '../../service/data-type.service';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
-import {InstanceService} from '../../service/instance.service';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {first, of} from 'rxjs';
 import Messages from '../../model/messages.model';
 import DataType from '../../model/data-type.model';
+import {NumberUtil} from '../../util/number.util';
 
 @Component({
   selector: 'data-type-page',
@@ -24,26 +24,29 @@ import DataType from '../../model/data-type.model';
 export class DataTypePageComponent {
   private readonly dataTypeService = inject(DataTypeService);
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
-  private readonly instanceService = inject(InstanceService);
   private readonly router = inject(Router);
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
 
   protected readonly dataTypes = rxResource({
     request: () => ({
-      instanceId: this.instanceId()
+      instanceId: NumberUtil.parse(this.instanceId())
     }),
-    loader: ({request}) => request.instanceId
-      ? this.dataTypeService.getAllByInstanceId(request.instanceId)
-      : of([])
+    loader: ({request}) => {
+      console.log('Loading data types for instanceId:', request.instanceId);
+
+      return request.instanceId
+        ? this.dataTypeService.getAllByInstanceId(request.instanceId)
+        : of([])
+    }
   });
 
-  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});
 
   protected delete(dataType: DataType) {
     this.confirmationComponent().request(() => {
       this.dataTypeService
-        .delete(this.instanceId()!, dataType.id)
+        .delete(NumberUtil.parse(this.instanceId())!, dataType.id)
         .pipe(first())
         .subscribe({
           next: () => this.messages.set({success: ['Data type deleted successfully']}),

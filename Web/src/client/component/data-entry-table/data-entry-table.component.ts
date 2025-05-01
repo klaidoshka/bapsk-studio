@@ -27,6 +27,7 @@ export class DataEntryTableComponent {
   readonly dataEntries = input.required<DataEntryJoined[]>();
   readonly dataType = input.required<DataType>();
   readonly delete = input<(entry: DataEntryJoined) => void>();
+  readonly instanceId = input.required<number>();
   readonly manage = input<(entry: DataEntryJoined) => void>();
   readonly preview = input<(entry: DataEntryJoined) => void>();
 }

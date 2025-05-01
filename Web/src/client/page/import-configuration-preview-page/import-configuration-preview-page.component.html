@@ -4,10 +4,7 @@
   <ng-container *ngIf="configuration.hasValue()">
     @let value = configuration.value()!;
 
-    <p-card
-      class="mb-4 min-w-256"
-      styleClass="p-2 dark:bg-primary-950! bg-primary-50!"
-    >
+    <p-card class="mb-4 min-w-256" styleClass="p-2 dark:bg-primary-950! bg-primary-50!">
       <ng-template #header>
         <h2 class="text-lg font-bold">{{ value.name }}</h2>
       </ng-template>
@@ -16,18 +13,12 @@
       </div>
     </p-card>
 
-    <p-card
-      class="min-w-256"
-      styleClass="p-2 dark:bg-primary-950! bg-primary-50!"
-    >
+    <p-card class="min-w-256" styleClass="p-2 dark:bg-primary-950! bg-primary-50!">
       <ng-template #header>
         <h2 class="text-lg font-semibold">Fields</h2>
       </ng-template>
 
-      <p-table
-        [value]="value.fields"
-        class="mt-4"
-      >
+      <p-table [value]="value.fields" class="mt-4">
         <ng-template #header>
           <tr>
             <th class="text-left">Order</th>
@@ -35,20 +26,14 @@
             <th class="text-left">Default Value</th>
           </tr>
         </ng-template>
-        <ng-template
-          #body
-          let-field
-        >
+        <ng-template #body let-field>
           @let dataTypeField = resolveDataTypeField(field);
           <tr>
             <td>{{ field.order + 1 }}</td>
             <td>{{ dataTypeField.name }}</td>
             <td>
-              <data-type-entry-field-display
-                [dataType]="value.dataType"
-                [dataTypeFieldId]="dataTypeField.id"
-                [value]="field.defaultValue"
-              />
+              <data-type-entry-field-display [dataType]="value.dataType" [dataTypeFieldId]="dataTypeField.id"
+                                             [value]="field.defaultValue" [instanceId]="instanceIdAsNumber()"/>
             </td>
           </tr>
         </ng-template>
@@ -58,10 +43,8 @@
         <p class="mt-4 font-semibold">Example CSV Format</p>
 
         @let csv = getExampleCSV();
-        <textarea
-          class="mt-2 p-1 dark:bg-primary-700 bg-primary-300 rounded-md min-h-14 max-h-32"
-          [value]="csv.header + '\n' + csv.values"
-        >
+        <textarea class="mt-2 p-1 dark:bg-primary-700 bg-primary-300 rounded-md min-h-14 max-h-32"
+                  [value]="csv.header + '\n' + csv.values">
           </textarea>
       </div>
     </p-card>

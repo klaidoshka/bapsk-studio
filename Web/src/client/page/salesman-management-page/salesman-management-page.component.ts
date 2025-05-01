@@ -15,7 +15,6 @@ import Messages from '../../model/messages.model';
 import {first, of, tap} from 'rxjs';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {NumberUtil} from '../../util/number.util';
-import {InstanceService} from '../../service/instance.service';
 
 @Component({
   selector: 'salesman-management-page',
@@ -34,16 +33,15 @@ import {InstanceService} from '../../service/instance.service';
 export class SalesmanManagementPageComponent {
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly instanceService = inject(InstanceService);
   private readonly salesmanService = inject(SalesmanService);
   protected readonly IsoCountries = IsoCountries;
   protected readonly salesmanId = input<string>();
-  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});
 
   protected readonly salesman = rxResource({
     request: () => ({
-      instanceId: this.instanceId(),
+      instanceId: NumberUtil.parse(this.instanceId()),
       salesmanId: NumberUtil.parse(this.salesmanId())
     }),
     loader: ({request}) => request.instanceId && request.salesmanId
@@ -109,7 +107,7 @@ export class SalesmanManagementPageComponent {
           value: this.form.value.vatPayerCode!.value!
         }
       },
-      instanceId: this.instanceId()!
+      instanceId: NumberUtil.parse(this.instanceId())!
     };
 
     if (this.salesman.value()) {

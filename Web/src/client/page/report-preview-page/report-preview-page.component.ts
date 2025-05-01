@@ -1,4 +1,4 @@
-import {Component, ElementRef, inject, viewChildren} from '@angular/core';
+import {Component, computed, ElementRef, inject, input, viewChildren} from '@angular/core';
 import {ReportService} from '../../service/report.service';
 import {NgClass, NgForOf, NgIf} from '@angular/common';
 import {TableModule} from 'primeng/table';
@@ -8,6 +8,7 @@ import {
 import {Button} from 'primeng/button';
 import {Router} from '@angular/router';
 import {Reports} from '../../model/report.model';
+import {NumberUtil} from '../../util/number.util';
 
 @Component({
   selector: 'report-preview-page',
@@ -25,11 +26,12 @@ import {Reports} from '../../model/report.model';
 export class ReportPreviewPageComponent {
   private readonly reportService = inject(ReportService);
   private readonly router = inject(Router);
+  protected readonly instanceId = input.required<string>();
+  protected readonly instanceIdAsNumber = computed(() => NumberUtil.parse(this.instanceId()));
+  protected readonly reports = this.router.lastSuccessfulNavigation?.extras?.state as Reports | undefined;
+  protected readonly reportContainers = viewChildren<ElementRef>('reportContainer');
 
-  reports = this.router.lastSuccessfulNavigation?.extras?.state as Reports | undefined;
-  reportContainers = viewChildren<ElementRef>('reportContainer');
-
-  export(index: number, type: 'pdf' | 'csv') {
+  protected export(index: number, type: 'pdf' | 'csv') {
     if (type === 'pdf') {
       const element = this.reportContainers()?.at(index)?.nativeElement;
 

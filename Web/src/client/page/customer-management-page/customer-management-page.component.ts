@@ -21,7 +21,7 @@ import {IdentityDocumentType} from '../../model/identity-document-type.model';
 import Messages from '../../model/messages.model';
 import {first, of, tap} from 'rxjs';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {InstanceService} from '../../service/instance.service';
+import {NumberUtil} from '../../util/number.util';
 
 @Component({
   selector: 'customer-management-page',
@@ -42,16 +42,15 @@ export class CustomerManagementPageComponent {
   private readonly customerService = inject(CustomerService);
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly instanceService = inject(InstanceService);
   protected readonly IsoCountries = IsoCountries;
   protected readonly customerId = input<string>();
-  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});
 
   protected readonly customer = rxResource({
     request: () => ({
-      customerId: this.customerId() ? +this.customerId()! : undefined,
-      instanceId: this.instanceId()
+      customerId: NumberUtil.parse(this.customerId()),
+      instanceId: NumberUtil.parse(this.instanceId())
     }),
     loader: ({request}) => request.customerId && request.instanceId
       ? this.customerService
@@ -161,7 +160,7 @@ export class CustomerManagementPageComponent {
         otherDocuments: this.form.value.otherDocuments as any,
         residenceCountry: this.form.value.residenceCountry!
       },
-      instanceId: this.instanceId()!
+      instanceId: NumberUtil.parse(this.instanceId())!
     };
 
     if (this.customer.value()) {

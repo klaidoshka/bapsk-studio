@@ -27,6 +27,7 @@ export interface ReportInfoField {
 
 export interface GenerateDataEntriesReportRequest {
   from: Date;
+  instanceId: number;
   reportTemplateId: number;
   to: Date;
 }
@@ -34,6 +35,7 @@ export interface GenerateDataEntriesReportRequest {
 export interface GenerateSalesReportsRequest {
   customerId: number;
   from: Date;
+  instanceId: number;
   salesmanId: number;
   to: Date;
 }

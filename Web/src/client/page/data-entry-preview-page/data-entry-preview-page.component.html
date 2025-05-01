@@ -43,7 +43,7 @@
         @for (field of fields; track field.id) {
           <td>
             <data-type-entry-field-display [dataTypeFieldId]="field.dataTypeFieldId" [dataType]="valueDataType"
-                                           [value]="field.value"/>
+                                           [value]="field.value" [instanceId]="instanceIdAsNumber()"/>
           </td>
         }
       </tr>

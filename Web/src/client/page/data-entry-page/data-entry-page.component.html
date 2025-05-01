@@ -5,7 +5,8 @@
 } @else {
   <p-dialog header="Data Entry Import" closeOnEscape="true" modal="true" styleClass="min-w-128" closable="true"
             [(visible)]="showImporting" (onHide)="showImporting.set(false)" (close)="showImporting.set(false)">
-    <data-entry-import-form [clearImportedValues]="showImporting()" [dataType]="dataType.value()!"/>
+    <data-entry-import-form [clearImportedValues]="showImporting()" [dataType]="dataType.value()!"
+                            [instanceId]="instanceIdAsNumber()!"/>
   </p-dialog>
 
   <confirmation [key]='"data-entry-delete-confirmation"' [header]='"Are you sure about deleting this data entry?"'/>
@@ -28,7 +29,6 @@
 
   <div class="card mt-4">
     <data-entry-table [dataEntries]="dataEntries.value() || []" [dataType]="dataType.value()!" [delete]="onDelete"
-                      [manage]="onManage"
-                      [preview]="onPreview"/>
+                      [manage]="onManage" [preview]="onPreview" [instanceId]="instanceIdAsNumber()!"/>
   </div>
 }

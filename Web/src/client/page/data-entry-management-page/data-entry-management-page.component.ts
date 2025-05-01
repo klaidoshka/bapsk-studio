@@ -1,7 +1,6 @@
 import {Component, computed, inject, input, Signal, signal} from '@angular/core';
 import {DataEntryService} from '../../service/data-entry.service';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {InstanceService} from '../../service/instance.service';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import DataEntry, {
   DataEntryCreateRequest,
@@ -41,18 +40,17 @@ export class DataEntryManagementPageComponent {
   private readonly dataEntryService = inject(DataEntryService);
   private readonly dataTypeService = inject(DataTypeService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly instanceService = inject(InstanceService);
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   protected readonly FieldType = FieldType;
   protected readonly dataEntryId = input<string>();
   protected readonly form = this.createForm();
-  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});
 
   protected readonly dataEntry = rxResource({
     request: () => ({
       dataEntryId: NumberUtil.parse(this.dataEntryId()),
-      instanceId: this.instanceId()
+      instanceId: NumberUtil.parse(this.instanceId())
     }),
     loader: ({request}) => request.dataEntryId && request.instanceId
       ? this.dataEntryService.getById(request.instanceId, request.dataEntryId)
@@ -62,7 +60,7 @@ export class DataEntryManagementPageComponent {
   protected readonly dataType = rxResource({
     request: () => ({
       dataEntry: this.dataEntry.value(),
-      instanceId: this.instanceId()
+      instanceId: NumberUtil.parse(this.instanceId())
     }),
     loader: ({request}) => request.dataEntry?.dataTypeId && request.instanceId
       ? this.dataTypeService
@@ -78,7 +76,7 @@ export class DataEntryManagementPageComponent {
       dataTypeIds: this.dataType.value()?.fields
         .map(field => field.referenceId)
         .filter(id => id != null),
-      instanceId: this.instanceId()
+      instanceId: NumberUtil.parse(this.instanceId())
     }),
     loader: ({request}) => request.dataTypeIds && request.instanceId
       ? this.dataEntryService.getAllByDataTypeIds(request.instanceId, request.dataTypeIds)
@@ -182,7 +180,7 @@ export class DataEntryManagementPageComponent {
             value: field.control.value.value
           };
         }),
-        instanceId: this.instanceId()!
+        instanceId: NumberUtil.parse(this.instanceId())!
       });
     } else {
       this.create({
@@ -193,7 +191,7 @@ export class DataEntryManagementPageComponent {
             value: this.formFields.find(f => f.field === dataTypeField.name)!.control!.value.value
           };
         }),
-        instanceId: this.instanceId()!
+        instanceId: NumberUtil.parse(this.instanceId())!
       });
     }
   }

@@ -5,7 +5,7 @@
   @default {
     @if (selectedInstance() !== undefined) {
       <p-select (onChange)="onChange($event.value)" [options]="instances.value() || []" optionLabel="name"
-                placeholder="Select an instance" class="w-48"/>
+                [ngModel]="selectedInstance()" placeholder="Select an instance" class="w-48"/>
     }
   }
 }

@@ -1,7 +1,6 @@
 import {Component, inject, input, signal, viewChild} from '@angular/core';
 import {ImportConfigurationService} from '../../service/import-configuration.service';
 import {ImportConfigurationJoined} from '../../model/import-configuration.model';
-import {InstanceService} from '../../service/instance.service';
 import {Button} from 'primeng/button';
 import {
   MessagesShowcaseComponent
@@ -29,17 +28,16 @@ import {NumberUtil} from '../../util/number.util';
 export class ImportConfigurationPageComponent {
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly importConfigurationService = inject(ImportConfigurationService);
-  private readonly instanceService = inject(InstanceService);
   private readonly router = inject(Router);
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly dataTypeId = input<string>();
+  protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});
-  protected readonly instanceId = this.instanceService.getActiveInstanceId();
 
   protected readonly configurations = rxResource({
     request: () => ({
       dataTypeId: NumberUtil.parse(this.dataTypeId),
-      instanceId: this.instanceId()
+      instanceId: NumberUtil.parse(this.instanceId())
     }),
     loader: ({request}) => {
       if (!request.instanceId) {
@@ -61,7 +59,7 @@ export class ImportConfigurationPageComponent {
   protected delete(configuration: ImportConfigurationJoined) {
     this.confirmationComponent().request(() => {
       this.importConfigurationService
-        .delete(this.instanceId()!, configuration.id!)
+        .delete(NumberUtil.parse(this.instanceId())!, configuration.id!)
         .pipe(first())
         .subscribe({
           next: () => this.changeMessages("Import configuration deleted successfully"),

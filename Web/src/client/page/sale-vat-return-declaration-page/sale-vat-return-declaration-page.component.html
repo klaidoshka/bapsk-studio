@@ -200,7 +200,7 @@
         <vat-return-payment-table [payments]="declaration.value()!.payments"/>
       </div>
     } @else if (!declaration.value()!.isCancelled && instanceId()) {
-      <vat-return-declaration-payment [instanceId]="instanceId()!" [saleId]="sale.value()!.id"/>
+      <vat-return-declaration-payment [instanceId]="instanceIdAsNumber()!" [saleId]="sale.value()!.id"/>
     } @else {
       <p>Because this declaration is cancelled, the payment fact cannot be submitted.</p>
     }
@@ -215,7 +215,7 @@
   </p>
 
   <div class="p-4 rounded mt-4">
-    <vat-return-declaration-submission [instanceId]="instanceId()!" [sale]="sale.value()!"
+    <vat-return-declaration-submission [instanceId]="instanceIdAsNumber()!" [sale]="sale.value()!"
                                        [hasDeclaration]="!!declaration.value()"/>
   </div>
 </div>

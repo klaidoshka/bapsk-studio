@@ -1,4 +1,4 @@
-import {Component, inject, input, signal, viewChild} from '@angular/core';
+import {Component, computed, inject, input, signal, viewChild} from '@angular/core';
 import {Button} from 'primeng/button';
 import {ConfirmationComponent} from '../../component/confirmation/confirmation.component';
 import {
@@ -18,7 +18,6 @@ import {first, of} from 'rxjs';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {DataTypeService} from '../../service/data-type.service';
 import {NumberUtil} from '../../util/number.util';
-import {InstanceService} from '../../service/instance.service';
 
 @Component({
   selector: 'data-entry-page',
@@ -38,18 +37,18 @@ export class DataEntryPageComponent {
   private readonly dataEntryService = inject(DataEntryService);
   private readonly dataTypeService = inject(DataTypeService);
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
-  private readonly instanceService = inject(InstanceService);
   private readonly router = inject(Router);
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly dataTypeId = input.required<string>();
-  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  protected readonly instanceId = input.required<string>();
+  protected readonly instanceIdAsNumber = computed(() => NumberUtil.parse(this.instanceId()));
   protected readonly messages = signal<Messages>({});
   protected readonly showImporting = signal<boolean>(false);
 
   protected readonly dataEntries = rxResource({
     request: () => ({
       dataTypeId: NumberUtil.parse(this.dataTypeId()),
-      instanceId: this.instanceId()
+      instanceId: this.instanceIdAsNumber()
     }),
     loader: ({request}) => request.dataTypeId && request.instanceId
       ? this.dataEntryService.getAllByDataTypeId(request.instanceId, request.dataTypeId)
@@ -59,7 +58,7 @@ export class DataEntryPageComponent {
   protected readonly dataType = rxResource({
     request: () => ({
       dataTypeId: NumberUtil.parse(this.dataTypeId()),
-      instanceId: this.instanceId()
+      instanceId: this.instanceIdAsNumber()
     }),
     loader: ({request}) => request.dataTypeId && request.instanceId
       ? this.dataTypeService.getById(request.instanceId, request.dataTypeId)
@@ -69,7 +68,7 @@ export class DataEntryPageComponent {
   protected delete(dataEntry: DataEntry) {
     this.confirmationComponent().request(() => {
       this.dataEntryService
-        .delete(this.instanceId()!, dataEntry.id)
+        .delete(this.instanceIdAsNumber()!, dataEntry.id)
         .pipe(first())
         .subscribe({
           next: () => this.messages.set({success: ['Data entry deleted successfully']}),

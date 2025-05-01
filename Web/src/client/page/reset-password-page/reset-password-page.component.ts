@@ -31,19 +31,18 @@ export class ResetPasswordPageComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly route = inject(ActivatedRoute);
+  protected readonly messages = signal<Messages>({});
 
-  messages = signal<Messages>({});
-
-  isTokenProvided = rxResource({
+  protected readonly isTokenProvided = rxResource({
     loader: () => this.route.queryParams.pipe(map(params => !!params['token']))
   });
 
-  form = this.formBuilder.group({
+  protected readonly form = this.formBuilder.group({
     password: ['', [Validators.required, Validators.minLength(8)]],
     confirmPassword: ['', [this.validatePasswordConfirmed()]]
   });
 
-  customErrorMessages = {
+  protected readonly customErrorMessages = {
     'mismatchPassword': () => "Passwords do not match."
   }
 
@@ -57,7 +56,7 @@ export class ResetPasswordPageComponent {
     }
   }
 
-  changePassword() {
+  protected changePassword() {
     if (this.form.invalid) {
       this.messages.set({ error: ["Please fill in all fields."] });
       return;

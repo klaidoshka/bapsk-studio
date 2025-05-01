@@ -1,4 +1,4 @@
-import {Component, inject, input, signal, viewChild} from '@angular/core';
+import {Component, computed, inject, input, signal, viewChild} from '@angular/core';
 import {VatReturnService} from '../../service/vat-return.service';
 import {ConfirmationComponent} from '../../component/confirmation/confirmation.component';
 import {rxResource} from '@angular/core/rxjs-interop';
@@ -14,7 +14,6 @@ import {
   toExportResultLabel,
   toSubmitDeclarationStateLabel
 } from '../../model/vat-return.model';
-import {InstanceService} from '../../service/instance.service';
 import {NumberUtil} from '../../util/number.util';
 import {Button} from 'primeng/button';
 import {CurrencyPipe, DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
@@ -50,7 +49,6 @@ import {SaleService} from '../../service/sale.service';
   styles: ``
 })
 export class SaleVatReturnDeclarationPageComponent {
-  private readonly instanceService = inject(InstanceService);
   private readonly saleService = inject(SaleService);
   private readonly vatReturnService = inject(VatReturnService);
   protected readonly SubmitDeclarationState = SubmitDeclarationState;
@@ -59,7 +57,8 @@ export class SaleVatReturnDeclarationPageComponent {
   protected readonly toSubmitDeclarationStateLabel = toSubmitDeclarationStateLabel;
   protected readonly toUserIdentityFullName = toUserIdentityFullName;
   protected readonly cancelConfirmationComponent = viewChild(ConfirmationComponent);
-  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  protected readonly instanceId = input.required<string>();
+  protected readonly instanceIdAsNumber = computed(() => NumberUtil.parse(this.instanceId()));
   protected readonly isCancelling = signal<boolean>(false);
   protected readonly isRefreshing = signal<boolean>(false);
   protected readonly saleId = input.required<string>();
@@ -68,7 +67,7 @@ export class SaleVatReturnDeclarationPageComponent {
 
   readonly declaration = rxResource({
     request: () => ({
-      instanceId: this.instanceId(),
+      instanceId: this.instanceIdAsNumber(),
       saleId: NumberUtil.parse(this.saleId())
     }),
     loader: ({request}) => request.instanceId && request.saleId
@@ -78,7 +77,7 @@ export class SaleVatReturnDeclarationPageComponent {
 
   readonly sale = rxResource({
     request: () => ({
-      instanceId: this.instanceId(),
+      instanceId: this.instanceIdAsNumber(),
       saleId: NumberUtil.parse(this.saleId())
     }),
     loader: ({request}) => request.instanceId && request.saleId
@@ -91,7 +90,7 @@ export class SaleVatReturnDeclarationPageComponent {
       this.isCancelling.set(true);
 
       this.vatReturnService
-        .cancel(this.instanceId()!, this.declaration.value()!.saleId)
+        .cancel(this.instanceIdAsNumber()!, this.declaration.value()!.saleId)
         .pipe(first())
         .subscribe({
           next: () => this.isCancelling.set(false),
@@ -110,7 +109,7 @@ export class SaleVatReturnDeclarationPageComponent {
     this.isRefreshing.set(true);
 
     this.vatReturnService
-      .update(this.instanceId()!, this.declaration.value()!.saleId)
+      .update(this.instanceIdAsNumber()!, this.declaration.value()!.saleId)
       .pipe(first())
       .subscribe({
         next: () => this.isRefreshing.set(false),

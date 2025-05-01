@@ -1,5 +1,4 @@
 import {Component, computed, inject, input, signal} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
 import {
   SubmitDeclarationState,
   toExportResultLabel,
@@ -42,7 +41,6 @@ import {rxResource} from '@angular/core/rxjs-interop';
 })
 export class DeclarationPreviewPageComponent {
   protected readonly SubmitDeclarationState = SubmitDeclarationState;
-  private readonly route = inject(ActivatedRoute);
   private readonly vatReturnService = inject(VatReturnService);
   private readonly isRefreshing = signal<boolean>(false);
   protected readonly declarationPreviewCode = input<string>();

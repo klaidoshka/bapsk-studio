@@ -5,18 +5,16 @@ import {Subscription} from 'rxjs';
 @Component({
   selector: 'not-found-page',
   templateUrl: './not-found-page.component.html',
-  styleUrls: ['./not-found-page.component.css'],
+  styleUrls: ['./not-found-page.component.css']
 })
 export class NotFoundPageComponent implements OnInit, OnDestroy {
   private router = inject(Router);
-
-  private interval!: NodeJS.Timeout;
-  private defaultValue = 5;
+  private readonly defaultValue = 5;
   private routerSubscription!: Subscription;
+  private interval!: NodeJS.Timeout;
+  protected readonly redirectSeconds = signal(this.defaultValue);
 
-  public redirectSeconds = signal(this.defaultValue);
-
-  ngOnInit(): void {
+  ngOnInit() {
     this.startRedirectCountdown();
 
     this.routerSubscription = this.router.events.subscribe(event => {
@@ -36,7 +34,7 @@ export class NotFoundPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  private startRedirectCountdown(): void {
+  private startRedirectCountdown() {
     const initialUrl = this.router.url;
 
     if (this.interval) {

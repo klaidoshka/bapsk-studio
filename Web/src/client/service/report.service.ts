@@ -1,14 +1,17 @@
 import {inject, Injectable} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {map, Observable} from 'rxjs';
-import Report, {GenerateDataEntriesReportRequest, GenerateSalesReportsRequest, ReportEntry} from '../model/report.model';
+import Report, {
+  GenerateDataEntriesReportRequest,
+  GenerateSalesReportsRequest,
+  ReportEntry
+} from '../model/report.model';
 import {HttpClient} from '@angular/common/http';
 import {EnumUtil} from '../util/enum.util';
 import {FieldType} from '../model/data-type-field.model';
 import {FieldTypeUtil} from '../util/field-type.util';
 import html2canvas from 'html2canvas-pro';
 import jsPDF from 'jspdf';
-import {InstanceService} from './instance.service';
 import {DateUtil} from '../util/date.util';
 
 @Injectable({
@@ -17,8 +20,6 @@ import {DateUtil} from '../util/date.util';
 export class ReportService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly httpClient = inject(HttpClient);
-  private readonly instanceService = inject(InstanceService);
-  private readonly instanceId = this.instanceService.getActiveInstanceId();
 
   private adjustRequestDateToISO<T extends GenerateDataEntriesReportRequest | GenerateSalesReportsRequest>(request: T): T {
     return {
@@ -78,7 +79,7 @@ export class ReportService {
   generateDataEntryReports(request: GenerateDataEntriesReportRequest): Observable<Report[]> {
     return this.httpClient
       .post<Report>(
-        this.apiRouter.report.generateDataEntries(this.instanceId()!),
+        this.apiRouter.report.generateDataEntries(request.instanceId),
         this.adjustRequestDateToISO(request)
       )
       .pipe(
@@ -89,7 +90,7 @@ export class ReportService {
   generateSaleReports(request: GenerateSalesReportsRequest): Observable<Report[]> {
     return this.httpClient
       .post<Report[]>(
-        this.apiRouter.report.generateSales(this.instanceId()!),
+        this.apiRouter.report.generateSales(request.instanceId),
         this.adjustRequestDateToISO(request)
       )
       .pipe(

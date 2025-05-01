@@ -1,4 +1,4 @@
-import {Component, inject, input} from '@angular/core';
+import {Component, computed, inject, input} from '@angular/core';
 import {ImportConfigurationService} from '../../service/import-configuration.service';
 import {ImportConfigurationField} from '../../model/import-configuration.model';
 import {TableModule} from 'primeng/table';
@@ -11,7 +11,6 @@ import {rxResource} from '@angular/core/rxjs-interop';
 import {FieldType} from '../../model/data-type-field.model';
 import {DateUtil} from '../../util/date.util';
 import {NumberUtil} from '../../util/number.util';
-import {InstanceService} from '../../service/instance.service';
 import {of} from 'rxjs';
 
 @Component({
@@ -27,14 +26,14 @@ import {of} from 'rxjs';
 })
 export class ImportConfigurationPreviewPageComponent {
   private readonly importConfigurationService = inject(ImportConfigurationService);
-  private readonly instanceService = inject(InstanceService);
   protected readonly configurationId = input.required<string>();
-  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  protected readonly instanceId = input.required<string>();
+  protected readonly instanceIdAsNumber = computed(() => NumberUtil.parse(this.instanceId()));
 
   protected readonly configuration = rxResource({
     request: () => ({
       configurationId: NumberUtil.parse(this.configurationId()),
-      instanceId: this.instanceId()
+      instanceId: this.instanceIdAsNumber()
     }),
     loader: ({request}) => request.configurationId && request.instanceId
       ? this.importConfigurationService.getById(request.instanceId, request.configurationId)

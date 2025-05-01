@@ -4,25 +4,7 @@
       <!-- Sidebar -->
       <div
         class="rounded sticky top-0 w-52 dark:bg-surface-950 bg-surface-50 dark:text-primary dark:text-primary text-primary-50 p-4 flex flex-col">
-        <div *ngFor="let type of workspacesPart"
-             class="w-full p-2 my-1 bg-surface-500 rounded hover:cursor-pointer text-center text-l"
-             [class.bg-surface-600]="selectedWorkspace() === type" (click)="selectWorkspace(type)">
-          {{ getWorkspaceName(type) }}
-        </div>
 
-        <div [class]="'mt-6 rounded' + (selectedWorkspace() === WorkspaceType.DataType ? ' bg-surface-500' : '')">
-          <div class="w-full p-2 bg-surface-500 rounded hover:cursor-pointer text-center text-l"
-               [class.bg-surface-600]="selectedWorkspace() === WorkspaceType.DataType"
-               (click)="selectWorkspace(WorkspaceType.DataType)">
-            {{ getWorkspaceName(WorkspaceType.DataType) }}
-          </div>
-
-          <div *ngIf="selectedWorkspace() === WorkspaceType.DataType" class="mt-4">
-            <p-select [(ngModel)]="selectedDataType" [options]="dataTypes.value() || []"
-                      (onChange)="selectDataType($event.value)" optionLabel="name" placeholder="Select..."
-                      class="m-1 w-40 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"/>
-          </div>
-        </div>
       </div>
 
       <!-- Main Content -->

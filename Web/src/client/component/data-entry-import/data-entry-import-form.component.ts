@@ -42,6 +42,7 @@ export class DataEntryImportFormComponent {
   protected readonly messages = signal<Messages>({});
   readonly clearImportedValues = input<boolean>();
   readonly dataType = input.required<DataType>();
+  readonly instanceId = input.required<number>();
 
   protected readonly importConfigurations = rxResource({
     request: () => ({

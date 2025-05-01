@@ -7,7 +7,6 @@ import {CurrencyPipe, DatePipe} from '@angular/common';
 import {getIsoCountryLabel} from '../../model/iso-country.model';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {map, of} from 'rxjs';
-import {InstanceService} from '../../service/instance.service';
 
 @Component({
   selector: 'data-type-entry-field-display',
@@ -21,10 +20,9 @@ import {InstanceService} from '../../service/instance.service';
 })
 export class DataTypeEntryFieldDisplayComponent {
   private readonly dataEntryService = inject(DataEntryService);
-  private readonly instanceService = inject(InstanceService);
   protected readonly FieldType = FieldType;
   protected readonly getIsoCountryLabel = getIsoCountryLabel;
-  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  readonly instanceId = input<number>();
   readonly dataType = input<DataType>();
   readonly dataTypeFieldId = input<number>();
   readonly type = input<FieldType>();

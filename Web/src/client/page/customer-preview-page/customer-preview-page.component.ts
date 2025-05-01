@@ -5,8 +5,8 @@ import {getIsoCountryLabel} from '../../model/iso-country.model';
 import {getIdentityDocumentTypeLabel} from '../../model/identity-document-type.model';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {CustomerService} from '../../service/customer.service';
-import {InstanceService} from '../../service/instance.service';
 import {of} from 'rxjs';
+import {NumberUtil} from '../../util/number.util';
 
 @Component({
   selector: 'customer-preview-page',
@@ -20,19 +20,18 @@ import {of} from 'rxjs';
 })
 export class CustomerPreviewPageComponent {
   private readonly customerService = inject(CustomerService);
-  private readonly instanceService = inject(InstanceService);
   protected readonly getIsoCountryLabel = getIsoCountryLabel;
   protected readonly getCountryName = getIsoCountryLabel;
   protected readonly getIdentityDocumentTypeLabel = getIdentityDocumentTypeLabel;
   protected readonly customerId = input.required<string>();
-  protected readonly instanceId = this.instanceService.getActiveInstanceId();
+  protected readonly instanceId = input.required<string>();
 
   protected readonly customer = rxResource({
     request: () => ({
-      customerId: +this.customerId(),
-      instanceId: this.instanceId()
+      customerId: NumberUtil.parse(this.customerId()),
+      instanceId: NumberUtil.parse(this.instanceId())
     }),
-    loader: ({request}) => request.instanceId
+    loader: ({request}) => request.customerId && request.instanceId
       ? this.customerService.getById(request.instanceId, request.customerId)
       : of(undefined)
   });

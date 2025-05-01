@@ -19,11 +19,12 @@ export interface ReportTemplateCreateEdit {
 }
 
 export interface ReportTemplateCreateRequest {
-  reportTemplate: ReportTemplateCreateEdit;
   instanceId: number;
+  reportTemplate: ReportTemplateCreateEdit;
 }
 
 export interface ReportTemplateEditRequest {
+  instanceId: number;
   reportTemplate: ReportTemplateCreateEdit;
 }
 

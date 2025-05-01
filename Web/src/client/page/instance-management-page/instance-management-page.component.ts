@@ -21,7 +21,6 @@ import {Textarea} from "primeng/textarea";
 import {instanceUserPermissions} from '../../constant/instance-user.permissions';
 import {AuthService} from '../../service/auth.service';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
-import {InstanceService} from '../../service/instance.service';
 import {UserService} from '../../service/user.service';
 import {
   InstanceCreateRequest,
@@ -33,6 +32,7 @@ import {rxResource} from '@angular/core/rxjs-interop';
 import {toUserIdentityFullName, UserIdentity} from '../../model/user.model';
 import {first, of, tap} from 'rxjs';
 import {NumberUtil} from '../../util/number.util';
+import {InstanceService} from '../../service/instance.service';
 
 @Component({
   selector: 'instance-management-page',

@@ -1,15 +1,17 @@
 import {Component, inject, input, signal, viewChild} from '@angular/core';
 import {ReportTemplateService} from '../../service/report-template.service';
-import {InstanceService} from '../../service/instance.service';
 import {Router} from '@angular/router';
 import {ConfirmationComponent} from '../../component/confirmation/confirmation.component';
 import Messages from '../../model/messages.model';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {of} from 'rxjs';
+import {first, of} from 'rxjs';
 import ReportTemplate, {getDataTypesCount} from '../../model/report-template.model';
 import {Button} from 'primeng/button';
-import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
+import {
+  MessagesShowcaseComponent
+} from '../../component/messages-showcase/messages-showcase.component';
 import {TableModule} from 'primeng/table';
+import {NumberUtil} from '../../util/number.util';
 
 @Component({
   selector: 'report-template-page',
@@ -24,19 +26,19 @@ import {TableModule} from 'primeng/table';
 })
 export class ReportTemplatePageComponent {
   private reportTemplateService = inject(ReportTemplateService);
-  private instanceService = inject(InstanceService);
   private router = inject(Router);
+  protected readonly getDataTypesCount = getDataTypesCount;
+  protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
+  protected readonly dataTypeId = input<string>();
+  protected readonly instanceId = input.required<string>();
+  protected readonly messages = signal<Messages>({});
 
-  confirmationComponent = viewChild.required(ConfirmationComponent);
-  dataTypeId = input<string>();
-  messages = signal<Messages>({});
-
-  templates = rxResource({
+  protected readonly templates = rxResource({
     request: () => ({
-      dataTypeId: this.dataTypeId() === undefined ? undefined : +this.dataTypeId()!,
-      instanceId: this.instanceId() === undefined ? undefined : +this.instanceId()!
+      dataTypeId: NumberUtil.parse(this.dataTypeId()),
+      instanceId: NumberUtil.parse(this.instanceId())
     }),
-    loader: ({ request }) => {
+    loader: ({request}) => {
       if (request.dataTypeId && request.instanceId) {
         return this.reportTemplateService.getAllByDataTypeId(request.instanceId, request.dataTypeId);
       }
@@ -47,29 +49,26 @@ export class ReportTemplatePageComponent {
     }
   });
 
-  instanceId = this.instanceService.getActiveInstanceId();
-
-  protected readonly getDataTypesCount = getDataTypesCount;
-
   private changeMessages(message: string, success: boolean = true) {
-    this.messages.set(success ? { success: [message] } : { error: [message] });
+    this.messages.set(success ? {success: [message]} : {error: [message]});
   }
 
-  delete(template: ReportTemplate) {
+  protected delete(template: ReportTemplate) {
     this.confirmationComponent().request(() => {
-      this.reportTemplateService.delete(template.id!).subscribe(() =>
-        this.changeMessages("Import template deleted successfully")
-      );
+      this.reportTemplateService
+        .delete(NumberUtil.parse(this.instanceId())!, template.id!)
+        .pipe(first())
+        .subscribe(() => this.changeMessages("Import template deleted successfully"));
     });
   }
 
-  manage(template?: ReportTemplate) {
+  protected manage(template?: ReportTemplate) {
     this.router.navigate(
       ['home/workspace/report-template/' + (template ? `${template.id}/edit` : 'create')]
     );
   }
 
-  preview(template: ReportTemplate) {
+  protected preview(template: ReportTemplate) {
     this.router.navigate([`home/workspace/report-template/${template.id}`]);
   }
 }
