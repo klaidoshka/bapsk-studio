@@ -4,7 +4,7 @@
 
 <div class="relative inline-block items-center" (clickOutside)="isProfileMenuOpen.set(false)">
   <button (click)="isProfileMenuOpen.set(!isProfileMenuOpen())"
-          class="text-primary-950 hover:text-primary-950/80 font-medium hover:cursor-pointer max-w-32">
+          class="text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80 font-medium hover:cursor-pointer max-w-32">
     {{ displayName.value() }}
   </button>
 

@@ -1,0 +1,26 @@
+<div class="h-full w-full relative container mx-auto flex flex-col mb-8">
+  <div class="flex flex-row w-full h-full gap-4">
+    <!-- Sidebar -->
+    <div
+      class="flex flex-col w-1/6 min-w-32 gap-6 h-full bg-primary-50 dark:bg-primary-950 border border-y-0 border-primary-950/20 dark:border-primary-50/20">
+      <div class="flex flex-col gap-1 mx-4">
+        <h4 class="p-2 text-sm font-semibold">Admin Panel</h4>
+        <!-- Sidebar Navigation -->
+        <nav class="flex flex-col w-full gap-0.5">
+          <a class="flex h-8 p-2 w-full items-center rounded-lg hover:bg-primary-200/50 dark:hover:bg-primary-800/80"
+             routerLink="/home/admin/user"
+             routerLinkActive="underline underline-offset-4">Users</a>
+        </nav>
+        <!-- Sidebar Actions -->
+        <h4 class="p-2 text-sm font-semibold">Admin Actions</h4>
+        <div class="flex flex-col w-full gap-0.5">
+          <html-upload-for-overhaul/>
+        </div>
+      </div>
+    </div>
+    <!-- Main Content -->
+    <div class="flex-1">
+      <router-outlet/>
+    </div>
+  </div>
+</div>

@@ -1,10 +1,10 @@
-<div class="h-full w-full container ml-auto mr-auto flex flex-col pb-8">
+<div class="h-full w-full container mx-auto flex flex-col mb-8">
   <instance-page-header-section/>
   <confirmation [key]='"instance-delete-confirmation"' [header]='"Are you sure about deleting this instance?"'/>
   <messages-showcase [messages]="messages()"/>
   <card>
     <p card-header>Instances</p>
-    <p card-subHeader>Manage your instances — create, preview, edit or delete</p>
+    <p card-subHeader>Manage your instances — create, preview, edit or delete.</p>
     <div card-body>
       <p-button title="Create" size="small" label="Create Instance" type="button" (onClick)="manage()"/>
       <p-table

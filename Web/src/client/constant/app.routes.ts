@@ -93,40 +93,9 @@ import {
 import {
   SaleVatReturnDeclarationPageComponent
 } from '../page/sale-vat-return-declaration-page/sale-vat-return-declaration-page.component';
+import {AdminPageComponent} from '../page/admin-page/admin-page.component';
 
 export const routes: Routes = [
-  {
-    path: "admin",
-    title: "Bapsk | Admin",
-    canActivate: [AdminOnlyGuard],
-    canActivateChild: [AdminOnlyChildGuard],
-    loadComponent: () => AuthenticatedLayoutComponent,
-    loadChildren: () => [
-      {
-        path: "user",
-        title: "Bapsk | User",
-        loadChildren: () => [
-          {
-            path: "",
-            pathMatch: "full",
-            loadComponent: () => UserPageComponent
-          },
-          {
-            path: "create",
-            loadComponent: () => UserManagementPageComponent
-          },
-          {
-            path: ":userId/edit",
-            loadComponent: () => UserManagementPageComponent
-          },
-          {
-            path: ":userId",
-            loadComponent: () => UserPreviewPageComponent
-          }
-        ]
-      }
-    ]
-  },
   {
     path: "auth",
     canActivate: [AnonymousOnlyGuard],
@@ -135,26 +104,63 @@ export const routes: Routes = [
     loadChildren: () => [
       {
         path: "login",
-        title: "Bapsk | Login",
+        title: "Bapsk - Login",
         loadComponent: () => LoginComponent
       },
       {
         path: "register",
-        title: "Bapsk | Register",
+        title: "Bapsk - Register",
         loadComponent: () => RegisterComponent
       }
     ]
   },
   {
     path: "home",
-    title: "Bapsk | Home",
+    title: "Bapsk - Home",
     canActivate: [AuthenticatedOnlyGuard],
     canActivateChild: [AuthenticatedOnlyChildGuard],
     loadComponent: () => AuthenticatedLayoutComponent,
     loadChildren: () => [
       {
+        path: "admin",
+        title: "Bapsk - Admin",
+        canActivate: [AdminOnlyGuard],
+        canActivateChild: [AdminOnlyChildGuard],
+        loadComponent: () => AdminPageComponent,
+        loadChildren: () => [
+          {
+            path: "",
+            pathMatch: "full",
+            redirectTo: "user"
+          },
+          {
+            path: "user",
+            title: "Bapsk - User",
+            loadChildren: () => [
+              {
+                path: "",
+                pathMatch: "full",
+                loadComponent: () => UserPageComponent
+              },
+              {
+                path: "create",
+                loadComponent: () => UserManagementPageComponent
+              },
+              {
+                path: ":userId/edit",
+                loadComponent: () => UserManagementPageComponent
+              },
+              {
+                path: ":userId",
+                loadComponent: () => UserPreviewPageComponent
+              }
+            ]
+          }
+        ]
+      },
+      {
         path: "instance",
-        title: "Bapsk | Instance",
+        title: "Bapsk - Instance",
         loadChildren: () => [
           {
             path: "",
@@ -177,22 +183,22 @@ export const routes: Routes = [
       },
       {
         path: "profile",
-        title: "Bapsk | Profile",
+        title: "Bapsk - Profile",
         loadComponent: () => ProfilePageComponent
       },
       {
         path: "workspace",
-        title: "Bapsk | Workspace",
+        title: "Bapsk - Workspace",
         loadComponent: () => WorkspacePageComponent
       },
       {
         path: "workspace/:instanceId",
-        title: "Bapsk | Workspace",
+        title: "Bapsk - Workspace",
         loadComponent: () => WorkspacePageComponent,
         loadChildren: () => [
           {
             path: "customer",
-            title: "Bapsk | Customer",
+            title: "Bapsk - Customer",
             loadChildren: () => [
               {
                 path: "",
@@ -215,7 +221,7 @@ export const routes: Routes = [
           },
           {
             path: "data-entry",
-            title: "Bapsk | Data Entry",
+            title: "Bapsk - Data Entry",
             loadChildren: () => [
               {
                 path: "",
@@ -238,7 +244,7 @@ export const routes: Routes = [
           },
           {
             path: "data-type",
-            title: "Bapsk | Data Type",
+            title: "Bapsk - Data Type",
             loadChildren: () => [
               {
                 path: "",
@@ -261,12 +267,12 @@ export const routes: Routes = [
           },
           {
             path: "generate-report",
-            title: "Bapsk | Generate Report",
+            title: "Bapsk - Generate Report",
             loadComponent: () => ReportGeneratePageComponent
           },
           {
             path: "import-configuration",
-            title: "Bapsk | Import Configuration",
+            title: "Bapsk - Import Configuration",
             loadChildren: () => [
               {
                 path: "",
@@ -289,7 +295,7 @@ export const routes: Routes = [
           },
           {
             path: "report-template",
-            title: "Bapsk | Report Template",
+            title: "Bapsk - Report Template",
             loadChildren: () => [
               {
                 path: "",
@@ -312,7 +318,7 @@ export const routes: Routes = [
           },
           {
             path: "sale",
-            title: "Bapsk | Sale",
+            title: "Bapsk - Sale",
             loadChildren: () => [
               {
                 path: "",
@@ -339,7 +345,7 @@ export const routes: Routes = [
           },
           {
             path: "salesman",
-            title: "Bapsk | Salesman",
+            title: "Bapsk - Salesman",
             loadChildren: () => [
               {
                 path: "",
@@ -370,19 +376,19 @@ export const routes: Routes = [
     loadChildren: () => [
       {
         path: "declaration-preview",
-        title: "Bapsk | Declaration Preview",
+        title: "Bapsk - Declaration Preview",
         loadComponent: () => DeclarationPreviewPageComponent
       },
       {
         path: "report-preview",
-        title: "Bapsk | Report Preview",
+        title: "Bapsk - Report Preview",
         loadComponent: () => ReportPreviewPageComponent
       }
     ]
   },
   {
     path: "auth/reset-password",
-    title: "Bapsk | Reset Password",
+    title: "Bapsk - Reset Password",
     loadComponent: () => ResetPasswordPageComponent
   },
   {
@@ -392,7 +398,7 @@ export const routes: Routes = [
   },
   {
     path: "**",
-    title: "Bapsk | Not Found",
+    title: "Bapsk - Not Found",
     loadComponent: () => NotFoundPageComponent
   }
 ];

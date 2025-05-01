@@ -14,6 +14,10 @@ import {getUserIsoCountryLabel} from '../../model/iso-country.model';
 import {User} from '../../model/user.model';
 import {first} from 'rxjs';
 import {Router} from '@angular/router';
+import {
+  UserPageHeaderSectionComponent
+} from '../../component/user-page-header-section/user-page-header-section.component';
+import {CardComponent} from '../../component/card/card.component';
 
 @Component({
   selector: 'user-page',
@@ -22,7 +26,9 @@ import {Router} from '@angular/router';
     ConfirmationComponent,
     DatePipe,
     MessagesShowcaseComponent,
-    TableModule
+    TableModule,
+    UserPageHeaderSectionComponent,
+    CardComponent
   ],
   templateUrl: './user-page.component.html',
   styles: ``
@@ -49,10 +55,10 @@ export class UserPageComponent {
   }
 
   protected manage(user?: User) {
-    this.router.navigate(['/admin/user/' + (user ? `${user.id}/edit` : 'create')]);
+    this.router.navigate(['/home/admin/user/' + (user ? `${user.id}/edit` : 'create')]);
   }
 
   protected preview(user: User) {
-    this.router.navigate(['/admin/user/' + user.id]);
+    this.router.navigate(['/home/admin/user/' + user.id]);
   }
 }

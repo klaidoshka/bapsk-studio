@@ -27,6 +27,8 @@ public class UserService : IUserService
 
     public async Task<User> CreateAsync(UserCreateRequest request)
     {
+        (await _userValidator.ValidateUserCreateRequestAsync(request)).AssertValid();
+
         var user = new User
         {
             BirthDate = request.BirthDate,

@@ -1,58 +1,86 @@
-<div class="min-w-128">
-  <messages-showcase [messages]="messages()"/>
+<div class="h-full w-full container mx-auto flex flex-col mb-8">
+  <user-page-header-section [canGoBack]="true"/>
+  <card>
+    <p card-header>Create User</p>
+    <p card-subHeader>Fill in the form below to register a new user or modify existing one.</p>
+    <form [formGroup]="form" card-body class="flex flex-col gap-4">
+      <div class="flex flex-col gap-4 md:flex-row">
+        <!-- First Name -->
+        <div>
+          <p-floatlabel variant="on">
+            <p-iconfield>
+              <p-inputicon class="pi pi-tag"/>
+              <input pInputText id="firstName" formControlName="firstName" type="text"/>
+            </p-iconfield>
+            <label for="firstName">First Name</label>
+          </p-floatlabel>
+          <form-input-error [control]="form.controls.firstName"/>
+        </div>
 
-  <form class="grid grid-cols-1 md:grid-cols-2 gap-4" [formGroup]="form">
-    <!-- First Name -->
-    <div class="form-field">
-      <label for="firstName" class="block text-sm font-medium">First Name</label>
-      <input type="text" id="firstName" formControlName="firstName" pInputText class="mt-1 block w-full"/>
-      <form-input-error [control]="form.controls.firstName"/>
-    </div>
-
-    <!-- Last Name -->
-    <div class="form-field">
-      <label for="lastName" class="block text-sm font-medium">Last Name</label>
-      <input type="text" id="lastName" formControlName="lastName" pInputText class="mt-1 block w-full"/>
-      <form-input-error [control]="form.controls.lastName"/>
-    </div>
-
-    <!-- Birth Date -->
-    <div class="form-field">
-      <label for="birthDate" class="block text-sm font-medium">Birthdate</label>
-      <p-datepicker inputId="birthDate" formControlName="birthDate" [showIcon]="true" variant="filled"
-                    inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-inherit!" class="mt-1 block w-full"
-                    appendTo="body"/>
-      <form-input-error [control]="form.controls.birthDate"/>
-    </div>
-
-    <!-- Email -->
-    <div class="form-field">
-      <label for="email" class="block text-sm font-medium">Email</label>
-      <input type="email" id="email" formControlName="email" pInputText class="mt-1 block w-full"/>
-      <form-input-error [control]="form.controls.email"/>
-    </div>
-
-    @if (!user.value()) {
-      <!-- Password -->
-      <div class="form-field">
-        <label for="password" class="block text-sm font-medium">Password</label>
-        <input type="password" id="password" formControlName="password" pInputText class="mt-1 block w-full"/>
-        <form-input-error [control]="form.controls.password"/>
+        <!-- Last Name -->
+        <div>
+          <p-floatlabel variant="on">
+            <p-iconfield>
+              <p-inputicon class="pi pi-tag"/>
+              <input pInputText id="lastName" formControlName="lastName" type="text"/>
+            </p-iconfield>
+            <label for="lastName">Last Name</label>
+          </p-floatlabel>
+          <form-input-error [control]="form.controls.lastName"/>
+        </div>
       </div>
-    }
 
-    <!-- Country Dropdown -->
-    <div class="form-field">
-      <label for="country" class="block text-sm font-medium">Country</label>
-      <p-autocomplete inputId="country" formControlName="country" optionLabel="name" placeholder="Select a country"
-                      [dropdown]="true" [suggestions]="filteredCountries()" (completeMethod)="filterCountries($event)"
-                      class="mt-1 block w-full" appendTo="body"/>
-      <form-input-error [control]="form.controls.country"/>
-    </div>
+      <div class="flex flex-col gap-4 md:flex-row">
+        <!-- Email -->
+        <div>
+          <p-floatlabel variant="on">
+            <p-iconfield>
+              <p-inputicon class="pi pi-envelope"/>
+              <input pInputText id="email" formControlName="email" type="email"/>
+            </p-iconfield>
+            <label for="email">Email</label>
+          </p-floatlabel>
+          <form-input-error [control]="form.controls.email"/>
+        </div>
 
-    <div class="flex justify-end mt-4">
+        @if (!user.value()) {
+          <!-- Password -->
+          <div>
+            <p-floatlabel variant="on">
+              <p-iconfield>
+                <p-inputicon class="pi pi-lock"/>
+                <input pInputText id="password" formControlName="password" type="password"/>
+              </p-iconfield>
+              <label for="password">Password</label>
+            </p-floatlabel>
+            <form-input-error [control]="form.controls.password"/>
+          </div>
+        }
+      </div>
+
+      <div class="flex flex-col gap-4 md:flex-row">
+        <!-- Birth Date -->
+        <div class="w-fit">
+          <p-ifta-label class="w-fit">
+            <p-date-picker formControlName="birthDate" styleClass="min-w-60" inputId="birthDate" appendTo="body"/>
+            <label for="birthDate">Birthdate</label>
+          </p-ifta-label>
+          <form-input-error [control]="form.controls.birthDate"/>
+        </div>
+
+        <!-- Country Dropdown -->
+        <div class="w-fit">
+          <p-ifta-label>
+            <p-select [options]="countries" formControlName="country" optionLabel="name" styleClass="min-w-60"
+                      appendTo="body"/>
+            <label for="birthDate">Country</label>
+          </p-ifta-label>
+          <form-input-error [control]="form.controls.birthDate"/>
+        </div>
+      </div>
+      <messages-showcase [messages]="messages()"/>
       <p-button [label]="!user.value() ? 'Create' : 'Save'" [disabled]="!form.valid || !form.dirty" (onClick)="save()"
                 type="submit"/>
-    </div>
-  </form>
+    </form>
+  </card>
 </div>

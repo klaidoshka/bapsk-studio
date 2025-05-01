@@ -1,20 +1,20 @@
 <div class="h-full w-full flex flex-col">
-  <header class="sticky top-0 z-50 w-full bg-surface-50/95 backdrop-blur supports-[backdrop-filter]:bg-surface-50/60">
+  <header class="sticky top-0 z-50 w-full border-b border-b-primary-950/20 dark:border-b-primary-50/20 bg-surface-50 dark:bg-surface-950 backdrop-blur supports-[backdrop-filter]:bg-surface-50/60 dark:supports-[backdrop-filter]:bg-surface-950/60">
     <div class="container flex h-14 items-center gap-2 md:gap-4 m-auto">
       <div class="mr-4 hidden md:flex">
         <!-- Home -->
         <a class="mr-4 flex items-center gap-2 lg:mr-6" routerLink="/home">
-          <span class="font-bold lg:inline-block text-primary-950 hover:text-primary-950/80">Bapsk</span>
+          <span class="font-bold lg:inline-block text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80">Bapsk</span>
         </a>
 
         <!-- Navigation -->
         <nav class="flex items-center gap-4 text-sm xl:gap-6">
-          <a class="transition-colors text-primary-950 hover:text-primary-950/80" routerLink="/home/instance"
+          <a class="transition-colors text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80" routerLink="/home/instance"
              routerLinkActive="underline underline-offset-4">Instances</a>
-          <a class="transition-colors text-primary-950 hover:text-primary-950/80" routerLink="/home/workspace"
+          <a class="transition-colors text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80" routerLink="/home/workspace"
              routerLinkActive="underline underline-offset-4 ">Workspace</a>
           @if (user.value()?.role === Role.Admin) {
-            <a class="transition-colors text-primary-950 hover:text-primary-950/80" routerLink="/admin"
+            <a class="transition-colors text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80" routerLink="/home/admin"
                routerLinkActive="underline underline-offset-4">Admin</a>
           }
         </nav>

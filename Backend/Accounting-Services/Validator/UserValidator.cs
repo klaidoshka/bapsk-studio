@@ -25,6 +25,35 @@ public class UserValidator : IUserValidator
             : new Validation();
     }
 
+    public async Task<Validation> ValidateUserCreateRequestAsync(UserCreateRequest request)
+    {
+        var failures = new List<string>();
+
+        if (String.IsNullOrWhiteSpace(request.FirstName))
+        {
+            failures.Add("First name is required.");
+        }
+
+        if (String.IsNullOrWhiteSpace(request.LastName))
+        {
+            failures.Add("Last name is required.");
+        }
+
+        if (String.IsNullOrWhiteSpace(request.Email) || !request.Email.Contains('@'))
+        {
+            failures.Add("Email is required, it must be valid.");
+        }
+
+        var exists = await _database.Users.AnyAsync(u => u.EmailNormalized.Equals(request.Email, StringComparison.InvariantCultureIgnoreCase));
+
+        if (exists)
+        {
+            failures.Add("User with this email already exists.");
+        }
+
+        return new Validation(failures);
+    }
+
     public async Task<Validation> ValidateUserDeleteAsync(int userId) =>
         await ValidateUserExists(userId);
 

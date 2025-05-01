@@ -1,4 +1,4 @@
-<div class="h-full w-full container ml-auto mr-auto flex flex-col pb-8">
+<div class="h-full w-full container mx-auto flex flex-col mb-8">
   <instance-page-header-section [canGoBack]="true"/>
   @if (instance.isLoading()) {
     <p-progress-spinner/>
@@ -6,7 +6,6 @@
     <failed-to-load-please-reload/>
   } @else {
     @let instanceValue = instance.value()!;
-
     <card>
       <p card-header>Instance</p>
       <div card-body class="flex flex-col gap-4">

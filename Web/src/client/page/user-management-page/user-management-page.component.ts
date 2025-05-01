@@ -1,7 +1,5 @@
 import {Component, inject, input, signal} from '@angular/core';
-import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
 import {Button} from 'primeng/button';
-import {DatePicker} from 'primeng/datepicker';
 import {FormInputErrorComponent} from '../../component/form-input-error/form-input-error.component';
 import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
@@ -13,26 +11,41 @@ import {UserService} from '../../service/user.service';
 import {
   getDefaultIsoCountry,
   getIsoCountryByCode,
-  IsoCountries,
-  IsoCountry
+  IsoCountries
 } from '../../model/iso-country.model';
 import Messages from '../../model/messages.model';
 import {User, UserCreateRequest, UserEditRequest} from '../../model/user.model';
 import {first, of, tap} from 'rxjs';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {NumberUtil} from '../../util/number.util';
+import {CardComponent} from '../../component/card/card.component';
+import {
+  UserPageHeaderSectionComponent
+} from '../../component/user-page-header-section/user-page-header-section.component';
+import {FloatLabel} from 'primeng/floatlabel';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {IftaLabel} from 'primeng/iftalabel';
+import {Select} from 'primeng/select';
+import {DatePicker} from 'primeng/datepicker';
 
 @Component({
   selector: 'user-management-page',
   imports: [
-    AutoComplete,
     Button,
-    DatePicker,
     FormInputErrorComponent,
     FormsModule,
     InputText,
     MessagesShowcaseComponent,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    CardComponent,
+    UserPageHeaderSectionComponent,
+    FloatLabel,
+    IconField,
+    InputIcon,
+    IftaLabel,
+    Select,
+    DatePicker
   ],
   templateUrl: './user-management-page.component.html',
   styles: ``
@@ -41,8 +54,7 @@ export class UserManagementPageComponent {
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly userService = inject(UserService);
-
-  protected readonly filteredCountries = signal<IsoCountry[]>([]);
+  protected readonly countries = IsoCountries;
   protected readonly form = this.createForm();
   protected readonly messages = signal<Messages>({});
   protected readonly userId = input<string>();
@@ -106,13 +118,6 @@ export class UserManagementPageComponent {
       country: getIsoCountryByCode(user.country)
     });
     this.form.controls.password.disable();
-  }
-
-  protected filterCountries(event: AutoCompleteCompleteEvent) {
-    const query = event.query.toLowerCase();
-    this.filteredCountries.set(IsoCountries.filter((country) =>
-      country.name.toLowerCase().startsWith(query)
-    ));
   }
 
   protected save() {

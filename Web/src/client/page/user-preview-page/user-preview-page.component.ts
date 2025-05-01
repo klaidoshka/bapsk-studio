@@ -5,11 +5,23 @@ import {UserService} from '../../service/user.service';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {NumberUtil} from '../../util/number.util';
 import {of} from 'rxjs';
+import {
+  FailedToLoadPleaseReloadComponent
+} from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {
+  UserPageHeaderSectionComponent
+} from '../../component/user-page-header-section/user-page-header-section.component';
+import {CardComponent} from '../../component/card/card.component';
 
 @Component({
   selector: 'user-preview-page',
   imports: [
-    DatePipe
+    DatePipe,
+    FailedToLoadPleaseReloadComponent,
+    ProgressSpinner,
+    UserPageHeaderSectionComponent,
+    CardComponent
   ],
   templateUrl: './user-preview-page.component.html',
   styles: ``

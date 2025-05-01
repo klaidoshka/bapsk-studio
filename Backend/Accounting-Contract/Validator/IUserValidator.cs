@@ -5,6 +5,8 @@ namespace Accounting.Contract.Validator;
 
 public interface IUserValidator
 {
+    public Task<Validation> ValidateUserCreateRequestAsync(UserCreateRequest request);
+    
     public Task<Validation> ValidateUserDeleteAsync(int userId);
 
     public Task<Validation> ValidateUserDeleteAuthorizationAsync(int requesterId);

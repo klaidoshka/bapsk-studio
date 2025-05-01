@@ -1,9 +1,10 @@
-<div class="h-full w-full container ml-auto mr-auto flex flex-col pb-8">
+<div class="h-full w-full container mx-auto flex flex-col mb-8">
   <instance-page-header-section [canGoBack]="true"/>
   <card>
     <p card-header>Create Instance</p>
-    <p card-subHeader>Fill in the form below to create a new instance.</p>
+    <p card-subHeader>Fill in the form below to create a new instance or modify existing one.</p>
     <form [formGroup]="form" card-body class="flex flex-col gap-4">
+      <!-- Name -->
       <div>
         <p-floatlabel variant="on">
           <p-iconfield>
@@ -15,6 +16,7 @@
         <form-input-error [control]="form.controls.name"/>
       </div>
 
+      <!-- Description -->
       <div>
         <p-floatlabel variant="on">
           <p-iconfield>
@@ -26,6 +28,7 @@
         <form-input-error [control]="form.controls.description"/>
       </div>
 
+      <!-- Users -->
       <card>
         <div card-header>
           <div class="font-semibold tracking-tight text-xl">Instance Users</div>
@@ -77,6 +80,7 @@
             </p-table>
           }
           <messages-showcase [messages]="messagesUsers()"/>
+          <!-- Users Form -->
           <form [formGroup]="formUser" class="flex flex-col gap-4">
             <div class="flex flex-col">
               <input formControlName="email" placeholder="Enter email..." pInputText type="email" id="email"
@@ -87,13 +91,9 @@
           </form>
         </div>
       </card>
-
-      <div>
-        <messages-showcase [messages]="messages()"/>
-
-        <p-button [label]="instance.value() === undefined ? 'Create' : 'Save'" [disabled]="form.invalid || !form.dirty"
-                  (onClick)="save()" size="small" type="submit"/>
-      </div>
+      <messages-showcase [messages]="messages()"/>
+      <p-button [label]="instance.value() === undefined ? 'Create' : 'Save'" [disabled]="form.invalid || !form.dirty"
+                (onClick)="save()" size="small" type="submit"/>
     </form>
   </card>
 </div>
