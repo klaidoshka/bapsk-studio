@@ -3,19 +3,13 @@ import {Button} from "primeng/button";
 import {DatePicker} from "primeng/datepicker";
 import {FormInputErrorComponent} from "../../component/form-input-error/form-input-error.component";
 import {InputText} from "primeng/inputtext";
-import {
-  MessagesShowcaseComponent
-} from "../../component/messages-showcase/messages-showcase.component";
+import {MessagesShowcaseComponent} from "../../component/messages-showcase/messages-showcase.component";
 import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Select} from "primeng/select";
 import {getDefaultIsoCountry, IsoCountries} from '../../model/iso-country.model';
 import {CustomerService} from '../../service/customer.service';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
-import Customer, {
-  CustomerCreateRequest,
-  CustomerEditRequest,
-  CustomerOtherDocument
-} from '../../model/customer.model';
+import Customer, {CustomerCreateRequest, CustomerEditRequest, CustomerOtherDocument} from '../../model/customer.model';
 import {IdentityDocumentType} from '../../model/identity-document-type.model';
 import Messages from '../../model/messages.model';
 import {first, of, tap} from 'rxjs';
@@ -62,7 +56,7 @@ export class CustomerManagementPageComponent {
       customerId: NumberUtil.parse(this.customerId()),
       instanceId: NumberUtil.parse(this.instanceId())
     }),
-    loader: ({request}) => request.customerId && request.instanceId
+    loader: ({ request }) => request.customerId && request.instanceId
       ? this.customerService
         .getById(request.instanceId, request.customerId)
         .pipe(
@@ -72,30 +66,11 @@ export class CustomerManagementPageComponent {
       : of(undefined)
   });
 
-  protected readonly form = this.formBuilder.group({
-    birthdate: [new Date(), [Validators.required]],
-    email: [""],
-    firstName: ["", [Validators.required, Validators.maxLength(200)]],
-    identityDocument: this.formBuilder.group({
-      issuedBy: [getDefaultIsoCountry().code, [Validators.required]],
-      number: ["", [Validators.required, Validators.maxLength(50)]],
-      type: [IdentityDocumentType.Passport, [Validators.required]],
-      value: [null as string | null, [Validators.maxLength(50)]]
-    }),
-    lastName: ["", [Validators.required, Validators.maxLength(200)]],
-    otherDocuments: this.formBuilder.array([
-      this.formBuilder.group({
-        issuedBy: [getDefaultIsoCountry().code, [Validators.required]],
-        type: ["", [Validators.required, Validators.maxLength(70)]],
-        value: ["", [Validators.required, Validators.maxLength(70)]]
-      })
-    ]),
-    residenceCountry: [getDefaultIsoCountry().code, [Validators.required]]
-  });
+  protected readonly form = this.createForm();
 
   protected readonly identityDocumentTypes = [
-    {label: 'ID Card', value: IdentityDocumentType.NationalId},
-    {label: 'Passport', value: IdentityDocumentType.Passport}
+    { label: 'ID Card', value: IdentityDocumentType.NationalId },
+    { label: 'Passport', value: IdentityDocumentType.Passport }
   ]
 
   private create(request: CustomerCreateRequest) {
@@ -103,6 +78,33 @@ export class CustomerManagementPageComponent {
       next: () => this.onSuccess("Customer has been created successfully."),
       error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
     });
+  }
+
+  private createForm() {
+    const form = this.formBuilder.group({
+      birthdate: [new Date(), [Validators.required]],
+      email: [""],
+      firstName: ["", [Validators.required, Validators.maxLength(200)]],
+      identityDocument: this.formBuilder.group({
+        issuedBy: [getDefaultIsoCountry().code, [Validators.required]],
+        number: ["", [Validators.required, Validators.maxLength(50)]],
+        type: [IdentityDocumentType.Passport, [Validators.required]],
+        value: [null as string | null, [Validators.maxLength(50)]]
+      }),
+      lastName: ["", [Validators.required, Validators.maxLength(200)]],
+      otherDocuments: this.formBuilder.array([
+        this.formBuilder.group({
+          issuedBy: [getDefaultIsoCountry().code, [Validators.required]],
+          type: ["", [Validators.required, Validators.maxLength(70)]],
+          value: ["", [Validators.required, Validators.maxLength(70)]]
+        })
+      ]),
+      residenceCountry: [getDefaultIsoCountry().code, [Validators.required]]
+    });
+
+    form.controls.otherDocuments.clear();
+
+    return form;
   }
 
   private edit(request: CustomerEditRequest) {
@@ -113,14 +115,14 @@ export class CustomerManagementPageComponent {
   }
 
   private onSuccess(message: string) {
-    this.messages.set({success: [message]});
+    this.messages.set({ success: [message] });
     this.form.markAsUntouched();
     this.form.markAsPristine();
   }
 
   private updateForm(customer: Customer) {
     this.form.reset();
-    this.form.patchValue({...customer});
+    this.form.patchValue({ ...customer });
   }
 
   protected addOtherDocument(document?: CustomerOtherDocument) {
@@ -139,7 +141,7 @@ export class CustomerManagementPageComponent {
 
   protected save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill out the form."]});
+      this.messages.set({ error: ["Please fill out the form."] });
       return;
     }
 
@@ -173,6 +175,4 @@ export class CustomerManagementPageComponent {
       this.create(request);
     }
   }
-
-  protected readonly countries = IsoCountries;
 }

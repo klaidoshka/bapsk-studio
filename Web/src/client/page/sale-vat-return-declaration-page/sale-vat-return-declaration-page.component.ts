@@ -116,7 +116,7 @@ export class SaleVatReturnDeclarationPageComponent {
     this.isRefreshing.set(true);
 
     this.vatReturnService
-      .update(this.instanceIdAsNumber()!, this.declaration.value()!.saleId)
+      .update(this.instanceIdAsNumber()!, this.sale.value()!.id)
       .pipe(first())
       .subscribe({
         next: () => this.isRefreshing.set(false),

@@ -1,9 +1,5 @@
 import {Component, computed, inject, input, signal} from '@angular/core';
-import {
-  SubmitDeclarationState,
-  toExportResultLabel,
-  toSubmitDeclarationStateLabel
-} from '../../model/vat-return.model';
+import {SubmitDeclarationState, toExportResultLabel, toSubmitDeclarationStateLabel} from '../../model/vat-return.model';
 import {VatReturnService} from '../../service/vat-return.service';
 import {TableModule} from 'primeng/table';
 import {first, of} from 'rxjs';
@@ -16,9 +12,7 @@ import {
   DeclarationPreviewPageSkeletonComponent
 } from './declaration-preview-page-skeleton/declaration-preview-page-skeleton.component';
 import {Badge} from 'primeng/badge';
-import {
-  VatReturnPaymentTableComponent
-} from '../../component/vat-return-payment-table/vat-return-payment-table.component';
+import {VatReturnPaymentTableComponent} from '../../component/vat-return-payment-table/vat-return-payment-table.component';
 import {rxResource} from '@angular/core/rxjs-interop';
 
 @Component({
@@ -43,7 +37,7 @@ export class DeclarationPreviewPageComponent {
   protected readonly SubmitDeclarationState = SubmitDeclarationState;
   private readonly vatReturnService = inject(VatReturnService);
   private readonly isRefreshing = signal<boolean>(false);
-  protected readonly declarationPreviewCode = input<string>();
+  protected readonly code = input<string>();
   protected readonly toCustomerFullName = toCustomerFullName;
   protected readonly toExportResultLabel = toExportResultLabel;
   protected readonly toSubmitDeclarationStateLabel = toSubmitDeclarationStateLabel;
@@ -52,7 +46,7 @@ export class DeclarationPreviewPageComponent {
 
   protected readonly declaration = rxResource({
     request: () => ({
-      code: this.declarationPreviewCode()
+      code: this.code()
     }),
     loader: ({request}) => request.code
       ? this.vatReturnService.getWithSaleByPreviewCode(request.code)
@@ -66,7 +60,7 @@ export class DeclarationPreviewPageComponent {
   }
 
   protected refresh() {
-    const code = this.declarationPreviewCode();
+    const code = this.code();
 
     if (!code) {
       return;

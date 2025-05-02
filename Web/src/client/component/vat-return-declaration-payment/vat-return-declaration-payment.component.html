@@ -6,7 +6,7 @@
         <!-- Type Dropdown -->
         <div>
           <p-float-label variant="on" class="w-32">
-            <p-select inputId="type" formControlName="type" [options]="types" optionLabel="label" optionValue="id" class="w-full bg-inherit!"
+            <p-select inputId="type" formControlName="type" [options]="types" optionLabel="label" optionValue="id" class="w-full"
                       appendTo="body" dropdownIcon="pi pi-objects-column"/>
             <label for="type">Payment Type</label>
           </p-float-label>
@@ -17,7 +17,7 @@
           <p-float-label variant="on" class="w-32">
             <p-icon-field>
               <p-inputicon class="pi pi-euro"/>
-              <input pInputText id="amount" type="number" formControlName="amount" [min]="0" [step]="0.05" class="w-full bg-inherit!"/>
+              <input pInputText id="amount" type="number" formControlName="amount" [min]="0" [step]="0.05" class="w-full"/>
             </p-icon-field>
             <label for="amount">Amount</label>
           </p-float-label>
@@ -27,7 +27,7 @@
         <div>
           <p-float-label variant="on" class="w-60">
             <p-date-picker inputId="date" formControlName="date" [showIcon]="true" [showTime]="true" variant="filled"
-                           iconDisplay="input" class="w-full" inputStyleClass="bg-inherit!" appendTo="body"/>
+                           iconDisplay="input" class="w-full" appendTo="body"/>
             <label for="date">Date</label>
           </p-float-label>
         </div>

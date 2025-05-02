@@ -20,10 +20,11 @@
         }
       </div>
 
+      @let hasCorrection = declaration.value()!.correction > 1;
       <div class="flex flex-col md:flex-row gap-4">
         <!-- Declaration -->
         @if (declaration.value()) {
-          <card class="min-h-62 flex-1">
+          <card class="flex-1" [class.min-h-62]="hasCorrection">
             <p card-header>Declaration</p>
             <div card-body>
               <p class="text-lg">
@@ -44,7 +45,7 @@
                          [value]="declaration.value()!.isCancelled ? 'Cancelled' : toSubmitDeclarationStateLabel(declaration.value()!.state)"
                          [severity]="declaration.value()!.isCancelled || declaration.value()!.state === SubmitDeclarationState.REJECTED ? 'danger' : 'success'"/>
               </p>
-              @if (declaration.value()!.correction > 1) {
+              @if (hasCorrection) {
                 <p class="text-lg">
                   <strong>Corrected Times</strong>
                   {{ declaration.value()!.correction }}
@@ -55,9 +56,9 @@
         }
 
         <!-- Sale -->
-        <card class="min-h-62 flex-1">
+        <card class="flex-1" [class.min-h-62]="hasCorrection">
           <p card-header>Sale</p>
-          <div card-body class="md:mb-7">
+          <div card-body [class.md:mb-7]="hasCorrection">
             @let saleValue = sale.value()!;
             <p class="text-lg">
               <strong>Customer</strong>
