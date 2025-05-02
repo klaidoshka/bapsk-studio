@@ -6,6 +6,9 @@ import {SaleService} from '../../service/sale.service';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {NumberUtil} from '../../util/number.util';
 import {of} from 'rxjs';
+import {
+  SalePageHeaderSectionComponent
+} from '../../component/sale-page-header-section/sale-page-header-section.component';
 
 @Component({
   selector: 'sale-preview-page',
@@ -13,7 +16,8 @@ import {of} from 'rxjs';
     CurrencyPipe,
     DatePipe,
     RoundPipe,
-    TableModule
+    TableModule,
+    SalePageHeaderSectionComponent
   ],
   templateUrl: './sale-preview-page.component.html',
   styles: ``

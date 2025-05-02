@@ -1,4 +1,4 @@
-import {computed, inject, Injectable, signal, Signal, WritableSignal} from '@angular/core';
+import {computed, inject, Injectable, signal, Signal} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import Instance, {
   InstanceCreateRequest,
@@ -41,7 +41,7 @@ export class InstanceService {
         })
       )
       .subscribe(instances => {
-        if (instances.length > 0) {
+        if (instances.length == 1) {
           const activeInstanceId = this.activeInstance()?.id;
 
           if (
@@ -50,7 +50,7 @@ export class InstanceService {
           ) {
             this.activeInstance.set(instances[0]);
           }
-        } else if (this.activeInstance() !== undefined) {
+        } else if (instances.length == 0 && this.activeInstance() !== undefined) {
           this.activeInstance.set(undefined);
         }
       });
@@ -183,7 +183,7 @@ export class InstanceService {
     return computed(() => this.activeInstance()?.id);
   }
 
-  setActiveInstance(instance: Instance) {
+  setActiveInstance(instance?: Instance) {
     this.activeInstance.set(instance);
   }
 

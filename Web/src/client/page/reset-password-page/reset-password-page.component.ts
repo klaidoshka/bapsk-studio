@@ -1,12 +1,20 @@
 import {Component, inject, signal} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {AuthService} from '../../service/auth.service';
-import {FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators
+} from '@angular/forms';
 import Messages from '../../model/messages.model';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {first, map} from 'rxjs';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
+import {
+  MessagesShowcaseComponent
+} from '../../component/messages-showcase/messages-showcase.component';
 import {Password} from 'primeng/password';
 import {Button} from 'primeng/button';
 import {ProgressSpinner} from 'primeng/progressspinner';

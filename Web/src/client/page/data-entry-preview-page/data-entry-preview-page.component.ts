@@ -10,13 +10,17 @@ import {DataEntryService} from '../../service/data-entry.service';
 import {of} from 'rxjs';
 import {NumberUtil} from '../../util/number.util';
 import {DataTypeService} from '../../service/data-type.service';
+import {
+  DataEntryPageHeaderSectionComponent
+} from '../../component/data-entry-page-header-section/data-entry-page-header-section.component';
 
 @Component({
   selector: 'data-entry-preview-page',
   imports: [
     DataTypeEntryFieldDisplayComponent,
     DatePipe,
-    TableModule
+    TableModule,
+    DataEntryPageHeaderSectionComponent
   ],
   templateUrl: './data-entry-preview-page.component.html',
   styles: ``

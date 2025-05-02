@@ -39,19 +39,19 @@
     <div class="flex flex-col gap-4 md:flex-row">
       <!-- Birth Date -->
       <div class="w-fit">
-        <p-ifta-label class="w-fit">
-          <p-date-picker formControlName="birthDate" styleClass="min-w-60" inputId="birthDate" appendTo="body"/>
+        <p-float-label variant="on" class="w-fit">
+          <p-date-picker icon="pi pi-calendar" iconDisplay="input" showIcon formControlName="birthDate" styleClass="min-w-60" inputId="birthDate" appendTo="body"/>
           <label for="birthDate">Birthdate</label>
-        </p-ifta-label>
+        </p-float-label>
         <form-input-error [control]="form.controls.birthDate"/>
       </div>
       <!-- Country Dropdown -->
       <div class="w-fit">
-        <p-ifta-label>
-          <p-select [options]="countries" formControlName="country" optionLabel="name" styleClass="min-w-60"
+        <p-float-label variant="on">
+          <p-select dropdownIcon="pi pi-globe" [options]="countries" formControlName="country" optionLabel="name" styleClass="min-w-60"
                     appendTo="body"/>
-          <label for="birthDate">Country</label>
-        </p-ifta-label>
+          <label for="country">Country</label>
+        </p-float-label>
         <form-input-error [control]="form.controls.birthDate"/>
       </div>
     </div>

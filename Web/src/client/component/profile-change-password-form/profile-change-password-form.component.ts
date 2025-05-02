@@ -16,8 +16,6 @@ import Messages from '../../model/messages.model';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {CardComponent} from '../card/card.component';
-import {DatePicker} from 'primeng/datepicker';
-import {IftaLabel} from 'primeng/iftalabel';
 import {FloatLabel} from 'primeng/floatlabel';
 
 @Component({
@@ -30,8 +28,6 @@ import {FloatLabel} from 'primeng/floatlabel';
     ReactiveFormsModule,
     MessagesShowcaseComponent,
     CardComponent,
-    DatePicker,
-    IftaLabel,
     FloatLabel
   ],
   templateUrl: './profile-change-password-form.component.html',

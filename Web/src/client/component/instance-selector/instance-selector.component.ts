@@ -5,10 +5,12 @@ import {Button} from 'primeng/button';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {Select} from 'primeng/select';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {ActivatedRoute, Router, UrlSegment} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink, UrlSegment} from '@angular/router';
 import Instance from '../../model/instance.model';
 import {first} from 'rxjs';
 import {NumberUtil} from '../../util/number.util';
+import {Splitter} from 'primeng/splitter';
+import {FloatLabel} from 'primeng/floatlabel';
 
 @Component({
   selector: 'instance-selector',
@@ -17,7 +19,10 @@ import {NumberUtil} from '../../util/number.util';
     Button,
     ReactiveFormsModule,
     FormsModule,
-    Select
+    Select,
+    Splitter,
+    RouterLink,
+    FloatLabel
   ],
   templateUrl: './instance-selector.component.html'
 })
@@ -57,9 +62,5 @@ export class InstanceSelectorComponent {
     }
 
     this.router.navigate(['/home/workspace/' + instance.id]);
-  }
-
-  protected manage() {
-    this.router.navigate(['/home/instance/create']);
   }
 }

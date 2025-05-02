@@ -8,11 +8,14 @@ import {
 import {TableModule} from 'primeng/table';
 import Messages from '../../model/messages.model';
 import {ConfirmationComponent} from '../../component/confirmation/confirmation.component';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {first, of} from 'rxjs';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {NumberUtil} from '../../util/number.util';
+import {
+  ImportConfigurationPageHeaderSectionComponent
+} from "../../component/import-configuration-page-header-section/import-configuration-page-header-section.component";
 
 @Component({
   selector: 'import-configuration-page',
@@ -20,7 +23,8 @@ import {NumberUtil} from '../../util/number.util';
     Button,
     MessagesShowcaseComponent,
     TableModule,
-    ConfirmationComponent
+    ConfirmationComponent,
+    ImportConfigurationPageHeaderSectionComponent
   ],
   templateUrl: './import-configuration-page.component.html',
   styles: ``
@@ -28,7 +32,9 @@ import {NumberUtil} from '../../util/number.util';
 export class ImportConfigurationPageComponent {
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly importConfigurationService = inject(ImportConfigurationService);
+  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  protected readonly canGoBack = input<boolean>();
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly dataTypeId = input<string>();
   protected readonly instanceId = input.required<string>();
@@ -69,12 +75,10 @@ export class ImportConfigurationPageComponent {
   }
 
   protected manage(configuration?: ImportConfigurationJoined) {
-    this.router.navigate(
-      ['home/workspace/import-configuration/' + (configuration ? `${configuration.id}/edit` : 'create')]
-    );
+    this.router.navigate(['./' + (configuration ? `${configuration.id}/edit` : 'create')], {relativeTo: this.route});
   }
 
   protected preview(configuration: ImportConfigurationJoined) {
-    this.router.navigate([`home/workspace/import-configuration/${configuration.id}`]);
+    this.router.navigate([`./${configuration.id}`], {relativeTo: this.route});
   }
 }

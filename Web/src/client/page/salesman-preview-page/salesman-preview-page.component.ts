@@ -4,10 +4,15 @@ import {SalesmanService} from '../../service/salesman.service';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {NumberUtil} from '../../util/number.util';
 import {of} from 'rxjs';
+import {
+  SalesmanPageHeaderSectionComponent
+} from "../../component/salesman-page-header-section/salesman-page-header-section.component";
 
 @Component({
   selector: 'salesman-preview-page',
-  imports: [],
+  imports: [
+    SalesmanPageHeaderSectionComponent
+  ],
   templateUrl: './salesman-preview-page.component.html',
   styles: ``
 })

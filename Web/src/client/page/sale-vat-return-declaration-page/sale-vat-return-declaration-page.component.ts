@@ -27,6 +27,9 @@ import {
   VatReturnDeclarationPaymentComponent
 } from '../../component/vat-return-declaration-payment/vat-return-declaration-payment.component';
 import {SaleService} from '../../service/sale.service';
+import {
+  SalePageHeaderSectionComponent
+} from "../../component/sale-page-header-section/sale-page-header-section.component";
 
 @Component({
   selector: 'sale-vat-return-declaration-page',
@@ -43,7 +46,8 @@ import {SaleService} from '../../service/sale.service';
     VatReturnPaymentTableComponent,
     VatReturnDeclarationPaymentComponent,
     VatReturnDeclarationSubmissionComponent,
-    NgForOf
+    NgForOf,
+    SalePageHeaderSectionComponent
   ],
   templateUrl: './sale-vat-return-declaration-page.component.html',
   styles: ``

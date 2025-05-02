@@ -26,6 +26,9 @@ import {rxResource} from '@angular/core/rxjs-interop';
 import {TableModule} from 'primeng/table';
 import {FormInputErrorComponent} from '../../component/form-input-error/form-input-error.component';
 import {NumberUtil} from '../../util/number.util';
+import {
+  ImportConfigurationPageHeaderSectionComponent
+} from '../../component/import-configuration-page-header-section/import-configuration-page-header-section.component';
 
 @Component({
   selector: 'import-configuration-management-page',
@@ -38,7 +41,8 @@ import {NumberUtil} from '../../util/number.util';
     NgIf,
     MessagesShowcaseComponent,
     TableModule,
-    FormInputErrorComponent
+    FormInputErrorComponent,
+    ImportConfigurationPageHeaderSectionComponent
   ],
   templateUrl: './import-configuration-management-page.component.html',
   styles: ``

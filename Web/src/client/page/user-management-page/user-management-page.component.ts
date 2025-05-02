@@ -25,7 +25,6 @@ import {
 import {FloatLabel} from 'primeng/floatlabel';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
-import {IftaLabel} from 'primeng/iftalabel';
 import {Select} from 'primeng/select';
 import {DatePicker} from 'primeng/datepicker';
 
@@ -43,7 +42,6 @@ import {DatePicker} from 'primeng/datepicker';
     FloatLabel,
     IconField,
     InputIcon,
-    IftaLabel,
     Select,
     DatePicker
   ],

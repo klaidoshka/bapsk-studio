@@ -1,5 +1,5 @@
 import {Component, inject, input} from '@angular/core';
-import {DatePipe, NgIf} from "@angular/common";
+import {DatePipe} from "@angular/common";
 import {TableModule} from "primeng/table";
 import {getIsoCountryLabel} from '../../model/iso-country.model';
 import {getIdentityDocumentTypeLabel} from '../../model/identity-document-type.model';
@@ -7,13 +7,24 @@ import {rxResource} from '@angular/core/rxjs-interop';
 import {CustomerService} from '../../service/customer.service';
 import {of} from 'rxjs';
 import {NumberUtil} from '../../util/number.util';
+import {
+  CustomerPageHeaderSectionComponent
+} from '../../component/customer-page-header-section/customer-page-header-section.component';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {
+  FailedToLoadPleaseReloadComponent
+} from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
+import {CardComponent} from '../../component/card/card.component';
 
 @Component({
   selector: 'customer-preview-page',
   imports: [
     DatePipe,
-    NgIf,
-    TableModule
+    TableModule,
+    CustomerPageHeaderSectionComponent,
+    ProgressSpinner,
+    FailedToLoadPleaseReloadComponent,
+    CardComponent
   ],
   templateUrl: './customer-preview-page.component.html',
   styles: ``

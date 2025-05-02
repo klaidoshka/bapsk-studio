@@ -1,117 +1,185 @@
-<div class="min-w-128">
-  <messages-showcase [messages]="messages()"/>
+<div class="h-full w-full relative container mx-auto flex flex-col mb-8">
+  <customer-page-header-section [canGoBack]="true"/>
+  <card>
+    <p card-header>Create Customer</p>
+    <p card-subHeader>Fill in the form below to create a new customer or modify existing one.</p>
+    <form [formGroup]="form" card-body class="flex flex-col gap-4">
+      <card>
+        <p card-header>Details</p>
+        <div card-body class="flex flex-col gap-4">
+          <div class="flex flex-col gap-4 md:flex-row">
+            <!-- First Name -->
+            <div>
+              <p-floatlabel variant="on">
+                <p-iconfield>
+                  <p-inputicon class="pi pi-tag"/>
+                  <input pInputText id="firstName" formControlName="firstName" type="text"/>
+                </p-iconfield>
+                <label for="firstName">First Name</label>
+              </p-floatlabel>
+              <form-input-error [control]="form.controls.firstName"/>
+            </div>
 
-  <form [formGroup]="form" class="flex flex-col gap-4">
-    <div class="flex flex-col md:flex-row gap-4">
-      <div class="flex-1">
-        <label for="firstName" class="block text-sm font-medium">First Name</label>
-        <input formControlName="firstName" pInputText type="text" id="firstName" class="mt-1 block w-full"/>
-        <form-input-error [control]="form.controls.firstName"/>
-      </div>
+            <!-- Last Name -->
+            <div>
+              <p-floatlabel variant="on">
+                <p-iconfield>
+                  <p-inputicon class="pi pi-tag"/>
+                  <input pInputText id="lastName" formControlName="lastName" type="text"/>
+                </p-iconfield>
+                <label for="lastName">Last Name</label>
+              </p-floatlabel>
+              <form-input-error [control]="form.controls.lastName"/>
+            </div>
 
-      <div class="flex-1">
-        <label for="lastName" class="block text-sm font-medium">Last Name</label>
-        <input formControlName="lastName" pInputText type="text" id="lastName" class="mt-1 block w-full"/>
-        <form-input-error [control]="form.controls.lastName"/>
-      </div>
-    </div>
-
-    <div class="flex flex-col md:flex-row gap-4">
-      <div class="flex-1">
-        <label for="birthdate" class="block text-sm font-medium">Birthdate</label>
-        <p-datepicker inputId="birthdate" formControlName="birthdate" [showIcon]="true" variant="filled"
-                      inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-inherit!" class="mt-1 block w-fit"
-                      appendTo="body"/>
-        <form-input-error [control]="form.controls.birthdate"/>
-      </div>
-
-      <div class="flex-1">
-        <label for="email" class="block text-sm font-medium">Email</label>
-        <input type="email" id="email" formControlName="email" pInputText class="mt-1 block w-full"/>
-      </div>
-
-      <div class="flex-1">
-        <label for="residenceCountry" class="block text-sm font-medium">Residence Country</label>
-        <p-select inputId="residenceCountry" formControlName="residenceCountry" [options]="IsoCountries"
-                  optionLabel="name"
-                  optionValue="code" class="mt-1 block w-full" appendTo="body"/>
-        <form-input-error [control]="form.controls.residenceCountry"/>
-      </div>
-    </div>
-
-    <div formGroupName="identityDocument">
-      <div class="flex flex-col md:flex-row gap-4">
-        <div class="flex-1">
-          <label for="identityDocumentType" class="block text-sm font-medium">ID Type</label>
-          <p-select formControlName="type" [options]="identityDocumentTypes" optionValue="value" optionLabel="label"
-                    id="identityDocumentType" class="mt-1 block w-full"/>
-          <form-input-error [control]="form.controls.identityDocument.controls.type"/>
-        </div>
-
-        <div class="flex-1">
-          <label for="identityDocumentIssuedBy" class="block text-sm font-medium">ID Issued By</label>
-          <p-select inputId="issuedBy" formControlName="issuedBy" [options]="IsoCountries" optionLabel="name"
-                    optionValue="code"
-                    class="mt-1 block w-full" appendTo="body"/>
-          <form-input-error [control]="form.controls.identityDocument.controls.issuedBy"/>
-        </div>
-      </div>
-
-      <div class="flex flex-col mt-2 md:flex-row gap-4">
-        <div class="flex-1">
-          <label for="identityDocumentNumber" class="block text-sm font-medium">ID Number</label>
-          <input formControlName="number" pInputText type="text" id="identityDocumentNumber"
-                 class="mt-1 block w-full"/>
-          <form-input-error [control]="form.controls.identityDocument.controls.number"/>
-        </div>
-
-        <div class="flex-1">
-          <label for="identityDocumentValue" class="block text-sm font-medium">ID Value (Personal Code)</label>
-          <input formControlName="value" pInputText type="text" id="identityDocumentValue" class="mt-1 block w-full"/>
-          <form-input-error [control]="form.controls.identityDocument.controls.value"/>
-        </div>
-      </div>
-    </div>
-
-    <div formArrayName="otherDocuments" class="flex flex-col gap-4">
-      <label class="block text-sm font-medium">Other Documents</label>
-      <div *ngFor="let control of otherDocuments().controls; let i = index" [formGroupName]="i"
-           class="border border-surface-300 p-4 rounded-md shadow-md bg-surface">
-        <div class="flex flex-wrap gap-4">
-          <div class="flex-1 min-w-[150px]">
-            <label for="issuedBy" class="block text-sm font-medium">Issued By</label>
-            <p-select formControlName="issuedBy" [options]="IsoCountries" optionLabel="name" optionValue="code"
-                      class="mt-1 block w-full" appendTo="body"/>
-            <form-input-error [control]="control.controls.issuedBy"/>
+            <!-- Email -->
+            <div>
+              <p-floatlabel variant="on">
+                <p-iconfield>
+                  <p-inputicon class="pi pi-envelope"/>
+                  <input pInputText id="email" formControlName="email" type="email"/>
+                </p-iconfield>
+                <label for="email">Email</label>
+              </p-floatlabel>
+              <form-input-error [control]="form.controls.email"/>
+            </div>
           </div>
 
-          <div class="flex-1 min-w-[150px]">
-            <label for="type" class="block text-sm font-medium">Type</label>
-            <input formControlName="type" pInputText type="text" id="type" class="mt-1 block w-full"/>
-            <form-input-error [control]="control.controls.type"/>
-          </div>
+          <div class="flex flex-col md:flex-row gap-4">
+            <!-- Birthdate -->
+            <div class="w-fit">
+              <p-float-label variant="on" class="w-fit">
+                <p-date-picker icon="pi pi-calendar" iconDisplay="input" showIcon formControlName="birthdate" styleClass="min-w-60" inputId="birthdate" appendTo="body"/>
+                <label for="birthdate">Birthdate</label>
+              </p-float-label>
+              <form-input-error [control]="form.controls.birthdate"/>
+            </div>
 
-          <div class="flex-1 min-w-[150px]">
-            <label for="value" class="block text-sm font-medium">Value</label>
-            <input formControlName="value" pInputText type="text" id="value" class="mt-1 block w-full"/>
-            <form-input-error [control]="control.controls.value"/>
-          </div>
-
-          <div class="mt-3 flex justify-end">
-            <p-button label="Remove" (onClick)="removeOtherDocument(i)"/>
+            <!-- Residence Country -->
+            <div class="w-fit">
+              <p-float-label variant="on">
+                <p-select dropdownIcon="pi pi-globe" [options]="IsoCountries" formControlName="residenceCountry" optionLabel="name"
+                          optionValue="code" styleClass="min-w-60" appendTo="body"/>
+                <label for="residenceCountry">Residence Country</label>
+              </p-float-label>
+              <form-input-error [control]="form.controls.residenceCountry"/>
+            </div>
           </div>
         </div>
-      </div>
+      </card>
 
-      <!-- Add Button -->
-      <div class="mt-4">
-        <p-button label="Add Other Document" (onClick)="addOtherDocument()"/>
-      </div>
-    </div>
+      <!-- ID -->
+      <card>
+        <p card-header>Identity Document</p>
+        <div card-body formGroupName="identityDocument" class="flex flex-col gap-4">
+          <div class="flex flex-col md:flex-row gap-4">
+            <!-- ID Type -->
+            <div class="w-fit">
+              <p-float-label variant="on">
+                <p-select dropdownIcon="pi pi-objects-column" [options]="identityDocumentTypes" formControlName="type" optionLabel="label"
+                          optionValue="value" styleClass="min-w-60" appendTo="body"/>
+                <label for="type">Type</label>
+              </p-float-label>
+              <form-input-error [control]="form.controls.identityDocument.controls.type"/>
+            </div>
 
-    <div class="flex justify-end mt-4">
-      <p-button [label]="!customerId() ? 'Create' : 'Save'" [disabled]="form.invalid || !form.dirty" (onClick)="save()"
+            <!-- ID Issued By -->
+            <div class="w-fit">
+              <p-float-label variant="on">
+                <p-select dropdownIcon="pi pi-globe" [options]="IsoCountries" formControlName="issuedBy"
+                          optionLabel="name" optionValue="code" styleClass="min-w-60" appendTo="body"/>
+                <label for="issuedBy">Issued By</label>
+              </p-float-label>
+              <form-input-error [control]="form.controls.identityDocument.controls.issuedBy"/>
+            </div>
+
+            <!-- ID Number -->
+            <div class="w-fit">
+              <p-float-label variant="on">
+                <p-iconfield>
+                  <p-inputicon class="pi pi-hashtag"/>
+                  <input pInputText formControlName="number" type="text" id="number"/>
+                </p-iconfield>
+                <label for="number">Number</label>
+              </p-float-label>
+              <form-input-error [control]="form.controls.identityDocument.controls.number"/>
+            </div>
+
+            <!-- ID Value -->
+            <div class="w-fit">
+              <p-float-label variant="on">
+                <p-iconfield>
+                  <p-inputicon class="pi pi-code"/>
+                  <input pInputText formControlName="value" type="text" id="value"/>
+                </p-iconfield>
+                <label for="value">Value (Personal Code)</label>
+              </p-float-label>
+              <form-input-error [control]="form.controls.identityDocument.controls.value"/>
+            </div>
+          </div>
+        </div>
+      </card>
+
+      <!-- Other Documents  -->
+      <card>
+        <p card-header>Other Documents</p>
+        <p card-subHeader>These documents help customs determine whether customer's residence is not within EU
+          country.</p>
+        <div card-body formArrayName="otherDocuments" class="flex flex-col gap-4">
+          @for (control of form.controls.otherDocuments.controls; track $index; let i = $index) {
+            <div [formGroupName]="i">
+              <div class="flex flex-wrap gap-4">
+                <!-- Other ID Issued By -->
+                <div class="w-fit">
+                  <p-float-label variant="on">
+                    <p-select dropdownIcon="pi pi-globe" [options]="IsoCountries" formControlName="issuedBy"
+                              optionLabel="name" optionValue="code" styleClass="min-w-60" appendTo="body"/>
+                    <label for="issuedBy">Issued By</label>
+                  </p-float-label>
+                  <form-input-error [control]="control.controls.issuedBy"/>
+                </div>
+
+                <!-- Other ID Type -->
+                <div class="w-fit">
+                  <p-float-label variant="on">
+                    <p-iconfield>
+                      <p-inputicon class="pi pi-objects-column"/>
+                      <input pInputText formControlName="type" type="text" id="type"/>
+                    </p-iconfield>
+                    <label for="type">Type</label>
+                  </p-float-label>
+                  <form-input-error [control]="control.controls.type"/>
+                </div>
+
+                <!-- Other ID Value -->
+                <div class="w-fit">
+                  <p-float-label variant="on">
+                    <p-iconfield>
+                      <p-inputicon class="pi pi-code"/>
+                      <input pInputText formControlName="value" type="text" id="value"/>
+                    </p-iconfield>
+                    <label for="value">Value</label>
+                  </p-float-label>
+                  <form-input-error [control]="control.controls.value"/>
+                </div>
+
+                <!-- Remove Other ID Button -->
+                <div class="flex items-start">
+                  <p-button title="Remove" icon="pi pi-trash" variant="text" (onClick)="removeOtherDocument(i)"/>
+                </div>
+              </div>
+            </div>
+          }
+          <!-- Add Other ID Button -->
+          <div class="mt-4">
+            <p-button size="small" label="Add Other Document" (onClick)="addOtherDocument()"/>
+          </div>
+        </div>
+      </card>
+      <messages-showcase [messages]="messages()"/>
+      <p-button size="small" [label]="!customerId() ? 'Create' : 'Save'" [disabled]="form.invalid || !form.dirty"
+                (onClick)="save()"
                 type="submit"/>
-    </div>
-  </form>
+    </form>
+  </card>
 </div>

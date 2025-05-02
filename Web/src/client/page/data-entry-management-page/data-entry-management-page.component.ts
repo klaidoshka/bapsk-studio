@@ -22,6 +22,9 @@ import {FormInputErrorComponent} from '../../component/form-input-error/form-inp
 import {Button} from 'primeng/button';
 import {NumberUtil} from '../../util/number.util';
 import {DataTypeService} from '../../service/data-type.service';
+import {
+  DataEntryPageHeaderSectionComponent
+} from '../../component/data-entry-page-header-section/data-entry-page-header-section.component';
 
 @Component({
   selector: 'data-entry-management-page',
@@ -31,7 +34,8 @@ import {DataTypeService} from '../../service/data-type.service';
     Select,
     DataTypeEntryFieldInputComponent,
     FormInputErrorComponent,
-    Button
+    Button,
+    DataEntryPageHeaderSectionComponent
   ],
   templateUrl: './data-entry-management-page.component.html',
   styles: ``

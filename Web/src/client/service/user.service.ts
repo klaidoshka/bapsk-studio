@@ -1,6 +1,12 @@
 import {inject, Injectable, signal} from '@angular/core';
 import {ApiRouter} from './api-router.service';
-import {toUserIdentity, User, UserCreateRequest, UserEditRequest, UserIdentity} from '../model/user.model';
+import {
+  toUserIdentity,
+  User,
+  UserCreateRequest,
+  UserEditRequest,
+  UserIdentity
+} from '../model/user.model';
 import {first, map, Observable, of, switchMap, tap} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {EnumUtil} from '../util/enum.util';

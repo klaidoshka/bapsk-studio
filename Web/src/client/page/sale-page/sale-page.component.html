@@ -1,35 +1,38 @@
-<confirmation [key]='"sale-delete-confirmation"' [header]='"Are you sure about deleting this sale?"'/>
-<messages-showcase [messages]="messages()"/>
-<p-button styleClass="mt-4" label="Create" icon="pi pi-plus" type="button" (onClick)="manage()"/>
+<div class="h-full w-full relative container mx-auto flex flex-col mb-8">
+  <sale-page-header-section/>
+  <confirmation [key]='"sale-delete-confirmation"' [header]='"Are you sure about deleting this sale?"'/>
+  <messages-showcase [messages]="messages()"/>
+  <p-button styleClass="mt-4" label="Create" icon="pi pi-plus" type="button" (onClick)="manage()"/>
 
-<div class="card mt-4">
-  <p-table styleClass="w-fit shadow-lg mt-2 dark:bg-primary-950! bg-primary-50!"
-           paginatorStyleClass="dark:bg-primary-950! bg-primary-50!" [value]="sales.value() || []" [paginator]="true"
-           [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
-    <ng-template #header>
-      <tr>
-        <th>Customer</th>
-        <th>Salesman</th>
-        <th>Sale Date</th>
-        <th>Sold Goods</th>
-        <th>Total Price</th>
-        <th></th>
-      </tr>
-    </ng-template>
-    <ng-template #body let-sale>
-      <tr>
-        <td>{{ toCustomerFullName(sale.customer) }}</td>
-        <td>{{ sale.salesman.name }}</td>
-        <td>{{ sale.date | date:'medium' }}</td>
-        <td>{{ sale.soldGoods.length }} good(s)</td>
-        <td>{{ getTotalPrice(sale.soldGoods) | currency:'EUR':'symbol':'1.2-2' }}</td>
-        <td class="flex flex-nowrap items-center">
-          <p-button icon="pi pi-eye" type="button" variant="text" (onClick)="preview(sale)"/>
-          <p-button icon="pi pi-book" type="button" variant="text" (onClick)="vatReturnDeclaration(sale)"/>
-          <p-button icon="pi pi-pencil" type="button" variant="text" (onClick)="manage(sale)"/>
-          <p-button icon="pi pi-trash" type="button" variant="text" (onClick)="delete(sale)"/>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+  <div class="card mt-4">
+    <p-table styleClass="w-fit shadow-lg mt-2 dark:bg-primary-950! bg-primary-50!"
+             paginatorStyleClass="dark:bg-primary-950! bg-primary-50!" [value]="sales.value() || []" [paginator]="true"
+             [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+      <ng-template #header>
+        <tr>
+          <th>Customer</th>
+          <th>Salesman</th>
+          <th>Sale Date</th>
+          <th>Sold Goods</th>
+          <th>Total Price</th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-sale>
+        <tr>
+          <td>{{ toCustomerFullName(sale.customer) }}</td>
+          <td>{{ sale.salesman.name }}</td>
+          <td>{{ sale.date | date:'medium' }}</td>
+          <td>{{ sale.soldGoods.length }} good(s)</td>
+          <td>{{ getTotalPrice(sale.soldGoods) | currency:'EUR':'symbol':'1.2-2' }}</td>
+          <td class="flex flex-nowrap items-center">
+            <p-button icon="pi pi-eye" type="button" variant="text" (onClick)="preview(sale)"/>
+            <p-button icon="pi pi-book" type="button" variant="text" (onClick)="vatReturnDeclaration(sale)"/>
+            <p-button icon="pi pi-pencil" type="button" variant="text" (onClick)="manage(sale)"/>
+            <p-button icon="pi pi-trash" type="button" variant="text" (onClick)="delete(sale)"/>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
 </div>

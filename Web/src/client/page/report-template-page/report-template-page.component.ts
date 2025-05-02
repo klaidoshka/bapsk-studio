@@ -1,6 +1,6 @@
 import {Component, inject, input, signal, viewChild} from '@angular/core';
 import {ReportTemplateService} from '../../service/report-template.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {ConfirmationComponent} from '../../component/confirmation/confirmation.component';
 import Messages from '../../model/messages.model';
 import {rxResource} from '@angular/core/rxjs-interop';
@@ -12,6 +12,9 @@ import {
 } from '../../component/messages-showcase/messages-showcase.component';
 import {TableModule} from 'primeng/table';
 import {NumberUtil} from '../../util/number.util';
+import {
+  ReportTemplatePageHeaderSectionComponent
+} from '../../component/report-template-page-header-section/report-template-page-header-section.component';
 
 @Component({
   selector: 'report-template-page',
@@ -19,15 +22,18 @@ import {NumberUtil} from '../../util/number.util';
     Button,
     ConfirmationComponent,
     MessagesShowcaseComponent,
-    TableModule
+    TableModule,
+    ReportTemplatePageHeaderSectionComponent
   ],
   templateUrl: './report-template-page.component.html',
   styles: ``
 })
 export class ReportTemplatePageComponent {
-  private reportTemplateService = inject(ReportTemplateService);
-  private router = inject(Router);
+  private readonly reportTemplateService = inject(ReportTemplateService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   protected readonly getDataTypesCount = getDataTypesCount;
+  protected readonly canGoBack = input<boolean>();
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly dataTypeId = input<string>();
   protected readonly instanceId = input.required<string>();
@@ -63,12 +69,10 @@ export class ReportTemplatePageComponent {
   }
 
   protected manage(template?: ReportTemplate) {
-    this.router.navigate(
-      ['home/workspace/report-template/' + (template ? `${template.id}/edit` : 'create')]
-    );
+    this.router.navigate(['./' + (template ? `${template.id}/edit` : 'create')], {relativeTo: this.route});
   }
 
   protected preview(template: ReportTemplate) {
-    this.router.navigate([`home/workspace/report-template/${template.id}`]);
+    this.router.navigate([`./${template.id}`], {relativeTo: this.route});
   }
 }

@@ -19,7 +19,6 @@ import {CardComponent} from '../card/card.component';
 import {FloatLabel} from 'primeng/floatlabel';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
-import {IftaLabel} from 'primeng/iftalabel';
 import {Select} from 'primeng/select';
 
 @Component({
@@ -36,7 +35,6 @@ import {Select} from 'primeng/select';
     FloatLabel,
     IconField,
     InputIcon,
-    IftaLabel,
     Select
   ],
   templateUrl: './profile-management.component.html',

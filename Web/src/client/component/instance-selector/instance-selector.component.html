@@ -1,11 +1,12 @@
-@switch (instances.value()?.length) {
-  @case (0) {
-    <p-button label="Create Instance" icon="pi pi-plus" styleClass="w-42 h-8 text-center" (onClick)="manage()"/>
-  }
-  @default {
-    @if (selectedInstance() !== undefined) {
-      <p-select (onChange)="onChange($event.value)" [options]="instances.value() || []" optionLabel="name"
-                [ngModel]="selectedInstance()" placeholder="Select an instance" class="w-48"/>
-    }
-  }
-}
+<div class="flex flex-col gap-4 p-4">
+  <p-float-label variant="on">
+    <p-select dropdownIcon="pi pi-home" (onChange)="onChange($event.value)" [options]="instances.value() || []" optionLabel="name"
+              [ngModel]="selectedInstance()" styleClass="min-w-60" appendTo="body"/>
+    <label for="instance">Workspace (Instance)</label>
+  </p-float-label>
+  <p-splitter/>
+  <div class="flex flex-col gap-1">
+    <p-button label="Create Instance" styleClass="w-full" routerLink="/home/instance/create" size="small"/>
+    <p-button label="Exit Workspace" styleClass="w-full" routerLink="/home" size="small" severity="danger"/>
+  </div>
+</div>

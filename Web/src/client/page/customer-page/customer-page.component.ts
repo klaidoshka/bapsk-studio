@@ -13,9 +13,13 @@ import Messages from '../../model/messages.model';
 import {first, of} from 'rxjs';
 import {getIdentityDocumentTypeLabel} from '../../model/identity-document-type.model';
 import {getIsoCountryLabel} from '../../model/iso-country.model';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {NumberUtil} from '../../util/number.util';
+import {
+  CustomerPageHeaderSectionComponent
+} from '../../component/customer-page-header-section/customer-page-header-section.component';
+import {CardComponent} from '../../component/card/card.component';
 
 @Component({
   selector: 'customer-page',
@@ -24,7 +28,9 @@ import {NumberUtil} from '../../util/number.util';
     ConfirmationComponent,
     DatePipe,
     MessagesShowcaseComponent,
-    TableModule
+    TableModule,
+    CustomerPageHeaderSectionComponent,
+    CardComponent
   ],
   templateUrl: './customer-page.component.html',
   styles: ``
@@ -32,6 +38,7 @@ import {NumberUtil} from '../../util/number.util';
 export class CustomerPageComponent {
   private readonly customerService = inject(CustomerService);
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   protected readonly getIdentityDocumentTypeLabel = getIdentityDocumentTypeLabel;
   protected readonly getIsoCountryLabel = getIsoCountryLabel;
@@ -59,12 +66,10 @@ export class CustomerPageComponent {
   }
 
   protected manage(customer?: Customer) {
-    this.router.navigate(
-      ['home/workspace/customer/' + (customer ? `${customer}/edit` : 'create')]
-    );
+    this.router.navigate(['./' + (customer ? `${customer.id}/edit` : 'create')], {relativeTo: this.route});
   }
 
   protected preview(customer: Customer) {
-    this.router.navigate(['home/workspace/customer/' + customer.id]);
+    this.router.navigate(['./' + customer.id], {relativeTo: this.route});
   }
 }

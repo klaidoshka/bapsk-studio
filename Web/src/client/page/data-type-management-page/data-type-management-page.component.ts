@@ -32,6 +32,9 @@ import {Checkbox} from 'primeng/checkbox';
 import {Button} from 'primeng/button';
 import {NgIf} from '@angular/common';
 import {NumberUtil} from '../../util/number.util';
+import {
+  DataTypePageHeaderSectionComponent
+} from '../../component/data-type-page-header-section/data-type-page-header-section.component';
 
 @Component({
   selector: 'data-type-management-page',
@@ -43,7 +46,8 @@ import {NumberUtil} from '../../util/number.util';
     DataTypeEntryFieldInputComponent,
     Checkbox,
     Button,
-    NgIf
+    NgIf,
+    DataTypePageHeaderSectionComponent
   ],
   templateUrl: './data-type-management-page.component.html',
   styles: ``

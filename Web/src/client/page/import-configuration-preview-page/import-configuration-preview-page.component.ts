@@ -12,6 +12,9 @@ import {FieldType} from '../../model/data-type-field.model';
 import {DateUtil} from '../../util/date.util';
 import {NumberUtil} from '../../util/number.util';
 import {of} from 'rxjs';
+import {
+  ImportConfigurationPageHeaderSectionComponent
+} from "../../component/import-configuration-page-header-section/import-configuration-page-header-section.component";
 
 @Component({
   selector: 'import-configuration-preview-page',
@@ -19,7 +22,8 @@ import {of} from 'rxjs';
     TableModule,
     Card,
     NgIf,
-    DataTypeEntryFieldDisplayComponent
+    DataTypeEntryFieldDisplayComponent,
+    ImportConfigurationPageHeaderSectionComponent
   ],
   templateUrl: './import-configuration-preview-page.component.html',
   styles: ``

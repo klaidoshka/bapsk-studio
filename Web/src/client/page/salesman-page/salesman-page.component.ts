@@ -6,7 +6,7 @@ import Messages from '../../model/messages.model';
 import Salesman from '../../model/salesman.model';
 import {getIsoCountryLabel} from '../../model/iso-country.model';
 import {first, of} from 'rxjs';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {Button} from 'primeng/button';
 import {TableModule} from 'primeng/table';
@@ -14,6 +14,9 @@ import {
   MessagesShowcaseComponent
 } from '../../component/messages-showcase/messages-showcase.component';
 import {NumberUtil} from '../../util/number.util';
+import {
+  SalesmanPageHeaderSectionComponent
+} from "../../component/salesman-page-header-section/salesman-page-header-section.component";
 
 @Component({
   selector: 'salesman-page',
@@ -21,13 +24,15 @@ import {NumberUtil} from '../../util/number.util';
     Button,
     TableModule,
     ConfirmationComponent,
-    MessagesShowcaseComponent
+    MessagesShowcaseComponent,
+    SalesmanPageHeaderSectionComponent
   ],
   templateUrl: './salesman-page.component.html',
   styles: ``
 })
 export class SalesmanPageComponent {
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly salesmanService = inject(SalesmanService);
   protected readonly getCountryLabel = getIsoCountryLabel;
@@ -55,10 +60,10 @@ export class SalesmanPageComponent {
   }
 
   protected manage(salesman?: Salesman) {
-    this.router.navigate(['/home/workspace/salesman/' + (salesman ? `${salesman.id}/edit` : 'create')]);
+    this.router.navigate(['./' + (salesman ? `${salesman.id}/edit` : 'create')], {relativeTo: this.route});
   }
 
   protected preview(salesman: Salesman) {
-    this.router.navigate(['/home/workspace/salesman/' + salesman.id]);
+    this.router.navigate(['./' + salesman.id], {relativeTo: this.route});
   }
 }

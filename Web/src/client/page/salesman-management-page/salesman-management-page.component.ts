@@ -15,6 +15,9 @@ import Messages from '../../model/messages.model';
 import {first, of, tap} from 'rxjs';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {NumberUtil} from '../../util/number.util';
+import {
+  SalesmanPageHeaderSectionComponent
+} from '../../component/salesman-page-header-section/salesman-page-header-section.component';
 
 @Component({
   selector: 'salesman-management-page',
@@ -25,7 +28,8 @@ import {NumberUtil} from '../../util/number.util';
     InputText,
     MessagesShowcaseComponent,
     ReactiveFormsModule,
-    Select
+    Select,
+    SalesmanPageHeaderSectionComponent
   ],
   templateUrl: './salesman-management-page.component.html',
   styles: ``

@@ -25,6 +25,9 @@ import {
 } from './standard-measurement.model';
 import {CustomerService} from '../../service/customer.service';
 import {SalesmanService} from '../../service/salesman.service';
+import {
+  SalePageHeaderSectionComponent
+} from "../../component/sale-page-header-section/sale-page-header-section.component";
 
 @Component({
   selector: 'sale-management-page',
@@ -38,7 +41,8 @@ import {SalesmanService} from '../../service/salesman.service';
     NgForOf,
     NgIf,
     ReactiveFormsModule,
-    Select
+    Select,
+    SalePageHeaderSectionComponent
   ],
   templateUrl: './sale-management-page.component.html',
   styles: ``

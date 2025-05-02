@@ -1,6 +1,5 @@
-<div class="h-full w-fit flex flex-col p-4 mx-auto">
-  <h1 class="text-2xl font-bold mb-4">Import Configuration</h1>
-
+<div class="h-full w-full relative container mx-auto flex flex-col mb-8">
+  <import-configuration-page-header-section [canGoBack]="true"/>
   <ng-container *ngIf="configuration.hasValue()">
     @let value = configuration.value()!;
 

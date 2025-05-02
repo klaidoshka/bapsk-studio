@@ -94,6 +94,232 @@ import {
   SaleVatReturnDeclarationPageComponent
 } from '../page/sale-vat-return-declaration-page/sale-vat-return-declaration-page.component';
 import {AdminPageComponent} from '../page/admin-page/admin-page.component';
+import {HomePageComponent} from '../page/home-page/home-page.component';
+
+const authRoutes: Routes = [
+  {
+    path: "login",
+    title: "Bapsk - Login",
+    loadComponent: () => LoginComponent
+  },
+  {
+    path: "register",
+    title: "Bapsk - Register",
+    loadComponent: () => RegisterComponent
+  }
+];
+
+const adminUserRoutes: Routes = [
+  {
+    path: "",
+    pathMatch: "full",
+    loadComponent: () => UserPageComponent
+  },
+  {
+    path: "create",
+    loadComponent: () => UserManagementPageComponent
+  },
+  {
+    path: ":userId/edit",
+    loadComponent: () => UserManagementPageComponent
+  },
+  {
+    path: ":userId",
+    loadComponent: () => UserPreviewPageComponent
+  }
+];
+
+const customerRoutes: Routes = [
+  {
+    path: "",
+    pathMatch: "full",
+    loadComponent: () => CustomerPageComponent
+  },
+  {
+    path: "create",
+    loadComponent: () => CustomerManagementPageComponent
+  },
+  {
+    path: ":customerId/edit",
+    loadComponent: () => CustomerManagementPageComponent
+  },
+  {
+    path: ":customerId",
+    loadComponent: () => CustomerPreviewPageComponent
+  }
+];
+
+const dataEntryRoutes: Routes = [
+  {
+    path: "",
+    pathMatch: "full",
+    loadComponent: () => DataEntryPageComponent
+  },
+  {
+    path: "create",
+    loadComponent: () => DataEntryManagementPageComponent
+  },
+  {
+    path: ":dataEntryId/edit",
+    loadComponent: () => DataEntryManagementPageComponent
+  },
+  {
+    path: ":dataEntryId",
+    loadComponent: () => DataEntryPreviewPageComponent
+  }
+];
+
+const dataTypeRoutes: Routes = [
+  {
+    path: "",
+    pathMatch: "full",
+    loadComponent: () => DataTypePageComponent
+  },
+  {
+    path: "create",
+    loadComponent: () => DataTypeManagementPageComponent
+  },
+  {
+    path: ":dataTypeId/edit",
+    loadComponent: () => DataTypeManagementPageComponent
+  },
+  {
+    path: ":dataTypeId",
+    loadComponent: () => DataTypePreviewPageComponent
+  },
+  {
+    path: ":dataTypeId",
+    loadChildren: () => [
+      {
+        path: "import-configuration",
+        title: "Bapsk - Import Configuration",
+        loadChildren: () => importConfigurationRoutes
+      },
+      {
+        path: "report-template",
+        title: "Bapsk - Report Template",
+        loadChildren: () => reportTemplateRoutes
+      }
+    ]
+  }
+];
+
+const importConfigurationRoutes: Routes = [
+  {
+    path: "",
+    pathMatch: "full",
+    loadComponent: () => ImportConfigurationPageComponent
+  },
+  {
+    path: "create",
+    loadComponent: () => ImportConfigurationManagementPageComponent
+  },
+  {
+    path: ":configurationId/edit",
+    loadComponent: () => ImportConfigurationManagementPageComponent
+  },
+  {
+    path: ":configurationId",
+    loadComponent: () => ImportConfigurationPreviewPageComponent
+  }
+];
+
+const instanceRoutes: Routes = [
+  {
+    path: "",
+    pathMatch: "full",
+    loadComponent: () => InstancePageComponent
+  },
+  {
+    path: "create",
+    loadComponent: () => InstanceManagementPageComponent
+  },
+  {
+    path: ":instanceId/edit",
+    loadComponent: () => InstanceManagementPageComponent
+  },
+  {
+    path: ":instanceId",
+    loadComponent: () => InstancePreviewPageComponent
+  }
+];
+
+const miscRoutes: Routes = [
+  {
+    path: "declaration-preview",
+    title: "Bapsk - Declaration Preview",
+    loadComponent: () => DeclarationPreviewPageComponent
+  },
+  {
+    path: "report-preview",
+    title: "Bapsk - Report Preview",
+    loadComponent: () => ReportPreviewPageComponent
+  }
+];
+
+const reportTemplateRoutes: Routes = [
+  {
+    path: "",
+    pathMatch: "full",
+    loadComponent: () => ReportTemplatePageComponent
+  },
+  {
+    path: "create",
+    loadComponent: () => ReportTemplateManagementPageComponent
+  },
+  {
+    path: ":templateId/edit",
+    loadComponent: () => ReportTemplateManagementPageComponent
+  },
+  {
+    path: ":templateId",
+    loadComponent: () => ReportTemplatePreviewPageComponent
+  }
+];
+
+const salesmanRoutes: Routes = [
+  {
+    path: "",
+    pathMatch: "full",
+    loadComponent: () => SalesmanPageComponent
+  },
+  {
+    path: "create",
+    loadComponent: () => SalesmanManagementPageComponent
+  },
+  {
+    path: ":salesmanId/edit",
+    loadComponent: () => SalesmanManagementPageComponent
+  },
+  {
+    path: ":salesmanId",
+    loadComponent: () => SalesmanPreviewPageComponent
+  }
+];
+
+const saleRoutes: Routes = [
+  {
+    path: "",
+    pathMatch: "full",
+    loadComponent: () => SalePageComponent
+  },
+  {
+    path: "create",
+    loadComponent: () => SaleManagementPageComponent
+  },
+  {
+    path: ":saleId/edit",
+    loadComponent: () => SaleManagementPageComponent
+  },
+  {
+    path: ":saleId/vat-return-declaration",
+    loadComponent: () => SaleVatReturnDeclarationPageComponent
+  },
+  {
+    path: ":saleId",
+    loadComponent: () => SalePreviewPageComponent
+  }
+];
 
 export const routes: Routes = [
   {
@@ -101,18 +327,7 @@ export const routes: Routes = [
     canActivate: [AnonymousOnlyGuard],
     canActivateChild: [AnonymousOnlyChildGuard],
     loadComponent: () => AuthPageComponent,
-    loadChildren: () => [
-      {
-        path: "login",
-        title: "Bapsk - Login",
-        loadComponent: () => LoginComponent
-      },
-      {
-        path: "register",
-        title: "Bapsk - Register",
-        loadComponent: () => RegisterComponent
-      }
-    ]
+    loadChildren: () => authRoutes
   },
   {
     path: "home",
@@ -121,6 +336,11 @@ export const routes: Routes = [
     canActivateChild: [AuthenticatedOnlyChildGuard],
     loadComponent: () => AuthenticatedLayoutComponent,
     loadChildren: () => [
+      {
+        path: "",
+        pathMatch: "full",
+        loadComponent: () => HomePageComponent
+      },
       {
         path: "admin",
         title: "Bapsk - Admin",
@@ -136,50 +356,14 @@ export const routes: Routes = [
           {
             path: "user",
             title: "Bapsk - User",
-            loadChildren: () => [
-              {
-                path: "",
-                pathMatch: "full",
-                loadComponent: () => UserPageComponent
-              },
-              {
-                path: "create",
-                loadComponent: () => UserManagementPageComponent
-              },
-              {
-                path: ":userId/edit",
-                loadComponent: () => UserManagementPageComponent
-              },
-              {
-                path: ":userId",
-                loadComponent: () => UserPreviewPageComponent
-              }
-            ]
+            loadChildren: () => adminUserRoutes
           }
         ]
       },
       {
         path: "instance",
         title: "Bapsk - Instance",
-        loadChildren: () => [
-          {
-            path: "",
-            pathMatch: "full",
-            loadComponent: () => InstancePageComponent
-          },
-          {
-            path: "create",
-            loadComponent: () => InstanceManagementPageComponent
-          },
-          {
-            path: ":instanceId/edit",
-            loadComponent: () => InstanceManagementPageComponent
-          },
-          {
-            path: ":instanceId",
-            loadComponent: () => InstancePreviewPageComponent
-          }
-        ]
+        loadChildren: () => instanceRoutes
       },
       {
         path: "profile",
@@ -199,71 +383,17 @@ export const routes: Routes = [
           {
             path: "customer",
             title: "Bapsk - Customer",
-            loadChildren: () => [
-              {
-                path: "",
-                pathMatch: "full",
-                loadComponent: () => CustomerPageComponent
-              },
-              {
-                path: "create",
-                loadComponent: () => CustomerManagementPageComponent
-              },
-              {
-                path: ":customerId/edit",
-                loadComponent: () => CustomerManagementPageComponent
-              },
-              {
-                path: ":customerId",
-                loadComponent: () => CustomerPreviewPageComponent
-              }
-            ]
+            loadChildren: () => customerRoutes
           },
           {
             path: "data-entry",
             title: "Bapsk - Data Entry",
-            loadChildren: () => [
-              {
-                path: "",
-                pathMatch: "full",
-                loadComponent: () => DataEntryPageComponent
-              },
-              {
-                path: "create",
-                loadComponent: () => DataEntryManagementPageComponent
-              },
-              {
-                path: ":dataEntryId/edit",
-                loadComponent: () => DataEntryManagementPageComponent
-              },
-              {
-                path: ":dataEntryId",
-                loadComponent: () => DataEntryPreviewPageComponent
-              }
-            ]
+            loadChildren: () => dataEntryRoutes
           },
           {
             path: "data-type",
             title: "Bapsk - Data Type",
-            loadChildren: () => [
-              {
-                path: "",
-                pathMatch: "full",
-                loadComponent: () => DataTypePageComponent
-              },
-              {
-                path: "create",
-                loadComponent: () => DataTypeManagementPageComponent
-              },
-              {
-                path: ":dataTypeId/edit",
-                loadComponent: () => DataTypeManagementPageComponent
-              },
-              {
-                path: ":dataTypeId",
-                loadComponent: () => DataTypePreviewPageComponent
-              }
-            ]
+            loadChildren: () => dataTypeRoutes
           },
           {
             path: "generate-report",
@@ -273,98 +403,22 @@ export const routes: Routes = [
           {
             path: "import-configuration",
             title: "Bapsk - Import Configuration",
-            loadChildren: () => [
-              {
-                path: "",
-                pathMatch: "full",
-                loadComponent: () => ImportConfigurationPageComponent
-              },
-              {
-                path: "create",
-                loadComponent: () => ImportConfigurationManagementPageComponent
-              },
-              {
-                path: ":configurationId/edit",
-                loadComponent: () => ImportConfigurationManagementPageComponent
-              },
-              {
-                path: ":configurationId",
-                loadComponent: () => ImportConfigurationPreviewPageComponent
-              }
-            ]
+            loadChildren: () => importConfigurationRoutes
           },
           {
             path: "report-template",
             title: "Bapsk - Report Template",
-            loadChildren: () => [
-              {
-                path: "",
-                pathMatch: "full",
-                loadComponent: () => ReportTemplatePageComponent
-              },
-              {
-                path: "create",
-                loadComponent: () => ReportTemplateManagementPageComponent
-              },
-              {
-                path: ":templateId/edit",
-                loadComponent: () => ReportTemplateManagementPageComponent
-              },
-              {
-                path: ":templateId",
-                loadComponent: () => ReportTemplatePreviewPageComponent
-              }
-            ]
+            loadChildren: () => reportTemplateRoutes
           },
           {
             path: "sale",
             title: "Bapsk - Sale",
-            loadChildren: () => [
-              {
-                path: "",
-                pathMatch: "full",
-                loadComponent: () => SalePageComponent
-              },
-              {
-                path: "create",
-                loadComponent: () => SaleManagementPageComponent
-              },
-              {
-                path: ":saleId/edit",
-                loadComponent: () => SaleManagementPageComponent
-              },
-              {
-                path: ":saleId/vat-return-declaration",
-                loadComponent: () => SaleVatReturnDeclarationPageComponent
-              },
-              {
-                path: ":saleId",
-                loadComponent: () => SalePreviewPageComponent
-              }
-            ]
+            loadChildren: () => saleRoutes
           },
           {
             path: "salesman",
             title: "Bapsk - Salesman",
-            loadChildren: () => [
-              {
-                path: "",
-                pathMatch: "full",
-                loadComponent: () => SalesmanPageComponent
-              },
-              {
-                path: "create",
-                loadComponent: () => SalesmanManagementPageComponent
-              },
-              {
-                path: ":salesmanId/edit",
-                loadComponent: () => SalesmanManagementPageComponent
-              },
-              {
-                path: ":salesmanId",
-                loadComponent: () => SalesmanPreviewPageComponent
-              }
-            ]
+            loadChildren: () => salesmanRoutes
           }
         ]
       }
@@ -373,18 +427,7 @@ export const routes: Routes = [
   {
     path: "misc",
     loadComponent: () => MiscLayoutComponent,
-    loadChildren: () => [
-      {
-        path: "declaration-preview",
-        title: "Bapsk - Declaration Preview",
-        loadComponent: () => DeclarationPreviewPageComponent
-      },
-      {
-        path: "report-preview",
-        title: "Bapsk - Report Preview",
-        loadComponent: () => ReportPreviewPageComponent
-      }
-    ]
+    loadChildren: () => miscRoutes
   },
   {
     path: "auth/reset-password",

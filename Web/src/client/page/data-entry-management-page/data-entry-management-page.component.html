@@ -1,6 +1,6 @@
-<div class="min-w-128">
+<div class="h-full w-full relative container mx-auto flex flex-col mb-8">
+  <data-entry-page-header-section [canGoBack]="true"/>
   <messages-showcase [messages]="messages()"/>
-
   <form class="grid grid-cols-1 gap-4" [formGroup]="form">
     @for (field of formFields; track $index) {
       @let isReferenceField = field.type === FieldType.Reference;

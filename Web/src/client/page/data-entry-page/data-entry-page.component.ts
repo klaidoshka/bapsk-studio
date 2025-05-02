@@ -9,7 +9,7 @@ import {Dialog} from 'primeng/dialog';
 import {
   MessagesShowcaseComponent
 } from '../../component/messages-showcase/messages-showcase.component';
-import {Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {DataEntryService} from '../../service/data-entry.service';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import DataEntry, {DataEntryJoined} from '../../model/data-entry.model';
@@ -18,6 +18,9 @@ import {first, of} from 'rxjs';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {DataTypeService} from '../../service/data-type.service';
 import {NumberUtil} from '../../util/number.util';
+import {
+  DataEntryPageHeaderSectionComponent
+} from '../../component/data-entry-page-header-section/data-entry-page-header-section.component';
 
 @Component({
   selector: 'data-entry-page',
@@ -28,7 +31,8 @@ import {NumberUtil} from '../../util/number.util';
     DataEntryTableComponent,
     Dialog,
     MessagesShowcaseComponent,
-    RouterLink
+    RouterLink,
+    DataEntryPageHeaderSectionComponent
   ],
   templateUrl: './data-entry-page.component.html',
   styles: ``
@@ -37,6 +41,7 @@ export class DataEntryPageComponent {
   private readonly dataEntryService = inject(DataEntryService);
   private readonly dataTypeService = inject(DataTypeService);
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly dataTypeId = input.required<string>();
@@ -78,9 +83,7 @@ export class DataEntryPageComponent {
   }
 
   protected manage(dataEntry?: DataEntry) {
-    this.router.navigate(
-      ['home/workspace/data-entry/' + (dataEntry ? `${dataEntry}/edit` : 'create')]
-    );
+    this.router.navigate([`./` + (dataEntry ? `${dataEntry.id}/edit` : 'create')], {relativeTo: this.route});
   }
 
   protected onDelete = (entry: DataEntryJoined) => this.delete(entry);
@@ -88,6 +91,6 @@ export class DataEntryPageComponent {
   protected onPreview = (entry: DataEntryJoined) => this.preview(entry);
 
   protected preview(dataEntry: DataEntryJoined) {
-    this.router.navigate(['home/workspace/data-entry/' + dataEntry.id]);
+    this.router.navigate([`./` + dataEntry.id], {relativeTo: this.route});
   }
 }

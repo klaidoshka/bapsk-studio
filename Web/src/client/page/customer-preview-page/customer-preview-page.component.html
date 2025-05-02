@@ -1,48 +1,82 @@
-@if (customer.isLoading()) {
-  <p>Loading...</p>
-} @else if (!customer.value()) {
-  <p>Unknown customer value</p>
-} @else {
-  @let customerValue = customer.value()!;
+<div class="h-full w-full relative container mx-auto flex flex-col mb-8">
+  <customer-page-header-section [canGoBack]="true"/>
+  @if (customer.isLoading()) {
+    <p-progress-spinner/>
+  } @else if (!customer.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    @let customerValue = customer.value()!;
+    <card>
+      <p card-header>Customer</p>
+      <card card-body>
+        <p card-header>Details</p>
+        <div card-body class="flex flex-col gap-4">
+          <div class="flex flex-col gap-2">
+            <div class="flex flex-row">
+              <p class="font-semibold mr-2">First Name</p>
+              <p>{{ customerValue.firstName }}</p>
+            </div>
 
-  <p class="font-bold">First Name</p>
-  <p>{{ customerValue.firstName }}</p>
+            <div class="flex flex-row">
+              <p class="font-semibold mr-2">Last Name</p>
+              <p>{{ customerValue.lastName }}</p>
+            </div>
 
-  <p class="font-bold mt-4">Last Name</p>
-  <p>{{ customerValue.lastName }}</p>
+            <div class="flex flex-row">
+              <p class="font-semibold mr-2">Email</p>
+              <p>{{ customerValue.email }}</p>
+            </div>
 
-  <p class="font-bold mt-4">Email</p>
-  <p>{{ customerValue.email }}</p>
+            <div class="flex flex-row">
+              <p class="font-semibold mr-2">Birthdate</p>
+              <p>{{ customerValue.birthdate | date:'mediumDate' }}</p>
+            </div>
 
-  <p class="font-bold mt-4">Birthdate</p>
-  <p>{{ customerValue.birthdate | date:'mediumDate' }}</p>
+            <div class="flex flex-row">
+              <p class="font-semibold mr-2">Residence Country</p>
+              <p>{{ getIsoCountryLabel(customerValue.residenceCountry) }}</p>
+            </div>
+          </div>
 
-  <p class="font-bold mt-4">Residence Country</p>
-  <p>{{ getIsoCountryLabel(customerValue.residenceCountry) }}</p>
-
-  <p class="font-bold mt-4">Identity Document</p>
-  <p>Issued By: {{ getCountryName(customerValue.identityDocument!.issuedBy) }}</p>
-  <p>Type: {{ getIdentityDocumentTypeLabel(customerValue.identityDocument!.type) }}</p>
-  <p>Number: {{ customerValue.identityDocument!.number }}</p>
-  <p>Personal Code: {{ customerValue.identityDocument!.value || "Unprovided" }}</p>
-
-  <ng-container *ngIf="customerValue.otherDocuments.length">
-    <p class="font-bold mt-4">Other Documents</p>
-    <p-table [value]="customerValue.otherDocuments">
-      <ng-template #header>
-        <tr>
-          <th>Issued By</th>
-          <th>Type</th>
-          <th>Number</th>
-        </tr>
-      </ng-template>
-      <ng-template #body let-otherDocument>
-        <tr>
-          <td>{{ getCountryName(otherDocument.issuedBy) }}</td>
-          <td>{{ otherDocument.type }}</td>
-          <td>{{ otherDocument.value }}</td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </ng-container>
-}
+          <card>
+            <p card-header>Identity Document</p>
+            <div card-body>
+              <p>Issued By: {{ getCountryName(customerValue.identityDocument!.issuedBy) }}</p>
+              <p>Type: {{ getIdentityDocumentTypeLabel(customerValue.identityDocument!.type) }}</p>
+              <p>Number: {{ customerValue.identityDocument!.number }}</p>
+              <p>Personal Code: {{ customerValue.identityDocument!.value || "Unprovided" }}</p>
+            </div>
+          </card>
+          @if (customerValue.otherDocuments.length > 0) {
+            <card>
+              <p card-header>Other Documents</p>
+              <p card-subHeader>These documents help customs determine whether customer's residence is not within EU
+                country.</p>
+              <div card-body>
+                <p-table [value]="customerValue.otherDocuments" paginatorStyleClass="rounded-t-none! bg-inherit!"
+                         paginatorDropdownAppendTo="body" [styleClass]="'rounded-md mb-4 border border-primary-950/20 dark:border-primary-50/20 relative w-full overflow-auto ' +
+                      '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'"
+                         [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+                  <ng-template #header>
+                    <tr>
+                      <th>Issued By</th>
+                      <th>Type</th>
+                      <th>Number</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template #body let-otherDocument>
+                    <tr>
+                      <td>{{ getCountryName(otherDocument.issuedBy) }}</td>
+                      <td>{{ otherDocument.type }}</td>
+                      <td>{{ otherDocument.value }}</td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            </card>
+          }
+        </div>
+      </card>
+    </card>
+  }
+</div>

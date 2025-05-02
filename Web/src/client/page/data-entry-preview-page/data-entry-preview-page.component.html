@@ -1,52 +1,55 @@
-@if (dataEntry.isLoading() || dataType.isLoading()) {
-  <p>Loading...</p>
-} @else if (!dataEntry.value()) {
-  <p>Unknown data entry value</p>
-} @else if (!dataType.value()) {
-  <p>Unknown data type value</p>
-} @else {
-  @let valueDataEntry = dataEntry.value()!;
-  @let valueDataType = dataType.value()!;
+<div class="h-full w-full relative container mx-auto flex flex-col mb-8">
+  <data-entry-page-header-section [canGoBack]="true"/>
+  @if (dataEntry.isLoading() || dataType.isLoading()) {
+    <p>Loading...</p>
+  } @else if (!dataEntry.value()) {
+    <p>Unknown data entry value</p>
+  } @else if (!dataType.value()) {
+    <p>Unknown data type value</p>
+  } @else {
+    @let valueDataEntry = dataEntry.value()!;
+    @let valueDataType = dataType.value()!;
 
-  <div class="flex flex-wrap">
-    <div class="w-1/2">
-      <p class="font-bold">Created At</p>
-      <p>{{ valueDataEntry.createdAt | date:'short' }}</p>
+    <div class="flex flex-wrap">
+      <div class="w-1/2">
+        <p class="font-bold">Created At</p>
+        <p>{{ valueDataEntry.createdAt | date:'short' }}</p>
+      </div>
+      <div class="w-1/2">
+        <p class="font-bold">Created By</p>
+        <p>{{ toUserIdentityFullName(valueDataEntry.createdBy) }}</p>
+      </div>
+      <div class="w-1/2 mt-4">
+        <p class="font-bold">Modified At</p>
+        <p>{{ valueDataEntry.modifiedAt | date:'short' }}</p>
+      </div>
+      <div class="w-1/2 mt-4">
+        <p class="font-bold">Modified By</p>
+        <p>{{ toUserIdentityFullName(valueDataEntry.modifiedBy) }}</p>
+      </div>
     </div>
-    <div class="w-1/2">
-      <p class="font-bold">Created By</p>
-      <p>{{ toUserIdentityFullName(valueDataEntry.createdBy) }}</p>
-    </div>
-    <div class="w-1/2 mt-4">
-      <p class="font-bold">Modified At</p>
-      <p>{{ valueDataEntry.modifiedAt | date:'short' }}</p>
-    </div>
-    <div class="w-1/2 mt-4">
-      <p class="font-bold">Modified By</p>
-      <p>{{ toUserIdentityFullName(valueDataEntry.modifiedBy) }}</p>
-    </div>
-  </div>
 
-  <p class="font-bold mt-4">Values</p>
+    <p class="font-bold mt-4">Values</p>
 
-  <p-table [columns]="valueDataType?.fields || []" [value]="[valueDataEntry.fields]">
-    <ng-template #header let-fields>
-      <tr>
-        @for (field of fields; track field.id) {
-          <th>{{ field.name }}</th>
-        }
-      </tr>
-    </ng-template>
+    <p-table [columns]="valueDataType?.fields || []" [value]="[valueDataEntry.fields]">
+      <ng-template #header let-fields>
+        <tr>
+          @for (field of fields; track field.id) {
+            <th>{{ field.name }}</th>
+          }
+        </tr>
+      </ng-template>
 
-    <ng-template #body let-fields>
-      <tr>
-        @for (field of fields; track field.id) {
-          <td>
-            <data-type-entry-field-display [dataTypeFieldId]="field.dataTypeFieldId" [dataType]="valueDataType"
-                                           [value]="field.value" [instanceId]="instanceIdAsNumber()"/>
-          </td>
-        }
-      </tr>
-    </ng-template>
-  </p-table>
-}
+      <ng-template #body let-fields>
+        <tr>
+          @for (field of fields; track field.id) {
+            <td>
+              <data-type-entry-field-display [dataTypeFieldId]="field.dataTypeFieldId" [dataType]="valueDataType"
+                                             [value]="field.value" [instanceId]="instanceIdAsNumber()"/>
+            </td>
+          }
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>

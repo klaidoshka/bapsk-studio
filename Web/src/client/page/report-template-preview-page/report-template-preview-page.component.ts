@@ -7,13 +7,17 @@ import {TableModule} from 'primeng/table';
 import {getDataTypesCount} from '../../model/report-template.model';
 import {NumberUtil} from '../../util/number.util';
 import {of} from 'rxjs';
+import {
+  ReportTemplatePageHeaderSectionComponent
+} from '../../component/report-template-page-header-section/report-template-page-header-section.component';
 
 @Component({
   selector: 'report-template-preview-page',
   imports: [
     Card,
     NgIf,
-    TableModule
+    TableModule,
+    ReportTemplatePageHeaderSectionComponent
   ],
   templateUrl: './report-template-preview-page.component.html',
   styles: ``

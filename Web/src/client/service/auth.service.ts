@@ -1,7 +1,12 @@
 import {HttpClient} from "@angular/common/http";
 import {inject, Injectable} from "@angular/core";
 import {BehaviorSubject, filter, finalize, map, Observable, of, switchMap, tap} from "rxjs";
-import {AuthResponse, ChangePasswordRequest, LoginRequest, RegisterRequest} from "../model/auth.model";
+import {
+  AuthResponse,
+  ChangePasswordRequest,
+  LoginRequest,
+  RegisterRequest
+} from "../model/auth.model";
 import {User} from "../model/user.model";
 import {ApiRouter} from "./api-router.service";
 import {UserService} from './user.service';

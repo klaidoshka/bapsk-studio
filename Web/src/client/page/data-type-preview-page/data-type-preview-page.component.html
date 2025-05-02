@@ -1,51 +1,54 @@
-@if (dataType.isLoading()) {
-  <p>Loading...</p>
-} @else if (!dataType.value()) {
-  <p>Unknown data type value</p>
-} @else {
-  @let value = dataType.value()!;
+<div class="h-full w-full relative container mx-auto flex flex-col mb-8">
+  <data-type-page-header-section [canGoBack]="true"/>
+  @if (dataType.isLoading()) {
+    <p>Loading...</p>
+  } @else if (!dataType.value()) {
+    <p>Unknown data type value</p>
+  } @else {
+    @let value = dataType.value()!;
 
-  <p class="font-bold">Name</p>
-  <p>{{ value.name }}</p>
+    <p class="font-bold">Name</p>
+    <p>{{ value.name }}</p>
 
-  <p class="font-bold mt-4">Display Field</p>
-  <p>{{ getDisplayFieldName() }}</p>
+    <p class="font-bold mt-4">Display Field</p>
+    <p>{{ getDisplayFieldName() }}</p>
 
-  <p class="font-bold mt-4">Description</p>
-  <p>{{ value.description }}</p>
+    <p class="font-bold mt-4">Description</p>
+    <p>{{ value.description }}</p>
 
-  <p class="font-bold mt-4">Fields</p>
-  <p-table [value]="value.fields || []">
-    <ng-template #header>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Required</th>
-        <th>Default Value</th>
-      </tr>
-    </ng-template>
+    <p class="font-bold mt-4">Fields</p>
+    <p-table [value]="value.fields || []">
+      <ng-template #header>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Required</th>
+          <th>Default Value</th>
+        </tr>
+      </ng-template>
 
-    <ng-template #body let-field>
-      @let isReferenceField = field.type === FieldType.Reference;
+      <ng-template #body let-field>
+        @let isReferenceField = field.type === FieldType.Reference;
 
-      <tr>
-        <td><p [ngClass]="{'mt-7': isReferenceField}">{{ field.name }}</p></td>
-        <td><p [ngClass]="{'mt-7': isReferenceField}">{{ toFieldTypeLabel(field.type) }}</p></td>
-        <td>
-          <p-badge [value]="field.isRequired ? 'Required' : 'Optional'" severity="secondary"/>
-        </td>
-        <td>
-          @if (isReferenceField) {
-            <div class="flex flex-col gap-1">
-              <label class="font-semibold">Referenced Type</label>
-              {{ getReferencedDataTypeName(field) }}
-            </div>
-          } @else {
-            <data-type-entry-field-display [dataType]="value!" [value]="field.defaultValue"
-                                           [dataTypeFieldId]="field.id" [instanceId]="instanceIdAsNumber()"/>
-          }
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
-}
+        <tr>
+          <td><p [ngClass]="{'mt-7': isReferenceField}">{{ field.name }}</p></td>
+          <td><p [ngClass]="{'mt-7': isReferenceField}">{{ toFieldTypeLabel(field.type) }}</p></td>
+          <td>
+            <p-badge [value]="field.isRequired ? 'Required' : 'Optional'" severity="secondary"/>
+          </td>
+          <td>
+            @if (isReferenceField) {
+              <div class="flex flex-col gap-1">
+                <label class="font-semibold">Referenced Type</label>
+                {{ getReferencedDataTypeName(field) }}
+              </div>
+            } @else {
+              <data-type-entry-field-display [dataType]="value!" [value]="field.defaultValue"
+                                             [dataTypeFieldId]="field.id" [instanceId]="instanceIdAsNumber()"/>
+            }
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>

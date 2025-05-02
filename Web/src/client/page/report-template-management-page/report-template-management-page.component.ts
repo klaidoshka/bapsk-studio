@@ -19,6 +19,9 @@ import {Select} from 'primeng/select';
 import {TableModule} from 'primeng/table';
 import DataType from '../../model/data-type.model';
 import {NumberUtil} from '../../util/number.util';
+import {
+  ReportTemplatePageHeaderSectionComponent
+} from '../../component/report-template-page-header-section/report-template-page-header-section.component';
 
 @Component({
   selector: 'report-template-management-page',
@@ -30,7 +33,8 @@ import {NumberUtil} from '../../util/number.util';
     NgIf,
     ReactiveFormsModule,
     Select,
-    TableModule
+    TableModule,
+    ReportTemplatePageHeaderSectionComponent
   ],
   templateUrl: './report-template-management-page.component.html',
   styles: ``

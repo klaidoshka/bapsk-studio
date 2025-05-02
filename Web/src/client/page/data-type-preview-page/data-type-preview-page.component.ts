@@ -10,6 +10,9 @@ import {rxResource} from '@angular/core/rxjs-interop';
 import {of} from 'rxjs';
 import {NumberUtil} from '../../util/number.util';
 import {NgClass} from '@angular/common';
+import {
+  DataTypePageHeaderSectionComponent
+} from '../../component/data-type-page-header-section/data-type-page-header-section.component';
 
 @Component({
   selector: 'data-type-preview-page',
@@ -17,7 +20,8 @@ import {NgClass} from '@angular/common';
     Badge,
     DataTypeEntryFieldDisplayComponent,
     TableModule,
-    NgClass
+    NgClass,
+    DataTypePageHeaderSectionComponent
   ],
   templateUrl: './data-type-preview-page.component.html',
   styles: ``

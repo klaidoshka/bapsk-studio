@@ -6,7 +6,6 @@ import {InputText} from "primeng/inputtext";
 import {
   MessagesShowcaseComponent
 } from "../../component/messages-showcase/messages-showcase.component";
-import {NgForOf} from "@angular/common";
 import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Select} from "primeng/select";
 import {getDefaultIsoCountry, IsoCountries} from '../../model/iso-country.model';
@@ -22,6 +21,13 @@ import Messages from '../../model/messages.model';
 import {first, of, tap} from 'rxjs';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {NumberUtil} from '../../util/number.util';
+import {
+  CustomerPageHeaderSectionComponent
+} from '../../component/customer-page-header-section/customer-page-header-section.component';
+import {CardComponent} from '../../component/card/card.component';
+import {FloatLabel} from 'primeng/floatlabel';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
 
 @Component({
   selector: 'customer-management-page',
@@ -31,9 +37,13 @@ import {NumberUtil} from '../../util/number.util';
     FormInputErrorComponent,
     InputText,
     MessagesShowcaseComponent,
-    NgForOf,
     ReactiveFormsModule,
-    Select
+    Select,
+    CustomerPageHeaderSectionComponent,
+    CardComponent,
+    FloatLabel,
+    IconField,
+    InputIcon
   ],
   templateUrl: './customer-management-page.component.html',
   styles: ``
@@ -70,7 +80,7 @@ export class CustomerManagementPageComponent {
       issuedBy: [getDefaultIsoCountry().code, [Validators.required]],
       number: ["", [Validators.required, Validators.maxLength(50)]],
       type: [IdentityDocumentType.Passport, [Validators.required]],
-      value: [null, [Validators.maxLength(50)]]
+      value: [null as string | null, [Validators.maxLength(50)]]
     }),
     lastName: ["", [Validators.required, Validators.maxLength(200)]],
     otherDocuments: this.formBuilder.array([
@@ -108,34 +118,22 @@ export class CustomerManagementPageComponent {
     this.form.markAsPristine();
   }
 
-  private updateForm(customer?: Customer) {
+  private updateForm(customer: Customer) {
     this.form.reset();
-
-    if (customer) {
-      this.form.patchValue({...customer as any});
-
-      if (customer.otherDocuments.length > 0) {
-        customer.otherDocuments.forEach(it => this.addOtherDocument(it));
-      }
-    }
+    this.form.patchValue({...customer});
   }
 
   protected addOtherDocument(document?: CustomerOtherDocument) {
-    this.otherDocuments().push(this.formBuilder.group({
+    this.form.controls.otherDocuments.push(this.formBuilder.group({
       issuedBy: [document?.issuedBy || getDefaultIsoCountry().code, [Validators.required]],
       type: [document?.type || "", [Validators.required, Validators.maxLength(70)]],
       value: [document?.value || "", [Validators.required, Validators.maxLength(70)]]
     }));
-
     this.form.markAsDirty();
   }
 
-  protected otherDocuments() {
-    return this.form.controls.otherDocuments;
-  }
-
   protected removeOtherDocument(index: number) {
-    this.otherDocuments().removeAt(index);
+    this.form.controls.otherDocuments.removeAt(index);
     this.form.markAsDirty();
   }
 
@@ -175,4 +173,6 @@ export class CustomerManagementPageComponent {
       this.create(request);
     }
   }
+
+  protected readonly countries = IsoCountries;
 }

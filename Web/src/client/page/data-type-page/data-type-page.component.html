@@ -1,42 +1,38 @@
-<confirmation [key]='"data-type-delete-confirmation"' [header]='"Are you sure about deleting this data type?"'/>
+<div class="h-full w-full relative container mx-auto flex flex-col mb-8">
+  <data-type-page-header-section/>
+  <confirmation [key]='"data-type-delete-confirmation"' [header]='"Are you sure about deleting this data type?"'/>
+  <messages-showcase [messages]="messages()"/>
+  <div class="card mt-4">
+    <p-table styleClass="w-fit shadow-lg mt-2 dark:bg-primary-950! bg-primary-50!"
+             paginatorStyleClass="dark:bg-primary-950! bg-primary-50!" [value]="dataTypes.value() || []"
+             [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+      <ng-template #header>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Fields</th>
+          <th></th>
+        </tr>
+      </ng-template>
 
-<messages-showcase [messages]="messages()"/>
-
-@if (!instanceId()) {
-  <p-message severity="warn">Please select an instance to manage data types.</p-message>
-} @else {
-  <p-button label="Create" icon="pi pi-plus" type="button" (onClick)="manage()"/>
-}
-
-<div class="card mt-4">
-  <p-table styleClass="w-fit shadow-lg mt-2 dark:bg-primary-950! bg-primary-50!"
-           paginatorStyleClass="dark:bg-primary-950! bg-primary-50!" [value]="dataTypes.value() || []"
-           [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
-    <ng-template #header>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Fields</th>
-        <th></th>
-      </tr>
-    </ng-template>
-
-    <ng-template #body let-dataType>
-      <tr>
-        <td>{{ dataType.name }}</td>
-        <td>{{ dataType.description }}</td>
-        <td>{{ dataType.fields.length }} fields</td>
-        <td class="flex flex-nowrap items-center">
-          <p-button title="Preview" icon="pi pi-eye" type="button" variant="text" (onClick)="preview(dataType)"/>
-          <p-button title="Import Configurations" icon="pi pi-file-excel" variant="text"
-                    routerLink="../import-configuration"
-                    [queryParams]="{dataTypeId: dataType.id}"/>
-          <p-button title="Report Templates" icon="pi pi-file" variant="text" routerLink="../report-template"
-                    [queryParams]="{dataTypeId: dataType.id}"/>
-          <p-button title="Edit" icon="pi pi-pencil" type="button" variant="text" (onClick)="manage(dataType)"/>
-          <p-button title="Delete" icon="pi pi-trash" type="button" variant="text" (onClick)="delete(dataType)"/>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+      <ng-template #body let-dataType>
+        <tr>
+          <td>{{ dataType.name }}</td>
+          <td>{{ dataType.description }}</td>
+          <td>{{ dataType.fields.length }} fields</td>
+          <td>
+            <div class="flex flex-nowrap items-center">
+              <p-button title="Preview" icon="pi pi-eye" type="button" variant="text" (onClick)="preview(dataType)"/>
+              <p-button title="Import Configurations" icon="pi pi-file-excel" variant="text"
+                        [routerLink]="'./' + dataType.id + '/import-configuration'" [queryParams]="{canGoBack: true}"/>
+              <p-button title="Report Templates" icon="pi pi-file" variant="text"
+                        [routerLink]="'./' + dataType.id + '/report-template'" [queryParams]="{canGoBack: true}"/>
+              <p-button title="Edit" icon="pi pi-pencil" type="button" variant="text" (onClick)="manage(dataType)"/>
+              <p-button title="Delete" icon="pi pi-trash" type="button" variant="text" (onClick)="delete(dataType)"/>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
 </div>
