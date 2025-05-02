@@ -3,9 +3,7 @@ import {Button} from "primeng/button";
 import {FormInputErrorComponent} from "../../component/form-input-error/form-input-error.component";
 import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {InputText} from "primeng/inputtext";
-import {
-  MessagesShowcaseComponent
-} from "../../component/messages-showcase/messages-showcase.component";
+import {MessagesShowcaseComponent} from "../../component/messages-showcase/messages-showcase.component";
 import {Select} from "primeng/select";
 import {getDefaultIsoCountry, IsoCountries} from '../../model/iso-country.model';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
@@ -18,6 +16,10 @@ import {NumberUtil} from '../../util/number.util';
 import {
   SalesmanPageHeaderSectionComponent
 } from '../../component/salesman-page-header-section/salesman-page-header-section.component';
+import {CardComponent} from '../../component/card/card.component';
+import {FloatLabel} from 'primeng/floatlabel';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
 
 @Component({
   selector: 'salesman-management-page',
@@ -29,7 +31,11 @@ import {
     MessagesShowcaseComponent,
     ReactiveFormsModule,
     Select,
-    SalesmanPageHeaderSectionComponent
+    SalesmanPageHeaderSectionComponent,
+    CardComponent,
+    FloatLabel,
+    IconField,
+    InputIcon
   ],
   templateUrl: './salesman-management-page.component.html',
   styles: ``

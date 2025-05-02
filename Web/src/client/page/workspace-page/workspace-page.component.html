@@ -10,17 +10,17 @@
         class="flex flex-col min-w-60 w-60 gap-6 h-full bg-primary-50 dark:bg-primary-950 border border-y-0 border-primary-950/20 dark:border-primary-50/20">
         <div class="flex flex-col gap-4 mt-2 mx-4">
           <h4 class="px-1 text-lg font-semibold">{{ instanceName() }}</h4>
-          <p-button label="Change Workspace" size="small" styleClass="w-full" (onClick)="exit()"/>
+          <p-button title="Change" label="Change Workspace" size="small" styleClass="w-full" (onClick)="exit()"/>
         </div>
         <div class="flex flex-col gap-1 mx-4">
           <h4 class="p-2 text-sm font-semibold">Workspace Panel</h4>
           <!-- Sidebar Navigation -->
           <nav class="flex flex-col w-full gap-0.5">
             @for (link of [
-              {label: 'Data Types', path: 'data-type'},
-              {label: 'Import Configurations', path: 'import-configuration'},
-              {label: 'Report Templates', path: 'report-template'},
-              {label: 'Generate Report', path: 'generate-report'}
+              { label: 'Data Types', path: 'data-type' },
+              { label: 'Import Configurations', path: 'import-configuration' },
+              { label: 'Report Templates', path: 'report-template' },
+              { label: 'Generate Report', path: 'generate-report' }
             ]; track link.path) {
               <a
                 class="flex h-8 p-2 w-full items-center rounded-lg hover:bg-primary-200/50 dark:hover:bg-primary-800/80"
@@ -32,9 +32,9 @@
           <h4 class="p-2 text-sm font-semibold">Workspace VAT Return</h4>
           <nav class="flex flex-col w-full gap-0.5">
             @for (link of [
-              {label: 'Customers', path: 'customer'},
-              {label: 'Salesmen', path: 'salesman'},
-              {label: 'Sales', path: 'sale'}
+              { label: 'Customers', path: 'customer' },
+              { label: 'Salesmen', path: 'salesman' },
+              { label: 'Sales', path: 'sale' }
             ]; track link.path) {
               <a
                 class="flex h-8 p-2 w-full items-center rounded-lg hover:bg-primary-200/50 dark:hover:bg-primary-800/80"

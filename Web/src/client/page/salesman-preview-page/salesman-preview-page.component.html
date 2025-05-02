@@ -1,17 +1,41 @@
 <div class="h-full w-full relative container mx-auto flex flex-col mb-8">
-  <salesman-page-header-section/>
+  <salesman-page-header-section [canGoBack]="true"/>
   @if (salesman.isLoading()) {
-    <p>Loading...</p>
+    <p-progress-spinner/>
   } @else if (!salesman.value()) {
-    <p>Unknown salesman value</p>
+    <failed-to-load-please-reload/>
   } @else {
     @let salesmanValue = salesman.value()!;
-
-    <p class="font-bold">Name</p>
-    <p>{{ salesmanValue.name }}</p>
-
-    <p class="font-bold mt-4">Vat Payer Code</p>
-    <p>Issued By: {{ getIsoCountryLabel(salesmanValue.vatPayerCode.issuedBy) }}</p>
-    <p>Code: {{ salesmanValue.vatPayerCode.value }}</p>
+    <card>
+      <p card-header>Salesman</p>
+      <div card-body class="flex flex-col gap-4">
+        <card>
+          <p card-header>Details</p>
+          <div card-body class="flex flex-col gap-4">
+            <div class="flex flex-col gap-2">
+              <div class="flex flex-row gap-2">
+                <p class="font-semibold">Name</p>
+                <p>{{ salesmanValue.name }}</p>
+              </div>
+            </div>
+          </div>
+        </card>
+        <card>
+          <p card-header>VAT Payer Code</p>
+          <div card-body class="flex flex-col gap-4">
+            <div class="flex flex-col gap-2">
+              <div class="flex flex-row gap-2">
+                <p class="font-semibold">Issued By</p>
+                <p>{{ getIsoCountryLabel(salesmanValue.vatPayerCode.issuedBy) }}</p>
+              </div>
+              <div class="flex flex-row gap-2">
+                <p class="font-semibold">Code</p>
+                <p>{{ salesmanValue.vatPayerCode.value }}</p>
+              </div>
+            </div>
+          </div>
+        </card>
+      </div>
+    </card>
   }
 </div>

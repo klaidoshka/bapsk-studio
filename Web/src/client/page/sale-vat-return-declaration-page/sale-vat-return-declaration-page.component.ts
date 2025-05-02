@@ -12,7 +12,7 @@ import {toCustomerFullName} from '../../model/customer.model';
 import {SubmitDeclarationState, toExportResultLabel, toSubmitDeclarationStateLabel} from '../../model/vat-return.model';
 import {NumberUtil} from '../../util/number.util';
 import {Button} from 'primeng/button';
-import {CurrencyPipe, DatePipe, NgClass, NgIf} from '@angular/common';
+import {CurrencyPipe, DatePipe, NgClass} from '@angular/common';
 import {Badge} from 'primeng/badge';
 import {TableModule} from 'primeng/table';
 import {RoundPipe} from '../../pipe/round.pipe';
@@ -34,7 +34,6 @@ import {Tooltip} from 'primeng/tooltip';
   selector: 'sale-vat-return-declaration-page',
   imports: [
     Button,
-    NgIf,
     ConfirmationComponent,
     Badge,
     DatePipe,

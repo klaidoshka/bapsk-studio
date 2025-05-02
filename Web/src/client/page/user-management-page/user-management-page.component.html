@@ -2,7 +2,7 @@
   <user-page-header-section [canGoBack]="true"/>
   <card>
     <p card-header>Create User</p>
-    <p card-subHeader>Fill in the form below to register a new user or modify existing one.</p>
+    <p card-subHeader>Fill in the form below to register a new user or modify an existing one.</p>
     <form [formGroup]="form" card-body class="flex flex-col gap-4">
       <div class="flex flex-col gap-4 md:flex-row">
         <!-- First Name -->
@@ -62,7 +62,8 @@
         <!-- Birth Date -->
         <div class="w-fit">
           <p-float-label variant="on" class="w-fit">
-            <p-date-picker icon="pi pi-calendar" iconDisplay="input" showIcon formControlName="birthDate" styleClass="min-w-60" inputId="birthDate" appendTo="body"/>
+            <p-date-picker icon="pi pi-calendar" iconDisplay="input" showIcon formControlName="birthDate" styleClass="min-w-60"
+                           inputId="birthDate" appendTo="body"/>
             <label for="birthDate">Birthdate</label>
           </p-float-label>
           <form-input-error [control]="form.controls.birthDate"/>
@@ -71,7 +72,8 @@
         <!-- Country Dropdown -->
         <div class="w-fit">
           <p-float-label variant="on" class="w-60">
-            <p-select dropdownIcon="pi pi-globe" [options]="countries" formControlName="country" optionLabel="name" styleClass="min-w-60"
+            <p-select dropdownIcon="pi pi-globe" [options]="countries" formControlName="country" optionLabel="name"
+                      styleClass="min-w-60"
                       appendTo="body"/>
             <label for="country">Country</label>
           </p-float-label>
@@ -79,8 +81,8 @@
         </div>
       </div>
       <messages-showcase [messages]="messages()"/>
-      <p-button [label]="!user.value() ? 'Create' : 'Save'" [disabled]="!form.valid || !form.dirty" (onClick)="save()"
-                type="submit"/>
+      <p-button title="Submit" [label]="!user.value() ? 'Create' : 'Save'" [disabled]="!form.valid || !form.dirty"
+                (onClick)="save()" type="submit"/>
     </form>
   </card>
 </div>

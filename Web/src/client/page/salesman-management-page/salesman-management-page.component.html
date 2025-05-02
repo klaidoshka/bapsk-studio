@@ -1,36 +1,51 @@
 <div class="h-full w-full relative container mx-auto flex flex-col mb-8">
   <salesman-page-header-section [canGoBack]="true"/>
-  <form class="min-w-128" [formGroup]="form">
-    <messages-showcase [messages]="messages()"/>
+  <card>
+    <p card-header>Create Salesman</p>
+    <p card-subHeader>Fill in the form below to create a new salesman or modify an existing one.</p>
+    <form [formGroup]="form" card-body class="flex flex-col gap-4">
+      <div class="flex flex-col gap-4">
+        <!-- Name -->
+        <div>
+          <p-floatlabel variant="on" class="w-60">
+            <p-iconfield>
+              <p-inputicon class="pi pi-tag"/>
+              <input pInputText id="name" formControlName="name" type="text"/>
+            </p-iconfield>
+            <label for="name">Name</label>
+          </p-floatlabel>
+          <form-input-error [control]="form.controls.name"/>
+        </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <label for="name" class="block text-sm font-medium">Name</label>
-        <input formControlName="name" pInputText type="text" id="name" class="mt-1 block w-full"/>
-        <form-input-error [control]="form.controls.name"/>
+        <!-- VAT Payer Code -->
+        <card>
+          <p card-header>VAT Payer Code</p>
+          <div card-body formGroupName="vatPayerCode" class="flex flex-col md:flex-row gap-4">
+            <div>
+              <p-floatlabel variant="on" class="w-60">
+                <p-iconfield>
+                  <p-inputicon class="pi pi-code"/>
+                  <input formControlName="value" pInputText type="text" id="vatPayerCodeValue"/>
+                </p-iconfield>
+                <label for="vatPayerCodeValue">Code</label>
+              </p-floatlabel>
+              <form-input-error [control]="form.controls.vatPayerCode.controls.value"/>
+            </div>
+
+            <div>
+              <p-floatlabel variant="on" class="w-60">
+                <p-select dropdownIcon="pi pi-globe" inputId="issuedBy" formControlName="issuedBy" [options]="IsoCountries"
+                          optionLabel="name" optionValue="code" class="w-full" appendTo="body"/>
+                <label for="vatPayerCodeIssuedBy">Issued By</label>
+              </p-floatlabel>
+              <form-input-error [control]="form.controls.vatPayerCode.controls.issuedBy"/>
+            </div>
+          </div>
+        </card>
       </div>
-
-      <ng-container formGroupName="vatPayerCode">
-        <div>
-          <label for="vatPayerCodeValue" class="block text-sm font-medium">Vat Payer Code</label>
-          <input formControlName="value" pInputText type="text" id="vatPayerCodeValue" class="mt-1 block w-full"/>
-          <form-input-error [control]="form.controls.vatPayerCode.controls.value"/>
-        </div>
-
-        <div>
-          <label for="vatPayerCodeIssuedBy" class="block text-sm font-medium">Vat Payer Code Issued By</label>
-          <p-select inputId="issuedBy" formControlName="issuedBy" [options]="IsoCountries" optionLabel="name"
-                    optionValue="code"
-                    class="mt-1 block w-full" appendTo="body"/>
-          <form-input-error [control]="form.controls.vatPayerCode.controls.issuedBy"/>
-        </div>
-      </ng-container>
-    </div>
-
-    <div class="flex justify-end mt-4">
-      <p-button [label]="!salesman.value() ? 'Create' : 'Save'" [disabled]="!form.valid || !form.dirty"
-                (onClick)="save()"
-                type="submit"/>
-    </div>
-  </form>
+      <messages-showcase [messages]="messages()"/>
+      <p-button title="Submit" [label]="!salesman.value() ? 'Create' : 'Save'" [disabled]="!form.valid || !form.dirty"
+                (onClick)="save()" size="small" type="submit"/>
+    </form>
+  </card>
 </div>

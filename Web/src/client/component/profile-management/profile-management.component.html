@@ -57,9 +57,9 @@
     </div>
     <messages-showcase [messages]="messages()"/>
     <div class="flex flex-row gap-1">
-      <p-button label="Reset" [disabled]="!form.dirty" (onClick)="reset()" type="button" class="mr-2" size="small"
+      <p-button title="Reset" label="Reset" [disabled]="!form.dirty" (onClick)="reset()" type="button" class="mr-2" size="small"
                 severity="danger"/>
-      <p-button label="Save" [disabled]="form.invalid || !form.dirty" (onClick)="save()" type="submit" size="small"/>
+      <p-button title="Save" label="Save" [disabled]="form.invalid || !form.dirty" (onClick)="save()" type="submit" size="small"/>
     </div>
   </form>
 </card>

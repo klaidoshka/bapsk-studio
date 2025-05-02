@@ -13,8 +13,7 @@
           <p-button title="Refresh declaration" icon="pi pi-refresh" label="Refresh" (click)="refresh()" size="small"
                     [disabled]="isRefreshing()"/>
           @if (!declaration.value()?.export) {
-            <p-button *ngIf="!declaration.value()?.isCancelled && !declaration.value()?.export"
-                      title="Cancel declaration" size="small" icon="pi pi-ban" class="ml-2" label="Cancel" (click)="cancel()"
+            <p-button title="Cancel declaration" size="small" icon="pi pi-ban" class="ml-2" label="Cancel" (click)="cancel()"
                       [disabled]="isCancelling()" severity="danger"/>
           }
         }
@@ -157,10 +156,12 @@
                 <strong>Assessed Declaration Correction No</strong>
                 {{ declaration.value()!.export!.declarationCorrectionNo }}
               </p>
-              <p class="text-lg" *ngIf="declaration.value()!.export!.correctionDate">
-                <strong>Correction Date</strong>
-                {{ declaration.value()!.export!.correctionDate | date:'medium' }}
-              </p>
+              @if (declaration.value()!.export!.correctionDate) {
+                <p class="text-lg">
+                  <strong>Correction Date</strong>
+                  {{ declaration.value()!.export!.correctionDate | date:'medium' }}
+                </p>
+              }
               <p class="text-lg">
                 <strong>Customs Office Code</strong>
                 {{ declaration.value()!.export!.customsOfficeCode }}
@@ -238,9 +239,11 @@
       @if (sale.value() && !declaration.value()?.isCancelled && !declaration.value()?.export && instanceId()) {
         <card-headless>
           <div card-body>
-            <p class="font-bold text-lg my-2" *ngIf="declaration.value() === undefined">
-              This sale does not have a submitted VAT return declaration.
-            </p>
+            @if (!declaration.value()) {
+              <p class="font-bold text-lg my-2">
+                This sale does not have a submitted VAT return declaration.
+              </p>
+            }
 
             <div class="rounded mt-4">
               <vat-return-declaration-submission [instanceId]="instanceIdAsNumber()!" [sale]="sale.value()!"
