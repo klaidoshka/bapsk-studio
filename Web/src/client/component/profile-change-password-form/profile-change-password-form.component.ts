@@ -15,6 +15,10 @@ import {first} from 'rxjs';
 import Messages from '../../model/messages.model';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
+import {CardComponent} from '../card/card.component';
+import {DatePicker} from 'primeng/datepicker';
+import {IftaLabel} from 'primeng/iftalabel';
+import {FloatLabel} from 'primeng/floatlabel';
 
 @Component({
   selector: 'profile-change-password-form',
@@ -24,7 +28,11 @@ import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.
     FormsModule,
     Password,
     ReactiveFormsModule,
-    MessagesShowcaseComponent
+    MessagesShowcaseComponent,
+    CardComponent,
+    DatePicker,
+    IftaLabel,
+    FloatLabel
   ],
   templateUrl: './profile-change-password-form.component.html',
   styles: ``

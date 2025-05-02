@@ -1,18 +1,18 @@
-<div class="w-fit dark:bg-surface-950 bg-primary-50 p-4 rounded-md shadow-lg">
+<card>
   @let role = user()!.role;
-
-  <div class="flex flex-row">
-    <p class="font-semibold">You are an </p>
-    <p-badge
-      class="ml-1"
-      [value]="toRoleLabel(role)"
-      [severity]="role === Role.Admin ? 'danger' : 'info'"
-    />
+  <p card-header>Profile</p>
+  <div card-subHeader class="flex flex-col">
+    <div class="flex flex-row gap-0.5">
+      <p class="font-semibold">You are an </p>
+      <p-badge [value]="toRoleLabel(role)" [severity]="role === Role.Admin ? 'danger' : 'info'" size="small"/>
+      <p>.</p>
+    </div>
+    <p>Unfortunately, your email cannot be changed. If you want to change it, please contact the support.</p>
   </div>
-
-  <div class="flex flex-col w-fit mt-4 gap-4">
-    <profile-management [user]="user()!"/>
-
-    <profile-change-password-form [user]="user()!"/>
+  <div card-body>
+    <div class="flex flex-col w-full gap-4">
+      <profile-management [user]="user()!"/>
+      <profile-change-password-form [user]="user()!"/>
+    </div>
   </div>
-</div>
+</card>

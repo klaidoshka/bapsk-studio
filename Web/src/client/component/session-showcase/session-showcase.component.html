@@ -1,40 +1,41 @@
 <confirmation key="session-revokation" header="Are you sure about revoking this session?"/>
-
 <p-toast key="session-revokation"/>
 
-<p-table
-  styleClass="w-fit shadow-lg mt-2 dark:bg-primary-950! bg-primary-50!"
-  paginatorStyleClass="dark:bg-primary-950! bg-primary-50!"
-  [value]="sessions.value() || []"
->
-  <ng-template #header>
-    <tr>
-      <th>Agent</th>
-      <th>Created At</th>
-      <th>IP Address</th>
-      <th>Location</th>
-      <th></th>
-    </tr>
-  </ng-template>
+<card>
+  <p card-header>Sessions</p>
+  <div card-subHeader class="flex flex-col">
+    <p>These are your sessions (times and devices you logged in with).</p>
+    <p>If you want to revoke a session, click on the revoke button. Current session cannot be revoked.</p>
+  </div>
+  <div card-body>
+    <p-table paginatorStyleClass="rounded-t-none! bg-inherit!" paginatorDropdownAppendTo="body"
+             [styleClass]="'mt-4 rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-full overflow-auto ' +
+         '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'"
+             [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" [value]="sessions.value() || []">
+      <ng-template #header>
+        <tr>
+          <th>Agent</th>
+          <th>Created At</th>
+          <th>Active Time</th>
+          <th>IP Address</th>
+          <th>Location</th>
+          <th></th>
+        </tr>
+      </ng-template>
 
-  <ng-template
-    #body
-    let-session
-  >
-    <tr>
-      <td class="max-w-64">{{ session.agent }}</td>
-      <td>{{ session.createdAt | date: 'medium' }}</td>
-      <td>{{ session.ipAddress }}</td>
-      <td>{{ session.location }}</td>
-      <td>
-        <p-button
-          [disabled]="session.id === currentSessionId.value()"
-          icon="pi pi-ban"
-          type="button"
-          variant="text"
-          (onClick)="revoke(session)"
-        />
-      </td>
-    </tr>
-  </ng-template>
-</p-table>
+      <ng-template #body let-session>
+        <tr>
+          <td class="max-w-64">{{ session.agent }}</td>
+          <td>{{ session.createdAt | date: 'medium' }}</td>
+          <td>{{ getActiveTime(session) }}</td>
+          <td>{{ session.ipAddress }}</td>
+          <td>{{ session.location }}</td>
+          <td>
+            <p-button title="Revoke" [disabled]="session.id === currentSessionId.value()" icon="pi pi-ban" type="button"
+                      variant="text" (onClick)="revoke(session)"/>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</card>

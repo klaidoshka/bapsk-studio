@@ -28,10 +28,12 @@
             <td>{{ user.email }}</td>
             <td>{{ user.birthDate | date:'mediumDate' }}</td>
             <td>{{ getCountryName(user) }}</td>
-            <td class="flex flex-nowrap items-center">
-              <p-button icon="pi pi-eye" type="button" variant="text" (onClick)="preview(user)"/>
-              <p-button icon="pi pi-pencil" type="button" variant="text" (onClick)="manage(user)"/>
-              <p-button icon="pi pi-trash" type="button" variant="text" (onClick)="delete(user)"/>
+            <td>
+              <div class="flex flex-nowrap items-center">
+                <p-button icon="pi pi-eye" type="button" variant="text" (onClick)="preview(user)"/>
+                <p-button icon="pi pi-pencil" type="button" variant="text" (onClick)="manage(user)"/>
+                <p-button icon="pi pi-trash" type="button" variant="text" (onClick)="delete(user)"/>
+              </div>
             </td>
           </tr>
         </ng-template>

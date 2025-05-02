@@ -5,30 +5,39 @@ import {UserService} from '../../service/user.service';
 import {
   getDefaultIsoCountry,
   getIsoCountryByCode,
-  IsoCountries,
-  IsoCountry
+  IsoCountries
 } from '../../model/iso-country.model';
 import Messages from '../../model/messages.model';
 import {User} from '../../model/user.model';
 import {first} from 'rxjs';
-import {AutoComplete, AutoCompleteCompleteEvent} from 'primeng/autocomplete';
 import {Button} from 'primeng/button';
 import {DatePicker} from 'primeng/datepicker';
 import {InputText} from 'primeng/inputtext';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
+import {CardComponent} from '../card/card.component';
+import {FloatLabel} from 'primeng/floatlabel';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {IftaLabel} from 'primeng/iftalabel';
+import {Select} from 'primeng/select';
 
 @Component({
   selector: 'profile-management',
   imports: [
-    AutoComplete,
     Button,
     DatePicker,
     FormsModule,
     InputText,
     MessagesShowcaseComponent,
     ReactiveFormsModule,
-    FormInputErrorComponent
+    FormInputErrorComponent,
+    CardComponent,
+    FloatLabel,
+    IconField,
+    InputIcon,
+    IftaLabel,
+    Select
   ],
   templateUrl: './profile-management.component.html',
   styles: ``
@@ -38,7 +47,7 @@ export class ProfileManagementComponent implements OnInit {
   private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly userService = inject(UserService);
   protected readonly messages = signal<Messages>({});
-  protected readonly filteredCountries = signal<IsoCountry[]>([]);
+  protected readonly countries = IsoCountries;
   readonly user = input.required<User>();
 
   protected readonly form = this.formBuilder.group({
@@ -50,14 +59,8 @@ export class ProfileManagementComponent implements OnInit {
   });
 
   ngOnInit() {
+    this.form.controls.email.disable();
     this.reset();
-  }
-
-  protected filterCountries(event: AutoCompleteCompleteEvent) {
-    const query = event.query.toLowerCase();
-    this.filteredCountries.set(IsoCountries.filter((country) =>
-      country.name.toLowerCase().startsWith(query)
-    ));
   }
 
   protected reset() {
@@ -65,6 +68,8 @@ export class ProfileManagementComponent implements OnInit {
       ...this.user(),
       country: getIsoCountryByCode(this.user().country)
     });
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
   }
 
   protected save() {
@@ -77,7 +82,7 @@ export class ProfileManagementComponent implements OnInit {
       .edit({
         birthDate: this.form.value.birthDate!,
         country: this.form.value.country!.code,
-        email: this.form.value.email!,
+        email: this.user().email!,
         firstName: this.form.value.firstName!,
         lastName: this.form.value.lastName!,
         userId: this.user()!.id

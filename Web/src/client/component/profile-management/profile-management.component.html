@@ -1,49 +1,65 @@
-<messages-showcase [messages]="messages()"/>
-
-<div class="w-full">
-  <form class="flex flex-wrap w-full max-w-160 gap-4" [formGroup]="form">
-    <!-- First Name -->
-    <div class="flex-1 min-w-48 w-fit">
-      <label for="firstName" class="block text-sm font-medium">First Name</label>
-      <input type="text" id="firstName" formControlName="firstName" pInputText class="mt-1 block w-full"/>
-      <form-input-error [control]="form.controls.firstName"/>
+<card>
+  <p card-header>Details</p>
+  <form card-body class="flex flex-col gap-4" [formGroup]="form">
+    <div class="flex flex-col gap-4 md:flex-row">
+      <!-- First Name -->
+      <div>
+        <p-floatlabel variant="on">
+          <p-iconfield>
+            <p-inputicon class="pi pi-tag"/>
+            <input pInputText id="firstName" formControlName="firstName" type="text"/>
+          </p-iconfield>
+          <label for="firstName">First Name</label>
+        </p-floatlabel>
+        <form-input-error [control]="form.controls.firstName"/>
+      </div>
+      <!-- Last Name -->
+      <div>
+        <p-floatlabel variant="on">
+          <p-iconfield>
+            <p-inputicon class="pi pi-tag"/>
+            <input pInputText id="lastName" formControlName="lastName" type="text"/>
+          </p-iconfield>
+          <label for="lastName">Last Name</label>
+        </p-floatlabel>
+        <form-input-error [control]="form.controls.lastName"/>
+      </div>
+      <!-- Email -->
+      <div>
+        <p-floatlabel variant="on">
+          <p-iconfield>
+            <p-inputicon class="pi pi-envelope"/>
+            <input pInputText id="email" formControlName="email" type="email"/>
+          </p-iconfield>
+          <label for="email">Email</label>
+        </p-floatlabel>
+        <form-input-error [control]="form.controls.email"/>
+      </div>
     </div>
-
-    <!-- Last Name -->
-    <div class="flex-1 min-w-48 w-fit">
-      <label for="lastName" class="block text-sm font-medium">Last Name</label>
-      <input type="text" id="lastName" formControlName="lastName" pInputText class="mt-1 block w-full"/>
-      <form-input-error [control]="form.controls.lastName"/>
+    <div class="flex flex-col gap-4 md:flex-row">
+      <!-- Birth Date -->
+      <div class="w-fit">
+        <p-ifta-label class="w-fit">
+          <p-date-picker formControlName="birthDate" styleClass="min-w-60" inputId="birthDate" appendTo="body"/>
+          <label for="birthDate">Birthdate</label>
+        </p-ifta-label>
+        <form-input-error [control]="form.controls.birthDate"/>
+      </div>
+      <!-- Country Dropdown -->
+      <div class="w-fit">
+        <p-ifta-label>
+          <p-select [options]="countries" formControlName="country" optionLabel="name" styleClass="min-w-60"
+                    appendTo="body"/>
+          <label for="birthDate">Country</label>
+        </p-ifta-label>
+        <form-input-error [control]="form.controls.birthDate"/>
+      </div>
     </div>
-
-    <!-- Email -->
-    <div class="flex-1 min-w-48 w-fit">
-      <label for="email" class="block text-sm font-medium">Email</label>
-      <input type="email" id="email" formControlName="email" pInputText class="mt-1 block w-full"/>
-      <form-input-error [control]="form.controls.email"/>
-    </div>
-
-    <!-- Birth Date -->
-    <div class="flex-1 min-w-48 w-fit">
-      <label for="birthDate" class="block text-sm font-medium">Birthdate</label>
-      <p-datepicker inputId="birthDate" formControlName="birthDate" [showIcon]="true" variant="filled"
-                    inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-primary-50!" class="mt-1 block"
-                    styleClass="w-full" appendTo="body"/>
-      <form-input-error [control]="form.controls.birthDate"/>
-    </div>
-
-    <!-- Country Dropdown -->
-    <div class="flex-1 min-w-48 w-full">
-      <label for="country" class="block text-sm font-medium">Country</label>
-      <p-autocomplete inputId="country" formControlName="country" optionLabel="name" optionValue="code" placeholder="Select acountry"
-                      [dropdown]="true" [suggestions]="filteredCountries()" (completeMethod)="filterCountries($event)"
-                      class="mt-1 block w-full" styleClass="w-full" appendTo="body"/>
-      <form-input-error [control]="form.controls.country"/>
-    </div>
-
-    <div class="w-full flex justify-end mt-4">
-      <p-button label="Reset" [disabled]="!form.dirty" (onClick)="reset()" type="button" class="mr-2"/>
-      <p-button label="Save" [disabled]="form.invalid || !form.dirty" (onClick)="save()" type="submit"/>
+    <messages-showcase [messages]="messages()"/>
+    <div class="flex flex-row gap-1">
+      <p-button label="Reset" [disabled]="!form.dirty" (onClick)="reset()" type="button" class="mr-2" size="small"
+                severity="danger"/>
+      <p-button label="Save" [disabled]="form.invalid || !form.dirty" (onClick)="save()" type="submit" size="small"/>
     </div>
   </form>
-</div>
+</card>

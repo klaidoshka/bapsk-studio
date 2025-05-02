@@ -7,10 +7,11 @@ import {User} from '../../model/user.model';
 import {
   ProfileChangePasswordFormComponent
 } from '../profile-change-password-form/profile-change-password-form.component';
+import {CardComponent} from '../card/card.component';
 
 @Component({
   selector: 'profile-showcase',
-  imports: [TableModule, ProfileManagementComponent, Badge, ProfileChangePasswordFormComponent],
+  imports: [TableModule, ProfileManagementComponent, Badge, ProfileChangePasswordFormComponent, CardComponent],
   templateUrl: './profile-showcase.component.html',
   styles: ``
 })
