@@ -1,227 +1,253 @@
 <div class="h-full w-full relative container mx-auto flex flex-col mb-8">
-  <sale-page-header-section/>
-  <confirmation key="cancel-confirmation" header="Are you sure about cancelling this declaration?"/>
-
-  <div class="flex flex-wrap gap-4" *ngIf="sale.value()">
-    <!-- Row of actions -->
-    <div class="w-full">
-      <p-button *ngIf="!declaration.value()?.isCancelled" title="Refresh declaration" icon="pi pi-refresh"
-                label="Refresh"
-                (click)="refresh()" [disabled]="isRefreshing()"/>
-
-      <p-button *ngIf="!declaration.value()?.isCancelled && !declaration.value()?.export" title="Cancel declaration"
-                icon="pi pi-ban" class="ml-2" label="Cancel" (click)="cancel()" [disabled]="isCancelling()"
-                severity="danger"/>
-    </div>
-
-    <!-- Left Column -->
-    <div class="dark:bg-surface-950 bg-surface-50 flex-1 min-w-42 p-4 rounded-lg shadow-md relative"
-         *ngIf="declaration.value() != undefined">
-      <p class="font-bold text-lg mb-2">Declaration Information</p>
-
-      <p class="text-lg">
-        <strong>Declaration Id:</strong>
-        {{ declaration.value()!.id }}
-      </p>
-
-      <p class="text-lg">
-        <strong>Declared By</strong>
-        {{ toUserIdentityFullName(declaration.value()!.declaredBy) }}
-      </p>
-
-      <p class="text-lg">
-        <strong>Submit Date:</strong>
-        {{ declaration.value()!.submitDate | date:'medium' }}
-      </p>
-
-      <p class="text-lg">
-        <strong>State:</strong>
-        <p-badge class="ml-1"
-                 [value]="declaration.value()!.isCancelled ? 'Cancelled' : toSubmitDeclarationStateLabel(declaration.value()!.state)"
-                 [severity]="declaration.value()!.isCancelled || declaration.value()!.state === SubmitDeclarationState.REJECTED ? 'danger' : 'success'"/>
-      </p>
-
-      <p *ngIf="declaration.value()!.correction > 1" class="text-lg">
-        <strong>Corrected Times:</strong>
-        {{ declaration.value()!.correction }}
-      </p>
-    </div>
-
-    <!-- Right Column -->
-    <div class="dark:bg-surface-950 bg-surface-50 flex-1 min-w-42 p-4 rounded-lg shadow-md">
-      @let saleValue = sale.value()!;
-      <p class="font-bold text-lg mb-2">Sale Information</p>
-
-      <p class="text-lg">
-        <strong>Customer:</strong>
-        {{ toCustomerFullName(saleValue.customer) }}
-      </p>
-
-      <p class="text-lg">
-        <strong>Salesman:</strong>
-        {{ saleValue.salesman.name }}
-      </p>
-
-      <p class="text-lg">
-        <strong>Sold Goods:</strong>
-        {{ saleValue.soldGoods.length }} good(s)
-      </p>
-
-      <p class="text-lg">
-        <strong>VAT to return:</strong>
-        {{ getVATToReturn(saleValue) | currency:'EUR':'symbol':'1.2-2' }}
-      </p>
-    </div>
-  </div>
-
-  <div *ngIf="declaration?.value() && declaration.value()?.qrCodes?.length" class="mt-4">
-    <div class="dark:bg-surface-950 bg-surface-50 rounded-lg shadow-md">
-      <div class="p-4 cursor-pointer flex justify-between items-center" (click)="showQrCodes.set(!showQrCodes())">
-        <p class="font-bold text-lg">QR Codes</p>
-        <svg class="w-6 h-6 transform transition-transform" [ngClass]="{'rotate-180': showQrCodes()}"
-             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-        </svg>
+  <sale-page-header-section [canGoBack]="true"/>
+  @if (sale.isLoading()) {
+    <p-progress-spinner/>
+  } @else if (!sale.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    <confirmation key="cancel-confirmation" header="Are you sure about cancelling this declaration?"/>
+    <div class="flex flex-col gap-4">
+      <!-- Row of actions -->
+      <div class="w-full">
+        @if (!declaration.value()?.isCancelled) {
+          <p-button title="Refresh declaration" icon="pi pi-refresh" label="Refresh" (click)="refresh()" size="small"
+                    [disabled]="isRefreshing()"/>
+          @if (!declaration.value()?.export) {
+            <p-button *ngIf="!declaration.value()?.isCancelled && !declaration.value()?.export"
+                      title="Cancel declaration" size="small" icon="pi pi-ban" class="ml-2" label="Cancel" (click)="cancel()"
+                      [disabled]="isCancelling()" severity="danger"/>
+          }
+        }
       </div>
-      <div class="p-4" *ngIf="showQrCodes()">
-        <div class="flex flex-wrap gap-4">
-          <div *ngFor="let qrCode of declaration.value()!.qrCodes; let i = index"
-               class="flex justify-center w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
-            <img [src]="'data:image/png;base64,' + qrCode" [alt]="'Declaration\'s #' + (i + 1) + ' QR code chunk'"
-                 class="w-48 h-48"/>
+
+      <div class="flex flex-col md:flex-row gap-4">
+        <!-- Declaration -->
+        @if (declaration.value()) {
+          <card class="min-h-62 flex-1">
+            <p card-header>Declaration</p>
+            <div card-body>
+              <p class="text-lg">
+                <strong>Declaration Id</strong>
+                {{ declaration.value()!.id }}
+              </p>
+              <p class="text-lg">
+                <strong>Declared By</strong>
+                {{ toUserIdentityFullName(declaration.value()!.declaredBy) }}
+              </p>
+              <p class="text-lg">
+                <strong>Submit Date</strong>
+                {{ declaration.value()!.submitDate | date:'medium' }}
+              </p>
+              <p class="text-lg">
+                <strong>State</strong>
+                <p-badge class="ml-1"
+                         [value]="declaration.value()!.isCancelled ? 'Cancelled' : toSubmitDeclarationStateLabel(declaration.value()!.state)"
+                         [severity]="declaration.value()!.isCancelled || declaration.value()!.state === SubmitDeclarationState.REJECTED ? 'danger' : 'success'"/>
+              </p>
+              @if (declaration.value()!.correction > 1) {
+                <p class="text-lg">
+                  <strong>Corrected Times</strong>
+                  {{ declaration.value()!.correction }}
+                </p>
+              }
+            </div>
+          </card>
+        }
+
+        <!-- Sale -->
+        <card class="min-h-62 flex-1">
+          <p card-header>Sale</p>
+          <div card-body class="md:mb-7">
+            @let saleValue = sale.value()!;
+            <p class="text-lg">
+              <strong>Customer</strong>
+              {{ toCustomerFullName(saleValue.customer) }}
+            </p>
+            <p class="text-lg">
+              <strong>Salesman</strong>
+              {{ saleValue.salesman.name }}
+            </p>
+            <p class="text-lg">
+              <strong>Sold Goods</strong>
+              {{ saleValue.soldGoods.length }} good(s)
+            </p>
+            <p class="text-lg">
+              <strong>VAT to return</strong>
+              {{ getVATToReturn(saleValue) | currency:'EUR':'symbol':'1.2-2' }}
+            </p>
           </div>
-        </div>
+        </card>
       </div>
-    </div>
-  </div>
 
-  <div class="dark:bg-surface-950 bg-surface-50 card mt-4 p-4 rounded-lg shadow-md" *ngIf="sale.value()">
-    <p class="font-bold text-lg mb-4">Sold Goods</p>
+      @if (declaration.value()?.qrCodes?.length) {
+        <card-headless>
+          <div card-body class="dark:bg-surface-950 bg-surface-50">
+            <div
+              class="p-4 cursor-pointer flex justify-between items-center border-b border-b-primary-950/20 dark:border-b-primary-50/20"
+              (click)="showQrCodes.set(!showQrCodes())">
+              <p class="font-bold text-lg">QR Codes</p>
+              <svg class="w-6 h-6 transform transition-transform" [ngClass]="{'rotate-180': showQrCodes()}"
+                   xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+            @if (showQrCodes()) {
+              <div class="flex flex-wrap gap-4 p-2">
+                @for (qrCode of declaration.value()!.qrCodes; track $index; let i = $index) {
+                  <div class="flex justify-center w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
+                    <img [src]="'data:image/png;base64,' + qrCode"
+                         [alt]="'Declaration\'s #' + (i + 1) + ' QR code chunk'" class="w-48 h-48"/>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </card-headless>
+      }
 
-    <p-table [value]="sale.value()!.soldGoods">
-      <ng-template #header>
-        <tr>
-          <th class="text-left p-2">Sequence No</th>
-          <th class="text-left p-2">Description</th>
-          <th class="text-left p-2">Quantity</th>
-          <th class="text-left p-2">Measure Unit</th>
-          <th class="text-left p-2">Unit Price</th>
-          <th class="text-left p-2">VAT Amount</th>
-          <th class="text-left p-2">Total Amount</th>
-        </tr>
-      </ng-template>
-      <ng-template #body let-soldGood>
-        <tr>
-          <td class="p-2"><p class="text-right">{{ soldGood.sequenceNo }}</p></td>
-          <td class="p-2">{{ soldGood.description }}</td>
-          <td class="p-2"><p class="text-right">{{ soldGood.quantity }}</p></td>
-          <td class="p-2">{{ soldGood.unitOfMeasure }}</td>
-          <td class="p-2"><p class="text-right">{{
-              soldGood.taxableAmount / soldGood.quantity | round:2 | currency:'EUR':'symbol':'1.2-2'
-            }}</p></td>
-          <td class="p-2"><p class="text-right">{{ soldGood.vatAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}
-            ({{ soldGood.vatRate | round:2 }}%)</p></td>
-          <td class="p-2"><p
-            class="text-right">{{ soldGood.totalAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}</p>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
+      @if (sale.value()) {
+        <card>
+          <p card-header>Sold Goods</p>
+          <p card-subHeader>Goods that were sold in the occurred sale.</p>
+          <p-table card-body [value]="sale.value()!.soldGoods" paginatorStyleClass="rounded-t-none! bg-inherit!"
+                   paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]"
+                   [styleClass]="'rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-full overflow-auto ' +
+          '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'">
+            <ng-template #header>
+              <tr>
+                <th class="text-left p-2">Sequence No</th>
+                <th class="text-left p-2">Description</th>
+                <th class="text-left p-2">Quantity</th>
+                <th class="text-left p-2">Measure Unit</th>
+                <th class="text-left p-2">Unit Price</th>
+                <th class="text-left p-2">VAT Amount</th>
+                <th class="text-left p-2">Total Amount</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-soldGood>
+              <tr>
+                <td class="p-2"><p class="text-right">{{ soldGood.sequenceNo }}</p></td>
+                <td class="p-2">{{ soldGood.description }}</td>
+                <td class="p-2"><p class="text-right">{{ soldGood.quantity }}</p></td>
+                <td class="p-2">{{ soldGood.unitOfMeasure }}</td>
+                <td class="p-2"><p class="text-right">{{
+                    soldGood.taxableAmount / soldGood.quantity | round:2 | currency:'EUR':'symbol':'1.2-2'
+                  }}</p></td>
+                <td class="p-2"><p class="text-right">{{ soldGood.vatAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}
+                  ({{ soldGood.vatRate | round:2 }}%)</p></td>
+                <td class="p-2"><p class="text-right">{{ soldGood.totalAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}</p>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </card>
+      }
 
-  <div class="dark:bg-surface-950 bg-surface-50 card mt-4 p-4 rounded-lg shadow-md"
-       *ngIf="declaration?.value()?.export">
-    <p class="font-bold text-lg mb-4">Export Information</p>
+      @if (declaration.value()?.export) {
+        <card>
+          <p card-header>Export Information</p>
+          <div card-body class="flex flex-col gap-4">
+            <div class="mb-4">
+              <p class="text-lg">
+                <strong>Assessment Date</strong>
+                {{ declaration.value()!.export!.assessmentDate | date:'medium' }}
+              </p>
+              <p class="text-lg">
+                <strong>Assessed Declaration Correction No</strong>
+                {{ declaration.value()!.export!.declarationCorrectionNo }}
+              </p>
+              <p class="text-lg" *ngIf="declaration.value()!.export!.correctionDate">
+                <strong>Correction Date</strong>
+                {{ declaration.value()!.export!.correctionDate | date:'medium' }}
+              </p>
+              <p class="text-lg">
+                <strong>Customs Office Code</strong>
+                {{ declaration.value()!.export!.customsOfficeCode }}
+              </p>
+              <p class="text-lg">
+                <strong>Verification Date</strong>
+                {{ declaration.value()!.export!.verificationDate | date:'medium' }}
+              </p>
+              <p class="text-lg">
+                <strong>Verification Result</strong>
+                {{ toExportResultLabel(declaration.value()!.export!.verificationResult) }}
+              </p>
+              <p class="text-lg mt-4"><strong>Assessment Conditions</strong></p>
+              <ul card-body>
+                @for (condition of declaration.value()!.export!.conditions; track condition.code) {
+                  <li class="flex flex-row gap-1 items-center">
+                    <i class="pi pi-exclamation-circle" [pTooltip]="condition.description" tooltipPosition="top"></i>
+                    <p class="text-semibold">{{ condition.code }} - </p>
+                    <p-badge [value]="condition.isMet ? 'Met' : 'Not Met'" [severity]="condition.isMet ? 'success' : 'danger'"/>
+                  </li>
+                }
+              </ul>
+            </div>
 
-    <div class="mb-4">
-      <p class="text-lg">
-        <strong>Assessment Date:</strong>
-        {{ declaration.value()!.export!.assessmentDate | date:'medium' }}
-      </p>
-      <p class="text-lg">
-        <strong>Assessed Declaration Correction No:</strong>
-        {{ declaration.value()!.export!.declarationCorrectionNo }}
-      </p>
-      <p class="text-lg" *ngIf="declaration.value()!.export!.correctionDate">
-        <strong>Correction Date:</strong>
-        {{ declaration.value()!.export!.correctionDate | date:'medium' }}
-      </p>
-      <p class="text-lg">
-        <strong>Customs Office Code:</strong>
-        {{ declaration.value()!.export!.customsOfficeCode }}
-      </p>
-      <p class="text-lg">
-        <strong>Verification Date:</strong>
-        {{ declaration.value()!.export!.verificationDate | date:'medium' }}
-      </p>
-      <p class="text-lg">
-        <strong>Verification Result:</strong>
-        {{ toExportResultLabel(declaration.value()!.export!.verificationResult) }}
-      </p>
-    </div>
+            <card>
+              <p card-header>Verified Sold Goods</p>
+              <p card-subHeader>These goods were exported from the country.</p>
+              <p-table card-body paginatorStyleClass="rounded-t-none! bg-inherit!" paginatorDropdownAppendTo="body"
+                       [styleClass]="'rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-full overflow-auto ' +
+                       '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'"
+                       [value]="declaration.value()!.export!.verifiedSoldGoods" [paginator]="true" [rows]="10"
+                       [rowsPerPageOptions]="[10, 20, 50]">
+                <ng-template #header>
+                  <tr>
+                    <th class="text-left p-2">Sequence No</th>
+                    <th class="text-left p-2">Quantity</th>
+                    <th class="text-left p-2">Quantity Verified</th>
+                    <th class="text-left p-2">Unit of Measure</th>
+                    <th class="text-left p-2">Total Amount</th>
+                  </tr>
+                </ng-template>
+                <ng-template #body let-verifiedGood>
+                  <tr>
+                    <td class="p-2"><p class="text-right">{{ verifiedGood.sequenceNo }}</p></td>
+                    <td class="p-2"><p class="text-right">{{ verifiedGood.quantity }}</p></td>
+                    <td class="p-2"><p class="text-right">{{ verifiedGood.quantityVerified }}</p></td>
+                    <td class="p-2">{{ verifiedGood.unitOfMeasure }}</td>
+                    <td class="p-2"><p
+                      class="text-right">{{ verifiedGood.totalAmount | currency:'EUR':'symbol':'1.2-2' }}</p>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </card>
 
-    <div class="mb-4">
-      <p class="font-bold text-lg mb-2">Assessment Conditions</p>
-      <ul class="list-disc pl-6">
-        <li *ngFor="let condition of declaration.value()!.export!.conditions">
-          <p>
-            <strong>{{ condition.code }}:</strong> {{ condition.description }}
-            <p-badge class="ml-1" [value]="condition.isMet ? 'Met' : 'Not Met'"
-                     [severity]="condition.isMet ? 'success' : 'danger'"/>
-          </p>
-        </li>
-      </ul>
-    </div>
+            <card>
+              <p card-header>VAT Return Payment</p>
+              <p card-subHeader>Returned VAT payment that was executed for the customer.</p>
+              <div card-body>
+                @if (declaration.value()!.payments.length) {
+                  <div class="w-fit">
+                    <vat-return-payment-table [payments]="declaration.value()!.payments"/>
+                  </div>
+                } @else if (!declaration.value()!.isCancelled && instanceId()) {
+                  <vat-return-declaration-payment [instanceId]="instanceIdAsNumber()!" [saleId]="sale.value()!.id"/>
+                } @else {
+                  <p>Because this declaration is cancelled, the payment fact cannot be submitted.</p>
+                }
+              </div>
+            </card>
+          </div>
+        </card>
+      }
 
-    <div class="w-fit mb-4">
-      <p class="font-bold text-lg mb-2">Verified Sold Goods</p>
-      <p-table [value]="declaration.value()!.export!.verifiedSoldGoods" class="w-fit">
-        <ng-template #header>
-          <tr>
-            <th class="text-left p-2">Sequence No</th>
-            <th class="text-left p-2">Quantity</th>
-            <th class="text-left p-2">Quantity Verified</th>
-            <th class="text-left p-2">Unit of Measure</th>
-            <th class="text-left p-2">Total Amount</th>
-          </tr>
-        </ng-template>
-        <ng-template #body let-verifiedGood>
-          <tr>
-            <td class="p-2"><p class="text-right">{{ verifiedGood.sequenceNo }}</p></td>
-            <td class="p-2"><p class="text-right">{{ verifiedGood.quantity }}</p></td>
-            <td class="p-2"><p class="text-right">{{ verifiedGood.quantityVerified }}</p></td>
-            <td class="p-2">{{ verifiedGood.unitOfMeasure }}</td>
-            <td class="p-2"><p class="text-right">{{ verifiedGood.totalAmount | currency:'EUR':'symbol':'1.2-2' }}</p>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
+      @if (sale.value() && !declaration.value()?.isCancelled && !declaration.value()?.export && instanceId()) {
+        <card-headless>
+          <div card-body>
+            <p class="font-bold text-lg my-2" *ngIf="declaration.value() === undefined">
+              This sale does not have a submitted VAT return declaration.
+            </p>
 
-    <div class="w-full">
-      <p class="font-bold text-lg mb-2">VAT Return Payment</p>
-      @if (declaration.value()!.payments.length) {
-        <div class="w-fit">
-          <vat-return-payment-table [payments]="declaration.value()!.payments"/>
-        </div>
-      } @else if (!declaration.value()!.isCancelled && instanceId()) {
-        <vat-return-declaration-payment [instanceId]="instanceIdAsNumber()!" [saleId]="sale.value()!.id"/>
-      } @else {
-        <p>Because this declaration is cancelled, the payment fact cannot be submitted.</p>
+            <div class="rounded mt-4">
+              <vat-return-declaration-submission [instanceId]="instanceIdAsNumber()!" [sale]="sale.value()!"
+                                                 [hasDeclaration]="!!declaration.value()"/>
+            </div>
+          </div>
+        </card-headless>
       }
     </div>
-  </div>
-
-  <div
-    *ngIf="sale.value() && !declaration.value()?.isCancelled && !declaration.value()?.export && instanceId()"
-    class="dark:bg-surface-950 bg-surface-50">
-    <p class="font-bold text-lg my-2" *ngIf="declaration.value() === undefined">
-      This sale does not have a submitted VAT return declaration.
-    </p>
-
-    <div class="p-4 rounded mt-4">
-      <vat-return-declaration-submission [instanceId]="instanceIdAsNumber()!" [sale]="sale.value()!"
-                                         [hasDeclaration]="!!declaration.value()"/>
-    </div>
-  </div>
+  }
 </div>

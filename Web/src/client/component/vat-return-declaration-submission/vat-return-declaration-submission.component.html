@@ -6,8 +6,6 @@
   </p>
   <label for="affirmation" class="block text-sm font-medium mt-2">Affirmation</label>
   <p-checkbox binary="true" formControlName="affirmation" id="affirmation" class="mt-1 block w-fit"/>
-  <div class="flex justify-end mt-4">
-    <p-button [label]="!hasDeclaration() ? 'Submit' : 'Resubmit'" [disabled]="!form.valid || !form.dirty"
-              (onClick)="save()" type="submit"/>
-  </div>
+  <p-button size="small" [label]="!hasDeclaration() ? 'Submit' : 'Resubmit'" [disabled]="!form.valid || !form.dirty"
+            styleClass="mt-2" (onClick)="save()" type="submit"/>
 </form>

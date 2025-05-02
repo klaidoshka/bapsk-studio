@@ -7,7 +7,7 @@
       <div class="flex flex-col gap-4 md:flex-row">
         <!-- First Name -->
         <div>
-          <p-floatlabel variant="on">
+          <p-floatlabel variant="on" class="w-60">
             <p-iconfield>
               <p-inputicon class="pi pi-tag"/>
               <input pInputText id="firstName" formControlName="firstName" type="text"/>
@@ -19,7 +19,7 @@
 
         <!-- Last Name -->
         <div>
-          <p-floatlabel variant="on">
+          <p-floatlabel variant="on" class="w-60">
             <p-iconfield>
               <p-inputicon class="pi pi-tag"/>
               <input pInputText id="lastName" formControlName="lastName" type="text"/>
@@ -33,7 +33,7 @@
       <div class="flex flex-col gap-4 md:flex-row">
         <!-- Email -->
         <div>
-          <p-floatlabel variant="on">
+          <p-floatlabel variant="on" class="w-60">
             <p-iconfield>
               <p-inputicon class="pi pi-envelope"/>
               <input pInputText id="email" formControlName="email" type="email"/>
@@ -46,7 +46,7 @@
         @if (!user.value()) {
           <!-- Password -->
           <div>
-            <p-floatlabel variant="on">
+            <p-floatlabel variant="on" class="w-60">
               <p-iconfield>
                 <p-inputicon class="pi pi-lock"/>
                 <input pInputText id="password" formControlName="password" type="password"/>
@@ -70,7 +70,7 @@
 
         <!-- Country Dropdown -->
         <div class="w-fit">
-          <p-float-label variant="on">
+          <p-float-label variant="on" class="w-60">
             <p-select dropdownIcon="pi pi-globe" [options]="countries" formControlName="country" optionLabel="name" styleClass="min-w-60"
                       appendTo="body"/>
             <label for="country">Country</label>

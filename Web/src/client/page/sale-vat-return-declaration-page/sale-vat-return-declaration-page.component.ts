@@ -9,27 +9,26 @@ import {
 } from '../../component/vat-return-declaration-submission/vat-return-declaration-submission.component';
 import {toUserIdentityFullName} from '../../model/user.model';
 import {toCustomerFullName} from '../../model/customer.model';
-import {
-  SubmitDeclarationState,
-  toExportResultLabel,
-  toSubmitDeclarationStateLabel
-} from '../../model/vat-return.model';
+import {SubmitDeclarationState, toExportResultLabel, toSubmitDeclarationStateLabel} from '../../model/vat-return.model';
 import {NumberUtil} from '../../util/number.util';
 import {Button} from 'primeng/button';
-import {CurrencyPipe, DatePipe, NgClass, NgForOf, NgIf} from '@angular/common';
+import {CurrencyPipe, DatePipe, NgClass, NgIf} from '@angular/common';
 import {Badge} from 'primeng/badge';
 import {TableModule} from 'primeng/table';
 import {RoundPipe} from '../../pipe/round.pipe';
-import {
-  VatReturnPaymentTableComponent
-} from '../../component/vat-return-payment-table/vat-return-payment-table.component';
+import {VatReturnPaymentTableComponent} from '../../component/vat-return-payment-table/vat-return-payment-table.component';
 import {
   VatReturnDeclarationPaymentComponent
 } from '../../component/vat-return-declaration-payment/vat-return-declaration-payment.component';
 import {SaleService} from '../../service/sale.service';
+import {SalePageHeaderSectionComponent} from "../../component/sale-page-header-section/sale-page-header-section.component";
+import {CardComponent} from '../../component/card/card.component';
+import {CardHeadlessComponent} from '../../component/card-headless/card-headless.component';
 import {
-  SalePageHeaderSectionComponent
-} from "../../component/sale-page-header-section/sale-page-header-section.component";
+  FailedToLoadPleaseReloadComponent
+} from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
+import {ProgressSpinner} from 'primeng/progressspinner';
+import {Tooltip} from 'primeng/tooltip';
 
 @Component({
   selector: 'sale-vat-return-declaration-page',
@@ -46,8 +45,12 @@ import {
     VatReturnPaymentTableComponent,
     VatReturnDeclarationPaymentComponent,
     VatReturnDeclarationSubmissionComponent,
-    NgForOf,
-    SalePageHeaderSectionComponent
+    SalePageHeaderSectionComponent,
+    CardComponent,
+    CardHeadlessComponent,
+    FailedToLoadPleaseReloadComponent,
+    ProgressSpinner,
+    Tooltip
   ],
   templateUrl: './sale-vat-return-declaration-page.component.html',
   styles: ``

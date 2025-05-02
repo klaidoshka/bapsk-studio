@@ -4,10 +4,7 @@ import {DatePicker} from "primeng/datepicker";
 import {FormInputErrorComponent} from "../../component/form-input-error/form-input-error.component";
 import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {InputText} from "primeng/inputtext";
-import {
-  MessagesShowcaseComponent
-} from "../../component/messages-showcase/messages-showcase.component";
-import {NgForOf, NgIf} from "@angular/common";
+import {MessagesShowcaseComponent} from "../../component/messages-showcase/messages-showcase.component";
 import {Select} from "primeng/select";
 import {UnitOfMeasureType} from '../../model/unit-of-measure-type.model';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
@@ -18,16 +15,14 @@ import {first, map, of, tap} from 'rxjs';
 import {NumberUtil} from '../../util/number.util';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {SaleReceiptType, saleReceiptTypes} from './sale-receipt-type.model';
-import {
-  defaultStandardMeasurement,
-  measurementUnits,
-  StandardMeasurements
-} from './standard-measurement.model';
+import {defaultStandardMeasurement, measurementUnits, StandardMeasurements} from './standard-measurement.model';
 import {CustomerService} from '../../service/customer.service';
 import {SalesmanService} from '../../service/salesman.service';
-import {
-  SalePageHeaderSectionComponent
-} from "../../component/sale-page-header-section/sale-page-header-section.component";
+import {SalePageHeaderSectionComponent} from "../../component/sale-page-header-section/sale-page-header-section.component";
+import {CardComponent} from '../../component/card/card.component';
+import {FloatLabel} from 'primeng/floatlabel';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
 
 @Component({
   selector: 'sale-management-page',
@@ -38,11 +33,13 @@ import {
     FormsModule,
     InputText,
     MessagesShowcaseComponent,
-    NgForOf,
-    NgIf,
     ReactiveFormsModule,
     Select,
-    SalePageHeaderSectionComponent
+    SalePageHeaderSectionComponent,
+    CardComponent,
+    FloatLabel,
+    IconField,
+    InputIcon
   ],
   templateUrl: './sale-management-page.component.html',
   styles: ``
@@ -70,7 +67,7 @@ export class SaleManagementPageComponent {
         .getAllByInstanceId(request.instanceId)
         .pipe(
           map(customers => customers.map(customer => ({
-            label: `${customer.firstName} ${customer.lastName} (${customer.identityDocument.number})`,
+            label: `${customer.firstName} ${customer.lastName} (ID ${customer.identityDocument.number})`,
             value: customer.id
           })))
         )

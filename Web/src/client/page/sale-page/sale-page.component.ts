@@ -8,16 +8,16 @@ import Sale, {SaleWithVatReturnDeclaration, SoldGood} from '../../model/sale.mod
 import {first, of} from 'rxjs';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from '@angular/router';
-import {
-  MessagesShowcaseComponent
-} from '../../component/messages-showcase/messages-showcase.component';
+import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
 import {Button} from 'primeng/button';
 import {TableModule} from 'primeng/table';
 import {CurrencyPipe, DatePipe} from '@angular/common';
 import {NumberUtil} from '../../util/number.util';
-import {
-  SalePageHeaderSectionComponent
-} from '../../component/sale-page-header-section/sale-page-header-section.component';
+import {SalePageHeaderSectionComponent} from '../../component/sale-page-header-section/sale-page-header-section.component';
+import {CardComponent} from '../../component/card/card.component';
+import {BadgeContrastedComponent} from '../../component/badge-contrasted/badge-contrasted.component';
+import {SubmitDeclarationState} from '../../model/vat-return.model';
+import {Badge} from 'primeng/badge';
 
 @Component({
   selector: 'sale-page',
@@ -28,7 +28,10 @@ import {
     TableModule,
     CurrencyPipe,
     DatePipe,
-    SalePageHeaderSectionComponent
+    SalePageHeaderSectionComponent,
+    CardComponent,
+    BadgeContrastedComponent,
+    Badge
   ],
   templateUrl: './sale-page.component.html',
   styles: ``
@@ -38,6 +41,7 @@ export class SalePageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly saleService = inject(SaleService);
+  protected readonly SubmitDeclarationState = SubmitDeclarationState;
   protected readonly toCustomerFullName = toCustomerFullName;
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly instanceId = input.required<string>();
@@ -64,6 +68,10 @@ export class SalePageComponent {
 
   protected getTotalPrice(soldGoods: SoldGood[]): number {
     return soldGoods.reduce((total, soldGood) => total + soldGood.totalAmount, 0);
+  }
+
+  protected getTotalVAT(soldGoods: SoldGood[]): number {
+    return soldGoods.reduce((total, soldGood) => total + soldGood.vatAmount, 0);
   }
 
   protected manage(sale?: Sale) {

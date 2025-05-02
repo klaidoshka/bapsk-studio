@@ -10,7 +10,7 @@
           <div class="flex flex-col gap-4 md:flex-row">
             <!-- First Name -->
             <div>
-              <p-floatlabel variant="on">
+              <p-floatlabel variant="on" class="w-60">
                 <p-iconfield>
                   <p-inputicon class="pi pi-tag"/>
                   <input pInputText id="firstName" formControlName="firstName" type="text"/>
@@ -22,7 +22,7 @@
 
             <!-- Last Name -->
             <div>
-              <p-floatlabel variant="on">
+              <p-floatlabel variant="on" class="w-60">
                 <p-iconfield>
                   <p-inputicon class="pi pi-tag"/>
                   <input pInputText id="lastName" formControlName="lastName" type="text"/>
@@ -34,7 +34,7 @@
 
             <!-- Email -->
             <div>
-              <p-floatlabel variant="on">
+              <p-floatlabel variant="on" class="w-60">
                 <p-iconfield>
                   <p-inputicon class="pi pi-envelope"/>
                   <input pInputText id="email" formControlName="email" type="email"/>
@@ -47,7 +47,7 @@
 
           <div class="flex flex-col md:flex-row gap-4">
             <!-- Birthdate -->
-            <div class="w-fit">
+            <div>
               <p-float-label variant="on" class="w-fit">
                 <p-date-picker icon="pi pi-calendar" iconDisplay="input" showIcon formControlName="birthdate" styleClass="min-w-60" inputId="birthdate" appendTo="body"/>
                 <label for="birthdate">Birthdate</label>
@@ -56,8 +56,8 @@
             </div>
 
             <!-- Residence Country -->
-            <div class="w-fit">
-              <p-float-label variant="on">
+            <div>
+              <p-float-label variant="on" class="w-60">
                 <p-select dropdownIcon="pi pi-globe" [options]="IsoCountries" formControlName="residenceCountry" optionLabel="name"
                           optionValue="code" styleClass="min-w-60" appendTo="body"/>
                 <label for="residenceCountry">Residence Country</label>
@@ -74,8 +74,8 @@
         <div card-body formGroupName="identityDocument" class="flex flex-col gap-4">
           <div class="flex flex-col md:flex-row gap-4">
             <!-- ID Type -->
-            <div class="w-fit">
-              <p-float-label variant="on">
+            <div>
+              <p-float-label variant="on" class="w-60">
                 <p-select dropdownIcon="pi pi-objects-column" [options]="identityDocumentTypes" formControlName="type" optionLabel="label"
                           optionValue="value" styleClass="min-w-60" appendTo="body"/>
                 <label for="type">Type</label>
@@ -84,8 +84,8 @@
             </div>
 
             <!-- ID Issued By -->
-            <div class="w-fit">
-              <p-float-label variant="on">
+            <div>
+              <p-float-label variant="on" class="w-60">
                 <p-select dropdownIcon="pi pi-globe" [options]="IsoCountries" formControlName="issuedBy"
                           optionLabel="name" optionValue="code" styleClass="min-w-60" appendTo="body"/>
                 <label for="issuedBy">Issued By</label>
@@ -94,8 +94,8 @@
             </div>
 
             <!-- ID Number -->
-            <div class="w-fit">
-              <p-float-label variant="on">
+            <div>
+              <p-float-label variant="on" class="w-60">
                 <p-iconfield>
                   <p-inputicon class="pi pi-hashtag"/>
                   <input pInputText formControlName="number" type="text" id="number"/>
@@ -106,8 +106,8 @@
             </div>
 
             <!-- ID Value -->
-            <div class="w-fit">
-              <p-float-label variant="on">
+            <div>
+              <p-float-label variant="on" class="w-60">
                 <p-iconfield>
                   <p-inputicon class="pi pi-code"/>
                   <input pInputText formControlName="value" type="text" id="value"/>
@@ -130,8 +130,8 @@
             <div [formGroupName]="i">
               <div class="flex flex-wrap gap-4">
                 <!-- Other ID Issued By -->
-                <div class="w-fit">
-                  <p-float-label variant="on">
+                <div>
+                  <p-float-label variant="on" class="w-60">
                     <p-select dropdownIcon="pi pi-globe" [options]="IsoCountries" formControlName="issuedBy"
                               optionLabel="name" optionValue="code" styleClass="min-w-60" appendTo="body"/>
                     <label for="issuedBy">Issued By</label>
@@ -140,8 +140,8 @@
                 </div>
 
                 <!-- Other ID Type -->
-                <div class="w-fit">
-                  <p-float-label variant="on">
+                <div>
+                  <p-float-label variant="on" class="w-60">
                     <p-iconfield>
                       <p-inputicon class="pi pi-objects-column"/>
                       <input pInputText formControlName="type" type="text" id="type"/>
@@ -152,8 +152,8 @@
                 </div>
 
                 <!-- Other ID Value -->
-                <div class="w-fit">
-                  <p-float-label variant="on">
+                <div>
+                  <p-float-label variant="on" class="w-60">
                     <p-iconfield>
                       <p-inputicon class="pi pi-code"/>
                       <input pInputText formControlName="value" type="text" id="value"/>

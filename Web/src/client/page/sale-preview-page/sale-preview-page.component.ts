@@ -6,9 +6,12 @@ import {SaleService} from '../../service/sale.service';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {NumberUtil} from '../../util/number.util';
 import {of} from 'rxjs';
+import {SalePageHeaderSectionComponent} from '../../component/sale-page-header-section/sale-page-header-section.component';
+import {ProgressSpinner} from 'primeng/progressspinner';
 import {
-  SalePageHeaderSectionComponent
-} from '../../component/sale-page-header-section/sale-page-header-section.component';
+  FailedToLoadPleaseReloadComponent
+} from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
+import {CardComponent} from '../../component/card/card.component';
 
 @Component({
   selector: 'sale-preview-page',
@@ -17,7 +20,10 @@ import {
     DatePipe,
     RoundPipe,
     TableModule,
-    SalePageHeaderSectionComponent
+    SalePageHeaderSectionComponent,
+    ProgressSpinner,
+    FailedToLoadPleaseReloadComponent,
+    CardComponent
   ],
   templateUrl: './sale-preview-page.component.html',
   styles: ``

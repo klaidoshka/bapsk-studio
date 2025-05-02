@@ -7,7 +7,7 @@
     @if (!instanceId()) {
       <messages-showcase [messages]="{warning: ['Please select an instance to manage import configurations.']}"/>
     } @else {
-      <p-button label="Create" icon="pi pi-plus" type="button" (onClick)="manage()"/>
+      <p-button label="Create" type="button" (onClick)="manage()"/>
     }
 
     <p-table styleClass="w-fit shadow-lg mt-2 dark:bg-primary-950! bg-primary-50!"

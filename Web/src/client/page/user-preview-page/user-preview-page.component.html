@@ -12,23 +12,20 @@
         <card>
           <p card-header>Details</p>
           <div card-body class="flex flex-col gap-2">
-            <div class="flex flex-row">
-              <p class="font-semibold mr-2">Name</p>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">Name</p>
               <p>{{ userValue.firstName + ' ' + userValue.lastName }}</p>
             </div>
-
-            <div class="flex flex-row">
-              <p class="font-semibold mr-2">Email</p>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">Email</p>
               <p>{{ userValue.email }}</p>
             </div>
-
-            <div class="flex flex-row">
-              <p class="font-semibold mr-2">Birthdate</p>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">Birthdate</p>
               <p>{{ userValue.birthDate | date:'mediumDate' }}</p>
             </div>
-
-            <div class="flex flex-row">
-              <p class="font-semibold mr-2">Country</p>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">Country</p>
               <p>{{ getCountryName(userValue) }}</p>
             </div>
           </div>

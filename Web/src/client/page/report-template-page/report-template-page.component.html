@@ -3,7 +3,7 @@
   <confirmation key="report-template-delete-confirmation" header="Are you sure about deleting this report template?"/>
   <messages-showcase [messages]="messages()"/>
   <div class="card mt-4">
-    <p-button label="Create" icon="pi pi-plus" type="button" (onClick)="manage()"/>
+    <p-button label="Create" type="button" (onClick)="manage()"/>
     <p-table styleClass="w-fit shadow-lg mt-2 dark:bg-primary-950! bg-primary-50!"
              paginatorStyleClass="dark:bg-primary-950! bg-primary-50!" [value]="templates.value() || []"
              [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">

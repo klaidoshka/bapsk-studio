@@ -8,11 +8,13 @@ import {PaymentType, PaymentTypes} from '../../model/vat-return.model';
 import {first} from 'rxjs';
 import {MessageService} from 'primeng/api';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
-import {NgForOf, NgIf} from '@angular/common';
 import {DatePicker} from 'primeng/datepicker';
-import {InputNumber} from 'primeng/inputnumber';
 import {Select} from 'primeng/select';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
+import {FloatLabel} from 'primeng/floatlabel';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
 
 @Component({
   selector: 'vat-return-declaration-payment',
@@ -20,12 +22,13 @@ import {ConfirmationComponent} from '../confirmation/confirmation.component';
     Button,
     MessagesShowcaseComponent,
     ReactiveFormsModule,
-    NgForOf,
     DatePicker,
-    InputNumber,
     Select,
-    NgIf,
-    ConfirmationComponent
+    ConfirmationComponent,
+    FloatLabel,
+    IconField,
+    InputIcon,
+    InputText
   ],
   templateUrl: './vat-return-declaration-payment.component.html',
   styles: ``

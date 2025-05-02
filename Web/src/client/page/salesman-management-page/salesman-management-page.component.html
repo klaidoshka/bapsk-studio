@@ -1,5 +1,5 @@
 <div class="h-full w-full relative container mx-auto flex flex-col mb-8">
-  <salesman-page-header-section/>
+  <salesman-page-header-section [canGoBack]="true"/>
   <form class="min-w-128" [formGroup]="form">
     <messages-showcase [messages]="messages()"/>
 
