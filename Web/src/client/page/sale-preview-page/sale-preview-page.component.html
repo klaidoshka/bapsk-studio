@@ -1,7 +1,7 @@
 <div class="h-full w-full relative container mx-auto flex flex-col mb-8">
   <sale-page-header-section [canGoBack]="true"/>
   @if (sale.isLoading()) {
-    <p-progress-spinner/>
+    <loading-spinner/>
   } @else if (!sale.value()) {
     <failed-to-load-please-reload/>
   } @else {

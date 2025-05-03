@@ -7,7 +7,7 @@ import {of} from 'rxjs';
 import {
   SalesmanPageHeaderSectionComponent
 } from "../../component/salesman-page-header-section/salesman-page-header-section.component";
-import {ProgressSpinner} from 'primeng/progressspinner';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {
   FailedToLoadPleaseReloadComponent
 } from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
@@ -17,7 +17,7 @@ import {CardComponent} from '../../component/card/card.component';
   selector: 'salesman-preview-page',
   imports: [
     SalesmanPageHeaderSectionComponent,
-    ProgressSpinner,
+    LoadingSpinnerComponent,
     FailedToLoadPleaseReloadComponent,
     CardComponent
   ],

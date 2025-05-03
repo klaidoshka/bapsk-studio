@@ -9,7 +9,7 @@
     </p>
   </section>
   @if (user.isLoading()) {
-    <p-progress-spinner/>
+    <loading-spinner/>
   } @else if (!user.value()) {
     <failed-to-load-please-reload/>
   } @else {

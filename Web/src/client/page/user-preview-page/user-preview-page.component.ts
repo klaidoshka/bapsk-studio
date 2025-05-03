@@ -8,7 +8,7 @@ import {of} from 'rxjs';
 import {
   FailedToLoadPleaseReloadComponent
 } from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
-import {ProgressSpinner} from 'primeng/progressspinner';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {
   UserPageHeaderSectionComponent
 } from '../../component/user-page-header-section/user-page-header-section.component';
@@ -19,7 +19,7 @@ import {CardComponent} from '../../component/card/card.component';
   imports: [
     DatePipe,
     FailedToLoadPleaseReloadComponent,
-    ProgressSpinner,
+    LoadingSpinnerComponent,
     UserPageHeaderSectionComponent,
     CardComponent
   ],

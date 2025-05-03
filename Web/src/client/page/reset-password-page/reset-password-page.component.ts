@@ -17,7 +17,7 @@ import {
 } from '../../component/messages-showcase/messages-showcase.component';
 import {Password} from 'primeng/password';
 import {Button} from 'primeng/button';
-import {ProgressSpinner} from 'primeng/progressspinner';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {FormInputErrorComponent} from '../../component/form-input-error/form-input-error.component';
 
 @Component({
@@ -27,7 +27,7 @@ import {FormInputErrorComponent} from '../../component/form-input-error/form-inp
     MessagesShowcaseComponent,
     Password,
     Button,
-    ProgressSpinner,
+    LoadingSpinnerComponent,
     RouterLink,
     FormInputErrorComponent
   ],

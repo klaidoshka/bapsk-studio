@@ -10,7 +10,7 @@ import {NumberUtil} from '../../util/number.util';
 import {
   CustomerPageHeaderSectionComponent
 } from '../../component/customer-page-header-section/customer-page-header-section.component';
-import {ProgressSpinner} from 'primeng/progressspinner';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {
   FailedToLoadPleaseReloadComponent
 } from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
@@ -22,7 +22,7 @@ import {CardComponent} from '../../component/card/card.component';
     DatePipe,
     TableModule,
     CustomerPageHeaderSectionComponent,
-    ProgressSpinner,
+    LoadingSpinnerComponent,
     FailedToLoadPleaseReloadComponent,
     CardComponent
   ],

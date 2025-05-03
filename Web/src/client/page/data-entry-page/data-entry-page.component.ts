@@ -21,6 +21,7 @@ import {NumberUtil} from '../../util/number.util';
 import {
   DataEntryPageHeaderSectionComponent
 } from '../../component/data-entry-page-header-section/data-entry-page-header-section.component';
+import {CardComponent} from '../../component/card/card.component';
 
 @Component({
   selector: 'data-entry-page',
@@ -32,7 +33,8 @@ import {
     Dialog,
     MessagesShowcaseComponent,
     RouterLink,
-    DataEntryPageHeaderSectionComponent
+    DataEntryPageHeaderSectionComponent,
+    CardComponent
   ],
   templateUrl: './data-entry-page.component.html',
   styles: ``

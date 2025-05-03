@@ -7,7 +7,7 @@ import {
 } from '../../component/session-showcase/session-showcase.component';
 import {AuthService} from '../../service/auth.service';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {ProgressSpinner} from 'primeng/progressspinner';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {
   FailedToLoadPleaseReloadComponent
 } from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
@@ -17,7 +17,7 @@ import {
   imports: [
     ProfileShowcaseComponent,
     SessionShowcaseComponent,
-    ProgressSpinner,
+    LoadingSpinnerComponent,
     FailedToLoadPleaseReloadComponent
   ],
   templateUrl: './profile-page.component.html',

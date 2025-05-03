@@ -175,12 +175,14 @@
           }
           <!-- Add Other ID Button -->
           <div class="mt-4">
-            <p-button title="Add Other Document" size="small" label="Add Other Document" (onClick)="addOtherDocument()"/>
+            <p-button title="Add Other Document" size="small" label="Add Other Document"
+                      (onClick)="addOtherDocument()"/>
           </div>
         </div>
       </card>
       <messages-showcase [messages]="messages()"/>
-      <p-button title="Submit" size="small" [label]="!customerId() ? 'Create' : 'Save'" [disabled]="form.invalid || !form.dirty"
+      <p-button title="Submit" size="small" [label]="!customerId() ? 'Create' : 'Save'"
+                [disabled]="form.invalid || !form.dirty"
                 (onClick)="save()" type="submit"/>
     </form>
   </card>

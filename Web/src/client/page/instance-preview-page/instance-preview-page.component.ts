@@ -9,7 +9,7 @@ import {InstanceService} from '../../service/instance.service';
 import {
   InstancePageHeaderSectionComponent
 } from '../../component/instance-page-header-section/instance-page-header-section.component';
-import {ProgressSpinner} from 'primeng/progressspinner';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {
   FailedToLoadPleaseReloadComponent
 } from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
@@ -27,7 +27,7 @@ import {DataEntryService} from '../../service/data-entry.service';
     DatePipe,
     TableModule,
     InstancePageHeaderSectionComponent,
-    ProgressSpinner,
+    LoadingSpinnerComponent,
     FailedToLoadPleaseReloadComponent,
     CardComponent,
     BadgeContrastedComponent,

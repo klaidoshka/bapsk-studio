@@ -1,6 +1,7 @@
-<p-table styleClass="w-fit shadow-lg mt-2 dark:bg-primary-950! bg-primary-50!"
-         paginatorStyleClass="dark:bg-primary-950! bg-primary-50!" [columns]="dataType().fields || []"
-         [value]="dataEntries()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+<p-table paginatorStyleClass="rounded-t-none! bg-inherit!" paginatorDropdownAppendTo="body"
+         [styleClass]="'rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-full overflow-auto ' +
+          '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'"
+         [value]="dataEntries()" [columns]="dataType().fields" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
   <ng-template #header let-columns>
     <tr>
       @for (fields of columns; track fields.id) {
@@ -13,24 +14,26 @@
     </tr>
   </ng-template>
 
-  <ng-template
-    #body
-    let-dataEntry
-  >
+  <ng-template #body let-dataEntry>
     <tr>
       @for (field of dataEntry.fields; track field.id) {
         <td>
-          <data-type-entry-field-display [dataTypeFieldId]="field.dataTypeFieldId" [dataType]="dataType()"
-                                         [value]="field.value" [instanceId]="instanceId()"/>
+          <data-type-entry-field-display [dataTypeFieldId]="field.dataTypeFieldId" [dataType]="dataType()" [value]="field.value"
+                                         [instanceId]="instanceId()"/>
         </td>
       }
       <td>{{ dataEntry.createdAt | date:'short' }}</td>
       <td>{{ dataEntry.modifiedAt | date:'short' }}</td>
       <td>{{ toUserIdentityFullName(dataEntry.modifiedBy) }}</td>
-      <td *ngIf="containsActions()" class="flex flex-nowrap items-center">
-        <p-button *ngIf="preview()" icon="pi pi-eye" type="button" variant="text" (onClick)="preview()?.(dataEntry)"/>
-        <p-button *ngIf="manage()" icon="pi pi-pencil" type="button" variant="text" (onClick)="manage()?.(dataEntry)"/>
-        <p-button *ngIf="delete()" icon="pi pi-trash" type="button" variant="text" (onClick)="delete()?.(dataEntry)"/>
+      <td *ngIf="containsActions()">
+        <div class="flex flex-nowrap items-center">
+          <p-button *ngIf="preview()" title="Preview" icon="pi pi-eye" type="button" variant="text"
+                    (onClick)="preview()?.(dataEntry)"/>
+          <p-button *ngIf="manage()" title="Edit" icon="pi pi-pencil" type="button" variant="text"
+                    (onClick)="manage()?.(dataEntry)"/>
+          <p-button *ngIf="delete()" title="Delete" icon="pi pi-trash" type="button" variant="text"
+                    (onClick)="delete()?.(dataEntry)"/>
+        </div>
       </td>
     </tr>
   </ng-template>

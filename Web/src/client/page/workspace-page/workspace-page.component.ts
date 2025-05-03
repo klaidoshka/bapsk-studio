@@ -11,11 +11,12 @@ import {
 import {InstanceService} from '../../service/instance.service';
 import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'workspace-page',
   templateUrl: './workspace-page.component.html',
-  imports: [DropdownModule, FormsModule, RouterOutlet, InstanceSelectorComponent, RouterLink, RouterLinkActive, Button, Dialog],
+  imports: [DropdownModule, FormsModule, RouterOutlet, InstanceSelectorComponent, RouterLink, RouterLinkActive, Button, Dialog, LoadingSpinnerComponent, LoadingSpinnerComponent],
   providers: []
 })
 export class WorkspacePageComponent {
@@ -24,6 +25,7 @@ export class WorkspacePageComponent {
   private readonly router = inject(Router);
   protected readonly instanceId = this.instanceService.getActiveInstanceId();
   protected readonly instanceName = computed(() => this.instanceService.getActiveInstance()()?.name);
+  protected readonly isLoading = this.instanceService.getLoadingState();
 
   protected readonly dataTypes = rxResource({
     request: () => ({instanceId: this.instanceId()}),

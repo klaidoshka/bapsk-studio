@@ -22,6 +22,7 @@ export class InstanceService {
   private readonly userService = inject(UserService);
   private readonly cacheService = new CacheService<number, Instance>(instance => instance.id!);
   private readonly instancesFetched = signal<boolean>(false);
+  private readonly isLoading = signal<boolean>(true);
   private readonly activeInstance = signal<Instance | undefined>(undefined);
 
   constructor() {
@@ -52,6 +53,10 @@ export class InstanceService {
           }
         } else if (instances.length == 0 && this.activeInstance() !== undefined) {
           this.activeInstance.set(undefined);
+        }
+        
+        if (this.isLoading()) {
+          this.isLoading.set(false);
         }
       });
   }
@@ -181,6 +186,10 @@ export class InstanceService {
 
   getActiveInstanceId(): Signal<number | undefined> {
     return computed(() => this.activeInstance()?.id);
+  }
+
+  getLoadingState(): Signal<boolean> {
+    return this.isLoading.asReadonly();
   }
 
   setActiveInstance(instance?: Instance) {

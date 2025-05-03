@@ -27,7 +27,7 @@ import {CardHeadlessComponent} from '../../component/card-headless/card-headless
 import {
   FailedToLoadPleaseReloadComponent
 } from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
-import {ProgressSpinner} from 'primeng/progressspinner';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {Tooltip} from 'primeng/tooltip';
 
 @Component({
@@ -48,7 +48,7 @@ import {Tooltip} from 'primeng/tooltip';
     CardComponent,
     CardHeadlessComponent,
     FailedToLoadPleaseReloadComponent,
-    ProgressSpinner,
+    LoadingSpinnerComponent,
     Tooltip
   ],
   templateUrl: './sale-vat-return-declaration-page.component.html',

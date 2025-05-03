@@ -1,5 +1,9 @@
 import {Component, computed, inject, input, signal} from '@angular/core';
-import {SubmitDeclarationState, toExportResultLabel, toSubmitDeclarationStateLabel} from '../../model/vat-return.model';
+import {
+  SubmitDeclarationState,
+  toExportResultLabel,
+  toSubmitDeclarationStateLabel
+} from '../../model/vat-return.model';
 import {VatReturnService} from '../../service/vat-return.service';
 import {TableModule} from 'primeng/table';
 import {first, of} from 'rxjs';
@@ -8,12 +12,12 @@ import {toCustomerFullName} from '../../model/customer.model';
 import {RoundPipe} from '../../pipe/round.pipe';
 import {SaleWithVatReturnDeclaration} from '../../model/sale.model';
 import {Button} from 'primeng/button';
-import {
-  DeclarationPreviewPageSkeletonComponent
-} from './declaration-preview-page-skeleton/declaration-preview-page-skeleton.component';
 import {Badge} from 'primeng/badge';
-import {VatReturnPaymentTableComponent} from '../../component/vat-return-payment-table/vat-return-payment-table.component';
+import {
+  VatReturnPaymentTableComponent
+} from '../../component/vat-return-payment-table/vat-return-payment-table.component';
 import {rxResource} from '@angular/core/rxjs-interop';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'declaration-preview-page',
@@ -26,9 +30,9 @@ import {rxResource} from '@angular/core/rxjs-interop';
     NgForOf,
     NgClass,
     Button,
-    DeclarationPreviewPageSkeletonComponent,
     Badge,
-    VatReturnPaymentTableComponent
+    VatReturnPaymentTableComponent,
+    LoadingSpinnerComponent
   ],
   templateUrl: './declaration-preview-page.component.html',
   styles: ``
