@@ -109,13 +109,11 @@
       }
 
       @if (sale.value()) {
-        <card class="w-fit!">
+        <card>
           <p card-header>Sold Goods</p>
           <p card-subHeader>Goods that were sold in the occurred sale.</p>
-          <p-table card-body [value]="sale.value()!.soldGoods" paginatorStyleClass="rounded-t-none! bg-inherit!"
-                   paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]"
-                   [styleClass]="'rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto ' +
-          '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'">
+          <p-table card-body [value]="sale.value()!.soldGoods" paginatorDropdownAppendTo="body" [paginator]="true"
+                   [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
             <ng-template #header>
               <tr>
                 <th class="text-left p-2">Sequence No</th>
@@ -149,7 +147,7 @@
       }
 
       @if (declaration.value()?.export) {
-        <card class="w-fit!">
+        <card>
           <p card-header>Export Information</p>
           <p card-subHeader>Details of this sale's sold goods export via customs.</p>
           <div card-body class="flex flex-col gap-4">
@@ -193,12 +191,10 @@
               </ul>
             </div>
 
-            <card class="w-fit!">
+            <card>
               <p card-header>Verified Sold Goods</p>
               <p card-subHeader>These goods were exported from the country.</p>
-              <p-table card-body paginatorStyleClass="rounded-t-none! bg-inherit!" paginatorDropdownAppendTo="body"
-                       [styleClass]="'rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto ' +
-                       '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'"
+              <p-table card-body paginatorDropdownAppendTo="body"
                        [value]="declaration.value()!.export!.verifiedSoldGoods" [paginator]="true" [rows]="10"
                        [rowsPerPageOptions]="[10, 20, 50]">
                 <ng-template #header>
@@ -224,7 +220,7 @@
               </p-table>
             </card>
 
-            <card class="w-fit!">
+            <card>
               <p card-header>VAT Return Payment</p>
               <p card-subHeader>Returned VAT payment that was executed for the customer.</p>
               <div card-body>
@@ -244,7 +240,7 @@
       }
 
       @if (sale.value() && !declaration.value()?.isCancelled && !declaration.value()?.export && instanceId()) {
-        <card class="w-fit!">
+        <card>
           <p card-header>Submit Declaration</p>
           <p card-subHeader>Submit or resubmit to update this sale's VAT return declaration.</p>
           <div card-body class="flex flex-col gap-4">

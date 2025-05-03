@@ -2,8 +2,6 @@ import {Component, computed, inject, input} from '@angular/core';
 import {ImportConfigurationService} from '../../service/import-configuration.service';
 import {ImportConfigurationField} from '../../model/import-configuration.model';
 import {TableModule} from 'primeng/table';
-import {Card} from 'primeng/card';
-import {NgIf} from '@angular/common';
 import {
   DataTypeEntryFieldDisplayComponent
 } from '../../component/data-type-entry-field-display/data-type-entry-field-display.component';
@@ -15,15 +13,21 @@ import {of} from 'rxjs';
 import {
   ImportConfigurationPageHeaderSectionComponent
 } from "../../component/import-configuration-page-header-section/import-configuration-page-header-section.component";
+import {
+  FailedToLoadPleaseReloadComponent
+} from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
+import {CardComponent} from '../../component/card/card.component';
 
 @Component({
   selector: 'import-configuration-preview-page',
   imports: [
     TableModule,
-    Card,
-    NgIf,
     DataTypeEntryFieldDisplayComponent,
-    ImportConfigurationPageHeaderSectionComponent
+    ImportConfigurationPageHeaderSectionComponent,
+    FailedToLoadPleaseReloadComponent,
+    LoadingSpinnerComponent,
+    CardComponent
   ],
   templateUrl: './import-configuration-preview-page.component.html',
   styles: ``

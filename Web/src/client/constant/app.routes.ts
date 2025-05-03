@@ -186,21 +186,6 @@ const dataTypeRoutes: Routes = [
   {
     path: ":dataTypeId",
     loadComponent: () => DataTypePreviewPageComponent
-  },
-  {
-    path: ":dataTypeId",
-    loadChildren: () => [
-      {
-        path: "import-configuration",
-        title: "Bapsk - Import Configuration",
-        loadChildren: () => importConfigurationRoutes
-      },
-      {
-        path: "report-template",
-        title: "Bapsk - Report Template",
-        loadChildren: () => reportTemplateRoutes
-      }
-    ]
   }
 ];
 

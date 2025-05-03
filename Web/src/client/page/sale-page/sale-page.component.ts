@@ -1,5 +1,5 @@
 import {Component, inject, input, signal, viewChild} from '@angular/core';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {SaleService} from '../../service/sale.service';
 import {ConfirmationComponent} from '../../component/confirmation/confirmation.component';
 import {toCustomerFullName} from '../../model/customer.model';
@@ -37,7 +37,7 @@ import {Badge} from 'primeng/badge';
   styles: ``
 })
 export class SalePageComponent {
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly saleService = inject(SaleService);
@@ -61,7 +61,7 @@ export class SalePageComponent {
         .pipe(first())
         .subscribe({
           next: () => this.messages.set({success: ['Sale deleted successfully']}),
-          error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+          error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     });
   }

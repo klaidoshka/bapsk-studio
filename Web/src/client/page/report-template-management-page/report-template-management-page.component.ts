@@ -1,12 +1,12 @@
-import {Component, effect, inject, input, signal} from '@angular/core';
+import {Component, inject, input, signal} from '@angular/core';
 import {DataTypeService} from '../../service/data-type.service';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {first, of} from 'rxjs';
+import {first, of, tap} from 'rxjs';
 import Messages from '../../model/messages.model';
 import DataTypeField from '../../model/data-type-field.model';
-import {ReportTemplateEditRequest} from '../../model/report-template.model';
+import ReportTemplate, {ReportTemplateEditRequest} from '../../model/report-template.model';
 import {ReportTemplateService} from '../../service/report-template.service';
 import {Button} from 'primeng/button';
 import {FormInputErrorComponent} from '../../component/form-input-error/form-input-error.component';
@@ -14,7 +14,6 @@ import {InputText} from 'primeng/inputtext';
 import {
   MessagesShowcaseComponent
 } from '../../component/messages-showcase/messages-showcase.component';
-import {NgIf} from '@angular/common';
 import {Select} from 'primeng/select';
 import {TableModule} from 'primeng/table';
 import DataType from '../../model/data-type.model';
@@ -22,6 +21,19 @@ import {NumberUtil} from '../../util/number.util';
 import {
   ReportTemplatePageHeaderSectionComponent
 } from '../../component/report-template-page-header-section/report-template-page-header-section.component';
+import {CardComponent} from '../../component/card/card.component';
+import {
+  FailedToLoadPleaseReloadComponent
+} from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
+import {FloatLabel} from 'primeng/floatlabel';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {
+  BadgeContrastedComponent
+} from '../../component/badge-contrasted/badge-contrasted.component';
+import {MessageService} from 'primeng/api';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'report-template-management-page',
@@ -30,11 +42,17 @@ import {
     FormInputErrorComponent,
     InputText,
     MessagesShowcaseComponent,
-    NgIf,
     ReactiveFormsModule,
     Select,
     TableModule,
-    ReportTemplatePageHeaderSectionComponent
+    ReportTemplatePageHeaderSectionComponent,
+    CardComponent,
+    FailedToLoadPleaseReloadComponent,
+    LoadingSpinnerComponent,
+    FloatLabel,
+    IconField,
+    InputIcon,
+    BadgeContrastedComponent
   ],
   templateUrl: './report-template-management-page.component.html',
   styles: ``
@@ -43,7 +61,11 @@ export class ReportTemplateManagementPageComponent {
   private readonly dataTypeService = inject(DataTypeService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly reportTemplateService = inject(ReportTemplateService);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
+  private readonly messageService = inject(MessageService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  protected readonly form = this.createForm();
   protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});
   protected readonly templateId = input<string>();
@@ -63,35 +85,38 @@ export class ReportTemplateManagementPageComponent {
       templateId: NumberUtil.parse(this.templateId())
     }),
     loader: ({request}) => request.instanceId && request.templateId
-      ? this.reportTemplateService.getById(request.instanceId, request.templateId)
+      ? this.reportTemplateService
+        .getById(request.instanceId, request.templateId)
+        .pipe(tap(template => this.patchFormValues(template)))
       : of(undefined)
   });
 
-  protected readonly form = this.formBuilder.group({
-    fields: this.formBuilder.array([this.createFormField()], [Validators.required]),
-    id: [this.template.value()?.id],
-    name: [this.template.value()?.name, [Validators.required]]
-  });
-
-  constructor() {
-    const effectRef = effect(() => {
-      const template = this.template.value();
-
-      if (!template) {
-        return;
-      }
-
-      this.form.patchValue({
-        fields: template.fields.map(field => ({
-          id: field.id,
-          name: field.name
-        })),
-        id: template.id,
-        name: template.name
+  private consumeResult(message: string, id?: string | number, success: boolean = true) {
+    if (success) {
+      this.messageService.add({
+        key: 'root',
+        detail: message,
+        severity: 'success',
+        closable: true
       });
+      if (this.templateId()) {
+        this.router.navigate(['../'], {relativeTo: this.route});
+      } else {
+        this.router.navigate(['../', id], {relativeTo: this.route});
+      }
+    } else {
+      this.messages.set({error: [message]});
+    }
+  }
 
-      effectRef.destroy();
+  protected createForm(template?: ReportTemplate) {
+    const form = this.formBuilder.group({
+      fields: this.formBuilder.array([this.createFormField()], [Validators.required]),
+      id: [template?.id],
+      name: [template?.name, [Validators.required]]
     });
+    form.controls.fields.clear();
+    return form;
   }
 
   private createFormField(field?: DataTypeField) {
@@ -101,23 +126,28 @@ export class ReportTemplateManagementPageComponent {
     });
   }
 
-  private changeMessages(message: string, success: boolean = true) {
-    this.messages.set(success ? {success: [message]} : {error: [message]});
+  private patchFormValues(template: ReportTemplate) {
+    this.form.reset();
+    this.form.patchValue({
+      id: template.id,
+      name: template.name
+    });
+    template.fields.forEach(field => this.form.controls.fields.push(this.createFormField(field)));
   }
 
   protected changeFormFields(dataType?: DataType) {
     const fields = this.form.controls.fields!;
-
     fields.clear();
-
     dataType?.fields?.forEach(field => {
       fields.push(this.createFormField(field));
     });
+    this.form.markAsDirty();
   }
 
   protected save() {
     if (!this.form.valid) {
-      this.changeMessages("Please fill out the form.", false);
+      this.messages.set({error: ["Please fill in all required fields."]});
+      return;
     }
 
     const request: ReportTemplateEditRequest = {
@@ -134,16 +164,16 @@ export class ReportTemplateManagementPageComponent {
         .edit(request)
         .pipe(first())
         .subscribe({
-          next: () => this.changeMessages("Report template edited successfully."),
-          error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+          next: () => this.consumeResult("Report template edited successfully."),
+          error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     } else {
       this.reportTemplateService
         .create({...request})
         .pipe(first())
         .subscribe({
-          next: () => this.changeMessages("Report template created successfully."),
-          error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+          next: (value) => this.consumeResult("Report template created successfully.", value.id),
+          error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     }
   }

@@ -13,7 +13,7 @@ import {Password} from 'primeng/password';
 import {AuthService} from '../../service/auth.service';
 import {first} from 'rxjs';
 import Messages from '../../model/messages.model';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {CardComponent} from '../card/card.component';
 import {FloatLabel} from 'primeng/floatlabel';
@@ -35,7 +35,7 @@ import {FloatLabel} from 'primeng/floatlabel';
 })
 export class ProfileChangePasswordFormComponent {
   private readonly authService = inject(AuthService);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly formBuilder = inject(FormBuilder);
   protected readonly messages = signal<Messages>({});
   readonly user = input.required<User>();
@@ -73,7 +73,7 @@ export class ProfileChangePasswordFormComponent {
           this.form.reset();
           this.messages.set({success: ["Password changed successfully."]});
         },
-        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       })
   }
 }

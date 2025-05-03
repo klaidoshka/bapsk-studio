@@ -5,7 +5,7 @@ import {DataEntryService} from '../../service/data-entry.service';
 import Messages from '../../model/messages.model';
 import {DataEntryImportRequest, DataEntryJoined} from '../../model/data-entry.model';
 import {first, map} from 'rxjs';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {Select} from 'primeng/select';
 import DataType from '../../model/data-type.model';
 import {ImportConfigurationService} from '../../service/import-configuration.service';
@@ -37,7 +37,7 @@ export class DataEntryImportFormComponent {
   private readonly dataEntryService = inject(DataEntryService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly importConfigurationService = inject(ImportConfigurationService);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   protected readonly importedEntries = signal<DataEntryJoined[]>([]);
   protected readonly messages = signal<Messages>({});
   readonly clearImportedValues = input<boolean>();
@@ -112,7 +112,7 @@ export class DataEntryImportFormComponent {
         this.importedEntries.set(entries);
         this.messages.set({success: ['Data entries imported successfully.']});
       },
-      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+      error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
     });
   }
 

@@ -1,8 +1,5 @@
-<p-table paginatorStyleClass="rounded-t-none! bg-inherit!" paginatorDropdownAppendTo="body"
-         [styleClass]="'rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto ' +
-          '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'"
-         [value]="dataEntries()" [columns]="dataType().fields" [paginator]="true" [rows]="10"
-         [rowsPerPageOptions]="[10, 20, 50]">
+<p-table paginatorDropdownAppendTo="body" [value]="dataEntries()" [columns]="dataType().fields" [paginator]="true"
+         [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
   <ng-template #header let-columns>
     <tr>
       @for (field of columns; track field.id) {

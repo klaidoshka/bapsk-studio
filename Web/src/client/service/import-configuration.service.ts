@@ -19,7 +19,7 @@ export class ImportConfigurationService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly dataTypeService = inject(DataTypeService);
   private readonly httpClient = inject(HttpClient);
-  private readonly cacheService = new CacheService<number, ImportConfigurationJoined>(configuration => configuration.id!);
+  private readonly cacheService = new CacheService<number, ImportConfigurationJoined>(configuration => configuration.id);
   private readonly dataTypesFetched = new Set<number>();
   private readonly instancesFetched = new Set<number>();
 
@@ -126,7 +126,7 @@ export class ImportConfigurationService {
           )
         ),
         tap(configuration => this.cacheService.set(configuration)),
-        switchMap(configuration => this.cacheService.get(configuration.id!))
+        switchMap(configuration => this.cacheService.get(configuration.id))
       );
   }
 

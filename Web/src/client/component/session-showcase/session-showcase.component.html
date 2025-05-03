@@ -1,15 +1,13 @@
 <confirmation key="session-revokation" header="Are you sure about revoking this session?"/>
 <p-toast key="session-revokation"/>
-<card class="w-fit!">
+<card>
   <p card-header>Sessions</p>
   <div card-subHeader class="flex flex-col">
     <p>These are your sessions (times and devices you logged in with).</p>
     <p>If you want to revoke a session, click on the revoke button. Current session cannot be revoked.</p>
   </div>
-  <p-table card-body paginatorStyleClass="rounded-t-none! bg-inherit!" paginatorDropdownAppendTo="body"
-           [styleClass]="'mt-4 rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto ' +
-         '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'"
-           [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" [value]="sessions.value() || []">
+  <p-table card-body paginatorDropdownAppendTo="body"
+           styleClass="mt-4"            [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" [value]="sessions.value() || []">
     <ng-template #header>
       <tr>
         <th>Agent</th>

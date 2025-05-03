@@ -1,13 +1,17 @@
 import {Component, computed, inject, input, signal, viewChild} from '@angular/core';
 import {Button} from 'primeng/button';
 import {ConfirmationComponent} from '../../component/confirmation/confirmation.component';
-import {DataEntryImportFormComponent} from '../../component/data-entry-import/data-entry-import-form.component';
+import {
+  DataEntryImportFormComponent
+} from '../../component/data-entry-import/data-entry-import-form.component';
 import {DataEntryTableComponent} from '../../component/data-entry-table/data-entry-table.component';
 import {Dialog} from 'primeng/dialog';
-import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
+import {
+  MessagesShowcaseComponent
+} from '../../component/messages-showcase/messages-showcase.component';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {DataEntryService} from '../../service/data-entry.service';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import DataEntry, {DataEntryJoined} from '../../model/data-entry.model';
 import Messages from '../../model/messages.model';
 import {first, of} from 'rxjs';
@@ -44,7 +48,7 @@ import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-s
 export class DataEntryPageComponent {
   private readonly dataEntryService = inject(DataEntryService);
   private readonly dataTypeService = inject(DataTypeService);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
@@ -81,13 +85,16 @@ export class DataEntryPageComponent {
         .pipe(first())
         .subscribe({
           next: () => this.messages.set({success: ['Data entry deleted successfully']}),
-          error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+          error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     });
   }
 
   protected manage(dataEntry?: DataEntry) {
-    this.router.navigate([`./` + (dataEntry ? `${dataEntry.id}/edit` : 'create')], {relativeTo: this.route});
+    this.router.navigate([`./` + (dataEntry ? `${dataEntry.id}/edit` : 'create')], {
+      queryParams: {dataTypeId: this.dataTypeId()},
+      relativeTo: this.route
+    });
   }
 
   protected onDelete = (entry: DataEntryJoined) => this.delete(entry);

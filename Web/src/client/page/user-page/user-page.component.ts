@@ -6,7 +6,7 @@ import {
   MessagesShowcaseComponent
 } from '../../component/messages-showcase/messages-showcase.component';
 import {TableModule} from 'primeng/table';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {UserService} from '../../service/user.service';
 import Messages from '../../model/messages.model';
 import {rxResource} from '@angular/core/rxjs-interop';
@@ -34,7 +34,7 @@ import {CardComponent} from '../../component/card/card.component';
   styles: ``
 })
 export class UserPageComponent {
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly router = inject(Router);
   private readonly userService = inject(UserService);
   protected readonly getCountryName = getUserIsoCountryLabel;
@@ -49,7 +49,7 @@ export class UserPageComponent {
         .pipe(first())
         .subscribe({
           next: () => this.messages.set({success: ['User deleted successfully']}),
-          error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+          error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     });
   }

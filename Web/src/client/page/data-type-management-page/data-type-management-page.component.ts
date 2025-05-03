@@ -1,17 +1,30 @@
 import {Component, inject, input, signal} from '@angular/core';
 import {DataEntryService} from '../../service/data-entry.service';
 import {DataTypeService} from '../../service/data-type.service';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
-import {AbstractControl, FormArray, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators} from '@angular/forms';
+import {MessageHandlingService} from '../../service/message-handling.service';
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators
+} from '@angular/forms';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../../model/data-type.model';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {first, of, tap} from 'rxjs';
 import Option from '../../model/options.model';
 import Messages from '../../model/messages.model';
-import DataTypeField, {DataTypeFieldEditRequest, FieldType, fieldTypes} from '../../model/data-type-field.model';
+import DataTypeField, {
+  DataTypeFieldEditRequest,
+  FieldType,
+  fieldTypes
+} from '../../model/data-type-field.model';
 import {FormInputErrorComponent} from '../../component/form-input-error/form-input-error.component';
 import {Select} from 'primeng/select';
-import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
+import {
+  MessagesShowcaseComponent
+} from '../../component/messages-showcase/messages-showcase.component';
 import {
   DataTypeEntryFieldInputComponent
 } from '../../component/data-type-entry-field-input/data-type-entry-field-input.component';
@@ -31,6 +44,8 @@ import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
 import {CardComponent} from '../../component/card/card.component';
 import {TableModule} from 'primeng/table';
+import {MessageService} from 'primeng/api';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'data-type-management-page',
@@ -58,8 +73,11 @@ import {TableModule} from 'primeng/table';
 export class DataTypeManagementPageComponent {
   private readonly dataEntryService = inject(DataEntryService);
   private readonly dataTypeService = inject(DataTypeService);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly formBuilder = inject(FormBuilder);
+  private readonly messageHandlingService = inject(MessageHandlingService);
+  private readonly messageService = inject(MessageService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   protected readonly customErrorMessages = {'noFields': () => 'At least one field is required.'};
   protected readonly dataTypeId = input<string>();
   protected readonly fieldTypes = fieldTypes;
@@ -95,13 +113,31 @@ export class DataTypeManagementPageComponent {
     value: -1
   }]);
 
+  private consumeResult(message: string, id?: string | number, success: boolean = true) {
+    if (success) {
+      this.messageService.add({
+        key: 'root',
+        detail: message,
+        severity: 'success',
+        closable: true
+      });
+      if (this.dataTypeId()) {
+        this.router.navigate(['../'], {relativeTo: this.route});
+      } else {
+        this.router.navigate(['../', id], {relativeTo: this.route});
+      }
+    } else {
+      this.messages.set({error: [message]});
+    }
+  }
+
   private create(request: DataTypeCreateRequest) {
     this.dataTypeService
       .create(request)
       .pipe(first())
       .subscribe({
-        next: () => this.onSuccess("Data type has been created successfully."),
-        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+        next: (value) => this.consumeResult("Data type has been created successfully.", value.id),
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
 
@@ -133,26 +169,20 @@ export class DataTypeManagementPageComponent {
       .pipe(first())
       .subscribe({
         next: () => {
-          this.onSuccess("Data type has been edited successfully.");
+          this.consumeResult("Data type has been edited successfully.");
 
           this.dataEntryService
             .getAllByDataTypeId(NumberUtil.parse(this.instanceId())!, request.dataTypeId)
             .pipe(first())
             .subscribe();
         },
-        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
 
   private fieldsValidator(control: AbstractControl): ValidationErrors | null {
     return (control as FormArray).length === 0 ? {noFields: true} : null;
   };
-
-  private onSuccess(message: string) {
-    this.messages.set({success: [message]});
-    this.form.markAsPristine();
-    this.form.markAsUntouched();
-  }
 
   private patchFormValues(dataType: DataType) {
     this.displayFields.set(this.displayFields().slice(0, 1));

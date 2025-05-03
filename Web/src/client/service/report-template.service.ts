@@ -10,13 +10,14 @@ import ReportTemplate, {
 } from '../model/report-template.model';
 import {first, map, Observable, switchMap, tap} from 'rxjs';
 import {CacheService} from './cache.service';
+import DataType from '../model/data-type.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReportTemplateService {
   private readonly apiRouter = inject(ApiRouter);
-  private readonly templateService = inject(DataTypeService);
+  private readonly dataTypeService = inject(DataTypeService);
   private readonly httpClient = inject(HttpClient);
   private readonly userService = inject(UserService);
   private readonly cacheService = new CacheService<number, ReportTemplate>(template => template.id);
@@ -72,6 +73,11 @@ export class ReportTemplateService {
         tap(template => this.cacheService.set(template)),
         switchMap(template => this.cacheService.get(template.id))
       );
+  }
+
+  getDataType(instanceId: number, template: ReportTemplate): Observable<DataType> {
+    const dataTypeId = template.fields.at(0)!.dataTypeId;
+    return this.dataTypeService.getById(instanceId, dataTypeId);
   }
 
   getWithCreatorById(instanceId: number, id: number): Observable<ReportTemplateWithCreator> {
@@ -133,7 +139,7 @@ export class ReportTemplateService {
   updateProperties(template: ReportTemplate): ReportTemplate {
     return {
       ...template,
-      fields: template.fields.map(field => this.templateService.updateFieldProperties(field))
+      fields: template.fields.map(field => this.dataTypeService.updateFieldProperties(field))
     };
   }
 }

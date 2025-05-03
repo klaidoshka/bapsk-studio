@@ -2,7 +2,7 @@ import {Component, inject, signal} from '@angular/core';
 import {InputText} from 'primeng/inputtext';
 import {Button} from 'primeng/button';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import Messages from '../../model/messages.model';
 import {AuthService} from '../../service/auth.service';
 import {first} from 'rxjs';
@@ -24,7 +24,7 @@ import {FormInputErrorComponent} from '../form-input-error/form-input-error.comp
 export class AuthResetPasswordComponent {
   private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   protected readonly messages = signal<Messages>({});
 
   protected readonly form = this.formBuilder.group({
@@ -50,7 +50,7 @@ export class AuthResetPasswordComponent {
             ]
           });
         },
-        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
 }

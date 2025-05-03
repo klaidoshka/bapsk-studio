@@ -6,7 +6,7 @@ import {InputText} from 'primeng/inputtext';
 import {
   MessagesShowcaseComponent
 } from '../../component/messages-showcase/messages-showcase.component';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {UserService} from '../../service/user.service';
 import {
   getDefaultIsoCountry,
@@ -27,6 +27,12 @@ import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
 import {Select} from 'primeng/select';
 import {DatePicker} from 'primeng/datepicker';
+import {
+  FailedToLoadPleaseReloadComponent
+} from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
+import {MessageService} from 'primeng/api';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'user-management-page',
@@ -43,14 +49,19 @@ import {DatePicker} from 'primeng/datepicker';
     IconField,
     InputIcon,
     Select,
-    DatePicker
+    DatePicker,
+    FailedToLoadPleaseReloadComponent,
+    LoadingSpinnerComponent
   ],
   templateUrl: './user-management-page.component.html',
   styles: ``
 })
 export class UserManagementPageComponent {
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly formBuilder = inject(FormBuilder);
+  private readonly messageHandlingService = inject(MessageHandlingService);
+  private readonly messageService = inject(MessageService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly userService = inject(UserService);
   protected readonly countries = IsoCountries;
   protected readonly form = this.createForm();
@@ -64,12 +75,27 @@ export class UserManagementPageComponent {
     loader: ({request}) => request.userId
       ? this.userService
         .getById(request.userId)
-        .pipe(
-          first(),
-          tap(user => this.patchFormValues(user))
-        )
+        .pipe(tap(user => this.patchFormValues(user)))
       : of(undefined)
   });
+
+  private consumeResult(message: string, id?: string | number, success: boolean = true) {
+    if (success) {
+      this.messageService.add({
+        key: 'root',
+        detail: message,
+        severity: 'success',
+        closable: true
+      });
+      if (this.userId()) {
+        this.router.navigate(['../'], {relativeTo: this.route});
+      } else {
+        this.router.navigate(['../', id], {relativeTo: this.route});
+      }
+    } else {
+      this.messages.set({error: [message]});
+    }
+  }
 
   private createForm() {
     return this.formBuilder.group({
@@ -83,19 +109,13 @@ export class UserManagementPageComponent {
     });
   }
 
-  private onSuccess(message: string) {
-    this.messages.set({success: [message]});
-    this.form.markAsUntouched();
-    this.form.markAsPristine();
-  }
-
   private create(request: UserCreateRequest) {
     this.userService
       .create(request)
       .pipe(first())
       .subscribe({
-        next: () => this.onSuccess("User has been created successfully."),
-        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+        next: (value) => this.consumeResult("User has been created successfully.", value.id),
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
 
@@ -104,8 +124,8 @@ export class UserManagementPageComponent {
       .edit(request)
       .pipe(first())
       .subscribe({
-        next: () => this.onSuccess("User has been edited successfully."),
-        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+        next: () => this.consumeResult("User has been edited successfully."),
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
 

@@ -2,11 +2,11 @@
   <data-entry-page-header-section [canGoBack]="true"/>
   @if (dataType.isLoading() || dataEntry.isLoading()) {
     <loading-spinner/>
-  } @else if (!dataType.value() || !dataEntry.value()) {
+  } @else if (dataTypeId() && !dataType.value() || dataEntryId() && !dataEntry.value()) {
     <failed-to-load-please-reload/>
   } @else {
     @let dataType = this.dataType.value()!;
-    <card class="w-fit!">
+    <card>
       <p card-header>Manage {{ dataType.name }}</p>
       <p card-subHeader>Fill in the form below to create a new {{ dataType.name }} or modify an existing one.</p>
       <form card-body [formGroup]="form" class="flex flex-col gap-4">

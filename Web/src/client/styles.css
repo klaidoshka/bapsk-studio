@@ -10,7 +10,17 @@ p-table .p-datatable-table {
   }
 }
 
-p-paginator {
+.p-datatable {
+  @apply rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto;
+
+  th, td {
+    @apply border-b-primary-950/20! dark:border-primary-50/20!
+  }
+}
+
+.p-paginator {
+  @apply bg-primary-50! dark:bg-primary-950!;
+
   .p-select {
     @apply bg-primary-950! dark:bg-primary-700/80!;
   }

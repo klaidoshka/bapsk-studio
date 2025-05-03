@@ -6,7 +6,7 @@
     <failed-to-load-please-reload/>
   } @else {
     @let customer = this.customer.value()!;
-    <card class="w-fit!">
+    <card>
       <p card-header>Customer</p>
       <p card-subHeader>Preview of this unique customer entry.</p>
       <card card-body>
@@ -40,7 +40,7 @@
             </div>
           </div>
 
-          <card class="w-fit!">
+          <card>
             <p card-header>Identity Document</p>
             <p card-subHeader>ID details of this specific customer.</p>
             <div card-body>
@@ -63,14 +63,13 @@
             </div>
           </card>
           @if (customer.otherDocuments.length > 0) {
-            <card class="w-fit!">
+            <card>
               <p card-header>Other Documents</p>
               <p card-subHeader>These documents help customs determine whether customer's residence is not within EU
                 country.</p>
               <div card-body>
-                <p-table [value]="customer.otherDocuments" paginatorStyleClass="rounded-t-none! bg-inherit!"
-                         paginatorDropdownAppendTo="body" [styleClass]="'rounded-md mb-4 border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto ' +
-                      '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'"
+                <p-table [value]="customer.otherDocuments"                          paginatorDropdownAppendTo="body"
+
                          [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
                   <ng-template #header>
                     <tr>

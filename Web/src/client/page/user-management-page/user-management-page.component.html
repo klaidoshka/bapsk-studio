@@ -1,85 +1,92 @@
 <div class="h-full w-full container mx-auto flex flex-col mb-8">
   <user-page-header-section [canGoBack]="true"/>
-  <card class="w-fit!">
-    <p card-header>Manage User</p>
-    <p card-subHeader>Fill in the form below to register a new user or modify an existing one.</p>
-    <form [formGroup]="form" card-body class="flex flex-col gap-4">
-      <div class="flex flex-wrap gap-4">
-        <!-- First Name -->
-        <div>
-          <p-floatlabel variant="on" class="w-60">
-            <p-iconfield>
-              <p-inputicon class="pi pi-tag"/>
-              <input pInputText id="firstName" formControlName="firstName" type="text"/>
-            </p-iconfield>
-            <label for="firstName">First Name</label>
-          </p-floatlabel>
-          <form-input-error [control]="form.controls.firstName"/>
-        </div>
-
-        <!-- Last Name -->
-        <div>
-          <p-floatlabel variant="on" class="w-60">
-            <p-iconfield>
-              <p-inputicon class="pi pi-tag"/>
-              <input pInputText id="lastName" formControlName="lastName" type="text"/>
-            </p-iconfield>
-            <label for="lastName">Last Name</label>
-          </p-floatlabel>
-          <form-input-error [control]="form.controls.lastName"/>
-        </div>
-
-        <!-- Email -->
-        <div>
-          <p-floatlabel variant="on" class="w-60">
-            <p-iconfield>
-              <p-inputicon class="pi pi-envelope"/>
-              <input pInputText id="email" formControlName="email" type="email"/>
-            </p-iconfield>
-            <label for="email">Email</label>
-          </p-floatlabel>
-          <form-input-error [control]="form.controls.email"/>
-        </div>
-
-        @if (!user.value()) {
-          <!-- Password -->
+  @if (user.isLoading()) {
+    <loading-spinner/>
+  } @else if (userId() && !user.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    <card>
+      <p card-header>Manage User</p>
+      <p card-subHeader>Fill in the form below to register a new user or modify an existing one.</p>
+      <form [formGroup]="form" card-body class="flex flex-col gap-4">
+        <div class="flex flex-wrap gap-4">
+          <!-- First Name -->
           <div>
             <p-floatlabel variant="on" class="w-60">
               <p-iconfield>
-                <p-inputicon class="pi pi-lock"/>
-                <input pInputText id="password" formControlName="password" type="password"/>
+                <p-inputicon class="pi pi-tag"/>
+                <input pInputText id="firstName" formControlName="firstName" type="text"/>
               </p-iconfield>
-              <label for="password">Password</label>
+              <label for="firstName">First Name</label>
             </p-floatlabel>
-            <form-input-error [control]="form.controls.password"/>
+            <form-input-error [control]="form.controls.firstName"/>
           </div>
-        }
 
-        <!-- Birth Date -->
-        <div class="w-fit">
-          <p-float-label variant="on" class="w-fit">
-            <p-date-picker icon="pi pi-calendar" iconDisplay="input" showIcon formControlName="birthDate"
-                           styleClass="min-w-60"
-                           inputId="birthDate" appendTo="body"/>
-            <label for="birthDate">Birthdate</label>
-          </p-float-label>
-          <form-input-error [control]="form.controls.birthDate"/>
-        </div>
+          <!-- Last Name -->
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-iconfield>
+                <p-inputicon class="pi pi-tag"/>
+                <input pInputText id="lastName" formControlName="lastName" type="text"/>
+              </p-iconfield>
+              <label for="lastName">Last Name</label>
+            </p-floatlabel>
+            <form-input-error [control]="form.controls.lastName"/>
+          </div>
 
-        <!-- Country Dropdown -->
-        <div class="w-fit">
-          <p-float-label variant="on" class="w-60">
-            <p-select dropdownIcon="pi pi-globe" [options]="countries" formControlName="country" optionLabel="name"
-                      styleClass="min-w-60"
-                      appendTo="body"/>
-            <label for="country">Country</label>
-          </p-float-label>
-          <form-input-error [control]="form.controls.birthDate"/>
+          <!-- Email -->
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-iconfield>
+                <p-inputicon class="pi pi-envelope"/>
+                <input pInputText id="email" formControlName="email" type="email"/>
+              </p-iconfield>
+              <label for="email">Email</label>
+            </p-floatlabel>
+            <form-input-error [control]="form.controls.email"/>
+          </div>
+
+          @if (!user.value()) {
+            <!-- Password -->
+            <div>
+              <p-floatlabel variant="on" class="w-60">
+                <p-iconfield>
+                  <p-inputicon class="pi pi-lock"/>
+                  <input pInputText id="password" formControlName="password" type="password"/>
+                </p-iconfield>
+                <label for="password">Password</label>
+              </p-floatlabel>
+              <form-input-error [control]="form.controls.password"/>
+            </div>
+          }
+
+          <!-- Birth Date -->
+          <div class="w-fit">
+            <p-float-label variant="on" class="w-fit">
+              <p-date-picker icon="pi pi-calendar" iconDisplay="input" showIcon formControlName="birthDate"
+                             styleClass="min-w-60"
+                             inputId="birthDate" appendTo="body"/>
+              <label for="birthDate">Birthdate</label>
+            </p-float-label>
+            <form-input-error [control]="form.controls.birthDate"/>
+          </div>
+
+          <!-- Country Dropdown -->
+          <div class="w-fit">
+            <p-float-label variant="on" class="w-60">
+              <p-select dropdownIcon="pi pi-globe" [options]="countries" formControlName="country" optionLabel="name"
+                        styleClass="min-w-60"
+                        appendTo="body"/>
+              <label for="country">Country</label>
+            </p-float-label>
+            <form-input-error [control]="form.controls.birthDate"/>
+          </div>
         </div>
-      </div>
-      <messages-showcase [messages]="messages()"/>
-      <p-button title="Submit" size="small" [label]="!user.value() ? 'Create' : 'Save'" [disabled]="!form.valid || !form.dirty"
-                (onClick)="save()" type="submit"/>
-    </form>
-  </card>
+        <messages-showcase [messages]="messages()"/>
+        <p-button title="Submit" size="small" [label]="!user.value() ? 'Create' : 'Save'"
+                  [disabled]="!form.valid || !form.dirty"
+                  (onClick)="save()" type="submit"/>
+      </form>
+    </card>
+  }
 </div>

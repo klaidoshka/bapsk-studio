@@ -18,7 +18,7 @@ import {AuthService} from "../../service/auth.service";
 import {getDefaultIsoCountry, IsoCountries, IsoCountry} from '../../model/iso-country.model';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import Messages from '../../model/messages.model';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {Password} from 'primeng/password';
 import {MessageService} from 'primeng/api';
 import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
@@ -42,7 +42,7 @@ import {FormInputErrorComponent} from '../form-input-error/form-input-error.comp
 export class RegisterComponent {
   private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly messageService = inject(MessageService);
   private readonly router = inject(Router);
   protected readonly filteredCountries = signal<IsoCountry[]>([]);
@@ -121,7 +121,7 @@ export class RegisterComponent {
         this.isSubmitting.set(false);
       },
       error: (response: ErrorResponse) => {
-        this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages);
+        this.messageHandlingService.consumeHttpErrorResponse(response, this.messages);
         this.isSubmitting.set(false);
       }
     });

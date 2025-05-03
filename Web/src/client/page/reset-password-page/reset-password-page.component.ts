@@ -9,7 +9,7 @@ import {
   Validators
 } from '@angular/forms';
 import Messages from '../../model/messages.model';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {first, map} from 'rxjs';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {
@@ -19,6 +19,7 @@ import {Password} from 'primeng/password';
 import {Button} from 'primeng/button';
 import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {FormInputErrorComponent} from '../../component/form-input-error/form-input-error.component';
+import {MessageService} from 'primeng/api';
 
 @Component({
   selector: 'reset-password-page',
@@ -32,12 +33,12 @@ import {FormInputErrorComponent} from '../../component/form-input-error/form-inp
     FormInputErrorComponent
   ],
   templateUrl: './reset-password-page.component.html',
-  styles: ``
+  providers: [MessageService]
 })
 export class ResetPasswordPageComponent {
   private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly route = inject(ActivatedRoute);
   protected readonly messages = signal<Messages>({});
 
@@ -81,7 +82,7 @@ export class ResetPasswordPageComponent {
           this.form.reset();
           this.messages.set({ success: ["Password changed successfully."] });
         },
-        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
 }

@@ -2,16 +2,14 @@
   <customer-page-header-section/>
   <confirmation [key]='"customer-delete-confirmation"' [header]='"Are you sure about deleting this customer?"'/>
   <messages-showcase [messages]="messages()"/>
-  <card class="w-fit!">
+  <card>
     <p card-header>Customers</p>
     <p card-subHeader>Manage your customers — create, preview, edit or delete.</p>
     <div card-body>
       <p-button title="Create" size="small" label="Create Customer" type="button" (onClick)="manage()"/>
       <p-table
-        paginatorStyleClass="rounded-t-none! bg-inherit!" paginatorDropdownAppendTo="body"
-        [styleClass]="'mt-4 rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto ' +
-          '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'"
-        [value]="customers.value() || []" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+        paginatorDropdownAppendTo="body"
+        styleClass="mt-4"         [value]="customers.value() || []" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
         <ng-template #header>
           <tr>
             <th>First Name</th>

@@ -1,35 +1,47 @@
 <div class="h-full w-full relative container mx-auto flex flex-col mb-8">
   <report-template-page-header-section [canGoBack]="true"/>
-  <ng-container *ngIf="configuration.value()">
-    @let value = configuration.value()!;
-
-    <p-card class="mb-4 min-w-256" styleClass="p-2 dark:bg-primary-950! bg-primary-50!">
-      <ng-template #header>
-        <h2 class="text-lg font-bold">{{ value.name }}</h2>
-      </ng-template>
-      <ng-template #content>
-        <p>Report includes {{ getDataTypesCount(value) }} data type(s).</p>
-        <p>Report is made of {{ value.fields.length }} field(s).</p>
-      </ng-template>
-    </p-card>
-
-    <p-card class="min-w-256" styleClass="p-2 dark:bg-primary-950! bg-primary-50!">
-      <ng-template #header>
-        <h2 class="text-lg font-semibold">Fields</h2>
-      </ng-template>
-
-      <p-table [value]="value.fields" class="mt-4">
-        <ng-template #header>
-          <tr>
-            <th class="text-left">Field</th>
-          </tr>
-        </ng-template>
-        <ng-template #body let-field>
-          <tr>
-            <td>{{ field.name }}</td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </p-card>
-  </ng-container>
+  @if (template.isLoading()) {
+    <loading-spinner/>
+  } @else if (!template.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    @let template = this.template.value()!;
+    <card>
+      <p card-header>{{ template.name }}</p>
+      <p card-subHeader>Preview of this unique report template.</p>
+      <div card-body class="flex flex-col gap-4">
+        <card>
+          <p card-header>Details</p>
+          <p card-subHeader>Details of this specific report template.</p>
+          <div card-body class="flex flex-col">
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">ID</p>
+              <p>{{ template.id }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">Name</p>
+              <p>{{ template.name }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">Data Type</p>
+              <p>{{ getDataTypeName(template) | async }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">Included Fields</p>
+              <p>{{ template.fields.length }} field(s)</p>
+            </div>
+          </div>
+        </card>
+        <card>
+          <p card-header>Fields</p>
+          <p card-subHeader>Fields of this specific report template.</p>
+          <div card-body class="flex flex-wrap gap-4">
+            @for (field of template.fields; track field.id) {
+              <badge-contrasted [value]="field.name"/>
+            }
+          </div>
+        </card>
+      </div>
+    </card>
+  }
 </div>

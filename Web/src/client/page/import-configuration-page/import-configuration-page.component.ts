@@ -11,11 +11,12 @@ import {ConfirmationComponent} from '../../component/confirmation/confirmation.c
 import {ActivatedRoute, Router} from '@angular/router';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {first, of} from 'rxjs';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {NumberUtil} from '../../util/number.util';
 import {
   ImportConfigurationPageHeaderSectionComponent
 } from "../../component/import-configuration-page-header-section/import-configuration-page-header-section.component";
+import {CardComponent} from '../../component/card/card.component';
 
 @Component({
   selector: 'import-configuration-page',
@@ -24,13 +25,14 @@ import {
     MessagesShowcaseComponent,
     TableModule,
     ConfirmationComponent,
-    ImportConfigurationPageHeaderSectionComponent
+    ImportConfigurationPageHeaderSectionComponent,
+    CardComponent
   ],
   templateUrl: './import-configuration-page.component.html',
   styles: ``
 })
 export class ImportConfigurationPageComponent {
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly importConfigurationService = inject(ImportConfigurationService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -42,7 +44,7 @@ export class ImportConfigurationPageComponent {
 
   protected readonly configurations = rxResource({
     request: () => ({
-      dataTypeId: NumberUtil.parse(this.dataTypeId),
+      dataTypeId: NumberUtil.parse(this.dataTypeId()),
       instanceId: NumberUtil.parse(this.instanceId())
     }),
     loader: ({request}) => {
@@ -69,7 +71,7 @@ export class ImportConfigurationPageComponent {
         .pipe(first())
         .subscribe({
           next: () => this.changeMessages("Import configuration deleted successfully"),
-          error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+          error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     });
   }

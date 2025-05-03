@@ -2,15 +2,13 @@
   <salesman-page-header-section/>
   <confirmation [key]='"salesman-delete-confirmation"' [header]='"Are you sure about deleting this salesman?"'/>
   <messages-showcase [messages]="messages()"/>
-  <card class="w-fit!">
+  <card>
     <p card-header>Salesmen</p>
     <p card-subHeader>Manage your salesmen — create, preview, edit or delete.</p>
     <div card-body>
       <p-button title="Create" size="small" label="Create Salesman" type="button" (onClick)="manage()"/>
-      <p-table [value]="salesmen.value() || []" paginatorStyleClass="rounded-t-none! bg-inherit!" paginatorDropdownAppendTo="body"
-               [styleClass]="'mt-4 rounded-md mb-4 border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto ' +
-             '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'"
-               [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+      <p-table [value]="salesmen.value() || []" paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10"
+               [rowsPerPageOptions]="[10, 20, 50]" class="mt-4">
         <ng-template #header>
           <tr>
             <th>Name</th>

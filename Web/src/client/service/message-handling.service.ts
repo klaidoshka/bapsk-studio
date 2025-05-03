@@ -4,8 +4,9 @@ import ErrorResponse, {ErrorResponseDetails} from '../model/error-response.model
 
 @Injectable({
   providedIn: 'root'
+
 })
-export class ErrorMessageResolverService {
+export class MessageHandlingService {
   private readonly defaultErrorMessage = 'Unknown error occurred, please try again later.';
 
   private readonly statusCodeMessages: Record<number, string> = {
@@ -24,7 +25,7 @@ export class ErrorMessageResolverService {
     return obj?.messages !== undefined && !obj?.error;
   }
 
-  resolveError(error: any): string[] {
+  consumeError(error: any): string[] {
     if (error instanceof Error) {
       return [error.message];
     } else if (typeof error === 'string') {
@@ -44,7 +45,7 @@ export class ErrorMessageResolverService {
     return [this.defaultErrorMessage];
   }
 
-  resolveHttpErrorResponseTo(response: any, messages: WritableSignal<Messages>) {
-    messages.set({ error: this.resolveError(response) });
+  consumeHttpErrorResponse(response: any, messages: WritableSignal<Messages>) {
+    messages.set({error: this.consumeError(response)});
   }
 }

@@ -6,11 +6,11 @@
     <failed-to-load-please-reload/>
   } @else {
     @let dataType = this.dataType.value()!;
-    <card class="w-fit!">
+    <card>
       <p card-header>{{ dataType.name }}</p>
       <p card-subHeader>Preview of this unique {{ dataType.name }} data type.</p>
       <div card-body class="flex flex-col gap-4">
-        <card class="w-fit!">
+        <card>
           <p card-header>Details</p>
           <p card-subHeader>Details of this specific data type.</p>
           <div card-body class="flex flex-col">
@@ -36,8 +36,8 @@
           <p card-header>Fields</p>
           <p card-subHeader>Fields of this specific data type.</p>
           <p-table card-body [value]="dataType.fields || []"
-                   [styleClass]="'rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto ' +
-                  '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'">
+
+                  >
             <ng-template #header>
               <tr>
                 <th>Name</th>

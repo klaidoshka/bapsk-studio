@@ -1,102 +1,114 @@
 <div class="h-full w-full container mx-auto flex flex-col mb-8 lg:w-4/7">
   <instance-page-header-section [canGoBack]="true"/>
-  <card class="w-fit!">
-    <p card-header>Manage Instance</p>
-    <p card-subHeader>Fill in the form below to create a new instance or modify an existing one.</p>
-    <form [formGroup]="form" card-body class="flex flex-col gap-4">
-      <!-- Name -->
-      <div>
-        <p-floatlabel variant="on" class="w-60">
-          <p-iconfield>
-            <p-inputicon class="pi pi-tag"/>
-            <input pInputText id="name" formControlName="name" type="text"/>
-          </p-iconfield>
-          <label for="name">Name</label>
-        </p-floatlabel>
-        <form-input-error [control]="form.controls.name"/>
-      </div>
-
-      <!-- Description -->
-      <div>
-        <p-floatlabel variant="on" class="w-60">
-          <p-iconfield>
-            <p-inputicon class="pi pi-comment"/>
-            <input pInputText id="description" formControlName="description" type="text"/>
-          </p-iconfield>
-          <label for="description">Description</label>
-        </p-floatlabel>
-        <form-input-error [control]="form.controls.description"/>
-      </div>
-
-      <!-- Users -->
-      <card class="w-fit!">
-        <p card-header>Users</p>
-        <p card-subHeader>Users within this specific instance. You can modify their permissions to grant or restrict access to
-          certain data / features.</p>
-        <div card-body>
-          @if (form.controls.users.length > 0) {
-            <p-table [value]="form.controls.users.controls" paginatorStyleClass="rounded-t-none! bg-inherit!"
-                     paginatorDropdownAppendTo="body" [styleClass]="'rounded-md mb-4 border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto ' +
-                     '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'"
-                     [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
-              <ng-template #header>
-                <tr>
-                  <th>Email</th>
-                  <th>Name</th>
-                  <th class="max-w-96">Permissions</th>
-                  <th>User Since</th>
-                  <th></th>
-                </tr>
-              </ng-template>
-              <ng-template #body let-user let-i="rowIndex">
-                <tr>
-                  <td>{{ user.value.email }}</td>
-                  <td>{{ user.value.name }}</td>
-                  <td>
-                    @if (!user.value.isOwnerOrSelf) {
-                      @if (!user.value.showPermissions) {
-                        <p-button title="Modify" label="Modify Permissions" size="small" type="button"
-                                  (click)="user.value.showPermissions = true"/>
-                      }
-                      <p-dialog [(visible)]="user.value.showPermissions" [closable]="true" [modal]="true"
-                                styleClass="w-128 h-128" [header]="user.value.name + ' permissions'">
-                        <instance-user-permission-toggler [permissions]="user.value.permissions"
-                                                          [toggle]="togglePermission" [userIndex]="i"/>
-                      </p-dialog>
-                    } @else {
-                      <p-badge value="Owner. All granted" severity="success" class="px-2 py-1 text-xs"/>
-                    }
-                  </td>
-                  <td>
-                    <p-badge [value]="isOldUser(user.value.email) ? 'Some time ago' : 'Just now'" severity="contrast"
-                             class="px-2 py-1 text-xs"/>
-                  </td>
-                  <td>
-                    <p-button title="Remove" [disabled]="user.value.isOwnerOrSelf" variant="text" icon="pi pi-trash"
-                              (onClick)="removeUser(i)"/>
-                  </td>
-                </tr>
-              </ng-template>
-            </p-table>
-          }
-          <messages-showcase [messages]="messagesUsers()"/>
-
-          <!-- Users Form -->
-          <form [formGroup]="formUser" class="flex flex-col gap-4">
-            <div class="flex flex-col">
-              <input formControlName="email" placeholder="Enter email..." pInputText type="email" id="email"
-                     class="mt-1 block w-64"/>
-              <form-input-error [control]="formUser.controls.email" [customErrorMessages]="customErrorMessages"/>
-            </div>
-            <p-button title="Add User" class="mt-1" label="Add User" [disabled]="formUser.invalid" (onClick)="addUser()"
-                      size="small"/>
-          </form>
+  @if (instance.isLoading()) {
+    <loading-spinner/>
+  } @else if (instanceId() && !instance.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    <card>
+      <p card-header>Manage Instance</p>
+      <p card-subHeader>Fill in the form below to create a new instance or modify an existing one.</p>
+      <form [formGroup]="form" card-body class="flex flex-col gap-4">
+        <!-- Name -->
+        <div>
+          <p-floatlabel variant="on" class="w-60">
+            <p-iconfield>
+              <p-inputicon class="pi pi-tag"/>
+              <input pInputText id="name" formControlName="name" type="text"/>
+            </p-iconfield>
+            <label for="name">Name</label>
+          </p-floatlabel>
+          <form-input-error [control]="form.controls.name"/>
         </div>
-      </card>
-      <messages-showcase [messages]="messages()"/>
-      <p-button title="Submit" [label]="instance.value() === undefined ? 'Create' : 'Save'"
-                [disabled]="form.invalid || !form.dirty"
-                (onClick)="save()" size="small" type="submit"/>
-    </form>
-  </card>
+
+        <!-- Description -->
+        <div>
+          <p-floatlabel variant="on" class="w-60">
+            <p-iconfield>
+              <p-inputicon class="pi pi-comment"/>
+              <input pInputText id="description" formControlName="description" type="text"/>
+            </p-iconfield>
+            <label for="description">Description</label>
+          </p-floatlabel>
+          <form-input-error [control]="form.controls.description"/>
+        </div>
+
+        <!-- Users -->
+        <card>
+          <p card-header>Users</p>
+          <p card-subHeader>Users within this specific instance. You can modify their permissions to grant or restrict
+            access to
+            certain data / features.</p>
+          <div card-body class="flex flex-col gap-4">
+            @if (form.controls.users.length > 0) {
+              <p-table [value]="form.controls.users.controls" paginatorDropdownAppendTo="body" [paginator]="true"
+                       [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+                <ng-template #header>
+                  <tr>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th class="max-w-96">Permissions</th>
+                    <th>User Since</th>
+                    <th></th>
+                  </tr>
+                </ng-template>
+                <ng-template #body let-user let-i="rowIndex">
+                  <tr>
+                    <td>{{ user.value.email }}</td>
+                    <td>{{ user.value.name }}</td>
+                    <td>
+                      @if (!user.value.isOwnerOrSelf) {
+                        @if (!user.value.showPermissions) {
+                          <p-button title="Modify" label="Modify Permissions" size="small" type="button"
+                                    (click)="user.value.showPermissions = true"/>
+                        }
+                        <p-dialog [(visible)]="user.value.showPermissions" [closable]="true" [modal]="true"
+                                  styleClass="w-128 h-128" [header]="user.value.name + ' permissions'">
+                          <instance-user-permission-toggler [permissions]="user.value.permissions"
+                                                            [toggle]="togglePermission" [userIndex]="i"/>
+                        </p-dialog>
+                      } @else {
+                        <p-badge value="Owner. All granted" severity="success" class="px-2 py-1 text-xs"/>
+                      }
+                    </td>
+                    <td>
+                      <p-badge [value]="isOldUser(user.value.email) ? 'Some time ago' : 'Just now'" severity="contrast"
+                               class="px-2 py-1 text-xs"/>
+                    </td>
+                    <td>
+                      <p-button title="Remove" [disabled]="user.value.isOwnerOrSelf" variant="text" icon="pi pi-trash"
+                                (onClick)="removeUser(i)"/>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            }
+            <messages-showcase [messages]="messagesUsers()"/>
+
+            <!-- Users Form -->
+            <form [formGroup]="formUser" class="flex flex-col gap-4">
+              <!-- Email -->
+              <div>
+                <p-floatlabel variant="on" class="w-60">
+                  <p-iconfield>
+                    <p-inputicon class="pi pi-envelope"/>
+                    <input pInputText formControlName="email" type="email" id="email"/>
+                  </p-iconfield>
+                  <label for="email">Email</label>
+                </p-floatlabel>
+                <form-input-error [control]="formUser.controls.email" [customErrorMessages]="customErrorMessages"/>
+              </div>
+              <p-button title="Invite User" class="mt-1" label="Invite User" [disabled]="formUser.invalid"
+                        (onClick)="addUser()"
+                        size="small"/>
+            </form>
+          </div>
+        </card>
+        <messages-showcase [messages]="messages()"/>
+        <p-button title="Submit" [label]="instance.value() === undefined ? 'Create' : 'Save'"
+                  [disabled]="form.invalid || !form.dirty"
+                  (onClick)="save()" size="small" type="submit"/>
+      </form>
+    </card>
+  }
 </div>

@@ -4,10 +4,12 @@ import {DatePicker} from "primeng/datepicker";
 import {FormInputErrorComponent} from "../../component/form-input-error/form-input-error.component";
 import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {InputText} from "primeng/inputtext";
-import {MessagesShowcaseComponent} from "../../component/messages-showcase/messages-showcase.component";
+import {
+  MessagesShowcaseComponent
+} from "../../component/messages-showcase/messages-showcase.component";
 import {Select} from "primeng/select";
 import {UnitOfMeasureType} from '../../model/unit-of-measure-type.model';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {SaleService} from '../../service/sale.service';
 import Messages from '../../model/messages.model';
 import Sale, {SaleCreateRequest, SaleEditRequest, SoldGood} from '../../model/sale.model';
@@ -15,14 +17,26 @@ import {first, map, of, tap} from 'rxjs';
 import {NumberUtil} from '../../util/number.util';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {SaleReceiptType, saleReceiptTypes} from './sale-receipt-type.model';
-import {defaultStandardMeasurement, measurementUnits, StandardMeasurements} from './standard-measurement.model';
+import {
+  defaultStandardMeasurement,
+  measurementUnits,
+  StandardMeasurements
+} from './standard-measurement.model';
 import {CustomerService} from '../../service/customer.service';
 import {SalesmanService} from '../../service/salesman.service';
-import {SalePageHeaderSectionComponent} from "../../component/sale-page-header-section/sale-page-header-section.component";
+import {
+  SalePageHeaderSectionComponent
+} from "../../component/sale-page-header-section/sale-page-header-section.component";
 import {CardComponent} from '../../component/card/card.component';
 import {FloatLabel} from 'primeng/floatlabel';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
+import {
+  FailedToLoadPleaseReloadComponent
+} from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
+import {MessageService} from 'primeng/api';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'sale-management-page',
@@ -39,15 +53,20 @@ import {InputIcon} from 'primeng/inputicon';
     CardComponent,
     FloatLabel,
     IconField,
-    InputIcon
+    InputIcon,
+    FailedToLoadPleaseReloadComponent,
+    LoadingSpinnerComponent
   ],
   templateUrl: './sale-management-page.component.html',
   styles: ``
 })
 export class SaleManagementPageComponent {
   private readonly customerService = inject(CustomerService);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly formBuilder = inject(FormBuilder);
+  private readonly messageHandlingService = inject(MessageHandlingService);
+  private readonly messageService = inject(MessageService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly saleService = inject(SaleService);
   private readonly salesmanService = inject(SalesmanService);
   protected readonly SaleReceiptType = SaleReceiptType;
@@ -112,17 +131,32 @@ export class SaleManagementPageComponent {
     soldGoods: this.formBuilder.array([this.createSoldGood()])
   });
 
-  private onSuccess(message: string) {
-    this.messages.set({success: [message]});
-    this.form.markAsUntouched();
-    this.form.markAsPristine();
+  private consumeResult(message: string, id?: string | number, success: boolean = true) {
+    if (success) {
+      this.messageService.add({
+        key: 'root',
+        detail: message,
+        severity: 'success',
+        closable: true
+      });
+      if (this.saleId()) {
+        this.router.navigate(['../'], {relativeTo: this.route});
+      } else {
+        this.router.navigate(['../', id], {relativeTo: this.route});
+      }
+    } else {
+      this.messages.set({error: [message]});
+    }
   }
 
   private create(request: SaleCreateRequest) {
-    this.saleService.create(request).pipe(first()).subscribe({
-      next: () => this.onSuccess("Sale has been created successfully."),
-      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
-    });
+    this.saleService
+      .create(request)
+      .pipe(first())
+      .subscribe({
+        next: (value) => this.consumeResult("Sale has been created successfully.", value.id),
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
+      });
   }
 
   private createSoldGood(soldGood?: SoldGood) {
@@ -138,10 +172,13 @@ export class SaleManagementPageComponent {
   }
 
   private edit(request: SaleEditRequest) {
-    this.saleService.edit(request).pipe(first()).subscribe({
-      next: () => this.onSuccess("Sale has been edited successfully."),
-      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
-    });
+    this.saleService
+      .edit(request)
+      .pipe(first())
+      .subscribe({
+        next: () => this.consumeResult("Sale has been edited successfully."),
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
+      });
   }
 
   private patchFormValues(sale: Sale) {

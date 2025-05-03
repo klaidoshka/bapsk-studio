@@ -3,7 +3,7 @@ import {Button} from "primeng/button";
 import {MessagesShowcaseComponent} from "../messages-showcase/messages-showcase.component";
 import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
 import Messages from '../../model/messages.model';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {VatReturnService} from '../../service/vat-return.service';
 import {Checkbox} from 'primeng/checkbox';
 import Sale from '../../model/sale.model';
@@ -23,7 +23,7 @@ import {ConfirmationComponent} from '../confirmation/confirmation.component';
   styles: ``
 })
 export class VatReturnDeclarationSubmissionComponent {
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly vatReturnService = inject(VatReturnService);
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
@@ -76,7 +76,7 @@ export class VatReturnDeclarationSubmissionComponent {
       .pipe(first())
       .subscribe({
         next: () => this.onSuccess("Declaration for sale's VAT return has been submitted successfully."),
-        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
 }

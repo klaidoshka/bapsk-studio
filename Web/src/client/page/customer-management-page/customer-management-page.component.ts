@@ -3,13 +3,19 @@ import {Button} from "primeng/button";
 import {DatePicker} from "primeng/datepicker";
 import {FormInputErrorComponent} from "../../component/form-input-error/form-input-error.component";
 import {InputText} from "primeng/inputtext";
-import {MessagesShowcaseComponent} from "../../component/messages-showcase/messages-showcase.component";
+import {
+  MessagesShowcaseComponent
+} from "../../component/messages-showcase/messages-showcase.component";
 import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Select} from "primeng/select";
 import {getDefaultIsoCountry, IsoCountries} from '../../model/iso-country.model';
 import {CustomerService} from '../../service/customer.service';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
-import Customer, {CustomerCreateRequest, CustomerEditRequest, CustomerOtherDocument} from '../../model/customer.model';
+import {MessageHandlingService} from '../../service/message-handling.service';
+import Customer, {
+  CustomerCreateRequest,
+  CustomerEditRequest,
+  CustomerOtherDocument
+} from '../../model/customer.model';
 import {IdentityDocumentType} from '../../model/identity-document-type.model';
 import Messages from '../../model/messages.model';
 import {first, of, tap} from 'rxjs';
@@ -22,6 +28,12 @@ import {CardComponent} from '../../component/card/card.component';
 import {FloatLabel} from 'primeng/floatlabel';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
+import {
+  FailedToLoadPleaseReloadComponent
+} from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
+import {MessageService} from 'primeng/api';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'customer-management-page',
@@ -37,15 +49,20 @@ import {InputIcon} from 'primeng/inputicon';
     CardComponent,
     FloatLabel,
     IconField,
-    InputIcon
+    InputIcon,
+    FailedToLoadPleaseReloadComponent,
+    LoadingSpinnerComponent
   ],
   templateUrl: './customer-management-page.component.html',
   styles: ``
 })
 export class CustomerManagementPageComponent {
   private readonly customerService = inject(CustomerService);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly formBuilder = inject(FormBuilder);
+  private readonly messageHandlingService = inject(MessageHandlingService);
+  private readonly messageService = inject(MessageService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   protected readonly IsoCountries = IsoCountries;
   protected readonly customerId = input<string>();
   protected readonly instanceId = input.required<string>();
@@ -56,28 +73,46 @@ export class CustomerManagementPageComponent {
       customerId: NumberUtil.parse(this.customerId()),
       instanceId: NumberUtil.parse(this.instanceId())
     }),
-    loader: ({ request }) => request.customerId && request.instanceId
+    loader: ({request}) => request.customerId && request.instanceId
       ? this.customerService
         .getById(request.instanceId, request.customerId)
-        .pipe(
-          first(),
-          tap(customer => this.updateForm(customer))
-        )
+        .pipe(tap(customer => this.updateForm(customer)))
       : of(undefined)
   });
 
   protected readonly form = this.createForm();
 
   protected readonly identityDocumentTypes = [
-    { label: 'ID Card', value: IdentityDocumentType.NationalId },
-    { label: 'Passport', value: IdentityDocumentType.Passport }
+    {label: 'ID Card', value: IdentityDocumentType.NationalId},
+    {label: 'Passport', value: IdentityDocumentType.Passport}
   ]
 
+  private consumeResult(message: string, id?: string | number, success: boolean = true) {
+    if (success) {
+      this.messageService.add({
+        key: 'root',
+        detail: message,
+        severity: 'success',
+        closable: true
+      });
+      if (this.customerId()) {
+        this.router.navigate(['../'], {relativeTo: this.route});
+      } else {
+        this.router.navigate(['../', id], {relativeTo: this.route});
+      }
+    } else {
+      this.messages.set({error: [message]});
+    }
+  }
+
   private create(request: CustomerCreateRequest) {
-    this.customerService.create(request).pipe(first()).subscribe({
-      next: () => this.onSuccess("Customer has been created successfully."),
-      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
-    });
+    this.customerService
+      .create(request)
+      .pipe(first())
+      .subscribe({
+        next: (value) => this.consumeResult("Customer has been created successfully.", value.id),
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
+      });
   }
 
   private createForm() {
@@ -108,21 +143,18 @@ export class CustomerManagementPageComponent {
   }
 
   private edit(request: CustomerEditRequest) {
-    this.customerService.edit(request).pipe(first()).subscribe({
-      next: () => this.onSuccess("Customer has been edited successfully."),
-      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
-    });
-  }
-
-  private onSuccess(message: string) {
-    this.messages.set({ success: [message] });
-    this.form.markAsUntouched();
-    this.form.markAsPristine();
+    this.customerService
+      .edit(request)
+      .pipe(first())
+      .subscribe({
+        next: () => this.consumeResult("Customer has been edited successfully."),
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
+      });
   }
 
   private updateForm(customer: Customer) {
     this.form.reset();
-    this.form.patchValue({ ...customer });
+    this.form.patchValue({...customer});
   }
 
   protected addOtherDocument(document?: CustomerOtherDocument) {
@@ -141,7 +173,7 @@ export class CustomerManagementPageComponent {
 
   protected save() {
     if (!this.form.valid) {
-      this.messages.set({ error: ["Please fill out the form."] });
+      this.messages.set({error: ["Please fill out the form."]});
       return;
     }
 

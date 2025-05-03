@@ -6,11 +6,11 @@
     <failed-to-load-please-reload/>
   } @else {
     @let sale = this.sale.value()!;
-    <card class="w-fit!">
+    <card>
       <p card-header>Sale</p>
       <p card-subHeader>Preview of this unique sale entry.</p>
       <div card-body class="flex flex-col gap-4">
-        <card class="w-fit!">
+        <card>
           <p card-header>Details</p>
           <p card-subHeader>Details of this specific sale.</p>
           <div card-body class="flex flex-col md:flex-row gap-4">
@@ -48,13 +48,11 @@
             </div>
           </div>
         </card>
-        <card class="w-fit!">
+        <card>
           <p card-header>Sold Goods</p>
           <p card-subHeader>Goods that were sold to the customer of this specific sale.</p>
-          <p-table card-body [value]="sale.soldGoods" paginatorStyleClass="rounded-t-none! bg-inherit!"
-                   paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]"
-                   [styleClass]="'rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto ' +
-                    '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'">
+          <p-table card-body [value]="sale.soldGoods" paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10"
+                   [rowsPerPageOptions]="[10, 20, 50]">
             <ng-template #header>
               <tr>
                 <th>Sequence No</th>

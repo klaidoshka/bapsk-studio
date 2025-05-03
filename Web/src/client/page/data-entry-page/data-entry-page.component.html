@@ -12,7 +12,7 @@
     </p-dialog>
     <confirmation [key]='"data-entry-delete-confirmation"' [header]='"Are you sure about deleting this data entry?"'/>
     <messages-showcase [messages]="messages()"/>
-    <card class="w-fit!">
+    <card>
       <p card-header>
         @if (dataType.value()?.name) {
           {{ dataType.value()!.name }}

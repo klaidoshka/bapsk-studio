@@ -1,6 +1,6 @@
 import {Component, inject, input, OnInit, signal} from '@angular/core';
 import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {UserService} from '../../service/user.service';
 import {
   getDefaultIsoCountry,
@@ -42,7 +42,7 @@ import {Select} from 'primeng/select';
 })
 export class ProfileManagementComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly userService = inject(UserService);
   protected readonly messages = signal<Messages>({});
   protected readonly countries = IsoCountries;
@@ -92,7 +92,7 @@ export class ProfileManagementComponent implements OnInit {
           this.form.markAsUntouched();
           this.form.markAsPristine();
         },
-        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
 }

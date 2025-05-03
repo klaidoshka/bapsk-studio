@@ -6,11 +6,11 @@
     <failed-to-load-please-reload/>
   } @else {
     @let instanceValue = instance.value()!;
-    <card class="w-fit!">
+    <card>
       <p card-header>Instance</p>
       <p card-subHeader>Preview of this unique instance.</p>
       <div card-body class="flex flex-col gap-4">
-        <card class="w-fit!">
+        <card>
           <p card-header>Details</p>
           <p card-subHeader>Details of this specific instance.</p>
           <div card-body class="flex flex-col gap-2">
@@ -32,14 +32,12 @@
             </div>
           </div>
         </card>
-        <card class="w-fit!">
+        <card>
           <p card-header>Users</p>
           <p card-subHeader>Users within this specific instance.</p>
           <div card-body>
-            <p-table [value]="instanceValue.users" paginatorStyleClass="rounded-t-none! bg-inherit!"
-                     paginatorDropdownAppendTo="body" [styleClass]="'rounded-md mb-4 border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto ' +
-                     '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'"
-                     [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+            <p-table [value]="instanceValue.users" paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10"
+                     [rowsPerPageOptions]="[10, 20, 50]">
               <ng-template #header>
                 <tr>
                   <th>Name</th>

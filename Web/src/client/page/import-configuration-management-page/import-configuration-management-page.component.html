@@ -1,65 +1,82 @@
 <div class="h-full w-full relative container mx-auto flex flex-col mb-8">
   <import-configuration-page-header-section [canGoBack]="true"/>
-  <messages-showcase [messages]="messages()"/>
-  <form *ngIf="dataTypes.hasValue()" class="flex flex-col gap-4" [formGroup]="form">
-    <div class="flex flex-row gap-4">
-      <div class="flex flex-col w-full">
-        <label for="name" class="block text-sm font-medium">Name</label>
-        <input formControlName="name" pInputText type="text" id="name" class="mt-1 block w-full"/>
-        <form-input-error [control]="form.controls.name"/>
-      </div>
+  @if (configuration.isLoading() || dataTypes.isLoading() || dataEntries.isLoading()) {
+    <loading-spinner/>
+  } @else if (configurationId() && !configuration.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    <card>
+      <p card-header>Manage Import Configuration</p>
+      <p card-subHeader>Fill in the form below to create a new import configuration or modify an existing one.</p>
+      <form card-body [formGroup]="form" class="flex flex-col gap-4">
+        <div class="flex flex-wrap gap-4">
+          <!-- Name -->
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-iconfield>
+                <p-inputicon class="pi pi-tag"/>
+                <input pInputText id="name" formControlName="name" type="text"/>
+              </p-iconfield>
+              <label for="name">Name</label>
+            </p-floatlabel>
+            <form-input-error [control]="form.controls.name"/>
+          </div>
 
-      <div *ngIf="!configurationId()" class="flex flex-col w-full">
-        <label for="dataTypeId" class="block text-sm font-medium">Data Type</label>
-        <p-select formControlName="dataTypeId" [options]="dataTypes.value()" optionLabel="name" optionValue="id"
-                  placeholder="Select a data type" appendTo="body" styleClass="w-full" class="mt-1"
-                  (onChange)="changeFormFields($event.value)"/>
-        <form-input-error [control]="form.controls.dataTypeId"/>
-      </div>
-    </div>
-
-    <div class="flex flex-col">
-      <label for="fields" class="block text-sm font-medium">Fields</label>
-      <p-table styleClass="w-full mt-2 dark:bg-primary-950! bg-primary-50!"
-               paginatorStyleClass="dark:bg-primary-950! bg-primary-50!" id="fields" formArrayName="fields"
-               [value]="formFields().controls">
-        <ng-template #header>
-          <tr>
-            <th>Order</th>
-            <th>Name</th>
-            <th>Default Value</th>
-            <th></th>
-          </tr>
-        </ng-template>
-
-        <ng-template #body let-formField let-i="rowIndex">
-          <tr [formGroup]="formField">
-            <td>{{ i + 1 }}</td>
-            <td>{{ getFieldName(i) }}</td>
-
-            <td>
-              @let fieldType = getFieldType(i);
-
-              @if (fieldType === FieldType.Reference) {
-                <p-select placeholder="Select a referenced entry" [options]="getDataEntries(i)()" optionLabel="label"
-                          optionValue="id" appendTo="body" formControlName="defaultValue" class="w-full"/>
-              } @else {
-                <data-type-entry-field-input formControlName="defaultValue" [type]="fieldType"/>
-              }
-            </td>
-
-            <td>
-              <p-button icon="pi pi-chevron-up" type="button" variant="text" (onClick)="moveField(i,  -1)"/>
-              <p-button icon="pi pi-chevron-down" type="button" variant="text" (onClick)="moveField(i,  1)"/>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
-
-    <div class="flex justify-end mt-4">
-      <p-button [label]="configuration.hasValue() ? 'Save' : 'Create'" [disabled]="form.invalid || !form.dirty"
-                (onClick)="save()" type="submit"/>
-    </div>
-  </form>
+          @if (!configurationId()) {
+            <!-- Data Type -->
+            <div>
+              <p-floatlabel variant="on" class="w-60">
+                <p-select formControlName="dataTypeId" [options]="dataTypes.value()" optionLabel="name" optionValue="id"
+                          appendTo="body" styleClass="w-full" dropdownIcon="pi pi-objects-column"
+                          (onChange)="changeFormFields($event.value, configuration.value())"/>
+                <label for="dataTypeId">Data Type</label>
+              </p-floatlabel>
+              <form-input-error [control]="form.controls.dataTypeId"/>
+            </div>
+          }
+        </div>
+        <card class="w-fit">
+          <p card-header>Fields</p>
+          <p card-subHeader>Fields of this import configuration in specific order with default values.</p>
+          <p-table card-body formArrayName="fields" [value]="form.controls.fields.controls">
+            <ng-template #header>
+              <tr>
+                <th>Order</th>
+                <th>Name</th>
+                <th>Default Value</th>
+                <th></th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-field let-i="rowIndex">
+              <tr [formGroup]="field">
+                <td>{{ i + 1 }}</td>
+                <td>{{ getFieldName(i) }}</td>
+                <td>
+                  @let fieldType = getFieldType(i);
+                  @if (fieldType === FieldType.Reference) {
+                    <p-select placeholder="Select a referenced entry" [options]="getDataEntries(i)()"
+                              optionLabel="label" optionValue="id" appendTo="body" formControlName="defaultValue"
+                              class="w-full"/>
+                  } @else {
+                    <data-type-entry-field-input formControlName="defaultValue" [type]="fieldType"/>
+                  }
+                </td>
+                <td>
+                  <div class="flex items-center">
+                    <p-button title="Move Up" icon="pi pi-chevron-up" type="button" variant="text"
+                              (onClick)="moveField(i,  -1)"/>
+                    <p-button title="Move Down" icon="pi pi-chevron-down" type="button" variant="text"
+                              (onClick)="moveField(i,  1)"/>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </card>
+        <messages-showcase [messages]="messages()"/>
+        <p-button title="Submit" size="small" [label]="configuration.hasValue() ? 'Save' : 'Create'" [disabled]="form.invalid || !form.dirty"
+                  (onClick)="save()" type="submit"/>
+      </form>
+    </card>
+  }
 </div>

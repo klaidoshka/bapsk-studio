@@ -7,7 +7,7 @@ import {
 } from "../../component/messages-showcase/messages-showcase.component";
 import {TableModule} from "primeng/table";
 import {CustomerService} from '../../service/customer.service';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import Customer from '../../model/customer.model';
 import Messages from '../../model/messages.model';
 import {first, of} from 'rxjs';
@@ -37,7 +37,7 @@ import {CardComponent} from '../../component/card/card.component';
 })
 export class CustomerPageComponent {
   private readonly customerService = inject(CustomerService);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   protected readonly getIdentityDocumentTypeLabel = getIdentityDocumentTypeLabel;
@@ -60,7 +60,7 @@ export class CustomerPageComponent {
         .pipe(first())
         .subscribe({
           next: () => this.messages.set({success: ['Customer deleted successfully']}),
-          error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+          error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     });
   }

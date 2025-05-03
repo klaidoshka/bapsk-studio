@@ -18,7 +18,7 @@ import {
 import {TableModule} from "primeng/table";
 import {instanceUserPermissions} from '../../constant/instance-user.permissions';
 import {AuthService} from '../../service/auth.service';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {UserService} from '../../service/user.service';
 import {
   InstanceCreateRequest,
@@ -42,6 +42,12 @@ import {Dialog} from 'primeng/dialog';
 import {
   InstanceUserPermissionTogglerComponent
 } from '../../component/instance-user-permission-toggler/instance-user-permission-toggler.component';
+import {
+  FailedToLoadPleaseReloadComponent
+} from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
+import {MessageService} from 'primeng/api';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'instance-management-page',
@@ -60,18 +66,24 @@ import {
     InputIcon,
     CardComponent,
     Dialog,
-    InstanceUserPermissionTogglerComponent
+    InstanceUserPermissionTogglerComponent,
+    FailedToLoadPleaseReloadComponent,
+    LoadingSpinnerComponent
   ],
   templateUrl: './instance-management-page.component.html',
   styles: ``
 })
 export class InstanceManagementPageComponent {
   private readonly authService = inject(AuthService);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly instanceService = inject(InstanceService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
+  private readonly messageService = inject(MessageService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly userService = inject(UserService);
   private readonly allPermissions = instanceUserPermissions;
+  protected readonly form = this.createForm();
   protected readonly instanceId = input<string>();
   protected readonly messages = signal<Messages>({});
   protected readonly messagesUsers = signal<Messages>({});
@@ -84,14 +96,9 @@ export class InstanceManagementPageComponent {
     loader: ({request}) => request.instanceId
       ? this.instanceService
         .getWithUsersById(request.instanceId)
-        .pipe(
-          first(),
-          tap(instance => this.patchFormValues(instance))
-        )
+        .pipe(tap(instance => this.patchFormValues(instance)))
       : of(undefined)
   });
-
-  protected readonly form = this.createForm();
 
   protected readonly formUser = this.formBuilder.group({
     email: ["", [Validators.required, Validators.email, this.validateEmailExists(this.form.controls.users)]]
@@ -125,11 +132,32 @@ export class InstanceManagementPageComponent {
     this.form.markAsDirty();
   }
 
+  private consumeResult(message: string, id?: string | number, success: boolean = true) {
+    if (success) {
+      this.messageService.add({
+        key: 'root',
+        detail: message,
+        severity: 'success',
+        closable: true
+      });
+      if (this.instanceId()) {
+        this.router.navigate(['../'], {relativeTo: this.route});
+      } else {
+        this.router.navigate(['../', id], {relativeTo: this.route});
+      }
+    } else {
+      this.messages.set({error: [message]});
+    }
+  }
+
   private create(request: InstanceCreateRequest) {
-    this.instanceService.create(request).pipe(first()).subscribe({
-      next: () => this.onSuccess("Instance has been created successfully."),
-      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
-    });
+    this.instanceService
+      .create(request)
+      .pipe(first())
+      .subscribe({
+        next: (value) => this.consumeResult("Instance has been created successfully.", value.id),
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
+      });
   }
 
   private createForm() {
@@ -157,15 +185,13 @@ export class InstanceManagementPageComponent {
   }
 
   private edit(request: InstanceEditRequest) {
-    this.instanceService.edit(request).pipe(first()).subscribe({
-      next: () => this.onSuccess("Instance has been edited successfully."),
-      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
-    });
-  }
-
-  private onSuccess(message: string) {
-    this.messages.set({success: [message]});
-    this.form.markAsPristine();
+    this.instanceService
+      .edit(request)
+      .pipe(first())
+      .subscribe({
+        next: () => this.consumeResult("Instance has been edited successfully."),
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
+      });
   }
 
   private patchFormValues(instance: InstanceWithUsers) {
@@ -188,15 +214,12 @@ export class InstanceManagementPageComponent {
   private validateEmailExists(formArray: FormArray): ValidatorFn {
     return (control): ValidationErrors | null => {
       const email = control.value?.trim()?.toLowerCase();
-
       if (!email) {
         return null;
       }
-
       if (formArray.controls.some(um => um.value.email.trim().toLowerCase() === email)) {
         return {emailExists: true};
       }
-
       return null;
     };
   }
@@ -205,19 +228,19 @@ export class InstanceManagementPageComponent {
     if (!email) {
       email = this.formUser.value.email?.trim();
     }
-
     this.formUser.reset();
-
-    this.userService.getIdentityByEmail(email!).pipe(first()).subscribe(user => {
-      if (!user) {
-        this.messagesUsers.set({error: [`User with email '${email}' does not exist.`]});
-        return;
-      } else if (this.messagesUsers().error) {
-        this.messagesUsers.set({});
-      }
-
-      this.addUserInForm(user, email!);
-    });
+    this.userService
+      .getIdentityByEmail(email!)
+      .pipe(first())
+      .subscribe(user => {
+        if (!user) {
+          this.messagesUsers.set({error: [`User with email '${email}' does not exist.`]});
+          return;
+        } else if (this.messagesUsers().error) {
+          this.messagesUsers.set({});
+        }
+        this.addUserInForm(user, email!);
+      });
   }
 
   protected isOldUser(email: string): boolean {

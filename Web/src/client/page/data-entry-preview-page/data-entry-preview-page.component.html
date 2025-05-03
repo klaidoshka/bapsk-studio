@@ -7,11 +7,11 @@
   } @else {
     @let dataEntry = this.dataEntry.value()!;
     @let dataType = this.dataType.value()!;
-    <card class="w-fit!">
+    <card>
       <p card-header>{{ dataType.name }}</p>
       <p card-subHeader>Preview of this unique {{dataType.name}} data type entry.</p>
       <div card-body class="flex flex-col gap-4">
-        <card class="w-fit!">
+        <card>
           <p card-header>Details</p>
           <p card-subHeader>Details of this specific data entry.</p>
           <div card-body class="flex flex-col">
@@ -43,12 +43,12 @@
             </div>
           </div>
         </card>
-        <card class="w-fit!">
+        <card>
           <p card-header>Values</p>
           <p card-subHeader>Values of this specific data entry.</p>
           <p-table card-body [columns]="dataType?.fields || []" [value]="[dataEntry.fields]"
-                   [styleClass]="'rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto ' +
-                  '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'">
+
+                  >
             <ng-template #header let-fields>
               <tr>
                 @for (field of fields; track field.id) {

@@ -4,8 +4,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {ConfirmationComponent} from '../../component/confirmation/confirmation.component';
 import Messages from '../../model/messages.model';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {first, of} from 'rxjs';
-import ReportTemplate, {getDataTypesCount} from '../../model/report-template.model';
+import {first, map, Observable, of} from 'rxjs';
+import ReportTemplate from '../../model/report-template.model';
 import {Button} from 'primeng/button';
 import {
   MessagesShowcaseComponent
@@ -15,6 +15,8 @@ import {NumberUtil} from '../../util/number.util';
 import {
   ReportTemplatePageHeaderSectionComponent
 } from '../../component/report-template-page-header-section/report-template-page-header-section.component';
+import {CardComponent} from '../../component/card/card.component';
+import {AsyncPipe} from '@angular/common';
 
 @Component({
   selector: 'report-template-page',
@@ -23,7 +25,9 @@ import {
     ConfirmationComponent,
     MessagesShowcaseComponent,
     TableModule,
-    ReportTemplatePageHeaderSectionComponent
+    ReportTemplatePageHeaderSectionComponent,
+    CardComponent,
+    AsyncPipe
   ],
   templateUrl: './report-template-page.component.html',
   styles: ``
@@ -32,7 +36,6 @@ export class ReportTemplatePageComponent {
   private readonly reportTemplateService = inject(ReportTemplateService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  protected readonly getDataTypesCount = getDataTypesCount;
   protected readonly canGoBack = input<boolean>();
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly dataTypeId = input<string>();
@@ -66,6 +69,15 @@ export class ReportTemplatePageComponent {
         .pipe(first())
         .subscribe(() => this.changeMessages("Import template deleted successfully"));
     });
+  }
+
+  protected getDataTypeName(template: ReportTemplate): Observable<string> {
+    return this.reportTemplateService
+      .getDataType(NumberUtil.parse(this.instanceId())!, template)
+      .pipe(
+        first(),
+        map(dataType => dataType.name)
+      );
   }
 
   protected manage(template?: ReportTemplate) {

@@ -1,14 +1,19 @@
 import {Component, computed, inject, input, Signal, signal} from '@angular/core';
 import {DataEntryService} from '../../service/data-entry.service';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
-import DataEntry, {DataEntryCreateRequest, DataEntryEditRequest} from '../../model/data-entry.model';
+import {MessageHandlingService} from '../../service/message-handling.service';
+import DataEntry, {
+  DataEntryCreateRequest,
+  DataEntryEditRequest
+} from '../../model/data-entry.model';
 import {rxResource} from '@angular/core/rxjs-interop';
 import DataType from '../../model/data-type.model';
 import Messages from '../../model/messages.model';
 import {first, of, tap} from 'rxjs';
 import {FieldType} from '../../model/data-type-field.model';
-import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
+import {
+  MessagesShowcaseComponent
+} from '../../component/messages-showcase/messages-showcase.component';
 import {Select} from 'primeng/select';
 import {
   DataTypeEntryFieldInputComponent
@@ -26,6 +31,8 @@ import {
   FailedToLoadPleaseReloadComponent
 } from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
 import {FloatLabel} from 'primeng/floatlabel';
+import {MessageService} from 'primeng/api';
+import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'data-entry-management-page',
@@ -49,10 +56,14 @@ export class DataEntryManagementPageComponent {
   private readonly dataEntryService = inject(DataEntryService);
   private readonly dataTypeService = inject(DataTypeService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
+  private readonly messageService = inject(MessageService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   protected readonly FieldType = FieldType;
   protected readonly dataEntryId = input<string>();
   protected readonly form = this.createForm();
+  protected readonly dataTypeId = input.required<string>();
   protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});
 
@@ -69,12 +80,13 @@ export class DataEntryManagementPageComponent {
   protected readonly dataType = rxResource({
     request: () => ({
       dataEntry: this.dataEntry.value(),
+      dataTypeId: NumberUtil.parse(this.dataTypeId()),
       instanceId: NumberUtil.parse(this.instanceId())
     }),
-    loader: ({request}) => request.dataEntry?.dataTypeId && request.instanceId
+    loader: ({request}) => request.dataTypeId && request.instanceId
       ? this.dataTypeService
-        .getById(request.instanceId, request.dataEntry.dataTypeId)
-        .pipe(tap(dataType => this.patchFormValues(dataType, request.dataEntry!)))
+        .getById(request.instanceId, request.dataTypeId)
+        .pipe(tap(dataType => this.patchFormValues(dataType, request.dataEntry)))
       : of(undefined)
   });
 
@@ -90,6 +102,24 @@ export class DataEntryManagementPageComponent {
       : of(undefined)
   });
 
+  private consumeResult(message: string, id?: string | number, success: boolean = true) {
+    if (success) {
+      this.messageService.add({
+        key: 'root',
+        detail: message,
+        severity: 'success',
+        closable: true
+      });
+      if (this.dataEntryId()) {
+        this.router.navigate(['../'], {relativeTo: this.route});
+      } else {
+        this.router.navigate(['../', id], {relativeTo: this.route});
+      }
+    } else {
+      this.messages.set({error: [message]});
+    }
+  }
+
   private createForm(dataType?: DataType, dataEntry?: DataEntry) {
     return this.formBuilder.group({
       values: this.formBuilder.array(
@@ -104,11 +134,11 @@ export class DataEntryManagementPageComponent {
     });
   }
 
-  private patchFormValues(dataType: DataType, dataEntry: DataEntry) {
+  private patchFormValues(dataType: DataType, dataEntry?: DataEntry) {
     this.form.reset();
 
     const values = dataType.fields.map(field => {
-      const entryField = dataEntry.fields.find(ef => ef.dataTypeFieldId === field.id);
+      const entryField = dataEntry?.fields.find(ef => ef.dataTypeFieldId === field.id);
       return this.formBuilder.group({
         name: [field.name, [Validators.required]],
         value: [entryField?.value, field.isRequired ? [Validators.required] : []]
@@ -123,8 +153,8 @@ export class DataEntryManagementPageComponent {
       .create(request)
       .pipe(first())
       .subscribe({
-        next: () => this.onSuccess("Data entry has been created successfully."),
-        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+        next: (value) => this.consumeResult("Data entry has been created successfully.", value.id),
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
 
@@ -133,15 +163,9 @@ export class DataEntryManagementPageComponent {
       .edit(request)
       .pipe(first())
       .subscribe({
-        next: () => this.onSuccess("Data entry has been edited successfully."),
-        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+        next: () => this.consumeResult("Data entry has been edited successfully."),
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
-  }
-
-  private onSuccess(message: string) {
-    this.messages.set({success: [message]});
-    this.form.markAsPristine();
-    this.form.markAsUntouched();
   }
 
   protected formFields() {

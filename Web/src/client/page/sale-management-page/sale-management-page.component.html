@@ -1,198 +1,205 @@
 <div class="h-full w-full relative container mx-auto flex flex-col mb-8">
   <sale-page-header-section [canGoBack]="true"/>
-  <card class="w-fit!">
-    <p card-header>Manage Sale</p>
-    <p card-subHeader>Fill in the form below to create a new sale or modify an existing one.</p>
-    <form [formGroup]="form" card-body class="flex flex-col gap-4">
-      <card class="w-fit!">
-        <p card-header>Details</p>
-        <p card-subHeader>Sale customer, salesman and date of occurred sale.</p>
-        <div card-body class="flex flex-wrap gap-4">
-          <!-- Customer -->
-          <div>
-            <p-floatlabel variant="on" class="w-60">
-              <p-select dropdownIcon="pi pi-user" formControlName="customerId" id="customerId"
-                        [options]="customersLabeled.value()" optionValue="value" optionLabel="label"
-                        class="w-full"/>
-              <label for="customerId">Customer</label>
-            </p-floatlabel>
-            <form-input-error [control]="form.controls.customerId"/>
-          </div>
-
-          <!-- Salesman -->
-          <div>
-            <p-floatlabel variant="on" class="w-60">
-              <p-select dropdownIcon="pi pi-shopping-cart" formControlName="salesmanId" id="salesmanId"
-                        [options]="salesmenLabeled.value()" optionValue="value" optionLabel="label"
-                        class="w-full"/>
-              <label for="salesmanId">Salesman</label>
-            </p-floatlabel>
-            <form-input-error [control]="form.controls.salesmanId"/>
-          </div>
-
-          <!-- Date -->
-          <div>
-            <p-floatlabel variant="on" class="w-60">
-              <p-date-picker inputId="date" formControlName="date" iconDisplay="input" [showIcon]="true"
-                             [showTime]="true" variant="filled" styleClass="w-full" appendTo="body"
-                             inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-inherit!"/>
-              <label for="date" class="block text-sm font-medium">Date</label>
-            </p-floatlabel>
-            <form-input-error [control]="form.controls.date"/>
-          </div>
-        </div>
-      </card>
-
-      <card class="w-fit!">
-        <p card-header>Occurred Sale Receipt</p>
-        <p card-subHeader>Select which type receipt was provided to the customer. In case of cash register,
-          the receipt number and cash register number are required.</p>
-        <div card-body class="flex flex-wrap gap-4">
-          <!-- Receipt Type -->
-          <div>
-            <p-floatlabel variant="on" class="w-60">
-              <p-select id="saleReceiptType" [(ngModel)]="selectedSaleReceiptType" dropdownIcon="pi pi-receipt"
-                        [ngModelOptions]="{ standalone: true }" [options]="saleReceiptTypes" optionValue="value"
-                        optionLabel="label" class="w-full"/>
-              <label for="saleReceiptType">Receipt Type</label>
-            </p-floatlabel>
-          </div>
-
-          <!-- Receipt Info -->
-          @if (selectedSaleReceiptType() === SaleReceiptType.Invoice) {
+  @if (sale.isLoading()) {
+    <loading-spinner/>
+  } @else if (saleId() && !sale.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    <card>
+      <p card-header>Manage Sale</p>
+      <p card-subHeader>Fill in the form below to create a new sale or modify an existing one.</p>
+      <form [formGroup]="form" card-body class="flex flex-col gap-4">
+        <card>
+          <p card-header>Details</p>
+          <p card-subHeader>Sale customer, salesman and date of occurred sale.</p>
+          <div card-body class="flex flex-wrap gap-4">
+            <!-- Customer -->
             <div>
-              <p-float-label variant="on" class="w-60">
-                <p-iconfield>
-                  <p-inputicon class="pi pi-hashtag"/>
-                  <input formControlName="invoiceNo" pInputText type="text" id="invoiceNo" class="w-full"/>
-                </p-iconfield>
-                <label for="invoiceNo">Invoice No</label>
-              </p-float-label>
-              <form-input-error [control]="form.controls.invoiceNo"/>
+              <p-floatlabel variant="on" class="w-60">
+                <p-select dropdownIcon="pi pi-user" formControlName="customerId" id="customerId"
+                          [options]="customersLabeled.value()" optionValue="value" optionLabel="label"
+                          class="w-full"/>
+                <label for="customerId">Customer</label>
+              </p-floatlabel>
+              <form-input-error [control]="form.controls.customerId"/>
             </div>
-          } @else {
-            <ng-container formGroupName="cashRegister">
+
+            <!-- Salesman -->
+            <div>
+              <p-floatlabel variant="on" class="w-60">
+                <p-select dropdownIcon="pi pi-shopping-cart" formControlName="salesmanId" id="salesmanId"
+                          [options]="salesmenLabeled.value()" optionValue="value" optionLabel="label"
+                          class="w-full"/>
+                <label for="salesmanId">Salesman</label>
+              </p-floatlabel>
+              <form-input-error [control]="form.controls.salesmanId"/>
+            </div>
+
+            <!-- Date -->
+            <div>
+              <p-floatlabel variant="on" class="w-60">
+                <p-date-picker inputId="date" formControlName="date" iconDisplay="input" [showIcon]="true"
+                               [showTime]="true" variant="filled" styleClass="w-full" appendTo="body"
+                               inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-inherit!"/>
+                <label for="date" class="block text-sm font-medium">Date</label>
+              </p-floatlabel>
+              <form-input-error [control]="form.controls.date"/>
+            </div>
+          </div>
+        </card>
+
+        <card>
+          <p card-header>Occurred Sale Receipt</p>
+          <p card-subHeader>Select which type receipt was provided to the customer. In case of cash register,
+            the receipt number and cash register number are required.</p>
+          <div card-body class="flex flex-wrap gap-4">
+            <!-- Receipt Type -->
+            <div>
+              <p-floatlabel variant="on" class="w-60">
+                <p-select id="saleReceiptType" [(ngModel)]="selectedSaleReceiptType" dropdownIcon="pi pi-receipt"
+                          [ngModelOptions]="{ standalone: true }" [options]="saleReceiptTypes" optionValue="value"
+                          optionLabel="label" class="w-full"/>
+                <label for="saleReceiptType">Receipt Type</label>
+              </p-floatlabel>
+            </div>
+
+            <!-- Receipt Info -->
+            @if (selectedSaleReceiptType() === SaleReceiptType.Invoice) {
               <div>
                 <p-float-label variant="on" class="w-60">
                   <p-iconfield>
                     <p-inputicon class="pi pi-hashtag"/>
-                    <input required formControlName="cashRegisterNo" pInputText type="text" id="cashRegisterNo"
-                           class="w-full"/>
+                    <input formControlName="invoiceNo" pInputText type="text" id="invoiceNo" class="w-full"/>
                   </p-iconfield>
-                  <label for="cashRegisterNo">Cash Register No</label>
+                  <label for="invoiceNo">Invoice No</label>
                 </p-float-label>
+                <form-input-error [control]="form.controls.invoiceNo"/>
               </div>
-              <div>
-                <p-float-label variant="on" class="w-60">
-                  <p-iconfield>
-                    <p-inputicon class="pi pi-hashtag"/>
-                    <input required formControlName="receiptNo" pInputText type="text" id="receiptNo" class="w-full"/>
-                  </p-iconfield>
-                  <label for="receiptNo">Receipt No</label>
-                </p-float-label>
-              </div>
-            </ng-container>
-          }
-        </div>
-      </card>
-
-      <!-- Sold Goods -->
-      <card class="w-fit!">
-        <p card-header>Sold Goods</p>
-        <p card-subHeader>Goods that the customer bought. Make sure quantity and measurement type are correct.</p>
-        <div card-body formArrayName="soldGoods" class="flex flex-col gap-8">
-          @for (soldGood of form.controls.soldGoods.controls; track $index; let i = $index) {
-            <div [formGroupName]="i" class="flex flex-wrap gap-4">
-              <!-- Description -->
-              <div>
-                <p-float-label variant="on" class="w-60">
-                  <p-iconfield>
-                    <p-inputicon class="pi pi-book"/>
-                    <input id="description" formControlName="description" pInputText type="text" class="w-full"/>
-                  </p-iconfield>
-                  <label for="description">Description</label>
-                </p-float-label>
-                <form-input-error [control]="soldGood.controls.description"/>
-              </div>
-
-              <!-- Quantity -->
-              <div>
-                <p-float-label variant="on" class="w-60">
-                  <p-iconfield>
-                    <p-inputicon class="pi pi-chart-line"/>
-                    <input id="quantity" formControlName="quantity" pInputText type="number" class="w-full"/>
-                  </p-iconfield>
-                  <label for="quantity">Quantity</label>
-                </p-float-label>
-                <form-input-error [control]="soldGood.controls.quantity"/>
-              </div>
-
-              <!-- Unit Price -->
-              <div>
-                <p-float-label variant="on" class="w-60">
-                  <p-iconfield>
-                    <p-inputicon class="pi pi-euro"/>
-                    <input id="unitPrice" formControlName="unitPrice" pInputText type="number" class="w-full"/>
-                  </p-iconfield>
-                  <label for="unitPrice">Unit Price</label>
-                </p-float-label>
-                <form-input-error [control]="soldGood.controls.unitPrice"/>
-              </div>
-
-              <!-- Measure Type -->
-              <div>
-                <p-float-label variant="on" class="w-60">
-                  <p-select dropdownIcon="pi pi-objects-column" class="w-full" formControlName="unitOfMeasureType"
-                            optionValue="value" optionLabel="label" [options]="measurementUnits"
-                            (onChange)="clearMeasurement(i, $event.value)"/>
-                  <label for="unitOfMeasureType">Measure Type</label>
-                </p-float-label>
-                <form-input-error [control]="soldGood.controls.unitOfMeasureType"/>
-              </div>
-
-              <!-- Measure Unit -->
-              <div>
-                <p-float-label variant="on" class="w-60">
-                  @if (getMeasurementUnit(i) == UnitOfMeasureType.UnitOfMeasureOther) {
+            } @else {
+              <ng-container formGroupName="cashRegister">
+                <div>
+                  <p-float-label variant="on" class="w-60">
                     <p-iconfield>
-                      <p-inputicon class="pi pi-objects-column"/>
-                      <input id="unitOfMeasure" formControlName="unitOfMeasure" pInputText type="text"
+                      <p-inputicon class="pi pi-hashtag"/>
+                      <input required formControlName="cashRegisterNo" pInputText type="text" id="cashRegisterNo"
                              class="w-full"/>
                     </p-iconfield>
-                  } @else {
-                    <p-select formControlName="unitOfMeasure" [options]="standardMeasurements" optionValue="code"
-                              optionLabel="label" dropdownIcon="pi pi-objects-column" class="w-full" appendTo="body"/>
-                  }
-                  <label for="unitOfMeasure">Measure Unit</label>
-                </p-float-label>
-                <form-input-error [control]="soldGood.controls.unitOfMeasure"/>
+                    <label for="cashRegisterNo">Cash Register No</label>
+                  </p-float-label>
+                </div>
+                <div>
+                  <p-float-label variant="on" class="w-60">
+                    <p-iconfield>
+                      <p-inputicon class="pi pi-hashtag"/>
+                      <input required formControlName="receiptNo" pInputText type="text" id="receiptNo" class="w-full"/>
+                    </p-iconfield>
+                    <label for="receiptNo">Receipt No</label>
+                  </p-float-label>
+                </div>
+              </ng-container>
+            }
+          </div>
+        </card>
+
+        <!-- Sold Goods -->
+        <card>
+          <p card-header>Sold Goods</p>
+          <p card-subHeader>Goods that the customer bought. Make sure quantity and measurement type are correct.</p>
+          <div card-body formArrayName="soldGoods" class="flex flex-col gap-8">
+            @for (soldGood of form.controls.soldGoods.controls; track $index; let i = $index) {
+              <div [formGroupName]="i" class="flex flex-wrap gap-4">
+                <!-- Description -->
+                <div>
+                  <p-float-label variant="on" class="w-60">
+                    <p-iconfield>
+                      <p-inputicon class="pi pi-book"/>
+                      <input id="description" formControlName="description" pInputText type="text" class="w-full"/>
+                    </p-iconfield>
+                    <label for="description">Description</label>
+                  </p-float-label>
+                  <form-input-error [control]="soldGood.controls.description"/>
+                </div>
+
+                <!-- Quantity -->
+                <div>
+                  <p-float-label variant="on" class="w-60">
+                    <p-iconfield>
+                      <p-inputicon class="pi pi-chart-line"/>
+                      <input id="quantity" formControlName="quantity" pInputText type="number" class="w-full"/>
+                    </p-iconfield>
+                    <label for="quantity">Quantity</label>
+                  </p-float-label>
+                  <form-input-error [control]="soldGood.controls.quantity"/>
+                </div>
+
+                <!-- Unit Price -->
+                <div>
+                  <p-float-label variant="on" class="w-60">
+                    <p-iconfield>
+                      <p-inputicon class="pi pi-euro"/>
+                      <input id="unitPrice" formControlName="unitPrice" pInputText type="number" class="w-full"/>
+                    </p-iconfield>
+                    <label for="unitPrice">Unit Price</label>
+                  </p-float-label>
+                  <form-input-error [control]="soldGood.controls.unitPrice"/>
+                </div>
+
+                <!-- Measure Type -->
+                <div>
+                  <p-float-label variant="on" class="w-60">
+                    <p-select dropdownIcon="pi pi-objects-column" class="w-full" formControlName="unitOfMeasureType"
+                              optionValue="value" optionLabel="label" [options]="measurementUnits"
+                              (onChange)="clearMeasurement(i, $event.value)"/>
+                    <label for="unitOfMeasureType">Measure Type</label>
+                  </p-float-label>
+                  <form-input-error [control]="soldGood.controls.unitOfMeasureType"/>
+                </div>
+
+                <!-- Measure Unit -->
+                <div>
+                  <p-float-label variant="on" class="w-60">
+                    @if (getMeasurementUnit(i) == UnitOfMeasureType.UnitOfMeasureOther) {
+                      <p-iconfield>
+                        <p-inputicon class="pi pi-objects-column"/>
+                        <input id="unitOfMeasure" formControlName="unitOfMeasure" pInputText type="text"
+                               class="w-full"/>
+                      </p-iconfield>
+                    } @else {
+                      <p-select formControlName="unitOfMeasure" [options]="standardMeasurements" optionValue="code"
+                                optionLabel="label" dropdownIcon="pi pi-objects-column" class="w-full" appendTo="body"/>
+                    }
+                    <label for="unitOfMeasure">Measure Unit</label>
+                  </p-float-label>
+                  <form-input-error [control]="soldGood.controls.unitOfMeasure"/>
+                </div>
+
+                <!-- VAT Rate -->
+                <div>
+                  <p-float-label variant="on" class="w-60">
+                    <p-iconfield>
+                      <p-inputicon class="pi pi-percentage"/>
+                      <input id="vatRate" formControlName="vatRate" pInputText type="number" [min]="0" [max]="100"
+                             [step]="1"
+                             class="w-full"/>
+                    </p-iconfield>
+                    <label for="vatRate">VAT Rate (%)</label>
+                  </p-float-label>
+                  <form-input-error [control]="soldGood.controls.vatRate"/>
+                </div>
+
+                <p-button title="Remove" icon="pi pi-trash" variant="text" class="self-start"
+                          (onClick)="removeSoldGood(i)"/>
               </div>
+            }
 
-              <!-- VAT Rate -->
-              <div>
-                <p-float-label variant="on" class="w-60">
-                  <p-iconfield>
-                    <p-inputicon class="pi pi-percentage"/>
-                    <input id="vatRate" formControlName="vatRate" pInputText type="number" [min]="0" [max]="100"
-                           [step]="1"
-                           class="w-full"/>
-                  </p-iconfield>
-                  <label for="vatRate">VAT Rate (%)</label>
-                </p-float-label>
-                <form-input-error [control]="soldGood.controls.vatRate"/>
-              </div>
-
-              <p-button title="Remove" icon="pi pi-trash" variant="text" class="self-start" (onClick)="removeSoldGood(i)"/>
-            </div>
-          }
-
-          <!-- Add Sold Good -->
-          <p-button title="Add Sold Good" size="small" label="Add Sold Good" (onClick)="addSoldGood()"/>
-        </div>
-      </card>
-      <messages-showcase [messages]="messages()"/>
-      <p-button title="Submit" size="small" [label]="!sale.value() ? 'Create' : 'Save'"
-                [disabled]="!form.valid || !form.dirty" (onClick)="save()" type="submit"/>
-    </form>
-  </card>
+            <!-- Add Sold Good -->
+            <p-button title="Add Sold Good" size="small" label="Add Sold Good" (onClick)="addSoldGood()"/>
+          </div>
+        </card>
+        <messages-showcase [messages]="messages()"/>
+        <p-button title="Submit" size="small" [label]="!sale.value() ? 'Create' : 'Save'"
+                  [disabled]="!form.valid || !form.dirty" (onClick)="save()" type="submit"/>
+      </form>
+    </card>
+  }
 </div>

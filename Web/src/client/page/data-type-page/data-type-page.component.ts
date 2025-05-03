@@ -5,7 +5,7 @@ import {MessagesShowcaseComponent} from '../../component/messages-showcase/messa
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {TableModule} from 'primeng/table';
 import {DataTypeService} from '../../service/data-type.service';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {first, of} from 'rxjs';
 import Messages from '../../model/messages.model';
@@ -24,7 +24,7 @@ import {CardComponent} from '../../component/card/card.component';
 })
 export class DataTypePageComponent {
   private readonly dataTypeService = inject(DataTypeService);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
@@ -48,7 +48,7 @@ export class DataTypePageComponent {
         .pipe(first())
         .subscribe({
           next: () => this.messages.set({success: ['Data type deleted successfully']}),
-          error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+          error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     });
   }

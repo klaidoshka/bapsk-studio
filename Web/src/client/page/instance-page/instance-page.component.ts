@@ -9,7 +9,7 @@ import {AsyncPipe, DatePipe} from '@angular/common';
 import {
   MessagesShowcaseComponent
 } from '../../component/messages-showcase/messages-showcase.component';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {rxResource} from '@angular/core/rxjs-interop';
 import Messages from '../../model/messages.model';
 import Instance, {InstanceWithUsers} from '../../model/instance.model';
@@ -43,7 +43,7 @@ import {CardComponent} from '../../component/card/card.component';
   providers: [MessageService, ConfirmationService]
 })
 export class InstancePageComponent {
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly dataEntryService = inject(DataEntryService);
   private readonly dataTypeService = inject(DataTypeService);
   private readonly instanceService = inject(InstanceService);
@@ -59,7 +59,7 @@ export class InstancePageComponent {
         .pipe(first())
         .subscribe({
           next: () => this.messages.set({success: ['Instance deleted successfully']}),
-          error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+          error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     });
   }

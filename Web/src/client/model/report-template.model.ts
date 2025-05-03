@@ -27,7 +27,3 @@ export interface ReportTemplateEditRequest {
   instanceId: number;
   reportTemplate: ReportTemplateCreateEdit;
 }
-
-export const getDataTypesCount = (template: ReportTemplate) => {
-  return new Set(template.fields.map(field => field.dataTypeId)).size;
-}
