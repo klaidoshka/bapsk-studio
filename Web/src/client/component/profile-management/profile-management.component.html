@@ -1,7 +1,8 @@
-<card>
+<card class="w-fit!">
   <p card-header>Details</p>
+  <p card-subHeader>Details of your profile. Unfortunately, your email cannot be changed. To change it contact the support.</p>
   <form card-body class="flex flex-col gap-4" [formGroup]="form">
-    <div class="flex flex-col gap-4 md:flex-row">
+    <div class="flex flex-wrap gap-4">
       <!-- First Name -->
       <div>
         <p-floatlabel variant="on" class="w-60">
@@ -13,6 +14,7 @@
         </p-floatlabel>
         <form-input-error [control]="form.controls.firstName"/>
       </div>
+
       <!-- Last Name -->
       <div>
         <p-floatlabel variant="on" class="w-60">
@@ -24,6 +26,7 @@
         </p-floatlabel>
         <form-input-error [control]="form.controls.lastName"/>
       </div>
+
       <!-- Email -->
       <div>
         <p-floatlabel variant="on" class="w-60">
@@ -35,12 +38,12 @@
         </p-floatlabel>
         <form-input-error [control]="form.controls.email"/>
       </div>
-    </div>
-    <div class="flex flex-col gap-4 md:flex-row">
+
       <!-- Birth Date -->
       <div class="w-fit">
         <p-float-label variant="on" class="w-fit">
-          <p-date-picker icon="pi pi-calendar" iconDisplay="input" showIcon formControlName="birthDate" styleClass="min-w-60" inputId="birthDate" appendTo="body"/>
+          <p-date-picker icon="pi pi-calendar" iconDisplay="input" showIcon formControlName="birthDate"
+                         styleClass="min-w-60" inputId="birthDate" appendTo="body"/>
           <label for="birthDate">Birthdate</label>
         </p-float-label>
         <form-input-error [control]="form.controls.birthDate"/>
@@ -48,7 +51,8 @@
       <!-- Country Dropdown -->
       <div class="w-fit">
         <p-float-label variant="on" class="w-60">
-          <p-select dropdownIcon="pi pi-globe" [options]="countries" formControlName="country" optionLabel="name" styleClass="min-w-60"
+          <p-select dropdownIcon="pi pi-globe" [options]="countries" formControlName="country" optionLabel="name"
+                    styleClass="min-w-60"
                     appendTo="body"/>
           <label for="country">Country</label>
         </p-float-label>
@@ -57,9 +61,11 @@
     </div>
     <messages-showcase [messages]="messages()"/>
     <div class="flex flex-row gap-1">
-      <p-button title="Reset" label="Reset" [disabled]="!form.dirty" (onClick)="reset()" type="button" class="mr-2" size="small"
+      <p-button title="Reset" label="Reset" [disabled]="!form.dirty" (onClick)="reset()" type="button" class="mr-2"
+                size="small"
                 severity="danger"/>
-      <p-button title="Save" label="Save" [disabled]="form.invalid || !form.dirty" (onClick)="save()" type="submit" size="small"/>
+      <p-button title="Save" label="Save" [disabled]="form.invalid || !form.dirty" (onClick)="save()" type="submit"
+                size="small"/>
     </div>
   </form>
 </card>

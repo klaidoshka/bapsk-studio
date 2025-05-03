@@ -1,9 +1,7 @@
 import {Component, inject, input, signal, viewChild} from '@angular/core';
 import {Button} from 'primeng/button';
 import {ConfirmationComponent} from '../../component/confirmation/confirmation.component';
-import {
-  MessagesShowcaseComponent
-} from '../../component/messages-showcase/messages-showcase.component';
+import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {TableModule} from 'primeng/table';
 import {DataTypeService} from '../../service/data-type.service';
@@ -16,11 +14,12 @@ import {NumberUtil} from '../../util/number.util';
 import {
   DataTypePageHeaderSectionComponent
 } from '../../component/data-type-page-header-section/data-type-page-header-section.component';
+import {CardComponent} from '../../component/card/card.component';
 
 @Component({
   selector: 'data-type-page',
   templateUrl: './data-type-page.component.html',
-  imports: [Button, ConfirmationComponent, MessagesShowcaseComponent, RouterLink, TableModule, DataTypePageHeaderSectionComponent],
+  imports: [Button, ConfirmationComponent, MessagesShowcaseComponent, RouterLink, TableModule, DataTypePageHeaderSectionComponent, CardComponent],
   providers: []
 })
 export class DataTypePageComponent {

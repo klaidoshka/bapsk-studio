@@ -1,5 +1,4 @@
 import {Component, computed, inject, input} from '@angular/core';
-import {Badge} from 'primeng/badge';
 import {
   DataTypeEntryFieldDisplayComponent
 } from '../../component/data-type-entry-field-display/data-type-entry-field-display.component';
@@ -13,15 +12,26 @@ import {NgClass} from '@angular/common';
 import {
   DataTypePageHeaderSectionComponent
 } from '../../component/data-type-page-header-section/data-type-page-header-section.component';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
+import {
+  FailedToLoadPleaseReloadComponent
+} from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
+import {CardComponent} from '../../component/card/card.component';
+import {BadgeContrastedComponent} from '../../component/badge-contrasted/badge-contrasted.component';
+import {Badge} from 'primeng/badge';
 
 @Component({
   selector: 'data-type-preview-page',
   imports: [
-    Badge,
     DataTypeEntryFieldDisplayComponent,
     TableModule,
     NgClass,
-    DataTypePageHeaderSectionComponent
+    DataTypePageHeaderSectionComponent,
+    LoadingSpinnerComponent,
+    FailedToLoadPleaseReloadComponent,
+    CardComponent,
+    BadgeContrastedComponent,
+    Badge
   ],
   templateUrl: './data-type-preview-page.component.html',
   styles: ``
@@ -53,7 +63,7 @@ export class DataTypePreviewPageComponent {
       : of([])
   });
 
-  getDisplayFieldName() {
+  getDisplayFieldName(): string {
     const displayFieldId = this.dataType.value()?.displayFieldId;
 
     return this.dataType.value()?.fields?.find(it => it.id === displayFieldId)?.name || 'Id';

@@ -13,6 +13,11 @@ import {DataTypeService} from '../../service/data-type.service';
 import {
   DataEntryPageHeaderSectionComponent
 } from '../../component/data-entry-page-header-section/data-entry-page-header-section.component';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
+import {
+  FailedToLoadPleaseReloadComponent
+} from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
+import {CardComponent} from '../../component/card/card.component';
 
 @Component({
   selector: 'data-entry-preview-page',
@@ -20,7 +25,10 @@ import {
     DataTypeEntryFieldDisplayComponent,
     DatePipe,
     TableModule,
-    DataEntryPageHeaderSectionComponent
+    DataEntryPageHeaderSectionComponent,
+    LoadingSpinnerComponent,
+    FailedToLoadPleaseReloadComponent,
+    CardComponent
   ],
   templateUrl: './data-entry-preview-page.component.html',
   styles: ``

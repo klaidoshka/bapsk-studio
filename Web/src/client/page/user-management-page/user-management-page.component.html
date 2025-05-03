@@ -1,10 +1,10 @@
 <div class="h-full w-full container mx-auto flex flex-col mb-8">
   <user-page-header-section [canGoBack]="true"/>
-  <card>
-    <p card-header>Create User</p>
+  <card class="w-fit!">
+    <p card-header>Manage User</p>
     <p card-subHeader>Fill in the form below to register a new user or modify an existing one.</p>
     <form [formGroup]="form" card-body class="flex flex-col gap-4">
-      <div class="flex flex-col gap-4 md:flex-row">
+      <div class="flex flex-wrap gap-4">
         <!-- First Name -->
         <div>
           <p-floatlabel variant="on" class="w-60">
@@ -28,9 +28,7 @@
           </p-floatlabel>
           <form-input-error [control]="form.controls.lastName"/>
         </div>
-      </div>
 
-      <div class="flex flex-col gap-4 md:flex-row">
         <!-- Email -->
         <div>
           <p-floatlabel variant="on" class="w-60">
@@ -56,13 +54,12 @@
             <form-input-error [control]="form.controls.password"/>
           </div>
         }
-      </div>
 
-      <div class="flex flex-col gap-4 md:flex-row">
         <!-- Birth Date -->
         <div class="w-fit">
           <p-float-label variant="on" class="w-fit">
-            <p-date-picker icon="pi pi-calendar" iconDisplay="input" showIcon formControlName="birthDate" styleClass="min-w-60"
+            <p-date-picker icon="pi pi-calendar" iconDisplay="input" showIcon formControlName="birthDate"
+                           styleClass="min-w-60"
                            inputId="birthDate" appendTo="body"/>
             <label for="birthDate">Birthdate</label>
           </p-float-label>
@@ -81,7 +78,7 @@
         </div>
       </div>
       <messages-showcase [messages]="messages()"/>
-      <p-button title="Submit" [label]="!user.value() ? 'Create' : 'Save'" [disabled]="!form.valid || !form.dirty"
+      <p-button title="Submit" size="small" [label]="!user.value() ? 'Create' : 'Save'" [disabled]="!form.valid || !form.dirty"
                 (onClick)="save()" type="submit"/>
     </form>
   </card>

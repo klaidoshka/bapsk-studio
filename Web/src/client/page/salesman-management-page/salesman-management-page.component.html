@@ -1,48 +1,49 @@
 <div class="h-full w-full relative container mx-auto flex flex-col mb-8">
   <salesman-page-header-section [canGoBack]="true"/>
-  <card>
-    <p card-header>Create Salesman</p>
+  <card class="w-fit!">
+    <p card-header>Manage Salesman</p>
     <p card-subHeader>Fill in the form below to create a new salesman or modify an existing one.</p>
     <form [formGroup]="form" card-body class="flex flex-col gap-4">
-      <div class="flex flex-col gap-4">
-        <!-- Name -->
-        <div>
-          <p-floatlabel variant="on" class="w-60">
-            <p-iconfield>
-              <p-inputicon class="pi pi-tag"/>
-              <input pInputText id="name" formControlName="name" type="text"/>
-            </p-iconfield>
-            <label for="name">Name</label>
-          </p-floatlabel>
-          <form-input-error [control]="form.controls.name"/>
-        </div>
-
-        <!-- VAT Payer Code -->
-        <card>
-          <p card-header>VAT Payer Code</p>
-          <div card-body formGroupName="vatPayerCode" class="flex flex-col md:flex-row gap-4">
-            <div>
-              <p-floatlabel variant="on" class="w-60">
-                <p-iconfield>
-                  <p-inputicon class="pi pi-code"/>
-                  <input formControlName="value" pInputText type="text" id="vatPayerCodeValue"/>
-                </p-iconfield>
-                <label for="vatPayerCodeValue">Code</label>
-              </p-floatlabel>
-              <form-input-error [control]="form.controls.vatPayerCode.controls.value"/>
-            </div>
-
-            <div>
-              <p-floatlabel variant="on" class="w-60">
-                <p-select dropdownIcon="pi pi-globe" inputId="issuedBy" formControlName="issuedBy" [options]="IsoCountries"
-                          optionLabel="name" optionValue="code" class="w-full" appendTo="body"/>
-                <label for="vatPayerCodeIssuedBy">Issued By</label>
-              </p-floatlabel>
-              <form-input-error [control]="form.controls.vatPayerCode.controls.issuedBy"/>
-            </div>
-          </div>
-        </card>
+      <!-- Name -->
+      <div>
+        <p-floatlabel variant="on" class="w-60">
+          <p-iconfield>
+            <p-inputicon class="pi pi-tag"/>
+            <input pInputText id="name" formControlName="name" type="text"/>
+          </p-iconfield>
+          <label for="name">Name</label>
+        </p-floatlabel>
+        <form-input-error [control]="form.controls.name"/>
       </div>
+
+      <!-- VAT Payer Code -->
+      <card class="w-fit!">
+        <p card-header>VAT Payer Code</p>
+        <p card-subHeader>VAT payer information of this salesman. To use VAT Return Service salesman must have
+          Lithuanian VAT payer code.</p>
+        <div card-body formGroupName="vatPayerCode" class="flex flex-wrap gap-4">
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-iconfield>
+                <p-inputicon class="pi pi-code"/>
+                <input formControlName="value" pInputText type="text" id="vatPayerCodeValue"/>
+              </p-iconfield>
+              <label for="vatPayerCodeValue">Code</label>
+            </p-floatlabel>
+            <form-input-error [control]="form.controls.vatPayerCode.controls.value"/>
+          </div>
+
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-select dropdownIcon="pi pi-globe" inputId="issuedBy" formControlName="issuedBy"
+                        [options]="IsoCountries"
+                        optionLabel="name" optionValue="code" class="w-full" appendTo="body"/>
+              <label for="vatPayerCodeIssuedBy">Issued By</label>
+            </p-floatlabel>
+            <form-input-error [control]="form.controls.vatPayerCode.controls.issuedBy"/>
+          </div>
+        </div>
+      </card>
       <messages-showcase [messages]="messages()"/>
       <p-button title="Submit" [label]="!salesman.value() ? 'Create' : 'Save'" [disabled]="!form.valid || !form.dirty"
                 (onClick)="save()" size="small" type="submit"/>

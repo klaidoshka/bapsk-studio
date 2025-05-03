@@ -1,7 +1,7 @@
 <div class="h-full w-full container mx-auto flex flex-col mb-8 lg:w-4/7">
   <instance-page-header-section [canGoBack]="true"/>
-  <card>
-    <p card-header>Create Instance</p>
+  <card class="w-fit!">
+    <p card-header>Manage Instance</p>
     <p card-subHeader>Fill in the form below to create a new instance or modify an existing one.</p>
     <form [formGroup]="form" card-body class="flex flex-col gap-4">
       <!-- Name -->
@@ -29,14 +29,14 @@
       </div>
 
       <!-- Users -->
-      <card>
-        <div card-header>
-          <div class="font-semibold tracking-tight text-xl">Instance Users</div>
-        </div>
+      <card class="w-fit!">
+        <p card-header>Users</p>
+        <p card-subHeader>Users within this specific instance. You can modify their permissions to grant or restrict access to
+          certain data / features.</p>
         <div card-body>
           @if (form.controls.users.length > 0) {
             <p-table [value]="form.controls.users.controls" paginatorStyleClass="rounded-t-none! bg-inherit!"
-                     paginatorDropdownAppendTo="body" [styleClass]="'rounded-md mb-4 border border-primary-950/20 dark:border-primary-50/20 relative w-full overflow-auto ' +
+                     paginatorDropdownAppendTo="body" [styleClass]="'rounded-md mb-4 border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto ' +
                      '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'"
                      [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
               <ng-template #header>
@@ -80,6 +80,7 @@
             </p-table>
           }
           <messages-showcase [messages]="messagesUsers()"/>
+
           <!-- Users Form -->
           <form [formGroup]="formUser" class="flex flex-col gap-4">
             <div class="flex flex-col">

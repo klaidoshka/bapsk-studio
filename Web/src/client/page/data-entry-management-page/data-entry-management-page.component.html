@@ -1,26 +1,38 @@
 <div class="h-full w-full relative container mx-auto flex flex-col mb-8">
   <data-entry-page-header-section [canGoBack]="true"/>
-  <messages-showcase [messages]="messages()"/>
-  <form class="grid grid-cols-1 gap-4" [formGroup]="form">
-    @for (field of formFields; track $index) {
-      @let isReferenceField = field.type === FieldType.Reference;
+  @if (dataType.isLoading() || dataEntry.isLoading()) {
+    <loading-spinner/>
+  } @else if (!dataType.value() || !dataEntry.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    @let dataType = this.dataType.value()!;
+    <card class="w-fit!">
+      <p card-header>Manage {{ dataType.name }}</p>
+      <p card-subHeader>Fill in the form below to create a new {{ dataType.name }} or modify an existing one.</p>
+      <form card-body [formGroup]="form" class="flex flex-col gap-4">
+        <div class="flex flex-wrap gap-4" formArrayName="values">
+          @for (field of formFields(); track $index) {
+            @let isReferenceField = field.type === FieldType.Reference;
 
-      <div class="flex flex-col gap-1">
-        <label [for]="field.field" class="block text-sm font-medium">{{ field.field }}</label>
-        @if (isReferenceField) {
-          <p-select placeholder="Select a referenced entry" [options]="getDataEntries(field.referenceId)()"
-                    optionLabel="label" optionValue="id" appendTo="body" [formControl]="field.control.controls.value"
-                    class="w-full" [required]="field.isRequired!"/>
-        } @else {
-          <data-type-entry-field-input [formControl]="field.control.controls.value" [type]="field.type!"/>
-        }
-        <form-input-error [control]="field.control.controls.value"/>
-      </div>
-    }
-
-    <div class="flex justify-end mt-4">
-      <p-button [label]="dataEntry.value() ? 'Create' : 'Save'" [disabled]="form.invalid || !form.dirty"
-                (onClick)="save()" type="submit"/>
-    </div>
-  </form>
+            <div>
+              <p-floatlabel variant="on" class="w-60">
+                @if (isReferenceField) {
+                  <p-select placeholder="Select a referenced entry" [options]="getDataEntries(field.referenceId)()"
+                            optionLabel="label" optionValue="id" appendTo="body" dropdownIcon="pi pi-reference"
+                            [formControl]="field.control.controls.value" class="w-full" [required]="field.isRequired!"/>
+                } @else {
+                  <data-type-entry-field-input [formControl]="field.control.controls.value" [type]="field.type!"/>
+                }
+                <label [for]="field.field" class="block text-sm font-medium">{{ field.field }}</label>
+              </p-floatlabel>
+              <form-input-error [control]="field.control.controls.value"/>
+            </div>
+          }
+        </div>
+        <messages-showcase [messages]="messages()"/>
+        <p-button [label]="dataEntry.value() ? 'Create' : 'Save'" [disabled]="form.invalid || !form.dirty"
+                  (onClick)="save()" type="submit"/>
+      </form>
+    </card>
+  }
 </div>

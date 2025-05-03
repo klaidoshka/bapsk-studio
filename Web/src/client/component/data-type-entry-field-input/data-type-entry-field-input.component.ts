@@ -2,16 +2,13 @@ import {Component, effect, input, signal, untracked} from '@angular/core';
 import {FieldType} from '../../model/data-type-field.model';
 import {Checkbox} from 'primeng/checkbox';
 import {DatePicker} from 'primeng/datepicker';
-import {
-  ControlValueAccessor,
-  FormsModule,
-  NG_VALUE_ACCESSOR,
-  ReactiveFormsModule
-} from '@angular/forms';
+import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
 import {InputNumber} from 'primeng/inputnumber';
 import {getDefaultIsoCountry, IsoCountries} from '../../model/iso-country.model';
 import {Select} from 'primeng/select';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
 
 @Component({
   selector: 'data-type-entry-field-input',
@@ -22,7 +19,9 @@ import {Select} from 'primeng/select';
     InputText,
     InputNumber,
     FormsModule,
-    Select
+    Select,
+    IconField,
+    InputIcon
   ],
   templateUrl: './data-type-entry-field-input.component.html',
   styles: ``,
@@ -37,7 +36,6 @@ import {Select} from 'primeng/select';
 export class DataTypeEntryFieldInputComponent implements ControlValueAccessor {
   protected readonly FieldType = FieldType;
   protected readonly IsoCountries = IsoCountries;
-
   readonly type = input.required<FieldType>();
   protected readonly oldType = signal<FieldType | undefined>(undefined);
 
@@ -73,7 +71,7 @@ export class DataTypeEntryFieldInputComponent implements ControlValueAccessor {
 
   markAsTouched() {
     if (!this.touched()) {
-      this.onTouched();
+      this.onTouched()();
       this.touched.set(true);
     }
   }

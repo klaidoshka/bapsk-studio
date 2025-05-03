@@ -38,9 +38,7 @@ export class SessionShowcaseComponent {
 
     const timeParts = {
       days: Math.floor(diffInSeconds / 86400),
-      hours: Math.floor((diffInSeconds % 86400) / 3600),
-      minutes: Math.floor((diffInSeconds % 3600) / 60),
-      seconds: diffInSeconds % 60
+      hours: Math.floor((diffInSeconds % 86400) / 3600)
     };
 
     let activeTime = '';
@@ -51,14 +49,6 @@ export class SessionShowcaseComponent {
 
     if (timeParts.hours > 0) {
       activeTime += `${timeParts.hours}h `;
-    }
-
-    if (timeParts.minutes > 0) {
-      activeTime += `${timeParts.minutes}m `;
-    }
-
-    if (timeParts.seconds > 0) {
-      activeTime += `${timeParts.seconds}s`;
     }
 
     return activeTime;

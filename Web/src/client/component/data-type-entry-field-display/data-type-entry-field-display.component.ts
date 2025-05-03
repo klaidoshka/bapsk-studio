@@ -38,7 +38,7 @@ export class DataTypeEntryFieldDisplayComponent {
       const referenceId = this.dataTypeField()?.referenceId;
       const value = this.value();
 
-      if (!referenceId || this.type() !== FieldType.Reference) {
+      if (!referenceId || this.typeResolved() !== FieldType.Reference) {
         return undefined;
       }
 

@@ -32,10 +32,8 @@ export class FormInputErrorComponent {
     if (control.untouched || control.valid || !control.errors) {
       return undefined;
     }
-
     const key = Object.keys(control.errors)[0];
     const mapper = messages[key];
-
     return mapper ? mapper(control.errors[key]) : undefined;
   }
 }

@@ -1,14 +1,10 @@
 import {Component, computed, inject, input, signal, viewChild} from '@angular/core';
 import {Button} from 'primeng/button';
 import {ConfirmationComponent} from '../../component/confirmation/confirmation.component';
-import {
-  DataEntryImportFormComponent
-} from '../../component/data-entry-import/data-entry-import-form.component';
+import {DataEntryImportFormComponent} from '../../component/data-entry-import/data-entry-import-form.component';
 import {DataEntryTableComponent} from '../../component/data-entry-table/data-entry-table.component';
 import {Dialog} from 'primeng/dialog';
-import {
-  MessagesShowcaseComponent
-} from '../../component/messages-showcase/messages-showcase.component';
+import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {DataEntryService} from '../../service/data-entry.service';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
@@ -22,6 +18,10 @@ import {
   DataEntryPageHeaderSectionComponent
 } from '../../component/data-entry-page-header-section/data-entry-page-header-section.component';
 import {CardComponent} from '../../component/card/card.component';
+import {
+  FailedToLoadPleaseReloadComponent
+} from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'data-entry-page',
@@ -34,7 +34,9 @@ import {CardComponent} from '../../component/card/card.component';
     MessagesShowcaseComponent,
     RouterLink,
     DataEntryPageHeaderSectionComponent,
-    CardComponent
+    CardComponent,
+    FailedToLoadPleaseReloadComponent,
+    LoadingSpinnerComponent
   ],
   templateUrl: './data-entry-page.component.html',
   styles: ``
@@ -59,7 +61,7 @@ export class DataEntryPageComponent {
     }),
     loader: ({request}) => request.dataTypeId && request.instanceId
       ? this.dataEntryService.getAllByDataTypeId(request.instanceId, request.dataTypeId)
-      : of([])
+      : of(undefined)
   });
 
   protected readonly dataType = rxResource({

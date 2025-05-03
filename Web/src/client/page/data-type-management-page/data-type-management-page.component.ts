@@ -2,39 +2,35 @@ import {Component, inject, input, signal} from '@angular/core';
 import {DataEntryService} from '../../service/data-entry.service';
 import {DataTypeService} from '../../service/data-type.service';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
-import {
-  AbstractControl,
-  FormArray,
-  FormBuilder,
-  ReactiveFormsModule,
-  ValidationErrors,
-  Validators
-} from '@angular/forms';
+import {AbstractControl, FormArray, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators} from '@angular/forms';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../../model/data-type.model';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {first, of, tap} from 'rxjs';
 import Option from '../../model/options.model';
 import Messages from '../../model/messages.model';
-import DataTypeField, {
-  DataTypeFieldEditRequest,
-  FieldType,
-  fieldTypes
-} from '../../model/data-type-field.model';
+import DataTypeField, {DataTypeFieldEditRequest, FieldType, fieldTypes} from '../../model/data-type-field.model';
 import {FormInputErrorComponent} from '../../component/form-input-error/form-input-error.component';
 import {Select} from 'primeng/select';
-import {
-  MessagesShowcaseComponent
-} from '../../component/messages-showcase/messages-showcase.component';
+import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
 import {
   DataTypeEntryFieldInputComponent
 } from '../../component/data-type-entry-field-input/data-type-entry-field-input.component';
 import {Checkbox} from 'primeng/checkbox';
 import {Button} from 'primeng/button';
-import {NgIf} from '@angular/common';
 import {NumberUtil} from '../../util/number.util';
 import {
   DataTypePageHeaderSectionComponent
 } from '../../component/data-type-page-header-section/data-type-page-header-section.component';
+import {
+  FailedToLoadPleaseReloadComponent
+} from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
+import {InputText} from 'primeng/inputtext';
+import {FloatLabel} from 'primeng/floatlabel';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {CardComponent} from '../../component/card/card.component';
+import {TableModule} from 'primeng/table';
 
 @Component({
   selector: 'data-type-management-page',
@@ -46,8 +42,15 @@ import {
     DataTypeEntryFieldInputComponent,
     Checkbox,
     Button,
-    NgIf,
-    DataTypePageHeaderSectionComponent
+    DataTypePageHeaderSectionComponent,
+    FailedToLoadPleaseReloadComponent,
+    LoadingSpinnerComponent,
+    InputText,
+    FloatLabel,
+    IconField,
+    InputIcon,
+    CardComponent,
+    TableModule
   ],
   templateUrl: './data-type-management-page.component.html',
   styles: ``
@@ -74,10 +77,7 @@ export class DataTypeManagementPageComponent {
       request.dataTypeId && request.instanceId
         ? this.dataTypeService
           .getById(request.instanceId, request.dataTypeId)
-          .pipe(
-            first(),
-            tap(dataType => this.patchFormValues(dataType))
-          )
+          .pipe(tap(dataType => this.patchFormValues(dataType)))
         : of(undefined)
   });
 
@@ -87,12 +87,12 @@ export class DataTypeManagementPageComponent {
     }),
     loader: ({request}) => request.instanceId
       ? this.dataTypeService.getAllByInstanceId(request.instanceId)
-      : of([])
+      : of(undefined)
   });
 
-  protected readonly displayFields = signal<Option<number | null>[]>([{
+  protected readonly displayFields = signal<Option<number>[]>([{
     label: 'Id',
-    value: null
+    value: -1
   }]);
 
   private create(request: DataTypeCreateRequest) {
@@ -122,7 +122,7 @@ export class DataTypeManagementPageComponent {
     return this.formBuilder.group({
       name: [dataType?.name || '', Validators.required],
       description: [dataType?.description || 'No description set.'],
-      displayField: [null as number | null],
+      displayField: [-1 as number],
       fields: fields
     });
   }
@@ -164,20 +164,16 @@ export class DataTypeManagementPageComponent {
     }
 
     this.form.reset();
+    this.form.controls.fields.clear();
 
     this.form.patchValue({
       name: dataType.name,
       description: dataType.description,
-      displayField: displayFieldIndex,
-      fields: dataType.fields.map(field => ({
-        dataTypeFieldId: field.id,
-        defaultValue: field.type === FieldType.Reference ? field.referenceId : field.defaultValue,
-        isRequired: field.isRequired,
-        name: field.name,
-        referencedType: field.referenceId,
-        type: field.type
-      }))
+      displayField: displayFieldIndex
     });
+
+    dataType.fields.forEach(field => this.addField(dataType, field));
+    this.form.markAsPristine();
   }
 
   protected getFieldType(id: number): FieldType {
@@ -237,7 +233,7 @@ export class DataTypeManagementPageComponent {
     const request: DataTypeEditRequest = {
       name: this.form.value.name || '',
       description: this.form.value.description || null,
-      displayFieldIndex: this.form.value.displayField === null ? undefined : this.form.value.displayField,
+      displayFieldIndex: this.form.value.displayField === -1 ? undefined : this.form.value.displayField!,
       dataTypeId: this.dataType.value()?.id || 0,
       fields: this.form.controls.fields.controls.map(field => {
         const fieldType = field.value.type;

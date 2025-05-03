@@ -2,18 +2,13 @@ import {Component, computed, inject, input, Signal, signal} from '@angular/core'
 import {DataEntryService} from '../../service/data-entry.service';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
-import DataEntry, {
-  DataEntryCreateRequest,
-  DataEntryEditRequest
-} from '../../model/data-entry.model';
+import DataEntry, {DataEntryCreateRequest, DataEntryEditRequest} from '../../model/data-entry.model';
 import {rxResource} from '@angular/core/rxjs-interop';
 import DataType from '../../model/data-type.model';
 import Messages from '../../model/messages.model';
 import {first, of, tap} from 'rxjs';
 import {FieldType} from '../../model/data-type-field.model';
-import {
-  MessagesShowcaseComponent
-} from '../../component/messages-showcase/messages-showcase.component';
+import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
 import {Select} from 'primeng/select';
 import {
   DataTypeEntryFieldInputComponent
@@ -25,6 +20,12 @@ import {DataTypeService} from '../../service/data-type.service';
 import {
   DataEntryPageHeaderSectionComponent
 } from '../../component/data-entry-page-header-section/data-entry-page-header-section.component';
+import {CardComponent} from '../../component/card/card.component';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
+import {
+  FailedToLoadPleaseReloadComponent
+} from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
+import {FloatLabel} from 'primeng/floatlabel';
 
 @Component({
   selector: 'data-entry-management-page',
@@ -35,7 +36,11 @@ import {
     DataTypeEntryFieldInputComponent,
     FormInputErrorComponent,
     Button,
-    DataEntryPageHeaderSectionComponent
+    DataEntryPageHeaderSectionComponent,
+    CardComponent,
+    LoadingSpinnerComponent,
+    FailedToLoadPleaseReloadComponent,
+    FloatLabel
   ],
   templateUrl: './data-entry-management-page.component.html',
   styles: ``
@@ -69,9 +74,7 @@ export class DataEntryManagementPageComponent {
     loader: ({request}) => request.dataEntry?.dataTypeId && request.instanceId
       ? this.dataTypeService
         .getById(request.instanceId, request.dataEntry.dataTypeId)
-        .pipe(
-          tap(dataType => this.patchFormValues(dataType, request.dataEntry!))
-        )
+        .pipe(tap(dataType => this.patchFormValues(dataType, request.dataEntry!)))
       : of(undefined)
   });
 
@@ -92,7 +95,6 @@ export class DataEntryManagementPageComponent {
       values: this.formBuilder.array(
         dataType?.fields?.map(tf => {
           const entryField = dataEntry?.fields?.find(ef => ef.dataTypeFieldId === tf.id);
-
           return this.formBuilder.group({
             name: [tf.name, [Validators.required]],
             value: [entryField?.value, tf.isRequired ? [Validators.required] : []]
@@ -103,29 +105,37 @@ export class DataEntryManagementPageComponent {
   }
 
   private patchFormValues(dataType: DataType, dataEntry: DataEntry) {
-    this.form.patchValue({
-      values: dataType.fields.map((field) => {
-        const entryField = dataEntry.fields.find((ef) => ef.dataTypeFieldId === field.id);
-        return {
-          name: field.name,
-          value: entryField?.value
-        };
-      })
+    this.form.reset();
+
+    const values = dataType.fields.map(field => {
+      const entryField = dataEntry.fields.find(ef => ef.dataTypeFieldId === field.id);
+      return this.formBuilder.group({
+        name: [field.name, [Validators.required]],
+        value: [entryField?.value, field.isRequired ? [Validators.required] : []]
+      });
     });
+
+    this.form.setControl('values', this.formBuilder.array(values));
   }
 
   private create(request: DataEntryCreateRequest) {
-    this.dataEntryService.create(request).pipe(first()).subscribe({
-      next: () => this.onSuccess("Data entry has been created successfully."),
-      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
-    });
+    this.dataEntryService
+      .create(request)
+      .pipe(first())
+      .subscribe({
+        next: () => this.onSuccess("Data entry has been created successfully."),
+        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+      });
   }
 
   private edit(request: DataEntryEditRequest) {
-    this.dataEntryService.edit(request).pipe(first()).subscribe({
-      next: () => this.onSuccess("Data entry has been edited successfully."),
-      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
-    });
+    this.dataEntryService
+      .edit(request)
+      .pipe(first())
+      .subscribe({
+        next: () => this.onSuccess("Data entry has been edited successfully."),
+        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+      });
   }
 
   private onSuccess(message: string) {
@@ -134,7 +144,7 @@ export class DataEntryManagementPageComponent {
     this.form.markAsUntouched();
   }
 
-  protected get formFields() {
+  protected formFields() {
     return this.form.controls.values.controls.map(control => {
       const dataTypeField = this.dataType.value()!.fields.find(f => f.name === control.value.name);
       return {
@@ -173,7 +183,7 @@ export class DataEntryManagementPageComponent {
       this.edit({
         dataEntryId: this.dataEntry.value()!.id,
         dataTypeId: this.dataType.value()!.id,
-        fields: this.formFields.map(field => {
+        fields: this.formFields().map(field => {
           const candidate = this.dataEntry.value()!.fields.find(dataEntryField =>
             dataEntryField.dataTypeFieldId === field.dataTypeFieldId
           )!;
@@ -192,7 +202,7 @@ export class DataEntryManagementPageComponent {
         fields: this.dataType.value()!.fields.map((dataTypeField, _) => {
           return {
             dataTypeFieldId: dataTypeField.id,
-            value: this.formFields.find(f => f.field === dataTypeField.name)!.control!.value.value
+            value: this.formFields().find(f => f.field === dataTypeField.name)!.control!.value.value
           };
         }),
         instanceId: NumberUtil.parse(this.instanceId())!

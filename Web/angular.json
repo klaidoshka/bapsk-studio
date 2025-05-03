@@ -52,7 +52,7 @@
             "index": "src/client/index.html",
             "browser": "src/client/main.ts",
             "tsConfig": "tsconfig.client.json",
-            "inlineStyleLanguage": "scss",
+            "inlineStyleLanguage": "css",
             "assets": [
               {
                 "glob": "**/*",
@@ -60,7 +60,7 @@
               }
             ],
             "styles": [
-              "src/client/styles.scss"
+              "src/client/styles.css"
             ],
             "scripts": []
           },

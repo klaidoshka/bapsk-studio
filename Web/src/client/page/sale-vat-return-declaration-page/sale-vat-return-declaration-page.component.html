@@ -8,12 +8,13 @@
     <confirmation key="cancel-confirmation" header="Are you sure about cancelling this declaration?"/>
     <div class="flex flex-col gap-4">
       <!-- Row of actions -->
-      <div class="w-full">
+      <div>
         @if (!declaration.value()?.isCancelled) {
           <p-button title="Refresh declaration" icon="pi pi-refresh" label="Refresh" (click)="refresh()" size="small"
                     [disabled]="isRefreshing()"/>
           @if (!declaration.value()?.export) {
-            <p-button title="Cancel declaration" size="small" icon="pi pi-ban" class="ml-2" label="Cancel" (click)="cancel()"
+            <p-button title="Cancel declaration" size="small" icon="pi pi-ban" class="ml-2" label="Cancel"
+                      (click)="cancel()"
                       [disabled]="isCancelling()" severity="danger"/>
           }
         }
@@ -25,6 +26,7 @@
         @if (declaration.value()) {
           <card class="flex-1" [class.min-h-62]="hasCorrection">
             <p card-header>Declaration</p>
+            <p card-subHeader>Details of this sale's declaration.</p>
             <div card-body>
               <p class="text-lg">
                 <strong>Declaration Id</strong>
@@ -57,6 +59,7 @@
         <!-- Sale -->
         <card class="flex-1" [class.min-h-62]="hasCorrection">
           <p card-header>Sale</p>
+          <p card-subHeader>Details of this sale.</p>
           <div card-body [class.md:mb-7]="hasCorrection">
             @let saleValue = sale.value()!;
             <p class="text-lg">
@@ -106,12 +109,12 @@
       }
 
       @if (sale.value()) {
-        <card>
+        <card class="w-fit!">
           <p card-header>Sold Goods</p>
           <p card-subHeader>Goods that were sold in the occurred sale.</p>
           <p-table card-body [value]="sale.value()!.soldGoods" paginatorStyleClass="rounded-t-none! bg-inherit!"
                    paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]"
-                   [styleClass]="'rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-full overflow-auto ' +
+                   [styleClass]="'rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto ' +
           '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'">
             <ng-template #header>
               <tr>
@@ -133,9 +136,11 @@
                 <td class="p-2"><p class="text-right">{{
                     soldGood.taxableAmount / soldGood.quantity | round:2 | currency:'EUR':'symbol':'1.2-2'
                   }}</p></td>
-                <td class="p-2"><p class="text-right">{{ soldGood.vatAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}
+                <td class="p-2"><p
+                  class="text-right">{{ soldGood.vatAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}
                   ({{ soldGood.vatRate | round:2 }}%)</p></td>
-                <td class="p-2"><p class="text-right">{{ soldGood.totalAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}</p>
+                <td class="p-2"><p
+                  class="text-right">{{ soldGood.totalAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}</p>
                 </td>
               </tr>
             </ng-template>
@@ -144,8 +149,9 @@
       }
 
       @if (declaration.value()?.export) {
-        <card>
+        <card class="w-fit!">
           <p card-header>Export Information</p>
+          <p card-subHeader>Details of this sale's sold goods export via customs.</p>
           <div card-body class="flex flex-col gap-4">
             <div class="mb-4">
               <p class="text-lg">
@@ -180,17 +186,18 @@
                   <li class="flex flex-row gap-1 items-center">
                     <i class="pi pi-exclamation-circle" [pTooltip]="condition.description" tooltipPosition="top"></i>
                     <p class="text-semibold">{{ condition.code }} - </p>
-                    <p-badge [value]="condition.isMet ? 'Met' : 'Not Met'" [severity]="condition.isMet ? 'success' : 'danger'"/>
+                    <p-badge [value]="condition.isMet ? 'Met' : 'Not Met'"
+                             [severity]="condition.isMet ? 'success' : 'danger'"/>
                   </li>
                 }
               </ul>
             </div>
 
-            <card>
+            <card class="w-fit!">
               <p card-header>Verified Sold Goods</p>
               <p card-subHeader>These goods were exported from the country.</p>
               <p-table card-body paginatorStyleClass="rounded-t-none! bg-inherit!" paginatorDropdownAppendTo="body"
-                       [styleClass]="'rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-full overflow-auto ' +
+                       [styleClass]="'rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto ' +
                        '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'"
                        [value]="declaration.value()!.export!.verifiedSoldGoods" [paginator]="true" [rows]="10"
                        [rowsPerPageOptions]="[10, 20, 50]">
@@ -217,7 +224,7 @@
               </p-table>
             </card>
 
-            <card>
+            <card class="w-fit!">
               <p card-header>VAT Return Payment</p>
               <p card-subHeader>Returned VAT payment that was executed for the customer.</p>
               <div card-body>
@@ -237,20 +244,20 @@
       }
 
       @if (sale.value() && !declaration.value()?.isCancelled && !declaration.value()?.export && instanceId()) {
-        <card-headless>
-          <div card-body>
+        <card class="w-fit!">
+          <p card-header>Submit Declaration</p>
+          <p card-subHeader>Submit or resubmit to update this sale's VAT return declaration.</p>
+          <div card-body class="flex flex-col gap-4">
             @if (!declaration.value()) {
-              <p class="font-bold text-lg my-2">
+              <p class="font-bold text-lg">
                 This sale does not have a submitted VAT return declaration.
               </p>
             }
 
-            <div class="rounded mt-4">
-              <vat-return-declaration-submission [instanceId]="instanceIdAsNumber()!" [sale]="sale.value()!"
-                                                 [hasDeclaration]="!!declaration.value()"/>
-            </div>
+            <vat-return-declaration-submission [instanceId]="instanceIdAsNumber()!" [sale]="sale.value()!"
+                                               [hasDeclaration]="!!declaration.value()"/>
           </div>
-        </card-headless>
+        </card>
       }
     </div>
   }

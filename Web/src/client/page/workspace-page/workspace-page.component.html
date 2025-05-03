@@ -9,7 +9,7 @@
     <div class="flex flex-row w-full h-full gap-4">
       <!-- Sidebar -->
       <div
-        class="flex flex-col min-w-60 w-60 gap-6 h-full bg-primary-50 dark:bg-primary-950 border border-y-0 border-primary-950/20 dark:border-primary-50/20">
+        class="not-md:hidden flex flex-col min-w-60 w-60 gap-6 h-full bg-primary-50 dark:bg-primary-950 border border-y-0 border-primary-950/20 dark:border-primary-50/20">
         <div class="flex flex-col gap-4 mt-2 mx-4">
           <h4 class="px-1 text-lg font-semibold">{{ instanceName() }}</h4>
           <p-button title="Change" label="Change Workspace" size="small" styleClass="w-full" (onClick)="exit()"/>
@@ -61,7 +61,7 @@
         </div>
       </div>
       <!-- Main Content -->
-      <div class="flex-1">
+      <div class="flex-grow-1">
         <router-outlet/>
       </div>
     </div>

@@ -5,48 +5,55 @@
   } @else if (!sale.value()) {
     <failed-to-load-please-reload/>
   } @else {
-    @let saleValue = sale.value()!;
-    <card>
+    @let sale = this.sale.value()!;
+    <card class="w-fit!">
       <p card-header>Sale</p>
+      <p card-subHeader>Preview of this unique sale entry.</p>
       <div card-body class="flex flex-col gap-4">
-        <card>
+        <card class="w-fit!">
           <p card-header>Details</p>
+          <p card-subHeader>Details of this specific sale.</p>
           <div card-body class="flex flex-col md:flex-row gap-4">
-            <div class="flex flex-1 flex-col gap-2">
+            <div class="flex flex-1 flex-col">
+              <div class="flex flex-row gap-2">
+                <p class="font-semibold">ID</p>
+                <p>{{ sale.id }}</p>
+              </div>
               <div class="flex flex-row gap-2">
                 <p class="font-semibold">Customer</p>
-                <p>{{ saleValue.customer.firstName + ' ' + saleValue.customer.lastName }}</p>
+                <p>{{ sale.customer.firstName + ' ' + sale.customer.lastName }}</p>
               </div>
               <div class="flex flex-row gap-2">
                 <p class="font-semibold">Salesman</p>
-                <p>{{ saleValue.salesman.name }}</p>
+                <p>{{ sale.salesman.name }}</p>
               </div>
               <div class="flex flex-row gap-2">
                 <p class="font-semibold">Sale Date</p>
-                <p>{{ saleValue.date | date: 'medium' }}</p>
+                <p>{{ sale.date | date: 'medium' }}</p>
               </div>
             </div>
             <div class="flex flex-1 flex-col">
               <div class="flex flex-row gap-2">
                 <p class="font-semibold">Invoice No</p>
-                <p>{{ saleValue.invoiceNo || '-' }}</p>
+                <p>{{ sale.invoiceNo || '-' }}</p>
               </div>
               <div class="flex flex-row gap-2">
                 <p class="font-semibold">Cash Register No</p>
-                <p>{{ saleValue.cashRegister?.cashRegisterNo || '-' }}</p>
+                <p>{{ sale.cashRegister?.cashRegisterNo || '-' }}</p>
               </div>
               <div class="flex flex-row gap-2">
                 <p class="font-semibold">Receipt No</p>
-                <p>{{ saleValue.cashRegister?.receiptNo || '-' }}</p>
+                <p>{{ sale.cashRegister?.receiptNo || '-' }}</p>
               </div>
             </div>
           </div>
         </card>
-        <card>
+        <card class="w-fit!">
           <p card-header>Sold Goods</p>
-          <p-table card-body [value]="saleValue.soldGoods" paginatorStyleClass="rounded-t-none! bg-inherit!"
+          <p card-subHeader>Goods that were sold to the customer of this specific sale.</p>
+          <p-table card-body [value]="sale.soldGoods" paginatorStyleClass="rounded-t-none! bg-inherit!"
                    paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]"
-                   [styleClass]="'rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-full overflow-auto ' +
+                   [styleClass]="'rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto ' +
                     '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'">
             <ng-template #header>
               <tr>

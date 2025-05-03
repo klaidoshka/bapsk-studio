@@ -1,4 +1,4 @@
-<card>
+<card class="w-fit!">
   @let role = user()!.role;
   <p card-header>Profile</p>
   <div card-subHeader class="flex flex-col">
@@ -7,10 +7,9 @@
       <p-badge [value]="toRoleLabel(role)" [severity]="role === Role.Admin ? 'danger' : 'info'" size="small"/>
       <p>.</p>
     </div>
-    <p>Unfortunately, your email cannot be changed. If you want to change it, please contact the support.</p>
   </div>
   <div card-body>
-    <div class="flex flex-col w-full gap-4">
+    <div class="flex flex-col w-fit gap-4">
       <profile-management [user]="user()!"/>
       <profile-change-password-form [user]="user()!"/>
     </div>

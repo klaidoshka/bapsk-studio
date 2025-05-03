@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
-import {combineLatest, first, map, Observable, switchMap, tap} from 'rxjs';
+import {combineLatest, first, map, Observable, startWith, switchMap, tap} from 'rxjs';
 import DataEntry, {
   DataEntryCreateRequest,
   DataEntryEditRequest,
@@ -171,17 +171,19 @@ export class DataEntryService {
         )
     ))
       .pipe(map(groupedEntries => {
-        const map = new Map<number, DataEntryJoined[]>();
+          const map = new Map<number, DataEntryJoined[]>();
 
-        groupedEntries.forEach(dataEntries => {
-          map.set(
-            dataEntries.dataTypeId,
-            dataEntries.values
-          );
-        });
+          groupedEntries.forEach(dataEntries => {
+            map.set(
+              dataEntries.dataTypeId,
+              dataEntries.values
+            );
+          });
 
-        return map;
-      }));
+          return map;
+        }),
+        startWith(new Map())
+      );
   }
 
   import(request: DataEntryImportRequest): Observable<DataEntryJoined[]> {

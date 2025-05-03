@@ -2,13 +2,13 @@
   <salesman-page-header-section/>
   <confirmation [key]='"salesman-delete-confirmation"' [header]='"Are you sure about deleting this salesman?"'/>
   <messages-showcase [messages]="messages()"/>
-  <card>
+  <card class="w-fit!">
     <p card-header>Salesmen</p>
     <p card-subHeader>Manage your salesmen — create, preview, edit or delete.</p>
     <div card-body>
       <p-button title="Create" size="small" label="Create Salesman" type="button" (onClick)="manage()"/>
       <p-table [value]="salesmen.value() || []" paginatorStyleClass="rounded-t-none! bg-inherit!" paginatorDropdownAppendTo="body"
-               [styleClass]="'mt-4 rounded-md mb-4 border border-primary-950/20 dark:border-primary-50/20 relative w-full overflow-auto ' +
+               [styleClass]="'mt-4 rounded-md mb-4 border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto ' +
              '[&_th]:border-b-primary-950/20! [&_th]:dark:border-primary-50/20! [&_td]:border-b-primary-950/20! [&_td]:dark:border-primary-50/20!'"
                [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
         <ng-template #header>
@@ -29,7 +29,7 @@
               <badge-contrasted [value]="(getCustomersServed(salesman) | async) ?? 0"/>
             </td>
             <td>
-              <div class="flex flex-nowrap items-center">
+              <div class="flex items-center">
                 <p-button title="Preview" icon="pi pi-eye" type="button" variant="text" (onClick)="preview(salesman)"/>
                 <p-button title="Edit" icon="pi pi-pencil" type="button" variant="text" (onClick)="manage(salesman)"/>
                 <p-button title="Delete" icon="pi pi-trash" type="button" variant="text" (onClick)="delete(salesman)"/>
