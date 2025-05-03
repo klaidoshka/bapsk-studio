@@ -92,6 +92,7 @@ public class ReportTemplateService : IReportTemplateService
             .FirstAsync(it => it.Id == request.ReportTemplate.Id);
 
         if (await _database.ReportTemplates.AnyAsync(it =>
+                it.Id != template.Id &&
                 it.Fields.First().DataType.InstanceId == template.Fields.First().DataType.InstanceId &&
                 String.Equals(
                     it.Name,

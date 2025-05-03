@@ -8,6 +8,9 @@ import {AuthService} from '../../service/auth.service';
 import {first} from 'rxjs';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
+import {FloatLabel} from 'primeng/floatlabel';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
 
 @Component({
   selector: 'auth-reset-password',
@@ -16,7 +19,10 @@ import {FormInputErrorComponent} from '../form-input-error/form-input-error.comp
     Button,
     ReactiveFormsModule,
     MessagesShowcaseComponent,
-    FormInputErrorComponent
+    FormInputErrorComponent,
+    FloatLabel,
+    IconField,
+    InputIcon
   ],
   templateUrl: './auth-reset-password.component.html',
   styles: ``
@@ -28,7 +34,7 @@ export class AuthResetPasswordComponent {
   protected readonly messages = signal<Messages>({});
 
   protected readonly form = this.formBuilder.group({
-    email: ['', [Validators.email]],
+    email: ['', [Validators.required, Validators.email]],
   });
 
   protected resetPassword() {
@@ -43,7 +49,6 @@ export class AuthResetPasswordComponent {
       .subscribe({
         next: () => {
           this.form.reset();
-
           this.messages.set({
             success: [
               "Request has been sent! Please check your email, request will be valid for 10 minutes."

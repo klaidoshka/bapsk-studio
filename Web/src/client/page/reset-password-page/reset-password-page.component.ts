@@ -20,6 +20,9 @@ import {Button} from 'primeng/button';
 import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {FormInputErrorComponent} from '../../component/form-input-error/form-input-error.component';
 import {MessageService} from 'primeng/api';
+import {FloatLabel} from 'primeng/floatlabel';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
 
 @Component({
   selector: 'reset-password-page',
@@ -30,7 +33,10 @@ import {MessageService} from 'primeng/api';
     Button,
     LoadingSpinnerComponent,
     RouterLink,
-    FormInputErrorComponent
+    FormInputErrorComponent,
+    FloatLabel,
+    IconField,
+    InputIcon
   ],
   templateUrl: './reset-password-page.component.html',
   providers: [MessageService]

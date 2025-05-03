@@ -105,11 +105,12 @@ public class ImportConfigurationService : IImportConfigurationService
             );
         }
 
-        if (await _database.ImportConfigurations.AnyAsync(it => it.DataType.InstanceId == dataType.InstanceId &&
-                                                                it.Name.Equals(
-                                                                    request.ImportConfiguration.Name,
-                                                                    StringComparison.OrdinalIgnoreCase
-                                                                )
+        if (await _database.ImportConfigurations.AnyAsync(it =>
+                it.DataType.InstanceId == dataType.InstanceId &&
+                it.Name.Equals(
+                    request.ImportConfiguration.Name,
+                    StringComparison.OrdinalIgnoreCase
+                )
             ))
         {
             throw new ValidationException("Import configuration with such name already exists.");
@@ -181,6 +182,18 @@ public class ImportConfigurationService : IImportConfigurationService
             throw new ValidationException(
                 $"Data type fields '{String.Join("', '", missingIds.Select(it => dataTypeFields[it].Name))}' are not present in the request."
             );
+        }
+        
+        if (await _database.ImportConfigurations.AnyAsync(it =>
+                it.Id != request.ImportConfiguration.Id &&
+                it.DataType.InstanceId == configuration.DataType.InstanceId &&
+                it.Name.Equals(
+                    request.ImportConfiguration.Name,
+                    StringComparison.OrdinalIgnoreCase
+                ) && it.Id != request.ImportConfiguration.Id
+            ))
+        {
+            throw new ValidationException("Import configuration with such name already exists.");
         }
 
         // Validate order

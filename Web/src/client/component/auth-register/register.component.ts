@@ -22,6 +22,10 @@ import {MessageHandlingService} from '../../service/message-handling.service';
 import {Password} from 'primeng/password';
 import {MessageService} from 'primeng/api';
 import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
+import {FloatLabel} from 'primeng/floatlabel';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {Select} from 'primeng/select';
 
 @Component({
   selector: "auth-register",
@@ -36,7 +40,11 @@ import {FormInputErrorComponent} from '../form-input-error/form-input-error.comp
     ReactiveFormsModule,
     MessagesShowcaseComponent,
     Password,
-    FormInputErrorComponent
+    FormInputErrorComponent,
+    FloatLabel,
+    IconField,
+    InputIcon,
+    Select
   ]
 })
 export class RegisterComponent {
@@ -49,7 +57,7 @@ export class RegisterComponent {
   protected readonly isSubmitting = signal<boolean>(false);
   protected readonly messages = signal<Messages>({});
 
-  protected readonly registerForm = this.formBuilder.group({
+  protected readonly form = this.formBuilder.group({
     birthDate: [new Date(), Validators.required],
     country: [getDefaultIsoCountry(), Validators.required],
     email: ["", [Validators.required, Validators.email]],
@@ -66,7 +74,7 @@ export class RegisterComponent {
   private validatePasswordConfirmed(): ValidatorFn {
     return (control): ValidationErrors | null => {
       const confirmPassword = control.value;
-      const password = this.registerForm?.get("password")?.value;
+      const password = this.form?.get("password")?.value;
 
       if (password !== confirmPassword) {
         return {passwordConfirmed: true};
@@ -88,7 +96,7 @@ export class RegisterComponent {
       return;
     }
 
-    if (this.registerForm.invalid) {
+    if (this.form.invalid) {
       this.messages.set({error: ["Please fill out all required fields correctly."]});
       return;
     }
@@ -96,17 +104,17 @@ export class RegisterComponent {
     this.isSubmitting.set(true);
 
     const request: RegisterRequest = {
-      birthDate: this.registerForm.value.birthDate!,
-      country: this.registerForm.value.country!.code,
-      email: this.registerForm.value.email!,
-      firstName: this.registerForm.value.firstName!,
-      lastName: this.registerForm.value.lastName!,
-      password: this.registerForm.value.password!
+      birthDate: this.form.value.birthDate!,
+      country: this.form.value.country!.code,
+      email: this.form.value.email!,
+      firstName: this.form.value.firstName!,
+      lastName: this.form.value.lastName!,
+      password: this.form.value.password!
     };
 
     this.authService.register(request).subscribe({
       next: (response) => {
-        this.registerForm.reset();
+        this.form.reset();
         this.messages.set({success: ["Registration successful!"]});
 
         this.messageService.add({
@@ -126,4 +134,6 @@ export class RegisterComponent {
       }
     });
   }
+
+  protected readonly IsoCountries = IsoCountries;
 }

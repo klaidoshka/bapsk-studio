@@ -15,11 +15,14 @@ import {MessageService} from 'primeng/api';
 import {Dialog} from 'primeng/dialog';
 import {AuthResetPasswordComponent} from '../auth-reset-password/auth-reset-password.component';
 import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
+import {FloatLabel} from 'primeng/floatlabel';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
 
 @Component({
   selector: "auth-login",
   templateUrl: "./login.component.html",
-  imports: [Button, ReactiveFormsModule, FormsModule, RouterLink, InputText, MessagesShowcaseComponent, Password, Dialog, AuthResetPasswordComponent, FormInputErrorComponent],
+  imports: [Button, ReactiveFormsModule, FormsModule, RouterLink, InputText, MessagesShowcaseComponent, Password, Dialog, AuthResetPasswordComponent, FormInputErrorComponent, FloatLabel, IconField, InputIcon],
   providers: []
 })
 export class LoginComponent {
@@ -33,7 +36,7 @@ export class LoginComponent {
   protected readonly messages = signal<Messages>({});
   protected readonly showResetDialog = signal<boolean>(false);
 
-  protected readonly loginForm = this.formBuilder.group({
+  protected readonly form = this.formBuilder.group({
     email: ["", [Validators.required, Validators.email]],
     password: ["", [Validators.required]]
   });
@@ -43,20 +46,20 @@ export class LoginComponent {
       return;
     }
 
-    if (this.loginForm.invalid) {
+    if (this.form.invalid) {
       return;
     }
 
     this.isSubmitting.set(true);
 
     const request: LoginRequest = {
-      email: this.loginForm.value.email ?? "",
-      password: this.loginForm.value.password ?? ""
+      email: this.form.value.email ?? "",
+      password: this.form.value.password ?? ""
     };
 
     this.authService.login(request).subscribe({
       next: (response) => {
-        this.loginForm.reset();
+        this.form.reset();
         this.messages.set({ success: ["Logged in successfully"] });
 
         this.messageService.add({
