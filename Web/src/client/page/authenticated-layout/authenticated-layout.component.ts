@@ -8,10 +8,11 @@ import {
 import {ThemeSelectorComponent} from '../../component/theme-selector/theme-selector.component';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {Role} from '../../model/role.model';
+import {ClickOutsideDirective} from '../../directive/click-outside.directive';
 
 @Component({
   selector: "authenticated-layout",
-  imports: [RouterModule, NgIf, ProfileDropdownComponent, ThemeSelectorComponent],
+  imports: [RouterModule, NgIf, ProfileDropdownComponent, ThemeSelectorComponent, ClickOutsideDirective],
   templateUrl: "./authenticated-layout.component.html",
   providers: []
 })
@@ -20,6 +21,7 @@ export class AuthenticatedLayoutComponent {
   protected readonly Role = Role;
   protected readonly isAdminMenuOpen = signal<boolean>(false);
   protected readonly isAuthenticated = rxResource({loader: () => this.authService.isAuthenticated()});
+  protected readonly isMobileNavOpen = signal<boolean>(false);
   protected readonly isWorkspaceMenuOpen = signal<boolean>(false);
   protected readonly user = rxResource({loader: () => this.authService.getUser()});
 }

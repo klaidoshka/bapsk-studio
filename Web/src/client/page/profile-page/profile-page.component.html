@@ -13,7 +13,7 @@
   } @else if (!user.value()) {
     <failed-to-load-please-reload/>
   } @else {
-    <div class="flex flex-col gap-4 w-fit">
+    <div class="flex flex-col gap-4 min-w-0 w-auto">
       <profile-showcase [user]="user.value()!"/>
       <session-showcase/>
     </div>

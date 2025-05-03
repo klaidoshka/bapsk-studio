@@ -1,12 +1,13 @@
-<div class="h-full w-full container mx-auto flex flex-col mb-8 relative">
-  <p-button variant="text" icon="pi pi-bars" styleClass="rounded-full!" class="fixed! z-50 md:hidden"
-            [class.left-60]="isMobileSidebarOpen()" (onClick)="isMobileSidebarOpen.set(!isMobileSidebarOpen())"
-            (clickOutside)="isMobileSidebarOpen.set(false)"/>
+<p-button variant="text" icon="pi pi-bars" size="small"
+          styleClass="rounded-xs! bg-primary-950/70! dark:bg-primary-50/70! text-primary-50! dark:text-primary-950! p-1!"
+          class="fixed! l-0 top-15 left-1 z-20 md:hidden" (onClick)="isMobileSidebarOpen.set(true)"
+          [class.hidden]="isMobileSidebarOpen()"/>
+<div class="h-full w-full container mx-auto flex flex-col mb-8">
   <div class="flex flex-row w-full h-full gap-4">
     <!-- Sidebar -->
     <div
       class="not-md:hidden flex flex-col min-w-60 w-60 gap-6 h-full bg-primary-50 dark:bg-primary-950 border border-y-0
-      border-primary-950/20 dark:border-primary-50/20" [class.not-md:hidden]="!isMobileSidebarOpen()">
+      border-primary-950/20 dark:border-primary-50/20 relative" [class.not-md:hidden]="!isMobileSidebarOpen()">
       <div class="flex flex-col gap-1 mx-4">
         <h4 class="p-2 text-sm font-semibold">Admin Panel</h4>
         <!-- Sidebar Navigation -->
@@ -20,10 +21,15 @@
           <html-upload-for-overhaul (click)="isMobileSidebarOpen.set(true)"/>
         </div>
       </div>
+      <p-button variant="text" icon="pi pi-bars" size="small" class="fixed! left-60 top-15 z-20 md:hidden"
+                styleClass="rounded-xs! bg-primary-950/70! dark:bg-primary-50/70! text-primary-50! dark:text-primary-950! p-1!"
+                (onClick)="isMobileSidebarOpen.set(false)"/>
     </div>
     <!-- Main Content -->
-    <div class="flex-grow-1">
-      <router-outlet/>
+    <div class="flex-1 min-w-0 overflow-hidden">
+      <div class="h-full w-full overflow-auto">
+        <router-outlet/>
+      </div>
     </div>
   </div>
 </div>

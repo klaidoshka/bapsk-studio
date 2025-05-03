@@ -25,7 +25,7 @@
             <td>{{ dataType.description }}</td>
             <td>{{ dataType.fields.length }} fields</td>
             <td>
-              <div class="flex items-center">
+              <div class="flex flex-wrap items-center">
                 <p-button title="Preview" icon="pi pi-eye" type="button" variant="text" (onClick)="preview(dataType)"/>
                 <p-button title="Import Configurations" icon="pi pi-file-excel" variant="text"
                           [routerLink]="'../import-configuration'"

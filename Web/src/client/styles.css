@@ -8,6 +8,12 @@ p-table .p-datatable-table {
   th, tr {
     background-color: inherit !important;
   }
+
+  overflow-x: auto !important;
+}
+
+.p-datatable {
+  width: auto !important;
 }
 
 .p-datatable {
