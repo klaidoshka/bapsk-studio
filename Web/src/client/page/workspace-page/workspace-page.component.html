@@ -1,7 +1,8 @@
 @if (isLoading()) {
   <loading-spinner/>
 } @else if (!instanceId()) {
-  <p-dialog [visible]="!instanceId()" [modal]="true" header="Select Workspace" [closable]="false">
+  <p-dialog [visible]="!instanceId()" [modal]="true" header="Select Workspace" [closable]="false"
+            styleClass="dark:bg-primary-950! bg-primary-50! shadow-2xl! shadow-primary-800/80! dark:shadow-primary-50!">
     <instance-selector/>
   </p-dialog>
 } @else {

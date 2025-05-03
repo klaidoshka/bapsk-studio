@@ -3,11 +3,13 @@ import {
   ReportGenerateFormComponent
 } from '../../component/report-generate-form/report-generate-form.component';
 import {NumberUtil} from '../../util/number.util';
+import {CardComponent} from '../../component/card/card.component';
 
 @Component({
   selector: 'report-generate-page',
   imports: [
-    ReportGenerateFormComponent
+    ReportGenerateFormComponent,
+    CardComponent
   ],
   templateUrl: './report-generate-page.component.html',
   styles: ``

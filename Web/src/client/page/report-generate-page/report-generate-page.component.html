@@ -8,5 +8,9 @@
       the report in different formats: .csv, .pdf.
     </p>
   </div>
-  <report-generate-form [instanceId]="instanceIdAsNumber()!"/>
+  <card>
+    <p card-header>Report Generation</p>
+    <p card-subHeader>Choose report type — Data Entry or Sale — and fill in the required fields.</p>
+    <report-generate-form card-body [instanceId]="instanceIdAsNumber()!"/>
+  </card>
 </div>

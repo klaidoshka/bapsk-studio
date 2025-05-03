@@ -5,7 +5,8 @@
   } @else if (!dataType.value()) {
     <failed-to-load-please-reload/>
   } @else {
-    <p-dialog header="Data Entry Import" closeOnEscape="true" modal="true" styleClass="min-w-128" closable="true"
+    <p-dialog header="Data Entry Import" closeOnEscape="true" modal="true"
+              styleClass="max-w-xl w-full dark:bg-primary-950! bg-primary-50!" closable="true"
               [(visible)]="showImporting" (onHide)="showImporting.set(false)" (close)="showImporting.set(false)">
       <data-entry-import-form [clearImportedValues]="showImporting()" [dataType]="dataType.value()!"
                               [instanceId]="instanceIdAsNumber()!"/>

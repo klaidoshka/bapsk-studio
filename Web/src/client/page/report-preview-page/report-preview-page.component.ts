@@ -1,6 +1,6 @@
 import {Component, computed, ElementRef, inject, input, viewChildren} from '@angular/core';
 import {ReportService} from '../../service/report.service';
-import {NgClass, NgForOf, NgIf} from '@angular/common';
+import {NgClass, NgForOf} from '@angular/common';
 import {TableModule} from 'primeng/table';
 import {
   DataTypeEntryFieldDisplayComponent
@@ -9,16 +9,17 @@ import {Button} from 'primeng/button';
 import {Router} from '@angular/router';
 import {Reports} from '../../model/report.model';
 import {NumberUtil} from '../../util/number.util';
+import {CardComponent} from '../../component/card/card.component';
 
 @Component({
   selector: 'report-preview-page',
   imports: [
     NgForOf,
-    NgIf,
     TableModule,
     DataTypeEntryFieldDisplayComponent,
     Button,
-    NgClass
+    NgClass,
+    CardComponent
   ],
   templateUrl: './report-preview-page.component.html',
   styles: ``

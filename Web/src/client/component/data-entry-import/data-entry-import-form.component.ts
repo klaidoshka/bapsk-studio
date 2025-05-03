@@ -16,6 +16,8 @@ import {Checkbox} from 'primeng/checkbox';
 import {NgIf} from '@angular/common';
 import {TableModule} from 'primeng/table';
 import {DataEntryTableComponent} from '../data-entry-table/data-entry-table.component';
+import {FloatLabel} from 'primeng/floatlabel';
+import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
 
 @Component({
   selector: 'data-entry-import-form',
@@ -28,7 +30,9 @@ import {DataEntryTableComponent} from '../data-entry-table/data-entry-table.comp
     Checkbox,
     NgIf,
     TableModule,
-    DataEntryTableComponent
+    DataEntryTableComponent,
+    FloatLabel,
+    FormInputErrorComponent
   ],
   templateUrl: './data-entry-import-form.component.html',
   styles: ``

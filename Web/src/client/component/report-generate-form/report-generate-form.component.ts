@@ -16,24 +16,24 @@ import {CustomerService} from '../../service/customer.service';
 import {SalesmanService} from '../../service/salesman.service';
 import Messages from '../../model/messages.model';
 import {Router} from '@angular/router';
-import {NgIf} from '@angular/common';
 import {DatePicker} from 'primeng/datepicker';
 import {Button} from 'primeng/button';
 import {Select} from 'primeng/select';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
+import {FloatLabel} from 'primeng/floatlabel';
 
 @Component({
   selector: 'report-generate-form',
   imports: [
     ReactiveFormsModule,
-    NgIf,
     DatePicker,
     Button,
     Select,
     MessagesShowcaseComponent,
     FormInputErrorComponent,
-    FormsModule
+    FormsModule,
+    FloatLabel
   ],
   templateUrl: './report-generate-form.component.html',
   styles: ``

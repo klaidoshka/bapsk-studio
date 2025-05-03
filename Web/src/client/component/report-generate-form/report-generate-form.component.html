@@ -1,52 +1,71 @@
-<form [formGroup]="form" class="w-fit p-4 space-y-4 dark:bg-surface-950 bg-surface-50 rounded-lg shadow">
+<form [formGroup]="form" class="flex flex-col gap-4">
+  <div class="flex flex-wrap gap-4">
+    <!-- Report Type -->
+    <div>
+      <p-floatlabel variant="on" class="w-60">
+        <p-select [options]="reportTypes" optionLabel="label" optionValue="id" appendTo="body" inputId="reportType"
+                  [(ngModel)]="selectedType" [ngModelOptions]="{standalone: true}" dropdownIcon="pi pi-book"
+                  styleClass="w-full"/>
+        <label for="reportType">Report Type</label>
+      </p-floatlabel>
+    </div>
+
+    @switch (selectedType()) {
+      @case (1) {
+        <!-- Template -->
+        <div formGroupName="dataEntry">
+          <p-floatlabel variant="on" class="w-60">
+            <p-select [options]="reportTemplates.value()" optionLabel="label" optionValue="id" appendTo="body"
+                      formControlName="templateId" class="w-full"/>
+            <label for="templateId">Report Template</label>
+          </p-floatlabel>
+        </div>
+      }
+      @default {
+        <ng-container formGroupName="sale">
+          <!-- Customer -->
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-select [options]="customers.value()" optionLabel="label" optionValue="id" appendTo="body"
+                        styleClass="w-full" formControlName="customerId" dropdownIcon="pi pi-user"/>
+              <label for="customerId">Customer</label>
+            </p-floatlabel>
+          </div>
+
+          <!-- Salesman -->
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-select [options]="salesmen.value()" optionLabel="label" optionValue="id" appendTo="body"
+                        styleClass="w-full" formControlName="salesmanId" dropdownIcon="pi pi-shopping-cart"/>
+              <label for="salesmanId">Salesman</label>
+            </p-floatlabel>
+          </div>
+        </ng-container>
+      }
+    }
+
+    <!-- Date (From) -->
+    <div>
+      <p-floatlabel variant="on" class="w-60">
+        <p-date-picker inputId="from" formControlName="from" [showIcon]="true" variant="filled" iconDisplay="input"
+                       appendTo="body" styleClass="w-full"/>
+        <label for="to">From (Inclusive)</label>
+        <form-input-error [control]="form.controls.from"/>
+      </p-floatlabel>
+    </div>
+
+    <!-- Date (To) -->
+    <div>
+      <p-floatlabel variant="on" class="w-60">
+        <p-date-picker inputId="to" formControlName="to" [showIcon]="true" variant="filled" iconDisplay="input"
+                       appendTo="body" styleClass="w-full"/>
+        <label for="to">Until (Inclusive)</label>
+        <form-input-error [control]="form.controls.to"/>
+      </p-floatlabel>
+    </div>
+  </div>
+  <form-input-error [control]="form" [customErrorMessages]="customErrorMessages"/>
   <messages-showcase [messages]="messages()"/>
-
-  <div class="flex flex-col justify-center">
-    <label class="block text-sm font-medium">Report Type</label>
-    <p-select [options]="reportTypes" optionLabel="label" optionValue="id" placeholder="Select report type" appendTo="body"
-              [(ngModel)]="selectedType" [ngModelOptions]="{standalone: true}"/>
-  </div>
-
-  <div class="grid grid-cols-2 gap-4">
-    <div>
-      <label class="block text-sm font-medium">From</label>
-      <p-datepicker inputId="from" formControlName="from" [showIcon]="true" variant="filled"
-                    inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-primary-50!" class="mt-1 block"
-                    styleClass="w-full" appendTo="body"/>
-      <form-input-error [control]="form.controls.from"/>
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium">To</label>
-      <p-datepicker inputId="to" formControlName="to" [showIcon]="true" variant="filled"
-                    inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-primary-50!" class="mt-1 block"
-                    styleClass="w-full" appendTo="body"/>
-      <form-input-error [control]="form.controls.to"/>
-    </div>
-  </div>
-
-  <div *ngIf="selectedType() === 1" formGroupName="dataEntry">
-    <label class="block text-sm font-medium">Template</label>
-    <p-select [options]="reportTemplates.value()" optionLabel="label" optionValue="id" placeholder="Select template"
-              appendTo="body" formControlName="templateId"/>
-  </div>
-
-  <div *ngIf="selectedType() === 2" formGroupName="sale" class="space-y-4">
-    <div>
-      <label class="block text-sm font-medium">Customer</label>
-      <p-select [options]="customers.value()" optionLabel="label" optionValue="id" placeholder="Select customer" appendTo="body"
-                formControlName="customerId"/>
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium">Salesman</label>
-      <p-select [options]="salesmen.value()" optionLabel="label" optionValue="id" placeholder="Select salesman" appendTo="body"
-                formControlName="salesmanId"/>
-    </div>
-  </div>
-
-  <div class="block">
-    <form-input-error [control]="form" [customErrorMessages]="customErrorMessages"/>
-  </div>
-  <p-button label="Generate" type="submit" (click)="generate()" [disabled]="form.invalid || !form.dirty"/>
+  <p-button title="Submit" size="small" label="Generate" type="submit" (onClick)="generate()"
+            [disabled]="form.invalid || !form.dirty"/>
 </form>
