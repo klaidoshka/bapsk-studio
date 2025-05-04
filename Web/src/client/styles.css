@@ -43,3 +43,13 @@ p-table .p-datatable-table {
 .p-floatlabel-on label {
   @apply bg-primary-50! dark:bg-primary-950!;
 }
+
+.p-accordionpanel {
+  .p-accordionheader {
+    @apply bg-primary-50! dark:bg-primary-950!;
+  }
+
+  .p-accordioncontent-content {
+    @apply bg-primary-50! dark:bg-primary-950!;
+  }
+}
