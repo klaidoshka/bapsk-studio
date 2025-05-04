@@ -4,8 +4,7 @@ import {RouterModule} from "@angular/router";
 @Component({
   selector: "auth-page",
   imports: [RouterModule],
-  templateUrl: "./auth-page.component.html",
-  styleUrl: "./auth-page.component.scss"
+  templateUrl: "./auth-page.component.html"
 })
 export class AuthPageComponent {
 }

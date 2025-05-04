@@ -7,6 +7,8 @@ import {InputText} from 'primeng/inputtext';
 import {InputNumber} from 'primeng/inputnumber';
 import {getDefaultIsoCountry, IsoCountries} from '../../model/iso-country.model';
 import {Select} from 'primeng/select';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
 
 @Component({
   selector: 'data-type-entry-field-input',
@@ -17,7 +19,9 @@ import {Select} from 'primeng/select';
     InputText,
     InputNumber,
     FormsModule,
-    Select
+    Select,
+    IconField,
+    InputIcon
   ],
   templateUrl: './data-type-entry-field-input.component.html',
   styles: ``,
@@ -32,17 +36,16 @@ import {Select} from 'primeng/select';
 export class DataTypeEntryFieldInputComponent implements ControlValueAccessor {
   protected readonly FieldType = FieldType;
   protected readonly IsoCountries = IsoCountries;
+  readonly type = input.required<FieldType>();
+  protected readonly oldType = signal<FieldType | undefined>(undefined);
 
-  type = input.required<FieldType>();
-  oldType = signal<FieldType | undefined>(undefined);
-
-  onChange = signal<(value: string) => void>(() => {
+  protected readonly onChange = signal<(value: string) => void>(() => {
   });
-  onTouched = signal<() => void>(() => {
+  protected readonly onTouched = signal<() => void>(() => {
   });
-  touched = signal<boolean>(false);
-  disabled = signal<boolean>(false);
-  value = signal<any>(undefined);
+  protected readonly touched = signal<boolean>(false);
+  protected readonly disabled = signal<boolean>(false);
+  protected readonly value = signal<any>(undefined);
 
   constructor() {
     effect(() => {
@@ -68,7 +71,7 @@ export class DataTypeEntryFieldInputComponent implements ControlValueAccessor {
 
   markAsTouched() {
     if (!this.touched()) {
-      this.onTouched();
+      this.onTouched()();
       this.touched.set(true);
     }
   }

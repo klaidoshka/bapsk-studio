@@ -25,7 +25,7 @@ public class NumberFieldHandler() : FieldHandler(FieldType.Number)
             {
                 JsonValueKind.String => Double.TryParse(jsonElement.GetString(), out var output)
                     ? output
-                    : 0.0,
+                    : null,
                 _ => jsonElement.TryGetDouble(out var output) ? output : null
             },
             string stringValue => Double.TryParse(stringValue, out var output) ? output : null,

@@ -1,13 +1,13 @@
-import {inject, Injectable, signal, WritableSignal} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {ApiRouter} from './api-router.service';
 import Customer, {CustomerCreateRequest, CustomerEditRequest} from '../model/customer.model';
-import {first, tap} from 'rxjs';
+import {first, map, Observable, switchMap, tap} from 'rxjs';
 import {EnumUtil} from '../util/enum.util';
 import {IsoCountryCode} from '../model/iso-country.model';
 import {IdentityDocumentType} from '../model/identity-document-type.model';
 import {DateUtil} from '../util/date.util';
-import {InstanceService} from './instance.service';
+import {CacheService} from './cache.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,103 +15,92 @@ import {InstanceService} from './instance.service';
 export class CustomerService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly httpClient = inject(HttpClient);
-  private readonly instanceService = inject(InstanceService);
+  private readonly cacheService = new CacheService<number, Customer>(c => c.id!);
+  private readonly instancesFetched = new Set<number>();
 
-  private readonly instanceId = this.instanceService.getActiveInstanceId();
-
-  // Key: InstanceId
-  private readonly store = new Map<number, WritableSignal<Customer[]>>();
-
-  private updateSingleInStore(instanceId: number, customer: Customer) {
-    const existingSignal = this.store.get(instanceId);
-
-    if (existingSignal != null) {
-      existingSignal.update(customers => {
-        const index = customers.findIndex(c => c.id === customer.id);
-
-        return index !== -1
-          ? [...customers.slice(0, index), customer, ...customers.slice(index + 1)]
-          : [...customers, customer];
-      });
-    } else {
-      this.store.set(instanceId, signal([customer]));
-    }
-  }
-
-  create(request: CustomerCreateRequest) {
-    return this.httpClient.post<Customer>(this.apiRouter.customer.create(this.instanceId()!), {
+  private adjustRequestDateToISO<T extends CustomerCreateRequest | CustomerEditRequest>(request: T): T {
+    return {
       ...request,
       customer: {
         ...request.customer,
-        birthdate: request.customer.birthdate.toISOString() as any
+        birthdate: request.customer.birthdate?.toISOString() as any
       }
-    } as CustomerCreateRequest).pipe(
-      tap(customer => this.updateSingleInStore(request.instanceId, this.updateProperties(customer)))
-    );
+    };
   }
 
-  delete(instanceId: number, id: number) {
-    return this.httpClient.delete<void>(this.apiRouter.customer.delete(this.instanceId()!, id)).pipe(
-      tap(() => {
-        const existingSignal = this.store.get(instanceId);
-
-        if (existingSignal != null) {
-          existingSignal.update(customers => customers.filter(c => c.id !== id));
-        } else {
-          this.store.set(instanceId, signal([]));
-        }
-      })
-    );
+  create(request: CustomerCreateRequest): Observable<Customer> {
+    return this.httpClient
+      .post<Customer>(
+        this.apiRouter.customer.create(request.instanceId),
+        this.adjustRequestDateToISO(request)
+      )
+      .pipe(
+        map(customer => this.updateProperties(customer)),
+        tap(customer => this.cacheService.set(customer)),
+        switchMap(customer => this.cacheService.get(customer.id!))
+      );
   }
 
-  edit(request: CustomerEditRequest) {
-    return this.httpClient.put<void>(this.apiRouter.customer.edit(this.instanceId()!, request.customer.id!), {
-      ...request,
-      customer: {
-        ...request.customer,
-        birthdate: request.customer.birthdate.toISOString() as any
-      }
-    } as CustomerEditRequest).pipe(
-      tap(() => this.getById(request.instanceId, request.customer.id!).pipe(first()).subscribe())
-    );
+  delete(instanceId: number, id: number): Observable<void> {
+    return this.httpClient
+      .delete<void>(this.apiRouter.customer.delete(instanceId, id))
+      .pipe(
+        tap(() => this.cacheService.delete(id))
+      );
   }
 
-  getById(instanceId: number, id: number) {
-    return this.httpClient.get<Customer>(this.apiRouter.customer.getById(this.instanceId()!, id)).pipe(
-      tap(customer => this.updateSingleInStore(instanceId, this.updateProperties(customer)))
-    );
+  edit(request: CustomerEditRequest): Observable<void> {
+    return this.httpClient
+      .put<void>(
+        this.apiRouter.customer.edit(request.instanceId, request.customer.id!),
+        this.adjustRequestDateToISO(request)
+      )
+      .pipe(
+        tap(() => {
+            this.cacheService.invalidate(request.customer.id!);
+
+            this
+              .getById(request.instanceId, request.customer.id!)
+              .pipe(first())
+              .subscribe();
+          }
+        )
+      );
   }
 
-  getByInstanceId(instanceId: number) {
-    return this.httpClient.get<Customer[]>(this.apiRouter.customer.getByInstanceId(instanceId)).pipe(
-      tap(customers => {
-        const existingSignal = this.store.get(instanceId);
-
-        if (existingSignal != null) {
-          existingSignal.update(() => customers.map(customer => this.updateProperties(customer)));
-        } else {
-          this.store.set(instanceId, signal(customers.map(customer => this.updateProperties(customer))));
-        }
-      })
-    );
-  }
-
-  /**
-   * Get the customers as a readonly signal. Customers are cached and updated whenever
-   * HTTP requests are made via this service.
-   *
-   * @param instanceId
-   *
-   * @returns Readonly signal of customers
-   */
-  getAsSignal(instanceId: number) {
-    if (!this.store.has(instanceId)) {
-      this.store.set(instanceId, signal([]));
-
-      new Promise((resolve) => this.getByInstanceId(instanceId).subscribe(resolve));
+  getById(instanceId: number, id: number): Observable<Customer> {
+    if (this.cacheService.has(id)) {
+      return this.cacheService.get(id);
     }
 
-    return this.store.get(instanceId)!.asReadonly();
+    return this.httpClient
+      .get<Customer>(this.apiRouter.customer.getById(instanceId, id))
+      .pipe(
+        map(customer => this.updateProperties(customer)),
+        tap(customer => this.cacheService.set(customer)),
+        switchMap(customer => this.cacheService.get(customer.id!))
+      );
+  }
+
+  getAllByInstanceId(instanceId: number): Observable<Customer[]> {
+    if (this.instancesFetched.has(instanceId)) {
+      return this.cacheService.getAllWhere(customer => customer.instanceId === instanceId);
+    }
+
+    return this.httpClient
+      .get<Customer[]>(this.apiRouter.customer.getByInstanceId(instanceId))
+      .pipe(
+        map(customers => customers.map(customer => this.updateProperties(customer))),
+        tap(customers => {
+          this.instancesFetched.add(instanceId);
+
+          this.cacheService.update(
+            customers,
+            customer => customer.instanceId === instanceId
+          );
+        }),
+        switchMap(_ => this.cacheService.getAllWhere(customer => customer.instanceId === instanceId))
+      );
   }
 
   updateProperties(customer: Customer): Customer {

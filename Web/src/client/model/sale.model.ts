@@ -8,6 +8,7 @@ export default interface Sale {
   customer: Customer;
   date: Date;
   id: number;
+  instanceId?: number;
   invoiceNo?: string;
   salesman: Salesman;
   soldGoods: SoldGood[];

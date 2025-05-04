@@ -1,0 +1,86 @@
+<div class="h-full w-full relative container mx-auto flex flex-col">
+  <sale-page-header-section [canGoBack]="true"/>
+  @if (sale.isLoading()) {
+    <loading-spinner/>
+  } @else if (!sale.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    @let sale = this.sale.value()!;
+    <card>
+      <p card-header>Sale</p>
+      <p card-subHeader>Preview of this unique sale entry.</p>
+      <div card-body class="flex flex-col gap-4">
+        <card>
+          <p card-header>Details</p>
+          <p card-subHeader>Details of this specific sale.</p>
+          <div card-body class="flex flex-col md:flex-row gap-4">
+            <div class="flex flex-1 flex-col">
+              <div class="flex flex-row gap-2">
+                <p class="font-semibold">ID</p>
+                <p>{{ sale.id }}</p>
+              </div>
+              <div class="flex flex-row gap-2">
+                <p class="font-semibold">Customer</p>
+                <p>{{ sale.customer.firstName + ' ' + sale.customer.lastName }}</p>
+              </div>
+              <div class="flex flex-row gap-2">
+                <p class="font-semibold">Salesman</p>
+                <p>{{ sale.salesman.name }}</p>
+              </div>
+              <div class="flex flex-row gap-2">
+                <p class="font-semibold">Sale Date</p>
+                <p>{{ sale.date | date: 'medium' }}</p>
+              </div>
+            </div>
+            <div class="flex flex-1 flex-col">
+              <div class="flex flex-row gap-2">
+                <p class="font-semibold">Invoice No</p>
+                <p>{{ sale.invoiceNo || '-' }}</p>
+              </div>
+              <div class="flex flex-row gap-2">
+                <p class="font-semibold">Cash Register No</p>
+                <p>{{ sale.cashRegister?.cashRegisterNo || '-' }}</p>
+              </div>
+              <div class="flex flex-row gap-2">
+                <p class="font-semibold">Receipt No</p>
+                <p>{{ sale.cashRegister?.receiptNo || '-' }}</p>
+              </div>
+            </div>
+          </div>
+        </card>
+        <card>
+          <p card-header>Sold Goods</p>
+          <p card-subHeader>Goods that were sold to the customer of this specific sale.</p>
+          <p-table card-body [value]="sale.soldGoods" paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10"
+                   [rowsPerPageOptions]="[10, 20, 50]">
+            <ng-template #header>
+              <tr>
+                <th>Sequence No</th>
+                <th>Description</th>
+                <th>Quantity</th>
+                <th>Measure Unit</th>
+                <th>Unit Price</th>
+                <th>VAT Amount</th>
+                <th>Total Amount</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-soldGood>
+              <tr>
+                <td>{{ soldGood.sequenceNo }}</td>
+                <td>{{ soldGood.description }}</td>
+                <td>{{ soldGood.quantity }}</td>
+                <td>{{ soldGood.unitOfMeasure }}</td>
+                <td>{{ soldGood.taxableAmount / soldGood.quantity | round:2 | currency:'EUR':'symbol':'1.2-2' }}</td>
+                <td>{{ soldGood.vatAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}
+                  ({{ soldGood.vatRate | round:2 }}
+                  %)
+                </td>
+                <td>{{ soldGood.totalAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </card>
+      </div>
+    </card>
+  }
+</div>

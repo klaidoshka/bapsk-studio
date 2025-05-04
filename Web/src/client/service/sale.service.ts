@@ -1,14 +1,19 @@
-import {inject, Injectable, signal, WritableSignal} from '@angular/core';
-import Sale, {SaleCreateRequest, SaleEditRequest} from '../model/sale.model';
+import {inject, Injectable} from '@angular/core';
+import Sale, {
+  SaleCreateRequest,
+  SaleEditRequest,
+  SaleWithVatReturnDeclaration
+} from '../model/sale.model';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
-import {first, tap} from 'rxjs';
+import {combineLatest, first, map, Observable, switchMap, tap} from 'rxjs';
 import {CustomerService} from './customer.service';
 import {SalesmanService} from './salesman.service';
 import {EnumUtil} from '../util/enum.util';
 import {UnitOfMeasureType} from '../model/unit-of-measure-type.model';
 import {DateUtil} from '../util/date.util';
-import {InstanceService} from './instance.service';
+import {CacheService} from './cache.service';
+import {VatReturnService} from './vat-return.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,104 +22,122 @@ export class SaleService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly customerService = inject(CustomerService);
   private readonly httpClient = inject(HttpClient);
-  private readonly instanceService = inject(InstanceService);
   private readonly salesmanService = inject(SalesmanService);
+  private readonly vatReturnService = inject(VatReturnService);
+  private readonly cacheService = new CacheService<number, Sale>(sale => sale.id);
+  private readonly instancesFetched = new Set<number>();
 
-  private readonly instanceId = this.instanceService.getActiveInstanceId();
-
-  // Key: InstanceId
-  private readonly store = new Map<number, WritableSignal<Sale[]>>();
-
-  private updateSingleInStore(instanceId: number, sale: Sale) {
-    const existingSignal = this.store.get(instanceId);
-
-    if (existingSignal != null) {
-      existingSignal.update(sales => {
-        const index = sales.findIndex(c => c.id === sale.id);
-
-        return index !== -1
-          ? [...sales.slice(0, index), sale, ...sales.slice(index + 1)]
-          : [...sales, sale];
-      });
-    } else {
-      this.store.set(instanceId, signal([sale]));
-    }
-  }
-
-  create(request: SaleCreateRequest) {
-    return this.httpClient.post<Sale>(this.apiRouter.sale.create(this.instanceId()!), {
+  private adjustRequestDateToISO<T extends SaleCreateRequest | SaleEditRequest>(request: T): T {
+    return {
       ...request,
       sale: {
         ...request.sale,
-        date: request.sale.date.toISOString() as any
+        date: request.sale.date?.toISOString() as any
       }
-    } as SaleCreateRequest).pipe(
-      tap(sale => this.updateSingleInStore(request.instanceId, this.updateProperties(sale)))
-    );
+    };
   }
 
-  delete(instanceId: number, id: number) {
-    return this.httpClient.delete<void>(this.apiRouter.sale.delete(this.instanceId()!, id)).pipe(
-      tap(() => {
-        const existingSignal = this.store.get(instanceId);
-
-        if (existingSignal != null) {
-          existingSignal.update(sales => sales.filter(c => c.id !== id));
-        } else {
-          this.store.set(instanceId, signal([]));
-        }
-      })
-    );
+  create(request: SaleCreateRequest): Observable<Sale> {
+    return this.httpClient
+      .post<Sale>(this.apiRouter.sale.create(request.instanceId), this.adjustRequestDateToISO(request))
+      .pipe(
+        map(sale => this.updateProperties(sale)),
+        tap(sale => this.cacheService.set(sale)),
+        switchMap(sale => this.cacheService.get(sale.id!))
+      );
   }
 
-  edit(request: SaleEditRequest) {
-    return this.httpClient.put<void>(this.apiRouter.sale.edit(this.instanceId()!, request.sale.id!), {
-      ...request,
-      sale: {
-        ...request.sale,
-        date: request.sale.date.toISOString() as any
-      }
-    } as SaleEditRequest).pipe(
-      tap(() => this.getById(request.instanceId, request.sale.id!).pipe(first()).subscribe())
-    );
+  delete(instanceId: number, id: number): Observable<void> {
+    return this.httpClient
+      .delete<void>(this.apiRouter.sale.delete(instanceId, id))
+      .pipe(
+        tap(() => this.cacheService.delete(id))
+      );
   }
 
-  get(instanceId: number) {
-    return this.httpClient.get<Sale[]>(this.apiRouter.sale.getByInstanceId(instanceId)).pipe(
-      tap(sales => {
-        const existingSignal = this.store.get(instanceId);
+  edit(request: SaleEditRequest): Observable<void> {
+    return this.httpClient
+      .put<void>(this.apiRouter.sale.edit(request.instanceId, request.sale.id!), this.adjustRequestDateToISO(request))
+      .pipe(
+        tap(() => {
+            this.cacheService.invalidate(request.sale.id!);
 
-        if (existingSignal != null) {
-          existingSignal.update(() => sales.map(sale => this.updateProperties(sale)));
-        } else {
-          this.store.set(instanceId, signal(sales.map(sale => this.updateProperties(sale))));
-        }
-      })
-    );
+            this
+              .getById(request.instanceId, request.sale.id!)
+              .pipe(first())
+              .subscribe();
+          }
+        )
+      );
   }
 
-  getById(instanceId: number, id: number) {
-    return this.httpClient.get<Sale>(this.apiRouter.sale.getById(this.instanceId()!, id)).pipe(
-      tap(sale => this.updateSingleInStore(instanceId, this.updateProperties(sale)))
-    );
-  }
-
-  /**
-   * Get the sales as a readonly signal. Sales are cached and updated whenever
-   * HTTP requests are made via this service.
-   *
-   * @param instanceId
-   *
-   * @returns Readonly signal of sales
-   */
-  getAsSignal(instanceId: number) {
-    if (!this.store.has(instanceId)) {
-      this.store.set(instanceId, signal([]));
-
-      new Promise((resolve) => this.get(instanceId).subscribe(resolve));
+  getById(instanceId: number, id: number): Observable<Sale> {
+    if (this.cacheService.has(id)) {
+      return this.cacheService.get(id);
     }
 
-    return this.store.get(instanceId)!.asReadonly();
+    return this.httpClient
+      .get<Sale>(this.apiRouter.sale.getById(instanceId, id))
+      .pipe(
+        map(sale => this.updateProperties(sale)),
+        tap(sale => this.cacheService.set(sale)),
+        switchMap(sale => this.cacheService.get(sale.id!))
+      );
+  }
+
+  getWithVatDeclarationById(instanceId: number, saleId: number): Observable<SaleWithVatReturnDeclaration> {
+    return this
+      .getById(instanceId, saleId)
+      .pipe(
+        switchMap(sale => this.vatReturnService
+          .getBySaleId(instanceId, sale.id!)
+          .pipe(
+            map(declaration => ({
+              ...sale,
+              vatReturnDeclaration: declaration
+            }))
+          )
+        )
+      );
+  }
+
+  getAllByInstanceId(instanceId: number): Observable<Sale[]> {
+    if (this.instancesFetched.has(instanceId)) {
+      return this.cacheService.getAllWhere(sale => sale.instanceId === instanceId);
+    }
+
+    return this.httpClient
+      .get<Sale[]>(this.apiRouter.sale.getByInstanceId(instanceId))
+      .pipe(
+        map(sales => sales.map(sale => this.updateProperties(sale))),
+        tap(sales => {
+          this.instancesFetched.add(instanceId);
+
+          this.cacheService.update(
+            sales,
+            sale => sale.instanceId === instanceId
+          );
+        }),
+        switchMap(_ => this.cacheService.getAllWhere(sale => sale.instanceId === instanceId))
+      );
+  }
+
+  getAllWithVatDeclarationByInstanceId(instanceId: number): Observable<SaleWithVatReturnDeclaration[]> {
+    return this
+      .getAllByInstanceId(instanceId!)
+      .pipe(
+        switchMap(sales => combineLatest(
+            sales.map(sale => this.vatReturnService
+              .getBySaleId(instanceId, sale.id)
+              .pipe(
+                map(declaration => ({
+                  ...sale,
+                  vatReturnDeclaration: declaration
+                }))
+              )
+            )
+          )
+        ));
   }
 
   updateProperties(sale: Sale): Sale {

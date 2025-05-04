@@ -1,23 +1,31 @@
 @switch (type()) {
   @case (FieldType.Check) {
-    <p-check-box (onChange)="callOnChange()" (blur)="markAsTouched()" [(ngModel)]="value" binary/>
+    <p-check-box (onChange)="callOnChange()" (onBlur)="markAsTouched()" [(ngModel)]="value" binary/>
   }
   @case (FieldType.Currency) {
-    <p-input-number (onInput)="callOnChange()" (blur)="markAsTouched()" [(ngModel)]="value" currency="EUR" mode="currency"
-                    [min]="0" [showButtons]="true" [step]="0.05" class="w-full"/>
+    <p-icon-field>
+      <p-inputicon class="pi pi-euro"/>
+      <p-input-number (onInput)="callOnChange()" (onBlur)="markAsTouched()" [(ngModel)]="value" currency="EUR"
+                      mode="currency" [min]="0" [showButtons]="true" [step]="0.05" class="w-full" inputStyleClass="pl-10! w-60!"/>
+    </p-icon-field>
   }
   @case (FieldType.Date) {
-    <p-datepicker (onSelect)="callOnChange()" (blur)="markAsTouched()" [(ngModel)]="value" hideOnDateTimeSelect="true"
-                  appendTo="body" [showTime]="true" [showIcon]="true" [showClear]="true" class="w-full" (onClear)="value.set(undefined); callOnChange();"/>
+    <p-date-picker (onSelect)="callOnChange()" (blur)="markAsTouched()" [(ngModel)]="value" hideOnDateTimeSelect="true"
+                   appendTo="body" [showTime]="true" [showIcon]="true" [showClear]="true" class="w-full"
+                   (onClear)="value.set(undefined); callOnChange(); markAsTouched();" iconDisplay="input"/>
   }
   @case (FieldType.IsoCountryCode) {
-    <p-select (onChange)="callOnChange()" (blur)="markAsTouched()" [(ngModel)]="value" [options]="IsoCountries" optionLabel="name"
-              optionValue="code" appendTo="body" class="w-full"/>
+    <p-select (onChange)="callOnChange()" (blur)="markAsTouched()" [(ngModel)]="value" [options]="IsoCountries"
+              optionLabel="name" optionValue="code" appendTo="body" class="w-full" dropdownIcon="pi pi-globe"/>
   }
   @case (FieldType.Number) {
-    <p-input-number (onInput)="callOnChange()" (blur)="markAsTouched()" [(ngModel)]="value" class="w-full" [showButtons]="true"/>
+    <p-input-number (onInput)="callOnChange()" (onBlur)="markAsTouched()" [(ngModel)]="value" class="w-full"/>
   }
   @default {
-    <input (input)="callOnChange()" (blur)="markAsTouched()" [(ngModel)]="value" pInputText type="text" class="w-full"/>
+    <p-icon-field>
+      <p-inputicon class="pi pi-pencil"/>
+      <input pInputText (input)="callOnChange()" (blur)="markAsTouched()" [(ngModel)]="value" type="text"
+             class="w-full"/>
+    </p-icon-field>
   }
 }

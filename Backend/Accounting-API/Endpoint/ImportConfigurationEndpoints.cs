@@ -14,7 +14,8 @@ public static class ImportConfigurationEndpoints
     {
         builder
             .MapPost(String.Empty, Create)
-            .RequireInstancePermission(InstancePermission.ImportConfiguration.Create);
+            .RequireInstancePermission(InstancePermission.ImportConfiguration.Create)
+            .RequireInstanceOwnsEntity<DataType>("ImportConfiguration.DataTypeId");
 
         builder
             .MapDelete("/{id:int}", Delete)

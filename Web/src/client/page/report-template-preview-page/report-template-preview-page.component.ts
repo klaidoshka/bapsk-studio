@@ -1,32 +1,58 @@
 import {Component, inject, input} from '@angular/core';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {ReportTemplateService} from '../../service/report-template.service';
-import {Card} from 'primeng/card';
-import {NgIf} from '@angular/common';
 import {TableModule} from 'primeng/table';
-import {getDataTypesCount} from '../../model/report-template.model';
+import {NumberUtil} from '../../util/number.util';
+import {first, map, Observable, of} from 'rxjs';
+import {
+  ReportTemplatePageHeaderSectionComponent
+} from '../../component/report-template-page-header-section/report-template-page-header-section.component';
+import ReportTemplate from '../../model/report-template.model';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
+import {
+  FailedToLoadPleaseReloadComponent
+} from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
+import {CardComponent} from '../../component/card/card.component';
+import {
+  BadgeContrastedComponent
+} from '../../component/badge-contrasted/badge-contrasted.component';
+import {AsyncPipe} from '@angular/common';
 
 @Component({
   selector: 'report-template-preview-page',
   imports: [
-    Card,
-    NgIf,
-    TableModule
+    TableModule,
+    ReportTemplatePageHeaderSectionComponent,
+    LoadingSpinnerComponent,
+    FailedToLoadPleaseReloadComponent,
+    CardComponent,
+    BadgeContrastedComponent,
+    AsyncPipe
   ],
   templateUrl: './report-template-preview-page.component.html',
   styles: ``
 })
 export class ReportTemplatePreviewPageComponent {
   private reportTemplateService = inject(ReportTemplateService);
+  protected readonly instanceId = input.required<string>();
+  protected readonly templateId = input.required<string>();
 
-  configuration = rxResource({
+  protected readonly template = rxResource({
     request: () => ({
-      templateId: +this.templateId()
+      instanceId: NumberUtil.parse(this.instanceId()),
+      templateId: NumberUtil.parse(this.templateId())
     }),
-    loader: ({ request }) => this.reportTemplateService.getById(request.templateId)
+    loader: ({request}) => request.instanceId && request.templateId
+      ? this.reportTemplateService.getById(request.instanceId, request.templateId)
+      : of(undefined)
   });
 
-  templateId = input.required<string>();
-
-  protected readonly getDataTypesCount = getDataTypesCount;
+  protected getDataTypeName(template: ReportTemplate): Observable<string> {
+    return this.reportTemplateService
+      .getDataType(NumberUtil.parse(this.instanceId())!, template)
+      .pipe(
+        first(),
+        map(dataType => dataType.name)
+      );
+  }
 }

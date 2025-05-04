@@ -1,9 +1,11 @@
+using System.Text.Json;
 using Accounting.Contract;
 using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.DataEntry;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Accounting.Contract.Validator;
+using Accounting.Services.Util;
 using Microsoft.EntityFrameworkCore;
 using DataEntry = Accounting.Contract.Entity.DataEntry;
 using DataEntryField = Accounting.Contract.Entity.DataEntryField;
@@ -87,11 +89,15 @@ public class DataEntryService : IDataEntryService
         {
             if (requestFieldsById.TryGetValue(field.Id, out var requestField))
             {
+                var value = requestField.Value.IsNullOrEmpty()
+                    ? JsonSerializer.SerializeToElement(field.DefaultValue)
+                    : requestField.Value;
+
                 fields.Add(
                     new DataEntryField
                     {
                         DataTypeField = field,
-                        Value = _fieldTypeService.Serialize(field.Type, requestField.Value)
+                        Value = _fieldTypeService.Serialize(field.Type, value)
                     }
                 );
             }
@@ -155,7 +161,11 @@ public class DataEntryService : IDataEntryService
         {
             if (requestFieldsById.TryGetValue(field.Id, out var requestField))
             {
-                field.Value = _fieldTypeService.Serialize(dataTypeFields[field.DataTypeFieldId].Type, requestField.Value);
+                var value = requestField.Value.IsNullOrEmpty()
+                    ? JsonSerializer.SerializeToElement(dataTypeFields[field.DataTypeFieldId].DefaultValue)
+                    : requestField.Value;
+
+                field.Value = _fieldTypeService.Serialize(dataTypeFields[field.DataTypeFieldId].Type, value);
             }
             else
             {
@@ -236,23 +246,7 @@ public class DataEntryService : IDataEntryService
             .Include(it => it.DataType)
             .ThenInclude(it => it.Fields)
             .AsSplitQuery()
-            .FirstOrDefaultAsync(it => it.Id == request.ImportConfigurationId);
-
-        var instanceId = configuration?.DataType?.InstanceId;
-
-        var user = await _database.InstanceUsers.FirstOrDefaultAsync(
-            it => it.UserId == request.RequesterId && it.InstanceId == instanceId
-        );
-
-        if (user is null)
-        {
-            throw new ValidationException("You are not authorized to import data.");
-        }
-
-        if (configuration is null)
-        {
-            throw new ValidationException("Import configuration was not found.");
-        }
+            .FirstAsync(it => it.Id == request.ImportConfigurationId);
 
         if (!_csvService.IsSupportedFileExtension(request.FileExtension))
         {

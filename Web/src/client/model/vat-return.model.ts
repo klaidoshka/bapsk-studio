@@ -49,9 +49,9 @@ export enum PaymentType {
 }
 
 export const PaymentTypes = [
-  { id: PaymentType.Cash, label: 'Cash' },
-  { id: PaymentType.Bank, label: 'Bank' },
-  { id: PaymentType.Other, label: 'Other' }
+  {id: PaymentType.Cash, label: 'Cash'},
+  {id: PaymentType.Bank, label: 'Bank'},
+  {id: PaymentType.Other, label: 'Other'}
 ]
 
 export const toPaymentTypeLabel = (type: PaymentType): string => {

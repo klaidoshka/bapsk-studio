@@ -116,10 +116,11 @@ function updateFilterIndicators() {
 }
 
 function applyFilters() {
+  const headerProvided = document.querySelector('thead th') !== null;
   const rows = document.querySelectorAll('tbody tr');
 
   rows.forEach((row, i) => {
-    if (i === 0) {
+    if (!headerProvided && i === 0) {
       return;
     }
 

@@ -1,5 +1,7 @@
 using System.Collections.Immutable;
 using System.Globalization;
+using System.Text;
+using Accounting.Contract.Configuration;
 using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.DataEntry;
 using Accounting.Contract.Dto.DataType;
@@ -27,28 +29,28 @@ public class ReportService : IReportService
         "VAT Rate"
     );
 
+    private readonly Butenta _butenta;
     private readonly ICustomerService _customerService;
     private readonly IDataEntryService _dataEntryService;
     private readonly IDataTypeService _dataTypeService;
-    private readonly IInstanceAuthorizationService _instanceAuthorizationService;
     private readonly IReportTemplateService _reportTemplateService;
     private readonly ISalesmanService _salesmanService;
     private readonly ISaleService _saleService;
 
     public ReportService(
+        Butenta butenta,
         ICustomerService customerService,
         IDataEntryService dataEntryService,
         IDataTypeService dataTypeService,
-        IInstanceAuthorizationService instanceAuthorizationService,
         IReportTemplateService reportTemplateService,
         ISalesmanService salesmanService,
         ISaleService saleService
     )
     {
+        _butenta = butenta;
         _customerService = customerService;
         _dataEntryService = dataEntryService;
         _dataTypeService = dataTypeService;
-        _instanceAuthorizationService = instanceAuthorizationService;
         _reportTemplateService = reportTemplateService;
         _salesmanService = salesmanService;
         _saleService = saleService;
@@ -189,13 +191,6 @@ public class ReportService : IReportService
 
     public async Task<Report> GenerateDataEntriesReportAsync(ReportByDataEntriesGenerateRequest request)
     {
-        var instanceId = await _reportTemplateService.GetInstanceIdAsync(request.ReportTemplateId);
-
-        if (!await _instanceAuthorizationService.IsMemberAsync(instanceId, request.RequesterId))
-        {
-            throw new ValidationException("You are not authorized to generate this report.");
-        }
-
         var template = await _reportTemplateService.GetAsync(
             new ReportTemplateGetRequest
             {
@@ -310,14 +305,6 @@ public class ReportService : IReportService
             throw new ValidationException("Customer and salesman must belong to the same instance.");
         }
 
-        if (
-            customer.InstanceId is not null &&
-            !await _instanceAuthorizationService.IsMemberAsync(customer.InstanceId!.Value, request.RequesterId)
-        )
-        {
-            throw new ValidationException("You are not authorized to generate this report.");
-        }
-
         var sales = await _saleService.GetAsync(
             new SaleWithinIntervalGetRequest
             {
@@ -339,5 +326,33 @@ public class ReportService : IReportService
                 }
             )
             .ToList();
+    }
+
+    public async Task<string> UpdateHtmlAsync(string html)
+    {
+        using var client = new HttpClient();
+
+        var request = new HttpRequestMessage(HttpMethod.Post, _butenta.UpdateHtmlEndpoint)
+        {
+            Content = new StringContent(html, Encoding.UTF8, "text/html")
+        };
+
+        try
+        {
+            var response = await client.SendAsync(request);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+
+            var errorMessage = await response.Content.ReadAsStringAsync();
+
+            throw new ValidationException($"{response.StatusCode} - {errorMessage}");
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new ValidationException(ex.Message);
+        }
     }
 }

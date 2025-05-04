@@ -1,0 +1,74 @@
+<div class="h-full w-full relative container mx-auto flex flex-col">
+  <data-entry-page-header-section [canGoBack]="true"/>
+  @if (dataEntry.isLoading() || dataType.isLoading()) {
+    <loading-spinner/>
+  } @else if (!dataEntry.value() || !dataType.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    @let dataEntry = this.dataEntry.value()!;
+    @let dataType = this.dataType.value()!;
+    <card>
+      <p card-header>{{ dataType.name }}</p>
+      <p card-subHeader>Preview of this unique {{dataType.name}} data type entry.</p>
+      <div card-body class="flex flex-col gap-4">
+        <card>
+          <p card-header>Details</p>
+          <p card-subHeader>Details of this specific data entry.</p>
+          <div card-body class="flex flex-col">
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">ID</p>
+              <p>{{ dataEntry.id }}</p>
+            </div>
+            @if (dataType.displayFieldId) {
+              <div class="flex flex-row gap-2">
+                <p class="font-semibold">Displayed As</p>
+                <p>{{ dataEntry.display() }}</p>
+              </div>
+            }
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">Created At</p>
+              <p>{{ dataEntry.createdAt | date:'short' }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">Created By</p>
+              <p>{{ toUserIdentityFullName(dataEntry.createdBy) }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">Last Modified At</p>
+              <p>{{ dataEntry.modifiedAt | date:'short' }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">Last Modified By</p>
+              <p>{{ toUserIdentityFullName(dataEntry.modifiedBy) }}</p>
+            </div>
+          </div>
+        </card>
+        <card>
+          <p card-header>Values</p>
+          <p card-subHeader>Values of this specific data entry.</p>
+          <p-table card-body [columns]="dataType?.fields || []" [value]="[dataEntry.fields]"
+
+                  >
+            <ng-template #header let-fields>
+              <tr>
+                @for (field of fields; track field.id) {
+                  <th>{{ field.name }}</th>
+                }
+              </tr>
+            </ng-template>
+            <ng-template #body let-fields>
+              <tr>
+                @for (field of fields; track field.id) {
+                  <td>
+                    <data-type-entry-field-display [dataTypeFieldId]="field.dataTypeFieldId" [dataType]="dataType"
+                                                   [value]="field.value" [instanceId]="instanceIdAsNumber()"/>
+                  </td>
+                }
+              </tr>
+            </ng-template>
+          </p-table>
+        </card>
+      </div>
+    </card>
+  }
+</div>

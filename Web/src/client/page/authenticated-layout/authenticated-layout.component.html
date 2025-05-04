@@ -1,18 +1,73 @@
 <div class="h-full w-full flex flex-col">
-  <header class="flex w-full h-12 px-4 py-1 dark:bg-surface-950 bg-surface-50 shadow-md sticky top-0 z-10">
-    <div class="flex items-center space-x-4">
-      <a class="text-xl font-bold cursor-pointer hover:opacity-70" routerLink="/home">Accounting</a>
-      <theme-selector/>
-    </div>
+  <header
+    class="sticky top-0 z-50 w-full border-b border-b-primary-950/20 dark:border-b-primary-50/20 bg-surface-50 dark:bg-surface-950 backdrop-blur supports-[backdrop-filter]:bg-surface-50/60 dark:supports-[backdrop-filter]:bg-surface-950/60">
+    <div class="container flex h-14 items-center gap-2 md:gap-4 m-auto">
+      <!-- Navigation Mobile -->
+      <div class="md:hidden">
+        <button class="mr-4 flex items-center gap-2 ml-2 lg:mr-6 cursor-pointer"
+                (click)="isMobileNavOpen.set(!isMobileNavOpen())" (clickOutside)="isMobileNavOpen.set(false)">
+        <span class="flex flex-row font-bold lg:inline-block text-primary-950 hover:text-primary-950/80
+              dark:text-primary-50 dark:hover:text-primary-50/80">
+          Bapsk
+          <span class="ml-2 text-xs self-end">
+            <i class="pi" [class.pi-chevron-down]="!isMobileNavOpen()" [class.pi-chevron-up]="isMobileNavOpen()"></i>
+          </span>
+        </span>
+        </button>
 
-    <div class="flex items-center space-x-4 ml-auto">
-      <instance-selector *ngIf="isAuthenticated()"/>
+        @if (isMobileNavOpen()) {
+          <div class="absolute top-14 left-0 z-50 w-full bg-surface-50 dark:bg-surface-950 shadow-lg p-4">
+            <nav class="flex flex-col gap-2">
+              <a
+                class="transition-colors text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80"
+                routerLink="/home/instance" routerLinkActive="underline underline-offset-4">Instances</a>
+              <a
+                class="transition-colors text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80"
+                routerLink="/home/workspace" routerLinkActive="underline underline-offset-4 ">Workspace</a>
+              @if (user.value()?.role === Role.Admin) {
+                <a
+                  class="transition-colors text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80"
+                  routerLink="/home/admin" routerLinkActive="underline underline-offset-4">Admin</a>
+              }
+            </nav>
+          </div>
+        }
+      </div>
 
-      <profile-dropdown *ngIf="isAuthenticated()"/>
+      <!-- Navigation Desktop -->
+      <div class="mr-4 not-md:hidden md:flex">
+        <a class="mr-4 flex items-center gap-2 lg:mr-6" routerLink="/home">
+          <span class="font-bold lg:inline-block text-primary-950 hover:text-primary-950/80
+                dark:text-primary-50 dark:hover:text-primary-50/80">Bapsk</span>
+        </a>
+        <nav class="flex items-center gap-4 text-sm xl:gap-6">
+          <a
+            class="transition-colors text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80"
+            routerLink="/home/instance" routerLinkActive="underline underline-offset-4">Instances</a>
+          <a
+            class="transition-colors text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80"
+            routerLink="/home/workspace" routerLinkActive="underline underline-offset-4 ">Workspace</a>
+          @if (user.value()?.role === Role.Admin) {
+            <a
+              class="transition-colors text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80"
+              routerLink="/home/admin" routerLinkActive="underline underline-offset-4">Admin</a>
+          }
+        </nav>
+      </div>
+
+      <div class="ml-auto flex items-center gap-4 md:flex-1 md:justify-end not-md:mr-2">
+        <!-- Profile -->
+        <profile-dropdown *ngIf="isAuthenticated.value()"/>
+
+        <!-- Theme Selector -->
+        <theme-selector/>
+      </div>
     </div>
   </header>
 
-  <main class="flex-1">
-    <router-outlet/>
-  </main>
+  <div class="flex-1 min-w-0 overflow-hidden">
+    <div class="h-full w-full overflow-auto">
+      <router-outlet/>
+    </div>
+  </div>
 </div>

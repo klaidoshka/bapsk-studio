@@ -2,12 +2,15 @@ import {Component, inject, signal} from '@angular/core';
 import {InputText} from 'primeng/inputtext';
 import {Button} from 'primeng/button';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import Messages from '../../model/messages.model';
 import {AuthService} from '../../service/auth.service';
 import {first} from 'rxjs';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
+import {FloatLabel} from 'primeng/floatlabel';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
 
 @Component({
   selector: 'auth-reset-password',
@@ -16,7 +19,10 @@ import {FormInputErrorComponent} from '../form-input-error/form-input-error.comp
     Button,
     ReactiveFormsModule,
     MessagesShowcaseComponent,
-    FormInputErrorComponent
+    FormInputErrorComponent,
+    FloatLabel,
+    IconField,
+    InputIcon
   ],
   templateUrl: './auth-reset-password.component.html',
   styles: ``
@@ -24,15 +30,14 @@ import {FormInputErrorComponent} from '../form-input-error/form-input-error.comp
 export class AuthResetPasswordComponent {
   private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
+  protected readonly messages = signal<Messages>({});
 
-  messages = signal<Messages>({});
-
-  form = this.formBuilder.group({
-    email: ['', [Validators.email]],
+  protected readonly form = this.formBuilder.group({
+    email: ['', [Validators.required, Validators.email]],
   });
 
-  resetPassword() {
+  protected resetPassword() {
     if (this.form.invalid) {
       this.messages.set({ error: ["Please fill in a valid email address."] });
       return;
@@ -44,14 +49,13 @@ export class AuthResetPasswordComponent {
       .subscribe({
         next: () => {
           this.form.reset();
-
           this.messages.set({
             success: [
               "Request has been sent! Please check your email, request will be valid for 10 minutes."
             ]
           });
         },
-        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
 }

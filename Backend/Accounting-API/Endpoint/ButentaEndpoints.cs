@@ -10,6 +10,7 @@ public static class ButentaEndpoints
         builder.MapPost("submit-trade/{tradeId:int}", SubmitTrade);
         builder.MapPost("update-trade/{tradeId:int}", UpdateTrade);
         builder.MapGet("trade-declaration/{tradeId:int}", GetTradeDeclaration);
+        builder.MapPost("update-html", UpdateHtml);
     }
 
     private static async Task<IResult> SubmitTrade(
@@ -36,4 +37,17 @@ public static class ButentaEndpoints
         int tradeId,
         IButentaService butentaService
     ) => Results.Json(await butentaService.GetVatReturnDeclarationByTradeId(tradeId));
+
+    private static async Task<IResult> UpdateHtml(
+        HttpRequest request,
+        IReportService reportService
+    )
+    {
+        using var reader = new StreamReader(request.Body);
+        var html = await reader.ReadToEndAsync();
+
+        return String.IsNullOrWhiteSpace(html)
+            ? Results.BadRequest("HTML content is empty.")
+            : Results.Content(await reportService.UpdateHtmlAsync(html), contentType: "text/html");
+    }
 }

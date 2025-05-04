@@ -19,38 +19,41 @@ import {map, of} from 'rxjs';
   styles: ``
 })
 export class DataTypeEntryFieldDisplayComponent {
-  protected readonly FieldType = FieldType;
   private readonly dataEntryService = inject(DataEntryService);
+  protected readonly FieldType = FieldType;
+  protected readonly getIsoCountryLabel = getIsoCountryLabel;
+  readonly instanceId = input<number>();
+  readonly dataType = input<DataType>();
+  readonly dataTypeFieldId = input<number>();
+  readonly type = input<FieldType>();
+  protected readonly typeResolved = computed(() => this.type() || this.dataTypeField()?.type || FieldType.Text)
+  readonly value = input.required<any>();
 
-  dataType = input<DataType>();
-  dataTypeField = computed(() => this.dataType()?.fields.find(it => it.id === this.dataTypeFieldId()));
-  dataTypeFieldId = input<number>();
-  type = input<FieldType>();
-  typeResolved = computed(() => this.type() || this.dataTypeField()?.type || FieldType.Text)
-  value = input.required<any>();
+  protected readonly dataTypeField = computed(() => this.dataType()
+    ?.fields.find(it => it.id === this.dataTypeFieldId())
+  );
 
-  referencedDataEntry = rxResource({
+  protected readonly referencedDataEntry = rxResource({
     request: () => {
       const referenceId = this.dataTypeField()?.referenceId;
       const value = this.value();
 
-      if (!referenceId || this.type() !== FieldType.Reference) {
+      if (!referenceId || this.typeResolved() !== FieldType.Reference) {
         return undefined;
       }
 
       return {
+        instanceId: this.instanceId(),
         referenceId: +referenceId,
         value
       };
     },
-    loader: ({ request }) => request
+    loader: ({request}) => request?.instanceId
       ? this.dataEntryService
-        .getAllByDataTypeId(request.referenceId)
+        .getAllByDataTypeId(request.instanceId, request.referenceId)
         .pipe(
-          map(entries => entries.find(it => it.id === request.value)),
+          map(entries => entries.find(it => it.id === request.value))
         )
       : of(undefined)
   });
-
-  protected readonly getIsoCountryLabel = getIsoCountryLabel;
 }

@@ -3,10 +3,9 @@ namespace Accounting.Contract.Dto.Salesman;
 public class Salesman
 {
     public int? Id { get; set; }
+    public int? InstanceId { get; set; }
     public string Name { get; set; } = String.Empty;
-
-    public SalesmanVatPayerCode VatPayerCode { get; set; } =
-        new();
+    public SalesmanVatPayerCode VatPayerCode { get; set; } = new();
 }
 
 public static class SalesmanExtensions
@@ -16,6 +15,7 @@ public static class SalesmanExtensions
         return new Salesman
         {
             Id = salesman.Id,
+            InstanceId = salesman.InstanceId,
             Name = salesman.Name,
             VatPayerCode = new SalesmanVatPayerCode
             {
@@ -24,7 +24,7 @@ public static class SalesmanExtensions
             }
         };
     }
-    
+
     public static Entity.Salesman ToEntity(this Salesman salesman)
     {
         return new Entity.Salesman

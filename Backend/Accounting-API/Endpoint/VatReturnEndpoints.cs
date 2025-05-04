@@ -15,7 +15,7 @@ public static class VatReturnEndpoints
         builder
             .MapPost(String.Empty, Submit)
             .RequireInstancePermission(InstancePermission.VatReturn.Create)
-            .RequireInstanceOwnsEntity<Sale>("saleId");
+            .RequireInstanceOwnsEntity<Sale>("sale.id");
 
         builder
             .MapPost("/{saleId:int}/cancel", Cancel)

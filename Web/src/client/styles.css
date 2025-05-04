@@ -1,0 +1,60 @@
+@import "tailwindcss";
+@import "primeicons/primeicons.css";
+
+@plugin "tailwindcss-primeui";
+@custom-variant dark (&:where(.dark, .dark *));
+
+p-table .p-datatable-table {
+  th, tr {
+    background-color: inherit !important;
+  }
+
+  overflow-x: auto !important;
+}
+
+.p-datatable {
+  width: auto !important;
+  max-width: max-content !important;
+}
+
+.p-datatable-column-sorted {
+  @apply text-primary-950/90! dark:text-primary-200/80!;
+}
+
+.p-datatable {
+  @apply rounded-md border border-primary-950/20 dark:border-primary-50/20 relative w-fit overflow-auto;
+
+  th, td {
+    @apply border-b-primary-950/20! dark:border-primary-50/20!
+  }
+}
+
+.p-paginator {
+  @apply bg-primary-50! dark:bg-primary-950!;
+
+  .p-select {
+    @apply bg-primary-950! dark:bg-primary-700/80!;
+  }
+
+  .p-select-label {
+    @apply text-white!;
+  }
+}
+
+.p-inputtext, .p-inputwrapper {
+  background: inherit !important;
+}
+
+.p-floatlabel-on label {
+  @apply bg-primary-50! dark:bg-primary-950!;
+}
+
+.p-accordionpanel {
+  .p-accordionheader {
+    @apply bg-primary-50! dark:bg-primary-950!;
+  }
+
+  .p-accordioncontent-content {
+    @apply bg-primary-50! dark:bg-primary-950!;
+  }
+}

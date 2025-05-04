@@ -1,47 +1,50 @@
-<div class="h-full w-fit flex flex-col p-4 mx-auto">
-  <div class="min-w-128">
-    <h1 class="text-2xl font-bold mb-4">{{ templateId() ? 'Edit' : 'Create' }} Report Template</h1>
+<div class="h-full w-full relative container mx-auto flex flex-col">
+  <report-template-page-header-section [canGoBack]="true"/>
+  @if (template.isLoading() || dataTypes.isLoading()) {
+    <loading-spinner/>
+  } @else if (templateId() && !template.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    <card>
+      <p card-header>Manage Report Template</p>
+      <p card-subHeader>Fill in the form below to create a new report template or modify an existing one.</p>
+      <form card-body class="flex flex-col gap-4" [formGroup]="form">
+        <div class="flex flex-wrap gap-4">
+          <!-- Name -->
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-iconfield>
+                <p-inputicon class="pi pi-tag"/>
+                <input pInputText id="name" formControlName="name" type="text"/>
+              </p-iconfield>
+              <label for="name">Name</label>
+            </p-floatlabel>
+            <form-input-error [control]="form.controls.name"/>
+          </div>
 
-    <messages-showcase [messages]="messages()"/>
-
-    <form *ngIf="dataTypes.hasValue()" class="flex flex-col gap-4" [formGroup]="form">
-      <div class="flex flex-row gap-4">
-        <div class="flex flex-col w-full">
-          <label for="name" class="block text-sm font-medium">Name</label>
-          <input formControlName="name" pInputText type="text" id="name" class="mt-1 block w-full"/>
-          <form-input-error [control]="form.controls.name"/>
+          <!-- Data Type -->
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-select [options]="dataTypes.value()" optionLabel="name" appendTo="body" styleClass="w-full"
+                        dropdownIcon="pi pi-objects-column" (onChange)="changeFormFields($event.value)"/>
+              <label for="dataType">Data Type</label>
+            </p-floatlabel>
+          </div>
         </div>
 
-        <div class="flex flex-col w-full">
-          <label for="dataTypeId" class="block text-sm font-medium">Data Type</label>
-          <p-select inputId="dataTypeId" [options]="dataTypes.value()" optionLabel="name" placeholder="Select a data type"
-                    appendTo="body" styleClass="w-full" class="mt-1" (onChange)="changeFormFields($event.value)"/>
-        </div>
-      </div>
-
-      <div class="flex flex-col">
-        <label for="fields" class="block text-sm font-medium">Fields</label>
-        <p-table styleClass="w-full mt-2 dark:bg-primary-950! bg-primary-50!"
-                 paginatorStyleClass="dark:bg-primary-950! bg-primary-50!" id="fields" formArrayName="fields"
-                 [value]="form.controls.fields.controls">
-          <ng-template #header>
-            <tr>
-              <th>Name</th>
-            </tr>
-          </ng-template>
-
-          <ng-template #body let-formField>
-            <tr [formGroup]="formField">
-              <td>{{ formField.value.name }}</td>
-            </tr>
-          </ng-template>
-        </p-table>
-      </div>
-
-      <div class="flex justify-end mt-4">
-        <p-button [label]="template.hasValue() ? 'Save' : 'Create'" [disabled]="form.invalid || !form.dirty"
+        <card>
+          <p card-header>Fields</p>
+          <p card-subHeader>Fields of this report template.</p>
+          <div card-body class="flex flex-wrap gap-4" formArrayName="fields">
+            @for (field of form.controls.fields.value; track field.id) {
+              <badge-contrasted [value]="field.name!"/>
+            }
+          </div>
+        </card>
+        <messages-showcase [messages]="messages()"/>
+        <p-button title="Submit" size="small" [label]="template.hasValue() ? 'Save' : 'Create'" [disabled]="form.invalid || !form.dirty"
                   (onClick)="save()" type="submit"/>
-      </div>
-    </form>
-  </div>
+      </form>
+    </card>
+  }
 </div>

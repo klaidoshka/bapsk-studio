@@ -1,14 +1,14 @@
-import {Component, inject, input, signal} from '@angular/core';
+import {Component, inject, input, signal, viewChild} from '@angular/core';
 import {Button} from "primeng/button";
 import {MessagesShowcaseComponent} from "../messages-showcase/messages-showcase.component";
 import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
 import Messages from '../../model/messages.model';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
-import {TextService} from '../../service/text.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {VatReturnService} from '../../service/vat-return.service';
 import {Checkbox} from 'primeng/checkbox';
-import {SaleWithVatReturnDeclaration} from '../../model/sale.model';
+import Sale from '../../model/sale.model';
 import {first} from 'rxjs';
+import {ConfirmationComponent} from '../confirmation/confirmation.component';
 
 @Component({
   selector: 'vat-return-declaration-submission',
@@ -16,62 +16,49 @@ import {first} from 'rxjs';
     Button,
     MessagesShowcaseComponent,
     ReactiveFormsModule,
-    Checkbox
+    Checkbox,
+    ConfirmationComponent
   ],
   templateUrl: './vat-return-declaration-submission.component.html',
   styles: ``
 })
 export class VatReturnDeclarationSubmissionComponent {
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
-  private readonly textService = inject(TextService);
   private readonly vatReturnService = inject(VatReturnService);
+  protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
+  protected readonly messages = signal<Messages>({});
+  readonly hasDeclaration = input.required<boolean>();
+  readonly instanceId = input.required<number>();
+  readonly sale = input.required<Sale>();
 
-  form = this.formBuilder.group({
+  protected readonly form = this.formBuilder.group({
     affirmation: [false, [Validators.requiredTrue]]
   });
 
-  instanceId = input.required<number>();
-  isShown = signal<boolean>(false);
-  messages = signal<Messages>({});
-  sale = input.required<SaleWithVatReturnDeclaration>();
-
   private onSuccess(message: string) {
-    this.messages.set({ success: [message] });
+    this.messages.set({success: [message]});
     this.form.markAsUntouched();
     this.form.markAsPristine();
   }
 
-  getErrorMessage(field: string): string | null {
-    const control = this.form.get(field);
-
-    if (!control || !control.touched || !control.invalid) {
-      return "";
-    }
-
-    const name = this.textService.capitalize(field);
-
-    if (control.errors?.["required"]) {
-      return `${name} is required.`;
-    }
-
-    return null;
-  }
-
-  reset() {
-    this.form.reset();
-    this.form.markAsUntouched();
-    this.form.markAsPristine();
-  }
-
-  save() {
+  protected save() {
     if (!this.form.valid) {
-      this.messages.set({ error: ["Please fill out the form."] });
+      this.messages.set({error: ["Please fill out the form."]});
       return;
     }
 
     const sale = this.sale();
 
+    if (this.hasDeclaration()) {
+      this.confirmationComponent().request(() => this.submit(sale));
+      return;
+    }
+
+    this.submit(sale);
+  }
+
+  private submit(sale: Sale) {
     this.vatReturnService
       .submit({
         affirmation: this.form.value.affirmation!,
@@ -89,7 +76,7 @@ export class VatReturnDeclarationSubmissionComponent {
       .pipe(first())
       .subscribe({
         next: () => this.onSuccess("Declaration for sale's VAT return has been submitted successfully."),
-        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
 }

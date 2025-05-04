@@ -1,8 +1,21 @@
-<div class="h-full w-full flex flex-col p-4">
-  <div *ngIf="user()">
-    <h1 class="text-2xl font-bold mb-4">Profile</h1>
-    <profile-showcase [user]="user()!"/>
+<div class="h-full w-full container mx-auto flex flex-col lg:w-4/7">
+  <div class="container flex flex-col items-start gap-1 py-8 md:py-10 lg:py-12">
+    <h1 class="text-2xl font-bold leading-tight tracking-tighter sm:text-3xl md:text-4xl lg:leading-[1.1]">
+      Profile
+    </h1>
+    <p class="max-w-2xl text-base font-light opacity-70 sm:text-lg">
+      This is your profile. Make sure that you keep your password safe and change it once in a while!
+      Also, you can revoke any session that you are not using anymore or that you think is compromised.
+    </p>
   </div>
-  <h1 class="text-2xl font-bold my-4">Sessions</h1>
-  <session-showcase/>
+  @if (user.isLoading()) {
+    <loading-spinner/>
+  } @else if (!user.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    <div class="flex flex-col gap-4 min-w-0 w-auto">
+      <profile-showcase [user]="user.value()!"/>
+      <session-showcase/>
+    </div>
+  }
 </div>

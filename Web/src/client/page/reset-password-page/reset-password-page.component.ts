@@ -1,16 +1,28 @@
 import {Component, inject, signal} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {AuthService} from '../../service/auth.service';
-import {FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators
+} from '@angular/forms';
 import Messages from '../../model/messages.model';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {first, map} from 'rxjs';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
+import {
+  MessagesShowcaseComponent
+} from '../../component/messages-showcase/messages-showcase.component';
 import {Password} from 'primeng/password';
 import {Button} from 'primeng/button';
-import {ProgressSpinner} from 'primeng/progressspinner';
+import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {FormInputErrorComponent} from '../../component/form-input-error/form-input-error.component';
+import {MessageService} from 'primeng/api';
+import {FloatLabel} from 'primeng/floatlabel';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
 
 @Component({
   selector: 'reset-password-page',
@@ -19,31 +31,33 @@ import {FormInputErrorComponent} from '../../component/form-input-error/form-inp
     MessagesShowcaseComponent,
     Password,
     Button,
-    ProgressSpinner,
+    LoadingSpinnerComponent,
     RouterLink,
-    FormInputErrorComponent
+    FormInputErrorComponent,
+    FloatLabel,
+    IconField,
+    InputIcon
   ],
   templateUrl: './reset-password-page.component.html',
-  styles: ``
+  providers: [MessageService]
 })
 export class ResetPasswordPageComponent {
   private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly route = inject(ActivatedRoute);
+  protected readonly messages = signal<Messages>({});
 
-  messages = signal<Messages>({});
-
-  isTokenProvided = rxResource({
+  protected readonly isTokenProvided = rxResource({
     loader: () => this.route.queryParams.pipe(map(params => !!params['token']))
   });
 
-  form = this.formBuilder.group({
+  protected readonly form = this.formBuilder.group({
     password: ['', [Validators.required, Validators.minLength(8)]],
     confirmPassword: ['', [this.validatePasswordConfirmed()]]
   });
 
-  customErrorMessages = {
+  protected readonly customErrorMessages = {
     'mismatchPassword': () => "Passwords do not match."
   }
 
@@ -57,7 +71,7 @@ export class ResetPasswordPageComponent {
     }
   }
 
-  changePassword() {
+  protected changePassword() {
     if (this.form.invalid) {
       this.messages.set({ error: ["Please fill in all fields."] });
       return;
@@ -74,7 +88,7 @@ export class ResetPasswordPageComponent {
           this.form.reset();
           this.messages.set({ success: ["Password changed successfully."] });
         },
-        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
 }

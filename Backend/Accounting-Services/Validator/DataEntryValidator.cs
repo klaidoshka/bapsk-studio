@@ -27,14 +27,6 @@ public class DataEntryValidator : IDataEntryValidator
             .FirstAsync(dt => dt.Id == request.DataTypeId);
 
         var failures = new List<string>();
-
-        foreach (var field in request.Fields)
-        {
-            failures.AddRange(
-                (await ValidateDataEntryFieldCreateRequestAsync(field)).FailureMessages
-            );
-        }
-
         var requestFieldsById = request.Fields.ToDictionary(f => f.DataTypeFieldId);
 
         failures.AddRange(
@@ -48,26 +40,18 @@ public class DataEntryValidator : IDataEntryValidator
                 .ToList()
         );
 
+        foreach (var field in request.Fields)
+        {
+            failures.AddRange(
+                (await ValidateDataEntryFieldCreateRequestAsync(field)).FailureMessages
+            );
+        }
+
         return new Validation(failures);
     }
 
     public async Task<Validation> ValidateDataEntryEditRequestAsync(DataEntryEditRequest request)
     {
-        var dataEntry = await _database.DataEntries
-            .Include(de => de.DataType)
-            .ThenInclude(dt => dt.Instance)
-            .FirstOrDefaultAsync(de => de.Id == request.DataEntryId);
-
-        if (dataEntry == null || dataEntry.IsDeleted)
-        {
-            return new Validation("Data entry was not found.");
-        }
-
-        if (dataEntry.DataType.Instance.CreatedById != request.RequesterId)
-        {
-            return new Validation("You are not authorized to edit this data entry.");
-        }
-
         var failures = new List<string>();
 
         foreach (var field in request.Fields)

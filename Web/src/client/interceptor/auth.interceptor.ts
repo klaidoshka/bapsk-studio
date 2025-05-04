@@ -1,67 +1,83 @@
-import {HttpErrorResponse, HttpInterceptorFn} from "@angular/common/http";
-import {inject, signal} from "@angular/core";
-import {catchError, switchMap} from "rxjs";
+import {HttpErrorResponse, HttpEvent, HttpInterceptorFn} from "@angular/common/http";
+import {inject} from "@angular/core";
+import {
+  BehaviorSubject,
+  catchError,
+  concatAll,
+  finalize,
+  Observable,
+  Subject,
+  switchMap,
+  tap,
+  throwError
+} from "rxjs";
 import {ApiRouter} from "../service/api-router.service";
 import {AuthService} from "../service/auth.service";
 
-const renewingAccess = signal<boolean>(false);
+let retryQueue = new Subject<Observable<any>>();
+const isRefreshing = new BehaviorSubject<boolean>(false);
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const apiRouter = inject(ApiRouter);
   const authService = inject(AuthService);
-  const accessToken = authService.getAccessToken();
 
-  req = req.clone({
-    setHeaders: {
-      Authorization: `Bearer ${accessToken}`
-    },
+  const cloneWithToken = (token: string | undefined) => req.clone({
+    setHeaders: {Authorization: `Bearer ${token}`},
     withCredentials: true
   });
 
-  return next(req).pipe(
-    catchError((error) => {
-      if (
-        !(error instanceof HttpErrorResponse) ||
-        error.status !== 401 ||
-        error.url?.includes(apiRouter.auth.refresh())
-      ) {
-        throw error;
-      }
+  return next(cloneWithToken(authService.getAccessToken()))
+    .pipe(
+      catchError(error => {
+        const isUnauthorized = error instanceof HttpErrorResponse && error.status === 401;
+        const isRefreshCall = error.url?.includes(apiRouter.auth.refresh());
 
-      if (renewingAccess()) {
-        return next(
-          req.clone({
-            setHeaders: {
-              Authorization: `Bearer ${accessToken}`
-            },
-            withCredentials: true
-          })
-        );
-      }
+        if (!isUnauthorized || isRefreshCall) {
+          return throwError(() => error);
+        }
 
-      renewingAccess.set(true);
+        const retryRequest = () => next(cloneWithToken(authService.getAccessToken()));
 
-      return authService.renewAccess().pipe(
-        switchMap((response) => {
-          if (response) {
-            authService.acceptAuthResponse(response);
-            renewingAccess.set(false);
-
-            // Retry the original request with the new access token
-            return next(
-              req.clone({
-                setHeaders: {
-                  Authorization: `Bearer ${response.accessToken}`
-                },
-                withCredentials: true
+        if (isRefreshing.getValue()) {
+          return new Observable<HttpEvent<unknown>>(observer => {
+            retryQueue.next(retryRequest().pipe(
+              tap({
+                next: (value) => observer.next(value),
+                error: (error) => observer.error(error),
+                complete: () => observer.complete()
               })
-            );
-          }
+            ));
+          });
+        }
 
-          // If no new access token, throw an error
-          throw error;
-        })
-      );
-    })
-  );
+        isRefreshing.next(true);
+        retryQueue = new Subject();
+
+        return authService.renewAccess().pipe(
+          switchMap(response => {
+            if (!response) {
+              throw new Error('Refresh failed');
+            }
+            authService.acceptAuthResponse(response);
+            retryQueue
+              .pipe(
+                concatAll(),
+                finalize(() => {
+                  retryQueue.complete();
+                  retryQueue = new Subject();
+                })
+              )
+              .subscribe();
+            return retryRequest();
+          }),
+          catchError(err => {
+            retryQueue.error(err);
+            retryQueue.complete();
+            retryQueue = new Subject();
+            return throwError(() => err);
+          }),
+          finalize(() => isRefreshing.next(false))
+        );
+      })
+    );
 };

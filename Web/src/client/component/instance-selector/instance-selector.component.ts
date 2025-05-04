@@ -1,19 +1,16 @@
-import {
-  Component,
-  effect,
-  inject,
-  Signal,
-  viewChild,
-  ViewEncapsulation,
-  WritableSignal
-} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {DropdownModule} from "primeng/dropdown";
-import Instance from '../../model/instance.model';
 import {InstanceService} from '../../service/instance.service';
 import {Button} from 'primeng/button';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {InstanceManagementComponent} from '../instance-management/instance-management.component';
 import {Select} from 'primeng/select';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {ActivatedRoute, Router, RouterLink, UrlSegment} from '@angular/router';
+import Instance from '../../model/instance.model';
+import {first} from 'rxjs';
+import {NumberUtil} from '../../util/number.util';
+import {Splitter} from 'primeng/splitter';
+import {FloatLabel} from 'primeng/floatlabel';
 
 @Component({
   selector: 'instance-selector',
@@ -22,35 +19,48 @@ import {Select} from 'primeng/select';
     Button,
     ReactiveFormsModule,
     FormsModule,
-    InstanceManagementComponent,
-    Select
+    Select,
+    Splitter,
+    RouterLink,
+    FloatLabel
   ],
-  templateUrl: './instance-selector.component.html',
-  styleUrl: `./instance-selector.component.scss`,
-  encapsulation: ViewEncapsulation.None
+  templateUrl: './instance-selector.component.html'
 })
 export class InstanceSelectorComponent {
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly instanceService = inject(InstanceService);
-
-  instances = this.instanceService.getAsSignal();
-  managementMenu = viewChild.required(InstanceManagementComponent);
-  selectedInstance = this.instanceService.getActiveInstance();
+  protected readonly instances = rxResource({loader: () => this.instanceService.getAll()});
+  protected readonly selectedInstance = this.instanceService.getActiveInstance();
 
   constructor() {
-    effect(() => {
-      if (this.instances().length == 1) {
-        this.selectInstance(this.instances()[0]);
-      }
-    });
+    this.route.params
+      .pipe(first())
+      .subscribe(params => {
+        const instanceId = NumberUtil.parse(params['instanceId']);
+
+        if (instanceId) {
+          this.instanceService
+            .getById(instanceId)
+            .pipe(first())
+            .subscribe(instance => this.instanceService.setActiveInstance(instance));
+        }
+      });
   }
 
-  selectInstance(instance: Instance | null) {
-    if (this.selectedInstance() !== instance && instance !== null) {
-      this.instanceService.setActiveInstance(instance);
+  protected onChange(instance: Instance) {
+    const tree = this.router.parseUrl(this.router.url);
+    const segments = [...(tree.root.children['primary']?.segments ?? [])];
+    const index = segments.findIndex(s => s.path === 'workspace');
+
+    this.instanceService.setActiveInstance(instance);
+
+    if (index >= 0 && segments.length > index + 1) {
+      segments[index + 1] = new UrlSegment(instance.id!.toString(), {});
+      this.router.navigate(segments.map(s => s.path));
+      return;
     }
-  }
 
-  showManagementMenu() {
-    this.managementMenu().show();
+    this.router.navigate(['/home/workspace/' + instance.id]);
   }
 }

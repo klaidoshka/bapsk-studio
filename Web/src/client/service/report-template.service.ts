@@ -10,26 +10,23 @@ import ReportTemplate, {
 } from '../model/report-template.model';
 import {first, map, Observable, switchMap, tap} from 'rxjs';
 import {CacheService} from './cache.service';
-import {InstanceService} from './instance.service';
+import DataType from '../model/data-type.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReportTemplateService {
   private readonly apiRouter = inject(ApiRouter);
-  private readonly templateService = inject(DataTypeService);
+  private readonly dataTypeService = inject(DataTypeService);
   private readonly httpClient = inject(HttpClient);
-  private readonly instanceService = inject(InstanceService);
   private readonly userService = inject(UserService);
-
   private readonly cacheService = new CacheService<number, ReportTemplate>(template => template.id);
   private readonly instancesFetched = new Set<number>();
-  private readonly instanceId = this.instanceService.getActiveInstanceId();
   private readonly templateInstanceId = new Map<number, number>();
 
   create(request: ReportTemplateCreateRequest): Observable<ReportTemplate> {
     return this.httpClient
-      .post<ReportTemplate>(this.apiRouter.reportTemplate.create(this.instanceId()!), request)
+      .post<ReportTemplate>(this.apiRouter.reportTemplate.create(request.instanceId), request)
       .pipe(
         map(template => this.updateProperties(template)),
         tap(template => {
@@ -40,9 +37,9 @@ export class ReportTemplateService {
       );
   }
 
-  delete(id: number): Observable<void> {
+  delete(instanceId: number, id: number): Observable<void> {
     return this.httpClient
-      .delete<void>(this.apiRouter.reportTemplate.delete(this.instanceId()!, id))
+      .delete<void>(this.apiRouter.reportTemplate.delete(instanceId, id))
       .pipe(
         tap(() => this.cacheService.delete(id))
       );
@@ -50,13 +47,13 @@ export class ReportTemplateService {
 
   edit(request: ReportTemplateEditRequest): Observable<void> {
     return this.httpClient
-      .put<void>(this.apiRouter.reportTemplate.edit(this.instanceId()!, request.reportTemplate.id), request)
+      .put<void>(this.apiRouter.reportTemplate.edit(request.instanceId, request.reportTemplate.id), request)
       .pipe(
         tap(() => {
             this.cacheService.invalidate(request.reportTemplate.id);
 
             this
-              .getById(request.reportTemplate.id)
+              .getById(request.instanceId, request.reportTemplate.id)
               .pipe(first())
               .subscribe();
           }
@@ -64,13 +61,13 @@ export class ReportTemplateService {
       );
   }
 
-  getById(id: number): Observable<ReportTemplate> {
+  getById(instanceId: number, id: number): Observable<ReportTemplate> {
     if (this.cacheService.has(id)) {
       return this.cacheService.get(id);
     }
 
     return this.httpClient
-      .get<ReportTemplate>(this.apiRouter.reportTemplate.getById(this.instanceId()!, id))
+      .get<ReportTemplate>(this.apiRouter.reportTemplate.getById(instanceId, id))
       .pipe(
         map(template => this.updateProperties(template)),
         tap(template => this.cacheService.set(template)),
@@ -78,9 +75,14 @@ export class ReportTemplateService {
       );
   }
 
-  getWithCreatorById(id: number): Observable<ReportTemplateWithCreator> {
+  getDataType(instanceId: number, template: ReportTemplate): Observable<DataType> {
+    const dataTypeId = template.fields.at(0)!.dataTypeId;
+    return this.dataTypeService.getById(instanceId, dataTypeId);
+  }
+
+  getWithCreatorById(instanceId: number, id: number): Observable<ReportTemplateWithCreator> {
     return this
-      .getById(id)
+      .getById(instanceId, id)
       .pipe(
         switchMap(template => this.userService
           .getIdentityById(template.createdById)
@@ -91,6 +93,16 @@ export class ReportTemplateService {
             }))
           )
         )
+      );
+  }
+
+  getAllByDataTypeId(instanceId: number, dataTypeId: number): Observable<ReportTemplate[]> {
+    return this
+      .getAllByInstanceId(instanceId)
+      .pipe(
+        // If any of the fields are within the data-type, think as this template is that data-type's
+        // because templates are created only within one data-type's context
+        map(templates => templates.filter(template => template.fields.some(field => field.dataTypeId === dataTypeId)))
       );
   }
 
@@ -127,7 +139,7 @@ export class ReportTemplateService {
   updateProperties(template: ReportTemplate): ReportTemplate {
     return {
       ...template,
-      fields: template.fields.map(field => this.templateService.updateFieldProperties(field))
+      fields: template.fields.map(field => this.dataTypeService.updateFieldProperties(field))
     };
   }
 }

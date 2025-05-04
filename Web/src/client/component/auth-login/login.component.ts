@@ -8,73 +8,58 @@ import {AuthService} from "../../service/auth.service";
 import {TextService} from "../../service/text.service";
 import {InputText} from "primeng/inputtext";
 import Messages from "../../model/messages.model";
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {Password} from 'primeng/password';
 import {MessageService} from 'primeng/api';
 import {Dialog} from 'primeng/dialog';
 import {AuthResetPasswordComponent} from '../auth-reset-password/auth-reset-password.component';
+import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
+import {FloatLabel} from 'primeng/floatlabel';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
 
 @Component({
   selector: "auth-login",
   templateUrl: "./login.component.html",
-  imports: [Button, ReactiveFormsModule, FormsModule, RouterLink, InputText, MessagesShowcaseComponent, Password, Dialog, AuthResetPasswordComponent],
+  imports: [Button, ReactiveFormsModule, FormsModule, RouterLink, InputText, MessagesShowcaseComponent, Password, Dialog, AuthResetPasswordComponent, FormInputErrorComponent, FloatLabel, IconField, InputIcon],
   providers: []
 })
 export class LoginComponent {
   private readonly authService = inject(AuthService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly messageService = inject(MessageService);
   private readonly router = inject(Router);
   private readonly textService = inject(TextService);
+  protected readonly isSubmitting = signal<boolean>(false);
+  protected readonly messages = signal<Messages>({});
+  protected readonly showResetDialog = signal<boolean>(false);
 
-  isSubmitting = signal<boolean>(false);
-  messages = signal<Messages>({});
-  showResetDialog = signal<boolean>(false);
-
-  loginForm = this.formBuilder.group({
+  protected readonly form = this.formBuilder.group({
     email: ["", [Validators.required, Validators.email]],
     password: ["", [Validators.required]]
   });
 
-  getErrorMessage(field: string): string | null {
-    const control = this.loginForm.get(field);
-
-    if (!control || !control.touched || !control.invalid) {
-      return "";
-    }
-
-    if (control.errors?.["required"]) {
-      return `${this.textService.capitalize(field)} is required.`;
-    }
-
-    if (control.errors?.["email"]) {
-      return "Please enter a valid email address.";
-    }
-
-    return null;
-  }
-
-  async onSubmit(): Promise<void> {
+  protected async onSubmit(): Promise<void> {
     if (this.isSubmitting()) {
       return;
     }
 
-    if (this.loginForm.invalid) {
+    if (this.form.invalid) {
       return;
     }
 
     this.isSubmitting.set(true);
 
     const request: LoginRequest = {
-      email: this.loginForm.value.email ?? "",
-      password: this.loginForm.value.password ?? ""
+      email: this.form.value.email ?? "",
+      password: this.form.value.password ?? ""
     };
 
     this.authService.login(request).subscribe({
       next: (response) => {
-        this.loginForm.reset();
+        this.form.reset();
         this.messages.set({ success: ["Logged in successfully"] });
 
         this.messageService.add({
@@ -89,7 +74,7 @@ export class LoginComponent {
         this.isSubmitting.set(false);
       },
       error: (response: ErrorResponse) => {
-        this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages);
+        this.messageHandlingService.consumeHttpErrorResponse(response, this.messages);
         this.isSubmitting.set(false);
       }
     });

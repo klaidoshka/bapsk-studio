@@ -26,12 +26,11 @@ public class DataTypeValidator : IDataTypeValidator
         }
 
         if (
-            await _database.DataTypes.AnyAsync(
-                dt => dt.InstanceId == request.InstanceId &&
-                      dt.Name.Equals(
-                          request.Name,
-                          StringComparison.OrdinalIgnoreCase
-                      )
+            await _database.DataTypes.AnyAsync(dt => dt.InstanceId == request.InstanceId &&
+                                                     dt.Name.Equals(
+                                                         request.Name,
+                                                         StringComparison.OrdinalIgnoreCase
+                                                     )
             )
         )
         {
@@ -83,13 +82,12 @@ public class DataTypeValidator : IDataTypeValidator
         }
 
         if (
-            await _database.DataTypes.AnyAsync(
-                dt => dt.InstanceId == dataType.InstanceId &&
-                      dt.Name.Equals(
-                          request.Name,
-                          StringComparison.OrdinalIgnoreCase
-                      ) &&
-                      dt.Id != request.DataTypeId
+            await _database.DataTypes.AnyAsync(dt => dt.InstanceId == dataType.InstanceId &&
+                                                     dt.Name.Equals(
+                                                         request.Name,
+                                                         StringComparison.OrdinalIgnoreCase
+                                                     ) &&
+                                                     dt.Id != request.DataTypeId
             )
         )
         {
@@ -137,9 +135,8 @@ public class DataTypeValidator : IDataTypeValidator
         {
             failures.AddRange(
                 newFields
-                    .Select(
-                        f =>
-                            $"New field '{f.Name}' has no default value to assign to existing entries."
+                    .Select(f =>
+                        $"New field '{f.Name}' has no default value to assign to existing entries."
                     )
                     .ToList()
             );
@@ -164,7 +161,7 @@ public class DataTypeValidator : IDataTypeValidator
             );
         }
 
-        return new Validation();
+        return !request.IsRequired ? new Validation("Default value is required for optional field.") : new Validation();
     }
 
     public async Task<Validation> ValidateDataTypeFieldEditRequestAsync(DataTypeFieldEditRequest request)
@@ -177,6 +174,10 @@ public class DataTypeValidator : IDataTypeValidator
             {
                 return validation;
             }
+        }
+        else if (!request.IsRequired)
+        {
+            return new Validation("Default value is required for optional field.");
         }
 
         var field = await _database.DataTypeFields
@@ -202,7 +203,9 @@ public class DataTypeValidator : IDataTypeValidator
 
             if (!validation.IsValid)
             {
-                return new Validation($"Field '{request.Name}': Existing values are not compatible with the new type {request.Type}.");
+                return new Validation(
+                    $"Field '{request.Name}': Existing values are not compatible with the new type {request.Type}."
+                );
             }
         }
 

@@ -20,8 +20,10 @@ export interface ImportConfigurationJoined extends ImportConfiguration {
 
 export interface ImportConfigurationCreateRequest {
   importConfiguration: ImportConfiguration;
+  instanceId: number;
 }
 
 export interface ImportConfigurationEditRequest {
   importConfiguration: ImportConfiguration;
+  instanceId: number;
 }

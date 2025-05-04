@@ -1,4 +1,4 @@
-import {Component, inject, Signal, viewChild} from '@angular/core';
+import {Component, inject, viewChild} from '@angular/core';
 import {TableModule} from "primeng/table";
 import {SessionService} from '../../service/session.service';
 import Session from '../../model/session.model';
@@ -8,6 +8,8 @@ import {AuthService} from '../../service/auth.service';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
 import {MessageService} from 'primeng/api';
 import {Toast} from 'primeng/toast';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {CardComponent} from '../card/card.component';
 
 @Component({
   selector: 'session-showcase',
@@ -16,7 +18,8 @@ import {Toast} from 'primeng/toast';
     Button,
     DatePipe,
     ConfirmationComponent,
-    Toast
+    Toast,
+    CardComponent
   ],
   templateUrl: './session-showcase.component.html',
   providers: [MessageService],
@@ -26,12 +29,32 @@ export class SessionShowcaseComponent {
   private readonly authService = inject(AuthService);
   private readonly messageService = inject(MessageService);
   private readonly sessionService = inject(SessionService);
+  protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
+  protected readonly currentSessionId = rxResource({loader: () => this.authService.getSessionId()});
+  protected readonly sessions = rxResource({loader: () => this.sessionService.getByUser()});
 
-  currentSessionId = this.authService.getSessionId();
-  sessions = this.sessionService.getByUserAsSignal();
-  confirmationComponent = viewChild.required(ConfirmationComponent);
+  protected getActiveTime(session: Session): string {
+    const diffInSeconds = Math.floor(((new Date()).getTime() - session.createdAt.getTime()) / 1000);
 
-  revoke(session: Session) {
+    const timeParts = {
+      days: Math.floor(diffInSeconds / 86400),
+      hours: Math.floor((diffInSeconds % 86400) / 3600)
+    };
+
+    let activeTime = '';
+
+    if (timeParts.days > 0) {
+      activeTime += `${timeParts.days}d `;
+    }
+
+    if (timeParts.hours > 0) {
+      activeTime += `${timeParts.hours}h `;
+    }
+
+    return activeTime;
+  }
+
+  protected revoke(session: Session) {
     this.confirmationComponent().request(() => {
       this.sessionService.revoke(session.id).subscribe(() =>
         this.messageService.add({
@@ -41,6 +64,6 @@ export class SessionShowcaseComponent {
           detail: "Session has been successfully revoked"
         })
       );
-    })
+    });
   }
 }

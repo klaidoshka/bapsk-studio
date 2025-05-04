@@ -1,7 +1,12 @@
 import {HttpClient} from "@angular/common/http";
-import {computed, inject, Injectable, Signal, signal} from "@angular/core";
-import {finalize, Observable, of} from "rxjs";
-import {AuthResponse, ChangePasswordRequest, LoginRequest, RegisterRequest} from "../model/auth.model";
+import {inject, Injectable} from "@angular/core";
+import {BehaviorSubject, filter, finalize, map, Observable, of, switchMap, tap} from "rxjs";
+import {
+  AuthResponse,
+  ChangePasswordRequest,
+  LoginRequest,
+  RegisterRequest
+} from "../model/auth.model";
 import {User} from "../model/user.model";
 import {ApiRouter} from "./api-router.service";
 import {UserService} from './user.service';
@@ -16,58 +21,48 @@ export class AuthService {
   private readonly httpClient = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly userService = inject(UserService);
-
-  private readonly access = signal<AuthResponse | null>(this.getAccess());
-  private readonly user = this.toUser();
-  private readonly userAuthenticated = computed(() => this.access() !== null);
-  private readonly userSessionId = computed(() => this.access()?.sessionId);
+  private readonly access = new BehaviorSubject<AuthResponse | undefined>(this.getAccess());
 
   constructor() {
-    if (!this.isAuthenticated()()) {
+    if (this.access.value?.accessToken) {
+      // Authenticated
       return;
     }
 
-    this.renewAccess().subscribe({
-      next: (response) => {
-        this.acceptAuthResponse(response);
-      },
-      error: (response) => {
-        if (response.status === 401) {
-          this.cleanupCredentials();
-          this.router.navigate(["/auth/login"]);
+    this
+      .renewAccess()
+      .subscribe({
+        next: (response) => this.acceptAuthResponse(response),
+        error: (response) => {
+          if (response.status === 401) {
+            this.cleanupCredentials();
+            this.router.navigate(["/auth/login"]);
+          }
         }
-      }
-    });
+      });
   }
 
-  private toUser(): Signal<User | undefined> {
-    return computed(() => {
-      const userId = this.access()?.userId;
+  private resolveUser(userId?: number): Observable<User | undefined> {
+    if (userId === undefined) {
+      return of(this.resolveUserFromStorage());
+    }
 
-      if (userId == null) {
-        const value = localStorage.getItem(LocalStorageKeys.userKey);
+    return this.userService
+      .getById(userId)
+      .pipe(
+        tap(user => localStorage.setItem(LocalStorageKeys.userKey, JSON.stringify(user)))
+      );
+  }
 
-        return value !== null ? this.userService.updateProperties(JSON.parse(value)) : undefined;
-      }
-
-      const user = this.userService.getByIdAsSignal(userId)();
-
-      if (user == null) {
-        const value = localStorage.getItem(LocalStorageKeys.userKey);
-
-        return value !== null ? this.userService.updateProperties(JSON.parse(value)) : undefined;
-      }
-
-      localStorage.setItem(LocalStorageKeys.userKey, JSON.stringify(user));
-
-      return user;
-    })
+  private resolveUserFromStorage(): User | undefined {
+    const value = localStorage.getItem(LocalStorageKeys.userKey);
+    return value != null ? this.userService.updateProperties(JSON.parse(value)) : undefined;
   }
 
   acceptAuthResponse(response: AuthResponse) {
     localStorage.setItem(LocalStorageKeys.accessKey, JSON.stringify(response));
 
-    this.access.set(response);
+    this.access.next(response);
   }
 
   changePassword(request: ChangePasswordRequest): Observable<void> {
@@ -78,31 +73,45 @@ export class AuthService {
     localStorage.removeItem(LocalStorageKeys.accessKey);
     localStorage.removeItem(LocalStorageKeys.userKey);
 
-    if (this.access() != null) {
-      this.access.set(null);
+    if (this.access.value !== undefined) {
+      this.access.next(undefined);
     }
   }
 
-  private getAccess(): AuthResponse | null {
+  private getAccess(): AuthResponse | undefined {
     const access = localStorage.getItem(LocalStorageKeys.accessKey);
 
-    return access !== null ? JSON.parse(access) : null;
+    return access != null ? JSON.parse(access) : undefined;
   }
 
-  getAccessToken(): string | null {
-    return this.access()?.accessToken || null;
+  getAccessToken(): string | undefined {
+    return this.access.value?.accessToken;
   }
 
-  getSessionId(): Signal<string | undefined> {
-    return this.userSessionId;
+  getSessionId(): Observable<string> {
+    return this.access
+      .asObservable()
+      .pipe(
+        filter(access => !!access?.sessionId),
+        map(access => access!.sessionId)
+      );
   }
 
-  getUser(): Signal<User | undefined> {
-    return this.user;
+  getUser(): Observable<User> {
+    return this.access
+      .asObservable()
+      .pipe(
+        switchMap(access => this.resolveUser(access?.userId)),
+        filter(user => user != null)
+      );
   }
 
-  isAuthenticated(): Signal<boolean> {
-    return this.userAuthenticated;
+  isAuthenticated(): Observable<boolean> {
+    return this.access
+      .asObservable()
+      .pipe(
+        map(access => access?.accessToken !== undefined)
+      );
   }
 
   login(request: LoginRequest): Observable<AuthResponse> {
@@ -113,15 +122,15 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
-    if (!this.userAuthenticated()) {
+    if (this.access.value?.accessToken === undefined) {
       return of();
     }
 
-    return this.httpClient.post<void>(this.apiRouter.auth.logout(), {}).pipe(
-      finalize(() => {
-        this.cleanupCredentials();
-      })
-    );
+    return this.httpClient
+      .post<void>(this.apiRouter.auth.logout(), {})
+      .pipe(
+        finalize(() => this.cleanupCredentials())
+      );
   }
 
   register(request: RegisterRequest): Observable<AuthResponse> {

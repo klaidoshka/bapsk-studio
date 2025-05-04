@@ -1,0 +1,36 @@
+<div class="h-full w-full container mx-auto flex flex-col">
+  <user-page-header-section [canGoBack]="true"/>
+  @if (user.isLoading()) {
+    <loading-spinner/>
+  } @else if (!user.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    @let userValue = user.value()!;
+    <card>
+      <p card-header>User</p>
+      <p card-subHeader>Preview of this unique user entry.</p>
+      <card card-body>
+        <p card-header>Details</p>
+        <p card-subHeader>Details of this specific user.</p>
+        <div card-body class="flex flex-col">
+          <div class="flex flex-row gap-2">
+            <p class="font-semibold">Name</p>
+            <p>{{ userValue.firstName + ' ' + userValue.lastName }}</p>
+          </div>
+          <div class="flex flex-row gap-2">
+            <p class="font-semibold">Email</p>
+            <p>{{ userValue.email }}</p>
+          </div>
+          <div class="flex flex-row gap-2">
+            <p class="font-semibold">Birthdate</p>
+            <p>{{ userValue.birthDate | date:'mediumDate' }}</p>
+          </div>
+          <div class="flex flex-row gap-2">
+            <p class="font-semibold">Country</p>
+            <p>{{ getCountryName(userValue) }}</p>
+          </div>
+        </div>
+      </card>
+    </card>
+  }
+</div>

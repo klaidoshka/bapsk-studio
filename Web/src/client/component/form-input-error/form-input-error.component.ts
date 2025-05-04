@@ -18,22 +18,22 @@ const defaultErrorMessages: { [key: string]: (error: any) => string } = {
   styles: ``
 })
 export class FormInputErrorComponent {
-  errorMessages = computed(() => ({
+  readonly control = input.required<AbstractControl>();
+  readonly customErrorMessages = input<{ [key: string]: (error: any) => string } | undefined>();
+
+  protected readonly errorMessages = computed(() => ({
     ...defaultErrorMessages,
     ...this.customErrorMessages()
   }));
 
-  control = input.required<AbstractControl>();
-  customErrorMessages = input<{ [key: string]: (error: any) => string } | undefined>();
-
-  getErrorMessage(control: AbstractControl, messages: { [key: string]: (error: any) => string }): string | undefined {
+  protected getErrorMessage(control: AbstractControl, messages: {
+    [key: string]: (error: any) => string
+  }): string | undefined {
     if (control.untouched || control.valid || !control.errors) {
       return undefined;
     }
-
     const key = Object.keys(control.errors)[0];
     const mapper = messages[key];
-
     return mapper ? mapper(control.errors[key]) : undefined;
   }
 }

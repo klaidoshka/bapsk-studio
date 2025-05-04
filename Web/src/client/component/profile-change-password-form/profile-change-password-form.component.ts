@@ -2,13 +2,21 @@ import {Component, inject, input, signal} from '@angular/core';
 import {User} from '../../model/user.model';
 import {Button} from 'primeng/button';
 import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
-import {AbstractControl, FormBuilder, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 import {Password} from 'primeng/password';
 import {AuthService} from '../../service/auth.service';
 import {first} from 'rxjs';
 import Messages from '../../model/messages.model';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
+import {CardComponent} from '../card/card.component';
+import {FloatLabel} from 'primeng/floatlabel';
 
 @Component({
   selector: 'profile-change-password-form',
@@ -18,38 +26,39 @@ import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.
     FormsModule,
     Password,
     ReactiveFormsModule,
-    MessagesShowcaseComponent
+    MessagesShowcaseComponent,
+    CardComponent,
+    FloatLabel
   ],
   templateUrl: './profile-change-password-form.component.html',
   styles: ``
 })
 export class ProfileChangePasswordFormComponent {
   private readonly authService = inject(AuthService);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly formBuilder = inject(FormBuilder);
+  protected readonly messages = signal<Messages>({});
+  readonly user = input.required<User>();
 
-  messages = signal<Messages>({});
-  user = input.required<User>();
-
-  form = this.formBuilder.group({
+  protected readonly form = this.formBuilder.group({
     password: ['', [Validators.required, Validators.minLength(8)]],
     confirmPassword: ['', [(control: AbstractControl) => {
       if (this.form?.value?.password !== control.value) {
-        return { 'mismatchPassword': true };
+        return {'mismatchPassword': true};
       }
 
       return undefined;
     }]],
-    currentPassword: ['', [Validators.required]],
+    currentPassword: ['', [Validators.required]]
   });
 
-  customErrorMessages = {
+  protected readonly customErrorMessages = {
     'mismatchPassword': () => "Passwords do not match."
   }
 
-  changePassword() {
+  protected changePassword() {
     if (this.form.invalid) {
-      this.messages.set({ error: ["Please fill in all fields."] });
+      this.messages.set({error: ["Please fill in all fields."]});
       return;
     }
 
@@ -62,9 +71,9 @@ export class ProfileChangePasswordFormComponent {
       .subscribe({
         next: () => {
           this.form.reset();
-          this.messages.set({ success: ["Password changed successfully."] });
+          this.messages.set({success: ["Password changed successfully."]});
         },
-        error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+        error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       })
   }
 }

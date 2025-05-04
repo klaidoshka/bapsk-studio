@@ -5,7 +5,7 @@ import {DataEntryService} from '../../service/data-entry.service';
 import Messages from '../../model/messages.model';
 import {DataEntryImportRequest, DataEntryJoined} from '../../model/data-entry.model';
 import {first, map} from 'rxjs';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import {Select} from 'primeng/select';
 import DataType from '../../model/data-type.model';
 import {ImportConfigurationService} from '../../service/import-configuration.service';
@@ -16,6 +16,8 @@ import {Checkbox} from 'primeng/checkbox';
 import {NgIf} from '@angular/common';
 import {TableModule} from 'primeng/table';
 import {DataEntryTableComponent} from '../data-entry-table/data-entry-table.component';
+import {FloatLabel} from 'primeng/floatlabel';
+import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
 
 @Component({
   selector: 'data-entry-import-form',
@@ -28,7 +30,9 @@ import {DataEntryTableComponent} from '../data-entry-table/data-entry-table.comp
     Checkbox,
     NgIf,
     TableModule,
-    DataEntryTableComponent
+    DataEntryTableComponent,
+    FloatLabel,
+    FormInputErrorComponent
   ],
   templateUrl: './data-entry-import-form.component.html',
   styles: ``
@@ -37,26 +41,27 @@ export class DataEntryImportFormComponent {
   private readonly dataEntryService = inject(DataEntryService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly importConfigurationService = inject(ImportConfigurationService);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
+  protected readonly importedEntries = signal<DataEntryJoined[]>([]);
+  protected readonly messages = signal<Messages>({});
+  readonly clearImportedValues = input<boolean>();
+  readonly dataType = input.required<DataType>();
+  readonly instanceId = input.required<number>();
 
-  clearImportedValues = input<boolean>();
-  dataType = input.required<DataType>();
-  importedEntries = signal<DataEntryJoined[]>([]);
-  messages = signal<Messages>({});
-
-  importConfigurations = rxResource({
+  protected readonly importConfigurations = rxResource({
     request: () => ({
-      dataTypeId: this.dataType().id
+      dataTypeId: this.dataType().id,
+      instanceId: this.dataType().instanceId
     }),
-    loader: ({ request }) => this.importConfigurationService
-      .getAllByDataTypeId(request.dataTypeId)
+    loader: ({request}) => this.importConfigurationService
+      .getAllByDataTypeId(request.instanceId, request.dataTypeId)
       .pipe(map(configurations => configurations.map(configuration => ({
         id: configuration.id,
         label: configuration.name
       }))))
   });
 
-  form = this.formBuilder.group({
+  protected readonly form = this.formBuilder.group({
     file: [null as File | null, [Validators.required]],
     importConfigurationId: [null as number | null, [Validators.required]],
     skipHeader: [false]
@@ -70,7 +75,7 @@ export class DataEntryImportFormComponent {
     });
   }
 
-  getSelectedFileSize(): string | undefined {
+  protected getSelectedFileSize(): string | undefined {
     const file = this.form.value.file;
 
     if (!file) {
@@ -93,28 +98,29 @@ export class DataEntryImportFormComponent {
     }
   }
 
-  import() {
+  protected import() {
     if (this.form.invalid) {
-      this.messages.set({ error: ["Please fill in all required fields."] });
+      this.messages.set({error: ["Please fill in all required fields."]});
       return;
     }
 
     const request: DataEntryImportRequest = {
       importConfigurationId: this.form.value.importConfigurationId!,
       file: this.form.value.file!,
+      instanceId: this.dataType().instanceId,
       skipHeader: this.form.value.skipHeader || false
     }
 
     this.dataEntryService.import(request).pipe(first()).subscribe({
       next: (entries) => {
         this.importedEntries.set(entries);
-        this.messages.set({ success: ['Data entries imported successfully.'] });
+        this.messages.set({success: ['Data entries imported successfully.']});
       },
-      error: (response) => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
+      error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
     });
   }
 
-  onSelect(files: File[]) {
-    this.form.patchValue({ file: files.at(0) });
+  protected onSelect(files: File[]) {
+    this.form.patchValue({file: files.at(0)});
   }
 }

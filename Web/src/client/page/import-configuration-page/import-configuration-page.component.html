@@ -1,72 +1,46 @@
-<div class="h-full w-full flex flex-col p-4">
-  <confirmation
-    key="import-configuration-delete-confirmation"
-    header="Are you sure about deleting this import configuration?"
-  />
-
-  <h1 class="text-2xl font-bold mb-4">Import Configurations</h1>
-
+<div class="h-full w-full relative container mx-auto flex flex-col">
+  <import-configuration-page-header-section [canGoBack]="canGoBack()"/>
+  <confirmation key="import-configuration-delete-confirmation"
+                header="Are you sure about deleting this import configuration?"/>
   <messages-showcase [messages]="messages()"/>
-
-  <div class="card mt-4">
-    @if (!instanceId()) {
-      <messages-showcase [messages]="{warning: ['Please select an instance to manage import configurations.']}"/>
-    } @else {
-      <p-button
-        label="Create"
-        icon="pi pi-plus"
-        type="button"
-        (onClick)="manage()"
-      />
-    }
-
-    <p-table
-      styleClass="w-fit shadow-lg mt-2 dark:bg-primary-950! bg-primary-50!"
-      paginatorStyleClass="dark:bg-primary-950! bg-primary-50!"
-      [value]="configurations.hasValue() ? configurations.value()! : []"
-      [paginator]="true"
-      [rows]="10"
-      [rowsPerPageOptions]="[10, 20, 50]"
-    >
-      <ng-template #header>
-        <tr>
-          <th>Name</th>
-          <th>Data Type</th>
-          <th>Fields</th>
-          <th>Actions</th>
-        </tr>
-      </ng-template>
-
-      <ng-template
-        #body
-        let-configuration
-      >
-        <tr>
-          <td>{{ configuration.name }}</td>
-          <td>{{ configuration.dataType.name }}</td>
-          <td>{{ configuration.fields.length }} fields</td>
-          <td class="flex flex-nowrap items-center">
-            <p-button
-              icon="pi pi-eye"
-              type="button"
-              variant="text"
-              (onClick)="preview(configuration)"
-            />
-            <p-button
-              icon="pi pi-pencil"
-              type="button"
-              variant="text"
-              (onClick)="manage(configuration)"
-            />
-            <p-button
-              icon="pi pi-trash"
-              type="button"
-              variant="text"
-              (onClick)="delete(configuration)"
-            />
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
+  <card>
+    <p card-header>Import Configurations</p>
+    <p card-subHeader>Manage your import configurations — create, preview, edit or delete.</p>
+    <div card-body>
+      <p-button title="Create" size="small" label="Create Import Configuration" type="button" (onClick)="manage()"/>
+      <p-table paginatorDropdownAppendTo="body" styleClass="mt-4" [value]="configurations.value() || []"
+               [paginator]="true"
+               [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" sortMode="multiple">
+        <ng-template #header>
+          <tr>
+            <th pSortableColumn="name">Name
+              <p-sortIcon field="name"/>
+            </th>
+            <th pSortableColumn="dataType.name">Data Type
+              <p-sortIcon field="dataType.name"/>
+            </th>
+            <th>Fields</th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-configuration>
+          <tr>
+            <td>{{ configuration.name }}</td>
+            <td>{{ configuration.dataType.name }}</td>
+            <td>{{ configuration.fields.length }} fields</td>
+            <td>
+              <div class="flex items-center">
+                <p-button title="Preview" size="small" icon="pi pi-eye" type="button" variant="text"
+                          (onClick)="preview(configuration)"/>
+                <p-button title="Edit" size="small" icon="pi pi-pencil" type="button" variant="text"
+                          (onClick)="manage(configuration)"/>
+                <p-button title="Delete" size="small" icon="pi pi-trash" type="button" variant="text"
+                          (onClick)="delete(configuration)"/>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </card>
 </div>

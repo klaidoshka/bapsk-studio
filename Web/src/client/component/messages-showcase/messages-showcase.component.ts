@@ -12,9 +12,9 @@ import {NgClass, NgIf} from '@angular/common';
   styles: ``
 })
 export class MessagesShowcaseComponent {
-  messages = input.required<Messages>();
+  readonly messages = input.required<Messages>();
 
-  containsMessage() {
+  protected containsMessage() {
     return this.messages().error || this.messages().success || this.messages().warning;
   }
 }

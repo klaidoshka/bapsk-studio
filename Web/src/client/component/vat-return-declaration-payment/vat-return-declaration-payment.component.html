@@ -1,52 +1,52 @@
-<div>
-  <confirmation
-    [key]="'submit-confirmation'"
-    [header]="'Are you sure? No later changes can be made!'"
-  />
-
-  <messages-showcase [messages]="messages()"/>
-
-  <form [formGroup]="form">
-    <div formArrayName="payments" class="w-fit space-y-2">
-      <div *ngFor="let payment of getFormPayments().controls; let i = index" [formGroupName]="i"
-           class="flex flex-row gap-4 items-center justify-between">
+<confirmation [key]="'submit-confirmation'" [header]="'Are you sure? No later changes can be made!'"/>
+<form [formGroup]="form" class="flex flex-col gap-4">
+  <div formArrayName="payments" class="flex flex-col gap-8">
+    @for (_ of getFormPayments().controls; track $index; let i = $index) {
+      <div [formGroupName]="i" class="flex flex-wrap gap-4">
         <!-- Type Dropdown -->
-        <div class="flex-1">
-          <label for="type" class="block text-sm font-medium">Payment Type</label>
-          <p-select inputId="type" formControlName="type" [options]="types" optionLabel="label" optionValue="id"
-                    class="mt-1 block w-full min-w-24 max-w-32" appendTo="body"/>
+        <div>
+          <p-float-label variant="on" class="w-60">
+            <p-select inputId="type" formControlName="type" [options]="types" optionLabel="label" optionValue="id"
+                      class="w-full"
+                      appendTo="body" dropdownIcon="pi pi-objects-column"/>
+            <label for="type">Payment Type</label>
+          </p-float-label>
         </div>
 
         <!-- Amount Input -->
-        <div class="flex-1">
-          <label for="amount" class="block text-sm font-medium">Amount</label>
-          <p-input-number inputId="amount" formControlName="amount" currency="EUR" mode="currency" [min]="0" [showButtons]="true"
-                          [step]="0.05" inputStyleClass="w-32" class="mt-1 w-32"/>
+        <div>
+          <p-float-label variant="on" class="w-60">
+            <p-icon-field>
+              <p-inputicon class="pi pi-euro"/>
+              <input pInputText id="amount" type="number" formControlName="amount" [min]="0" [step]="0.05"
+                     class="w-full"/>
+            </p-icon-field>
+            <label for="amount">Amount</label>
+          </p-float-label>
         </div>
 
         <!-- Date Input -->
-        <div class="flex-1">
-          <label for="date" class="block text-sm font-medium">Date</label>
-          <p-datepicker inputId="date" formControlName="date" [showIcon]="true" [showTime]="true" variant="filled"
-                        inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-inherit!" class="mt-1 block w-48"
-                        appendTo="body"/>
+        <div>
+          <p-float-label variant="on" class="w-60">
+            <p-date-picker inputId="date" formControlName="date" [showIcon]="true" [showTime]="true" variant="filled"
+                           iconDisplay="input" class="w-full" appendTo="body"/>
+            <label for="date">Date</label>
+          </p-float-label>
         </div>
 
         <!-- Remove Button -->
-        <div *ngIf="getFormPayments().length > 1" class="self-end">
-          <p-button variant="text" icon="pi pi-trash" type="button" (click)="removePaymentInfo(i)"/>
-        </div>
+        @if (getFormPayments().length > 1) {
+          <p-button title="Remove" variant="text" icon="pi pi-trash" type="button" (click)="removePaymentInfo(i)"/>
+        }
       </div>
+    }
 
-      <!-- Add Payment Info Button -->
-      <div class="mt-4">
-        <p-button label="Add Payment Info" icon="pi pi-plus" type="button" (click)="addFormPaymentInfo()"/>
-      </div>
-    </div>
+    <!-- Add Payment Info Button -->
+    <p-button title="Add Payment Info Entry" label="Add Payment Info" size="small" type="button"
+              (click)="addFormPaymentInfo()"/>
+  </div>
 
-    <!-- Submit Button -->
-    <div class="flex w-full justify-end items-center mt-2">
-      <p-button label="Submit Payments" type="submit" (onClick)="submit()"/>
-    </div>
-  </form>
-</div>
+  <!-- Submit Button -->
+  <messages-showcase [messages]="messages()"/>
+  <p-button title="Submit" label="Submit Payments" size="small" type="submit" (onClick)="submit()"/>
+</form>

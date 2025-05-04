@@ -36,7 +36,7 @@ const buildUrl = (
   providedIn: 'root'
 })
 export class ApiRouter {
-  private readonly base = 'http://localhost:5125/api/v1';
+  private readonly base = 'http://localhost:5000/api/v1';
   private readonly accounting = this.base + '/accounting';
   private readonly accountingIsolated = this.accounting + '/instance/:instanceId';
 
@@ -142,7 +142,7 @@ export class ApiRouter {
     create: () => buildUrl(this.base, '/user'),
     delete: (id: number) => buildUrl(this.base, '/user/:id', { id }),
     edit: (id: number) => buildUrl(this.base, '/user/:id', { id }),
-    get: (returnIdentityOnly = false) => buildUrl(this.base, '/user', {}, { returnIdentityOnly }),
+    getAll: (returnIdentityOnly = false) => buildUrl(this.base, '/user', {}, { returnIdentityOnly }),
     getByEmail: (email: string, returnIdentityOnly = false) => buildUrl(this.base, '/user', {}, { email, returnIdentityOnly }),
     getById: (id: number, returnIdentityOnly = false) =>
       buildUrl(this.base, '/user/:id', { id }, { returnIdentityOnly }),

@@ -2,17 +2,19 @@ import {Component, inject, input, signal, viewChild} from '@angular/core';
 import {Button} from 'primeng/button';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {VatReturnService} from '../../service/vat-return.service';
-import {ErrorMessageResolverService} from '../../service/error-message-resolver.service';
+import {MessageHandlingService} from '../../service/message-handling.service';
 import Messages from '../../model/messages.model';
 import {PaymentType, PaymentTypes} from '../../model/vat-return.model';
 import {first} from 'rxjs';
 import {MessageService} from 'primeng/api';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
-import {NgForOf, NgIf} from '@angular/common';
 import {DatePicker} from 'primeng/datepicker';
-import {InputNumber} from 'primeng/inputnumber';
 import {Select} from 'primeng/select';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
+import {FloatLabel} from 'primeng/floatlabel';
+import {IconField} from 'primeng/iconfield';
+import {InputIcon} from 'primeng/inputicon';
+import {InputText} from 'primeng/inputtext';
 
 @Component({
   selector: 'vat-return-declaration-payment',
@@ -20,12 +22,13 @@ import {ConfirmationComponent} from '../confirmation/confirmation.component';
     Button,
     MessagesShowcaseComponent,
     ReactiveFormsModule,
-    NgForOf,
     DatePicker,
-    InputNumber,
     Select,
-    NgIf,
-    ConfirmationComponent
+    ConfirmationComponent,
+    FloatLabel,
+    IconField,
+    InputIcon,
+    InputText
   ],
   templateUrl: './vat-return-declaration-payment.component.html',
   styles: ``
@@ -33,15 +36,15 @@ import {ConfirmationComponent} from '../confirmation/confirmation.component';
 export class VatReturnDeclarationPaymentComponent {
   protected readonly types = PaymentTypes;
   private readonly formBuilder = inject(FormBuilder);
-  private readonly errorMessageResolverService = inject(ErrorMessageResolverService);
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly messageService = inject(MessageService);
   private readonly vatReturnService = inject(VatReturnService);
+  protected readonly confirmation = viewChild.required(ConfirmationComponent);
+  protected readonly messages = signal<Messages>({});
+  readonly instanceId = input.required<number>();
+  readonly saleId = input.required<number>();
 
-  confirmation = viewChild.required(ConfirmationComponent);
-  messages = signal<Messages>({});
-  saleId = input.required<number>();
-
-  form = this.formBuilder.group({
+  protected readonly form = this.formBuilder.group({
     payments: this.formBuilder.array([this.createFormPaymentInfo()])
   })
 
@@ -53,44 +56,47 @@ export class VatReturnDeclarationPaymentComponent {
     });
   }
 
-  addFormPaymentInfo() {
+  protected addFormPaymentInfo() {
     this.getFormPayments().push(this.createFormPaymentInfo());
   }
 
-  getFormPayments() {
+  protected getFormPayments() {
     return this.form.controls.payments;
   }
 
-  removePaymentInfo(index: number) {
+  protected removePaymentInfo(index: number) {
     if (this.getFormPayments().length > 1) {
       this.getFormPayments().removeAt(index);
     }
   }
 
-  submit() {
+  protected submit() {
     if (this.form.invalid) {
-      this.messages.set({ error: ['Please fill in all required fields'] });
+      this.messages.set({error: ['Please fill in all required fields']});
       return;
     }
 
     const payments = this
-      .getFormPayments()
-      .controls.map(control => ({
+      .getFormPayments().controls
+      .map(control => ({
         amount: control.get('amount')!.value!,
         date: control.get('date')!.value!,
         type: control.get('type')!.value!
       }));
 
     this.confirmation().request(() => {
-      this.vatReturnService.submitPayments(this.saleId(), payments).pipe(first()).subscribe({
-        next: () => this.messageService.add({
-          key: 'root',
-          summary: 'Payment Successful',
-          detail: 'You have successfully submitted the payment info.',
-          severity: 'success'
-        }),
-        error: response => this.errorMessageResolverService.resolveHttpErrorResponseTo(response, this.messages)
-      });
+      this.vatReturnService
+        .submitPayments(this.instanceId(), this.saleId(), payments)
+        .pipe(first())
+        .subscribe({
+          next: () => this.messageService.add({
+            key: 'root',
+            summary: 'Payment Successful',
+            detail: 'You have successfully submitted the payment info.',
+            severity: 'success'
+          }),
+          error: response => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
+        });
     });
   }
 }
