@@ -1,0 +1,79 @@
+services:
+  web-client:
+    restart: always
+    build:
+      context: ./Web
+      dockerfile: Dockerfile
+      target: client
+    working_dir: /web
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./Certificates:/certs:ro
+    networks:
+      - app-network
+
+  web-server:
+    restart: always
+    build:
+      context: ./Web
+      dockerfile: Dockerfile
+      target: server
+    working_dir: /web
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./Certificates:/certs:ro
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+  backend:
+    restart: always
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    working_dir: /app
+    ports:
+      - "5000:5000"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    volumes:
+      - ./Certificates:/certs:ro
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  db:
+    restart: always
+    image: mariadb:latest
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_USER: user
+      MARIADB_PASSWORD: "paassword."
+      MARIADB_ROOT_PASSWORD: "paassword."
+      MARIADB_DATABASE: accounting
+    volumes:
+      - database:/var/lib/mysql
+    networks:
+      - app-network
+
+  phpmyadmin:
+    restart: always
+    image: phpmyadmin:latest
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+volumes:
+  database:
+
+networks:
+  app-network:
+    driver: bridge

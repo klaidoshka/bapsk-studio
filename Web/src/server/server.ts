@@ -2,11 +2,17 @@ import express from "express";
 import cors from "cors";
 import {HtmlService} from './service/html.service';
 
-const apiPort = process.env["PORT"] || 4000;
+const apiPort = process.env["PORT"] || 3000;
 const apiPrefix = "/api/v1";
 const application = express();
 
-application.use(cors());
+application.use(cors(
+  {
+    origin: "*",
+    methods: ["POST", "OPTIONS"],
+  }
+));
+
 application.use(express.json());
 application.use(express.text({type: "text/html"}));
 
@@ -35,4 +41,4 @@ application.post(`${apiPrefix}/misc/beautify-html-table`, (req, res) => {
   }
 });
 
-application.listen(apiPort, () => console.log(`Server running at port http://localhost:${apiPort}`));
+application.listen(apiPort, () => console.log(`Server running at port https://0.0.0.0:${apiPort}`));

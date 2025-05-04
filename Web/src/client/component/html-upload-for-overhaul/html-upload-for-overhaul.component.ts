@@ -29,7 +29,7 @@ export class HtmlUploadForOverhaulComponent {
 
     reader.onload = () => {
       this.httpClient
-        .post(`http://localhost:4000/api/v1/misc/beautify-html-table`, reader.result, {
+        .post(`https://0.0.0.0:3000/api/v1/misc/beautify-html-table`, reader.result, {
           headers: {
             'Content-Type': 'text/html'
           },
