@@ -131,15 +131,11 @@ application.UseCors(cors => cors
     .AllowAnyMethod()
     .AllowCredentials()
     .AllowAnyHeader()
-    .WithOrigins(
-        "https://localhost:3000",
-        "https://localhost:4200",
-        "https://localhost:5000",
-        "https://*.bapsk.studio:3000",
-        "https://*.bapsk.studio:4200",
-        "https://*.bapsk.studio:5000"
+    .SetIsOriginAllowed(origin =>
+        origin.StartsWith("https://localhost:") ||
+        origin.StartsWith("https://bapsk.studio") ||
+        origin.EndsWith(".bapsk.studio")
     )
-    .SetIsOriginAllowedToAllowWildcardSubdomains()
 );
 
 application.UseAuthentication();
