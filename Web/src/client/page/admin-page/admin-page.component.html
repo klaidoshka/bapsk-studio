@@ -2,7 +2,7 @@
           styleClass="rounded-xs! bg-primary-950/70! dark:bg-primary-50/70! text-primary-50! dark:text-primary-950! p-1!"
           class="fixed! l-0 top-15 left-1 z-20 md:hidden" (onClick)="isMobileSidebarOpen.set(true)"
           [class.hidden]="isMobileSidebarOpen()"/>
-<div class="h-full w-full container mx-auto flex flex-col mb-8">
+<div class="h-full w-full container mx-auto flex flex-col">
   <div class="flex flex-row w-full h-full gap-4">
     <!-- Sidebar -->
     <div
@@ -28,7 +28,9 @@
     <!-- Main Content -->
     <div class="flex-1 min-w-0 overflow-hidden">
       <div class="h-full w-full overflow-auto">
-        <router-outlet/>
+        <div class="mr-4">
+          <router-outlet/>
+        </div>
       </div>
     </div>
   </div>

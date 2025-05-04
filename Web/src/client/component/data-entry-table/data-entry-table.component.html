@@ -24,7 +24,7 @@
       <td>{{ dataEntry.modifiedAt | date:'short' }}</td>
       <td>{{ toUserIdentityFullName(dataEntry.modifiedBy) }}</td>
       <td *ngIf="containsActions()">
-        <div class="flex flex-wrap items-center">
+        <div class="flex items-center">
           <p-button *ngIf="preview()" title="Preview" icon="pi pi-eye" type="button" variant="text"
                     (onClick)="preview()?.(dataEntry)"/>
           <p-button *ngIf="manage()" title="Edit" icon="pi pi-pencil" type="button" variant="text"

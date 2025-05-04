@@ -26,7 +26,7 @@
         <td>{{ session.ipAddress }}</td>
         <td>{{ session.location }}</td>
         <td>
-          <div class="flex flex-wrap items-center">
+          <div class="flex items-center">
             <p-button title="Revoke" [disabled]="session.id === currentSessionId.value()" icon="pi pi-ban"
                       type="button" variant="text" (onClick)="revoke(session)"/>
           </div>

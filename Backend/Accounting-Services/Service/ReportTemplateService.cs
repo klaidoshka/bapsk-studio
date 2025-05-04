@@ -111,7 +111,9 @@ public class ReportTemplateService : IReportTemplateService
             .Where(it => !it.DataType.IsDeleted && request.ReportTemplate.Fields.Contains(it.Id))
             .ToListAsync();
 
-        var dataTypeFieldsByInstanceId = fields.ToDictionary(it => it.DataType.InstanceId);
+        var dataTypeFieldsByInstanceId = fields
+            .Select(it => it.DataType.InstanceId)
+            .ToHashSet();
 
         if (dataTypeFieldsByInstanceId.Count != 1)
         {

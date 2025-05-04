@@ -1,4 +1,4 @@
-<div class="h-full w-full relative container mx-auto flex flex-col mb-8">
+<div class="h-full w-full relative container mx-auto flex flex-col">
   <data-type-page-header-section [canGoBack]="true"/>
   @if (dataType.isLoading() || dataTypes.isLoading()) {
     <loading-spinner/>
@@ -89,7 +89,7 @@
                     <p-checkbox formControlName="isRequired" binary [styleClass]="isReference ? 'mt-7' : ''"/>
                   </td>
                   <td>
-                    <div class="flex flex-wrap items-center">
+                    <div class="flex items-center">
                       <p-button icon="pi pi-trash" type="button" variant="text" (onClick)="removeField(i)"
                                 [styleClass]="isReference ? 'mt-7' : ''"/>
                     </div>

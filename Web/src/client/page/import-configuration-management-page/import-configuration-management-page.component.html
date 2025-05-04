@@ -1,4 +1,4 @@
-<div class="h-full w-full relative container mx-auto flex flex-col mb-8">
+<div class="h-full w-full relative container mx-auto flex flex-col">
   <import-configuration-page-header-section [canGoBack]="true"/>
   @if (configuration.isLoading() || dataTypes.isLoading() || dataEntries.isLoading()) {
     <loading-spinner/>
@@ -62,7 +62,7 @@
                   }
                 </td>
                 <td>
-                  <div class="flex flex-wrap items-center">
+                  <div class="flex items-center">
                     <p-button title="Move Up" icon="pi pi-chevron-up" type="button" variant="text"
                               (onClick)="moveField(i,  -1)"/>
                     <p-button title="Move Down" icon="pi pi-chevron-down" type="button" variant="text"
