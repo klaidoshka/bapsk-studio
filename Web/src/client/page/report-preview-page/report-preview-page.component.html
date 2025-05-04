@@ -43,10 +43,15 @@
             <p card-header>Report Entries</p>
             <p card-subHeader>This section contains report's entries. These entries can be exported into .CSV file if
               needed.</p>
-            <p-table card-body [value]="report.entries" class="w-fit">
+            <p-table card-body [value]="report.entries" sortMode="multiple" (sortFunction)="onSort($event)"
+                     [customSort]="true">
               <ng-template #header>
                 <tr>
-                  <th *ngFor="let field of report.header">{{ field }}</th>
+                  @for (field of report.header; track $index) {
+                    <th pSortableColumn="{{$index}}">{{ field }}
+                      <p-sortIcon field="{{$index}}"/>
+                    </th>
+                  }
                 </tr>
               </ng-template>
               <ng-template #body let-entry>

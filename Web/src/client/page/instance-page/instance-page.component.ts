@@ -49,8 +49,18 @@ export class InstancePageComponent {
   private readonly instanceService = inject(InstanceService);
   private readonly router = inject(Router);
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
-  protected readonly instances = rxResource({loader: () => this.instanceService.getAllWithUsers()})
   protected readonly messages = signal<Messages>({});
+
+  protected readonly instances = rxResource({
+    loader: () => this.instanceService
+      .getAllWithUsers()
+      .pipe(
+        map(instances => instances.map(instance => ({
+          ...instance,
+          ownerName: toUserFullName(this.getOwner(instance))
+        })))
+      )
+  })
 
   protected delete(instance: Instance) {
     this.confirmationComponent().request(() => {

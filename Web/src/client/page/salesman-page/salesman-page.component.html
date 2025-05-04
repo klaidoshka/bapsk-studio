@@ -8,12 +8,18 @@
     <div card-body>
       <p-button title="Create" size="small" label="Create Salesman" type="button" (onClick)="manage()"/>
       <p-table [value]="salesmen.value() || []" paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10"
-               [rowsPerPageOptions]="[10, 20, 50]" styleClass="mt-4">
+               [rowsPerPageOptions]="[10, 20, 50]" styleClass="mt-4" sortMode="multiple">
         <ng-template #header>
           <tr>
-            <th>Name</th>
-            <th>Vat Payer Code</th>
-            <th>Vat Payer Code Issued By</th>
+            <th pSortableColumn="name">Name
+              <p-sortIcon field="name"/>
+            </th>
+            <th pSortableColumn="vatPayerCode.value">Vat Payer Code
+              <p-sortIcon field="vatPayerCode.value"/>
+            </th>
+            <th pSortableColumn="salesman.vatPayerCode.issuedByLabel">Vat Payer Code Issued By
+              <p-sortIcon field="salesman.vatPayerCode.issuedByLabel"/>
+            </th>
             <th>Customers Served</th>
             <th></th>
           </tr>
@@ -22,7 +28,7 @@
           <tr>
             <td>{{ salesman.name }}</td>
             <td>{{ salesman.vatPayerCode.value }}</td>
-            <td>{{ getCountryLabel(salesman.vatPayerCode.issuedBy) }}</td>
+            <td>{{ salesman.vatPayerCode.issuedByLabel }}</td>
             <td>
               <badge-contrasted [value]="(getCustomersServed(salesman) | async) ?? 0"/>
             </td>

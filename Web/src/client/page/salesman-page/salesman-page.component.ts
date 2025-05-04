@@ -10,7 +10,9 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {Button} from 'primeng/button';
 import {TableModule} from 'primeng/table';
-import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
+import {
+  MessagesShowcaseComponent
+} from '../../component/messages-showcase/messages-showcase.component';
 import {NumberUtil} from '../../util/number.util';
 import {
   SalesmanPageHeaderSectionComponent
@@ -18,7 +20,9 @@ import {
 import {CardComponent} from '../../component/card/card.component';
 import {SaleService} from '../../service/sale.service';
 import {AsyncPipe} from '@angular/common';
-import {BadgeContrastedComponent} from '../../component/badge-contrasted/badge-contrasted.component';
+import {
+  BadgeContrastedComponent
+} from '../../component/badge-contrasted/badge-contrasted.component';
 
 @Component({
   selector: 'salesman-page',
@@ -47,9 +51,19 @@ export class SalesmanPageComponent {
   protected readonly messages = signal<Messages>({});
 
   protected readonly salesmen = rxResource({
-    request: () => ({ instanceId: NumberUtil.parse(this.instanceId()) }),
-    loader: ({ request }) => request.instanceId
-      ? this.salesmanService.getAllByInstanceId(request.instanceId)
+    request: () => ({instanceId: NumberUtil.parse(this.instanceId())}),
+    loader: ({request}) => request.instanceId
+      ? this.salesmanService
+        .getAllByInstanceId(request.instanceId)
+        .pipe(
+          map(salesmen => salesmen.map(salesman => ({
+            ...salesman,
+            vatPayerCode: {
+              ...salesman.vatPayerCode,
+              issuedByLabel: this.getCountryLabel(salesman.vatPayerCode.issuedBy)
+            }
+          })))
+        )
       : of(undefined)
   });
 
@@ -59,7 +73,7 @@ export class SalesmanPageComponent {
         .delete(NumberUtil.parse(this.instanceId())!, salesman.id!)
         .pipe(first())
         .subscribe({
-          next: () => this.messages.set({ success: ['Salesman deleted successfully'] }),
+          next: () => this.messages.set({success: ['Salesman deleted successfully']}),
           error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     });
@@ -78,10 +92,10 @@ export class SalesmanPageComponent {
   }
 
   protected manage(salesman?: Salesman) {
-    this.router.navigate(['./' + (salesman ? `${salesman.id}/edit` : 'create')], { relativeTo: this.route });
+    this.router.navigate(['./' + (salesman ? `${salesman.id}/edit` : 'create')], {relativeTo: this.route});
   }
 
   protected preview(salesman: Salesman) {
-    this.router.navigate(['./' + salesman.id], { relativeTo: this.route });
+    this.router.navigate(['./' + salesman.id], {relativeTo: this.route});
   }
 }

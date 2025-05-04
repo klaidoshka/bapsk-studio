@@ -1,13 +1,14 @@
-<p-table paginatorDropdownAppendTo="body" [value]="dataEntries()" [columns]="dataType().fields" [paginator]="true"
-         [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" scrollable="true" scrollHeight="flex">
+<p-table paginatorDropdownAppendTo="body" [value]="dataEntriesModified()" [columns]="dataType().fields" [paginator]="true"
+         [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" scrollable="true" scrollHeight="flex" sortMode="multiple"
+         (sortFunction)="onSort($event)" [customSort]="true">
   <ng-template #header let-columns>
     <tr>
       @for (field of columns; track field.id) {
-        <th>{{ field.name }}</th>
+        <th pSortableColumn="{{field.id}}">{{ field.name }} <p-sortIcon field="{{field.id}}" /></th>
       }
-      <th>Created</th>
-      <th>Modified</th>
-      <th>Modified By</th>
+      <th pSortableColumn="createdAt">Created <p-sortIcon field="createdAt" /></th>
+      <th pSortableColumn="modifiedAt">Modified <p-sortIcon field="modifiedAt" /></th>
+      <th pSortableColumn="modifiedByFullName">Last Modified By <p-sortIcon field="modifiedByFullName" /></th>
       <th *ngIf="containsActions()"></th>
     </tr>
   </ng-template>
@@ -22,7 +23,7 @@
       }
       <td>{{ dataEntry.createdAt | date:'short' }}</td>
       <td>{{ dataEntry.modifiedAt | date:'short' }}</td>
-      <td>{{ toUserIdentityFullName(dataEntry.modifiedBy) }}</td>
+      <td>{{ dataEntry.modifiedByFullName }}</td>
       <td *ngIf="containsActions()">
         <div class="flex items-center">
           <p-button *ngIf="preview()" title="Preview" icon="pi pi-eye" type="button" variant="text"

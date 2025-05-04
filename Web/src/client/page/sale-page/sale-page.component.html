@@ -7,38 +7,39 @@
     <p card-subHeader>Manage your sales — create, preview, edit or delete.</p>
     <div card-body>
       <p-button title="Create" size="small" label="Create Sale" type="button" (onClick)="manage()"/>
-      <p-table paginatorDropdownAppendTo="body"
-               styleClass="mt-4"                [value]="sales.value() || []" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+      <p-table paginatorDropdownAppendTo="body" styleClass="mt-4" [value]="sales.value() || []" [paginator]="true"
+               [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" sortMode="multiple">
         <ng-template #header>
           <tr>
-            <th>Customer</th>
-            <th>Salesman</th>
-            <th>Sale Date</th>
+            <th pSortableColumn="customer.fullName">Customer
+              <p-sortIcon field="customer.fullName"/>
+            </th>
+            <th pSortableColumn="salesman.name">Salesman
+              <p-sortIcon field="salesman.name"/>
+            </th>
+            <th pSortableColumn="date">Sale Date
+              <p-sortIcon field="date"/>
+            </th>
             <th>Sold Goods</th>
             <th>Total Price</th>
             <th>Returnable VAT</th>
-            <th>VAT Return Declaration</th>
+            <th pSortableColumn="vatReturnDeclarationStatus.value">VAT Return Declaration
+              <p-sortIcon field="vatReturnDeclarationStatus.value"/>
+            </th>
             <th></th>
           </tr>
         </ng-template>
         <ng-template #body let-sale>
           <tr>
-            <td>{{ toCustomerFullName(sale.customer) }}</td>
+            <td>{{ sale.customer.fullName }}</td>
             <td>{{ sale.salesman.name }}</td>
             <td>{{ sale.date | date:'medium' }}</td>
             <td>{{ sale.soldGoods.length }} good(s)</td>
             <td>{{ getTotalPrice(sale.soldGoods) | currency:'EUR':'symbol':'1.2-2' }}</td>
             <td>{{ getTotalVAT(sale.soldGoods) | currency:'EUR':'symbol':'1.2-2' }}</td>
             <td>
-              @if (!sale.vatReturnDeclaration) {
-                <badge-contrasted value="Not Submitted"/>
-              } @else if (sale.vatReturnDeclaration.isCancelle) {
-                <p-badge size="small" value="Cancelled" severity="danger"/>
-              } @else if (sale.vatReturnDeclaration?.state === SubmitDeclarationState.REJECTED) {
-                <p-badge size="small" value="Rejected" severity="danger"/>
-              } @else {
-                <p-badge size="small" value="Accepted" severity="success"/>
-              }
+              <p-badge size="small" [value]="sale.vatReturnDeclarationStatus.value"
+                       [severity]="sale.vatReturnDeclarationStatus.severity"/>
             </td>
             <td>
               <div class="flex items-center">

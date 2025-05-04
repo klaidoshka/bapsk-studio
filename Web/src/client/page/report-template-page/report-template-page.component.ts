@@ -4,7 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {ConfirmationComponent} from '../../component/confirmation/confirmation.component';
 import Messages from '../../model/messages.model';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {first, map, Observable, of} from 'rxjs';
+import {combineLatest, first, map, Observable, of, switchMap} from 'rxjs';
 import ReportTemplate from '../../model/report-template.model';
 import {Button} from 'primeng/button';
 import {
@@ -16,7 +16,6 @@ import {
   ReportTemplatePageHeaderSectionComponent
 } from '../../component/report-template-page-header-section/report-template-page-header-section.component';
 import {CardComponent} from '../../component/card/card.component';
-import {AsyncPipe} from '@angular/common';
 
 @Component({
   selector: 'report-template-page',
@@ -26,8 +25,7 @@ import {AsyncPipe} from '@angular/common';
     MessagesShowcaseComponent,
     TableModule,
     ReportTemplatePageHeaderSectionComponent,
-    CardComponent,
-    AsyncPipe
+    CardComponent
   ],
   templateUrl: './report-template-page.component.html',
   styles: ``
@@ -49,11 +47,27 @@ export class ReportTemplatePageComponent {
     }),
     loader: ({request}) => {
       if (request.dataTypeId && request.instanceId) {
-        return this.reportTemplateService.getAllByDataTypeId(request.instanceId, request.dataTypeId);
+        return this.reportTemplateService
+          .getAllByDataTypeId(request.instanceId, request.dataTypeId)
+          .pipe(
+            switchMap(templates => combineLatest(templates.map(template =>
+              this.reportTemplateService
+                .getDataType(request.instanceId!, template)
+                .pipe(map(dataType => ({...template, dataType})))
+            )))
+          );
       }
 
       return request.instanceId
-        ? this.reportTemplateService.getAllByInstanceId(request.instanceId)
+        ? this.reportTemplateService
+          .getAllByInstanceId(request.instanceId)
+          .pipe(
+            switchMap(templates => combineLatest(templates.map(template =>
+              this.reportTemplateService
+                .getDataType(request.instanceId!, template)
+                .pipe(map(dataType => ({...template, dataType})))
+            )))
+          )
         : of([])
     }
   });

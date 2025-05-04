@@ -7,18 +7,31 @@
     <p card-subHeader>Manage your customers — create, preview, edit or delete.</p>
     <div card-body>
       <p-button title="Create" size="small" label="Create Customer" type="button" (onClick)="manage()"/>
-      <p-table
-        paginatorDropdownAppendTo="body"
-        styleClass="mt-4"         [value]="customers.value() || []" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+      <p-table paginatorDropdownAppendTo="body" styleClass="mt-4" [value]="customers.value() || []" [paginator]="true"
+               [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" sortMode="multiple">
         <ng-template #header>
           <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Birthdate</th>
-            <th>Reside In</th>
-            <th>Identity Document</th>
-            <th>Personal Code</th>
+            <th pSortableColumn="firstName">First Name
+              <p-sortIcon field="firstName"/>
+            </th>
+            <th pSortableColumn="lastName">Last Name
+              <p-sortIcon field="lastName"/>
+            </th>
+            <th pSortableColumn="email">Email
+              <p-sortIcon field="email"/>
+            </th>
+            <th pSortableColumn="birthdate">Birthdate
+              <p-sortIcon field="birthdate"/>
+            </th>
+            <th pSortableColumn="residenceCountryLabel">Reside In
+              <p-sortIcon field="residenceCountryLabel"/>
+            </th>
+            <th pSortableColumn="identityDocument.typeLabel">Identity Document
+              <p-sortIcon field="identityDocument.typeLabel"/>
+            </th>
+            <th pSortableColumn="identityDocument.value">Personal Code
+              <p-sortIcon field="identityDocument.value"/>
+            </th>
             <th></th>
           </tr>
         </ng-template>
@@ -28,8 +41,8 @@
             <td>{{ customer.lastName }}</td>
             <td>{{ customer.email }}</td>
             <td>{{ customer.birthdate | date:'mediumDate' }}</td>
-            <td>{{ getIsoCountryLabel(customer.residenceCountry) }}</td>
-            <td>{{ getIdentityDocumentTypeLabel(customer.identityDocument.type) }}</td>
+            <td>{{ customer.residenceCountryLabel }}</td>
+            <td>{{ customer.identityDocument.typeLabel }}</td>
             <td>{{ customer.identityDocument.value || 'Unprovided' }}</td>
             <td>
               <div class="flex items-center">

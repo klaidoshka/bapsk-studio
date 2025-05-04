@@ -7,14 +7,17 @@
     <p card-subHeader>Manage your data types — create, preview, edit or delete.</p>
     <div card-body>
       <p-button title="Create" size="small" label="Create Data Type" type="button" (onClick)="manage()"/>
-      <p-table
-        paginatorDropdownAppendTo="body"
-        styleClass="mt-4" [value]="dataTypes.value() || []" [paginator]="true" [rows]="10"
-        [rowsPerPageOptions]="[10, 20, 50]">
+      <p-table paginatorDropdownAppendTo="body" styleClass="mt-4" [value]="dataTypes.value() || []" [paginator]="true"
+               [rows]="10"
+               [rowsPerPageOptions]="[10, 20, 50]" sortMode="multiple">
         <ng-template #header>
           <tr>
-            <th>Name</th>
-            <th>Description</th>
+            <th pSortableColumn="name">Name
+              <p-sortIcon field="name"/>
+            </th>
+            <th pSortableColumn="description">Description
+              <p-sortIcon field="description"/>
+            </th>
             <th>Fields</th>
             <th></th>
           </tr>

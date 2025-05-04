@@ -12,7 +12,7 @@ import Messages from '../../model/messages.model';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {getUserIsoCountryLabel} from '../../model/iso-country.model';
 import {User} from '../../model/user.model';
-import {first} from 'rxjs';
+import {first, map} from 'rxjs';
 import {Router} from '@angular/router';
 import {
   UserPageHeaderSectionComponent
@@ -40,7 +40,18 @@ export class UserPageComponent {
   protected readonly getCountryName = getUserIsoCountryLabel;
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly messages = signal<Messages>({});
-  protected readonly users = rxResource({loader: () => this.userService.getAll()});
+
+  protected readonly users = rxResource({
+    loader: () => this.userService
+      .getAll()
+      .pipe(
+        map(users => users.map(user => ({
+          ...user,
+          fullName: user.firstName + ' ' + user.lastName,
+          countryLabel: this.getCountryName(user)
+        })))
+      )
+  });
 
   protected delete(user: User) {
     this.confirmationComponent().request(() => {

@@ -5,17 +5,20 @@ import {ConfirmationComponent} from '../../component/confirmation/confirmation.c
 import {toCustomerFullName} from '../../model/customer.model';
 import Messages from '../../model/messages.model';
 import Sale, {SaleWithVatReturnDeclaration, SoldGood} from '../../model/sale.model';
-import {first, of} from 'rxjs';
+import {first, map, of} from 'rxjs';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from '@angular/router';
-import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
+import {
+  MessagesShowcaseComponent
+} from '../../component/messages-showcase/messages-showcase.component';
 import {Button} from 'primeng/button';
 import {TableModule} from 'primeng/table';
 import {CurrencyPipe, DatePipe} from '@angular/common';
 import {NumberUtil} from '../../util/number.util';
-import {SalePageHeaderSectionComponent} from '../../component/sale-page-header-section/sale-page-header-section.component';
+import {
+  SalePageHeaderSectionComponent
+} from '../../component/sale-page-header-section/sale-page-header-section.component';
 import {CardComponent} from '../../component/card/card.component';
-import {BadgeContrastedComponent} from '../../component/badge-contrasted/badge-contrasted.component';
 import {SubmitDeclarationState} from '../../model/vat-return.model';
 import {Badge} from 'primeng/badge';
 
@@ -30,7 +33,6 @@ import {Badge} from 'primeng/badge';
     DatePipe,
     SalePageHeaderSectionComponent,
     CardComponent,
-    BadgeContrastedComponent,
     Badge
   ],
   templateUrl: './sale-page.component.html',
@@ -50,7 +52,15 @@ export class SalePageComponent {
   protected readonly sales = rxResource({
     request: () => ({instanceId: NumberUtil.parse(this.instanceId())}),
     loader: ({request}) => request.instanceId
-      ? this.saleService.getAllWithVatDeclarationByInstanceId(request.instanceId)
+      ? this.saleService
+        .getAllWithVatDeclarationByInstanceId(request.instanceId)
+        .pipe(
+          map(sales => sales.map(sale => ({
+            ...sale,
+            customer: {...sale.customer, fullName: toCustomerFullName(sale.customer)},
+            vatReturnDeclarationStatus: this.getVatDeclarationStatus(sale)
+          })))
+        )
       : of(undefined)
   });
 
@@ -72,6 +82,18 @@ export class SalePageComponent {
 
   protected getTotalVAT(soldGoods: SoldGood[]): number {
     return soldGoods.reduce((total, soldGood) => total + soldGood.vatAmount, 0);
+  }
+
+  protected getVatDeclarationStatus(sale: SaleWithVatReturnDeclaration) {
+    if (!sale.vatReturnDeclaration) {
+      return {value: 'Not Submitted', severity: 'contrast' };
+    } else if (sale.vatReturnDeclaration.isCancelled) {
+      return {value: 'Cancelled', severity: 'danger' };
+    } else if (sale.vatReturnDeclaration.state === SubmitDeclarationState.REJECTED) {
+      return {value: 'Rejected', severity: 'danger' };
+    } else {
+      return {value: 'Accepted', severity: 'success' };
+    }
   }
 
   protected manage(sale?: Sale) {

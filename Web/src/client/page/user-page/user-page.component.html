@@ -7,25 +7,32 @@
     <p card-subHeader>Manage application's users — create, preview, edit or delete.</p>
     <div card-body>
       <p-button title="Create" size="small" label="Create User" type="button" (onClick)="manage()"/>
-      <p-table
-        paginatorDropdownAppendTo="body"
-        styleClass="mt-4"         [value]="users.value() || []" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+      <p-table paginatorDropdownAppendTo="body" styleClass="mt-4" [value]="users.value() || []" [paginator]="true"
+               [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" sortMode="multiple">
         <ng-template #header>
           <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Birthdate</th>
-            <th>Country</th>
+            <th pSortableColumn="fullName">Name
+              <p-sortIcon field="fullName"/>
+            </th>
+            <th pSortableColumn="email">Email
+              <p-sortIcon field="email"/>
+            </th>
+            <th pSortableColumn="birthDate">Birthdate
+              <p-sortIcon field="birthDate"/>
+            </th>
+            <th pSortableColumn="countryLabel">Country
+              <p-sortIcon field="countryLabel"/>
+            </th>
             <th></th>
           </tr>
         </ng-template>
 
         <ng-template #body let-user>
           <tr>
-            <td>{{ user.firstName + ' ' + user.lastName }}</td>
+            <td>{{ user.fullName }}</td>
             <td>{{ user.email }}</td>
             <td>{{ user.birthDate | date:'mediumDate' }}</td>
-            <td>{{ getCountryName(user) }}</td>
+            <td>{{ user.countryLabel }}</td>
             <td>
               <div class="flex items-center">
                 <p-button title="Preview" icon="pi pi-eye" type="button" variant="text" (onClick)="preview(user)"/>

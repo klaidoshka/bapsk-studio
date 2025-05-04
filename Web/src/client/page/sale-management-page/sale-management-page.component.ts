@@ -100,7 +100,7 @@ export class SaleManagementPageComponent {
     }),
     loader: ({request}) => request.instanceId && request.saleId
       ? this.saleService
-        .getById(request.instanceId, request.saleId)
+        .getWithVatDeclarationById(request.instanceId, request.saleId)
         .pipe(
           tap(sale => this.patchFormValues(sale))
         )
@@ -233,6 +233,11 @@ export class SaleManagementPageComponent {
   protected save() {
     if (!this.form.valid) {
       this.messages.set({error: ["Please fill out the form."]});
+      return;
+    }
+
+    if (this.sale.value()?.vatReturnDeclaration?.export) {
+      this.messages.set({error: ["Cannot edit a sale that has been already exported."]});
       return;
     }
 

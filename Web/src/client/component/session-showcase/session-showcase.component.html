@@ -7,14 +7,22 @@
     <p>If you want to revoke a session, click on the revoke button. Current session cannot be revoked.</p>
   </div>
   <p-table card-body paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]"
-           [value]="sessions.value() || []">
+           [value]="sessions.value() || []" sortMode="multiple">
     <ng-template #header>
       <tr>
-        <th>Agent</th>
-        <th>Created At</th>
+        <th pSortableColumn="agent">Agent
+          <p-sortIcon field="agent"/>
+        </th>
+        <th pSortableColumn="createdAt">Created At
+          <p-sortIcon field="createdAt"/>
+        </th>
         <th>Active Time</th>
-        <th>IP Address</th>
-        <th>Location</th>
+        <th pSortableColumn="ipAddress">IP Address
+          <p-sortIcon field="ipAddress"/>
+        </th>
+        <th pSortableColumn="location">Location
+          <p-sortIcon field="location"/>
+        </th>
         <th></th>
       </tr>
     </ng-template>

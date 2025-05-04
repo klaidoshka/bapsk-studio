@@ -10,7 +10,7 @@ import {CustomerService} from '../../service/customer.service';
 import {MessageHandlingService} from '../../service/message-handling.service';
 import Customer from '../../model/customer.model';
 import Messages from '../../model/messages.model';
-import {first, of} from 'rxjs';
+import {first, map, of} from 'rxjs';
 import {getIdentityDocumentTypeLabel} from '../../model/identity-document-type.model';
 import {getIsoCountryLabel} from '../../model/iso-country.model';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -49,7 +49,18 @@ export class CustomerPageComponent {
   protected readonly customers = rxResource({
     request: () => ({instanceId: NumberUtil.parse(this.instanceId())}),
     loader: ({request}) => request.instanceId
-      ? this.customerService.getAllByInstanceId(request.instanceId)
+      ? this.customerService
+        .getAllByInstanceId(request.instanceId)
+        .pipe(
+          map(customers => customers.map(customer => ({
+            ...customer,
+            residenceCountryLabel: getIsoCountryLabel(customer.residenceCountry),
+            identityDocument: {
+              ...customer.identityDocument,
+              typeLabel: getIdentityDocumentTypeLabel(customer.identityDocument.type)
+            }
+          })))
+        )
       : of([])
   })
 
