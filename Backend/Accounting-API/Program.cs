@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Accounting.API.Middleware;
 using Accounting.API.Util;
+using Accounting.Contract;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
@@ -10,6 +11,7 @@ using Accounting.Contract.Validator;
 using Accounting.Services.FieldHandler;
 using Accounting.Services.Service;
 using Accounting.Services.Validator;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -90,6 +92,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserValidator, UserValidator>();
 builder.Services.AddScoped<IVatReturnService, VatReturnService>();
 builder.Services.AddScoped<IVatReturnValidator, VatReturnValidator>();
+builder.Services.AddCors();
 
 builder.AddJwtAuth();
 
@@ -110,12 +113,33 @@ Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 var application = builder.Build();
 
+using (var scope = application.Services.CreateScope())
+{
+    var database = scope.ServiceProvider.GetRequiredService<AccountingDatabase>();
+    await database.Database.MigrateAsync();
+}
+
 application.Use(async (context, next) =>
     {
         context.Request.EnableBuffering();
 
         await next(context);
     }
+);
+
+application.UseCors(cors => cors
+    .AllowAnyMethod()
+    .AllowCredentials()
+    .AllowAnyHeader()
+    .WithOrigins(
+        "https://localhost:3000",
+        "https://localhost:4200",
+        "https://localhost:5000",
+        "https://*.bapsk.studio:3000",
+        "https://*.bapsk.studio:4200",
+        "https://*.bapsk.studio:5000"
+    )
+    .SetIsOriginAllowedToAllowWildcardSubdomains()
 );
 
 application.UseAuthentication();

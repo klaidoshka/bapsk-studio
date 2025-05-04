@@ -36,7 +36,7 @@ const buildUrl = (
   providedIn: 'root'
 })
 export class ApiRouter {
-  private readonly base = 'http://localhost:5000/api/v1';
+  private readonly base = 'https://localhost:5000/api/v1';
   private readonly accounting = this.base + '/accounting';
   private readonly accountingIsolated = this.accounting + '/instance/:instanceId';
 

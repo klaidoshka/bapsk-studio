@@ -4,9 +4,9 @@
   "scripts": {
     "build": "ng build",
     "start": "ng serve",
-    "build:server": "tsup src/server/**/*.ts --format esm --out-dir dist/out-tsc/server --shims --clean",
+    "build:server": "tsup ./src/server/server.ts --format esm --out-dir ./dist/out-tsc/server --shims --clean",
     "build:start:server": "npm run build:server && npm run start:server",
-    "start:server": "node dist/out-tsc/server/server.js"
+    "start:server": "node ./dist/out-tsc/server/server.js"
   },
   "type": "module",
   "private": true,
