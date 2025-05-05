@@ -1,16 +1,6 @@
 import {HttpErrorResponse, HttpEvent, HttpInterceptorFn} from "@angular/common/http";
 import {inject} from "@angular/core";
-import {
-  BehaviorSubject,
-  catchError,
-  concatAll,
-  finalize,
-  Observable,
-  Subject,
-  switchMap,
-  tap,
-  throwError
-} from "rxjs";
+import {BehaviorSubject, catchError, concatAll, finalize, Observable, Subject, switchMap, tap, throwError} from "rxjs";
 import {ApiRouter} from "../service/api-router.service";
 import {AuthService} from "../service/auth.service";
 
@@ -74,6 +64,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             retryQueue.error(err);
             retryQueue.complete();
             retryQueue = new Subject();
+            authService.logout().subscribe();
             return throwError(() => err);
           }),
           finalize(() => isRefreshing.next(false))

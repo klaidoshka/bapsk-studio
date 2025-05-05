@@ -15,7 +15,7 @@
             <p-floatlabel variant="on" class="w-60">
               <p-iconfield>
                 <p-inputicon class="pi pi-tag"/>
-                <input pInputText id="firstName" formControlName="firstName" type="text"/>
+                <input pInputText class="w-60" id="firstName" formControlName="firstName" type="text"/>
               </p-iconfield>
               <label for="firstName">First Name</label>
             </p-floatlabel>
@@ -27,7 +27,7 @@
             <p-floatlabel variant="on" class="w-60">
               <p-iconfield>
                 <p-inputicon class="pi pi-tag"/>
-                <input pInputText id="lastName" formControlName="lastName" type="text"/>
+                <input pInputText class="w-60" id="lastName" formControlName="lastName" type="text"/>
               </p-iconfield>
               <label for="lastName">Last Name</label>
             </p-floatlabel>
@@ -39,7 +39,7 @@
             <p-floatlabel variant="on" class="w-60">
               <p-iconfield>
                 <p-inputicon class="pi pi-envelope"/>
-                <input pInputText id="email" formControlName="email" type="email"/>
+                <input pInputText class="w-60" id="email" formControlName="email" type="email"/>
               </p-iconfield>
               <label for="email">Email</label>
             </p-floatlabel>
@@ -52,7 +52,7 @@
               <p-floatlabel variant="on" class="w-60">
                 <p-iconfield>
                   <p-inputicon class="pi pi-lock"/>
-                  <input pInputText id="password" formControlName="password" type="password"/>
+                  <input pInputText class="w-60" id="password" formControlName="password" type="password"/>
                 </p-iconfield>
                 <label for="password">Password</label>
               </p-floatlabel>
@@ -64,7 +64,7 @@
           <div class="w-fit">
             <p-float-label variant="on" class="w-fit">
               <p-date-picker icon="pi pi-calendar" iconDisplay="input" showIcon formControlName="birthDate"
-                             styleClass="min-w-60"
+                             styleClass="w-full"
                              inputId="birthDate" appendTo="body"/>
               <label for="birthDate">Birthdate</label>
             </p-float-label>
@@ -75,7 +75,7 @@
           <div class="w-fit">
             <p-float-label variant="on" class="w-60">
               <p-select dropdownIcon="pi pi-globe" [options]="countries" formControlName="country" optionLabel="name"
-                        styleClass="min-w-60"
+                        styleClass="w-full"
                         appendTo="body"/>
               <label for="country">Country</label>
             </p-float-label>

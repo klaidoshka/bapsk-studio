@@ -131,25 +131,11 @@ application.UseCors(cors => cors
     .AllowAnyMethod()
     .AllowCredentials()
     .AllowAnyHeader()
-    .SetIsOriginAllowed(origin =>
-        {
-            if (String.IsNullOrEmpty(origin))
-            {
-                return false;
-            }
-
-            var normalizedOrigin = new Uri(origin).GetLeftPart(UriPartial.Authority);
-
-            return normalizedOrigin switch
-            {
-                "https://localhost:3000" => true,
-                "https://localhost:4200" => true,
-                "https://localhost:5000" => true,
-                "https://bapsk.studio" => true,
-                String s when s.EndsWith(".bapsk.studio") => true,
-                _ => false
-            };
-        }
+    .SetIsOriginAllowed(origin => 
+            origin.StartsWith("https://localhost:") ||
+            origin.StartsWith("https://bapsk.studio") ||
+            origin.EndsWith(".bapsk.studio") ||
+            origin.EndsWith(".bapsk.studio/")
     )
 );
 

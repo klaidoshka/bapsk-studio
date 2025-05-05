@@ -19,7 +19,7 @@
               <p-floatlabel variant="on" class="w-60">
                 <p-iconfield>
                   <p-inputicon class="pi pi-tag"/>
-                  <input pInputText id="firstName" formControlName="firstName" type="text"/>
+                  <input pInputText class="w-60" id="firstName" formControlName="firstName" type="text"/>
                 </p-iconfield>
                 <label for="firstName">First Name</label>
               </p-floatlabel>
@@ -31,7 +31,7 @@
               <p-floatlabel variant="on" class="w-60">
                 <p-iconfield>
                   <p-inputicon class="pi pi-tag"/>
-                  <input pInputText id="lastName" formControlName="lastName" type="text"/>
+                  <input pInputText class="w-60" id="lastName" formControlName="lastName" type="text"/>
                 </p-iconfield>
                 <label for="lastName">Last Name</label>
               </p-floatlabel>
@@ -43,7 +43,7 @@
               <p-floatlabel variant="on" class="w-60">
                 <p-iconfield>
                   <p-inputicon class="pi pi-envelope"/>
-                  <input pInputText id="email" formControlName="email" type="email"/>
+                  <input pInputText class="w-60" id="email" formControlName="email" type="email"/>
                 </p-iconfield>
                 <label for="email">Email</label>
               </p-floatlabel>
@@ -54,7 +54,7 @@
             <div>
               <p-float-label variant="on" class="w-fit">
                 <p-date-picker icon="pi pi-calendar" iconDisplay="input" showIcon formControlName="birthdate"
-                               styleClass="min-w-60" inputId="birthdate" appendTo="body"/>
+                               styleClass="w-full" inputId="birthdate" appendTo="body"/>
                 <label for="birthdate">Birthdate</label>
               </p-float-label>
               <form-input-error [control]="form.controls.birthdate"/>
@@ -64,8 +64,7 @@
             <div>
               <p-float-label variant="on" class="w-60">
                 <p-select dropdownIcon="pi pi-globe" [options]="IsoCountries" formControlName="residenceCountry"
-                          optionLabel="name"
-                          optionValue="code" styleClass="min-w-60" appendTo="body"/>
+                          optionLabel="name" optionValue="code" styleClass="w-full" appendTo="body"/>
                 <label for="residenceCountry">Residence Country</label>
               </p-float-label>
               <form-input-error [control]="form.controls.residenceCountry"/>
@@ -82,8 +81,7 @@
             <div>
               <p-float-label variant="on" class="w-60">
                 <p-select dropdownIcon="pi pi-objects-column" [options]="identityDocumentTypes" formControlName="type"
-                          optionLabel="label"
-                          optionValue="value" styleClass="min-w-60" appendTo="body"/>
+                          optionLabel="label" optionValue="value" styleClass="w-full" appendTo="body"/>
                 <label for="type">Type</label>
               </p-float-label>
               <form-input-error [control]="form.controls.identityDocument.controls.type"/>
@@ -93,7 +91,7 @@
             <div>
               <p-float-label variant="on" class="w-60">
                 <p-select dropdownIcon="pi pi-globe" [options]="IsoCountries" formControlName="issuedBy"
-                          optionLabel="name" optionValue="code" styleClass="min-w-60" appendTo="body"/>
+                          optionLabel="name" optionValue="code" styleClass="w-full" appendTo="body"/>
                 <label for="issuedBy">Issued By</label>
               </p-float-label>
               <form-input-error [control]="form.controls.identityDocument.controls.issuedBy"/>
@@ -104,7 +102,7 @@
               <p-float-label variant="on" class="w-60">
                 <p-iconfield>
                   <p-inputicon class="pi pi-hashtag"/>
-                  <input pInputText formControlName="number" type="text" id="number"/>
+                  <input pInputText class="w-60" formControlName="number" type="text" id="number"/>
                 </p-iconfield>
                 <label for="number">Number</label>
               </p-float-label>
@@ -116,7 +114,7 @@
               <p-float-label variant="on" class="w-60">
                 <p-iconfield>
                   <p-inputicon class="pi pi-code"/>
-                  <input pInputText formControlName="value" type="text" id="value"/>
+                  <input pInputText class="w-60" formControlName="value" type="text" id="value"/>
                 </p-iconfield>
                 <label for="value">Value (Personal Code)</label>
               </p-float-label>
@@ -138,7 +136,7 @@
                   <div>
                     <p-float-label variant="on" class="w-60">
                       <p-select dropdownIcon="pi pi-globe" [options]="IsoCountries" formControlName="issuedBy"
-                                optionLabel="name" optionValue="code" styleClass="min-w-60" appendTo="body"/>
+                                optionLabel="name" optionValue="code" styleClass="w-full" appendTo="body"/>
                       <label for="issuedBy">Issued By</label>
                     </p-float-label>
                     <form-input-error [control]="control.controls.issuedBy"/>
@@ -149,7 +147,7 @@
                     <p-float-label variant="on" class="w-60">
                       <p-iconfield>
                         <p-inputicon class="pi pi-objects-column"/>
-                        <input pInputText formControlName="type" type="text" id="type"/>
+                        <input pInputText class="w-60" formControlName="type" type="text" id="type"/>
                       </p-iconfield>
                       <label for="type">Type</label>
                     </p-float-label>
@@ -161,7 +159,7 @@
                     <p-float-label variant="on" class="w-60">
                       <p-iconfield>
                         <p-inputicon class="pi pi-code"/>
-                        <input pInputText formControlName="value" type="text" id="value"/>
+                        <input pInputText class="w-60" formControlName="value" type="text" id="value"/>
                       </p-iconfield>
                       <label for="value">Value</label>
                     </p-float-label>

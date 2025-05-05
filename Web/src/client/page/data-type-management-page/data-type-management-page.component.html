@@ -15,7 +15,7 @@
             <p-floatlabel variant="on" class="w-60">
               <p-iconfield>
                 <p-inputicon class="pi pi-tag"/>
-                <input pInputText id="name" formControlName="name" type="text"/>
+                <input pInputText class="w-60" id="name" formControlName="name" type="text"/>
               </p-iconfield>
               <label for="name">Name</label>
             </p-floatlabel>
@@ -27,7 +27,7 @@
             <p-floatlabel variant="on" class="w-60">
               <p-iconfield>
                 <p-inputicon class="pi pi-comment"/>
-                <input pInputText id="description" formControlName="description" type="text"/>
+                <input pInputText class="w-60" id="description" formControlName="description" type="text"/>
               </p-iconfield>
               <label for="description">Description</label>
             </p-floatlabel>
@@ -69,7 +69,7 @@
                   </td>
                   <td>
                     <p-select formControlName="type" [options]="fieldTypes" optionLabel="label" optionValue="value"
-                              placeholder="Select a type" appendTo="body" styleClass="w-full"
+                              placeholder="Select a type" appendTo="body" styleClass="w-48"
                               [class]="{'mt-7': isReference}"/>
                   </td>
                   <td>

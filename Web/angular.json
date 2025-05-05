@@ -100,8 +100,8 @@
           },
           "options": {
             "ssl": true,
-            "sslKey": "../certs/Server.key",
-            "sslCert": "../certs/Server.crt"
+            "sslKey": "/certs/Server.key",
+            "sslCert": "/certs/Server.crt"
           },
           "defaultConfiguration": "development"
         },

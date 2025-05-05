@@ -1,7 +1,7 @@
 <div class="flex flex-col gap-4 p-4">
   <p-float-label variant="on" class="w-60">
     <p-select dropdownIcon="pi pi-home" (onChange)="onChange($event.value)" [options]="instances.value() || []" optionLabel="name"
-              [ngModel]="selectedInstance()" styleClass="min-w-60" appendTo="body"/>
+              [ngModel]="selectedInstance()" styleClass="w-full" appendTo="body"/>
     <label for="instance">Workspace (Instance)</label>
   </p-float-label>
   <p-splitter/>
