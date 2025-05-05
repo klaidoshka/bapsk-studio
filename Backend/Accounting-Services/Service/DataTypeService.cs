@@ -138,13 +138,13 @@ public class DataTypeService : IDataTypeService
 
         foreach (var field in newFields)
         {
-            var value = _fieldTypeService.Serialize(field.Type, field.DefaultValue);
-
             await _database.DataTypeFields.AddAsync(
                 new DataTypeField
                 {
                     DataTypeId = dataType.Id,
-                    DefaultValue = value,
+                    DefaultValue = field.DefaultValue.IsNull()
+                        ? null
+                        : _fieldTypeService.Serialize(field.Type, field.DefaultValue),
                     IsRequired = field.IsRequired,
                     Name = field.Name,
                     ReferenceId = field.Type == FieldType.Reference ? field.ReferenceId : null,
