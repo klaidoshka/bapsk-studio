@@ -15,7 +15,7 @@ COPY . .
 
 FROM base AS client
 EXPOSE 4200
-CMD ["ng", "run", "build:start:client"]
+CMD ["npm", "run", "build:start:client"]
 
 FROM base AS server
 EXPOSE 3000
