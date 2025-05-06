@@ -19,9 +19,7 @@ import Messages from '../../model/messages.model';
 import {first, of, tap} from 'rxjs';
 import {MessageHandlingService} from '../../service/message-handling.service';
 import {DataEntryService} from '../../service/data-entry.service';
-import {
-  MessagesShowcaseComponent
-} from '../../component/messages-showcase/messages-showcase.component';
+import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {TableModule} from 'primeng/table';
 import {FormInputErrorComponent} from '../../component/form-input-error/form-input-error.component';
@@ -83,7 +81,7 @@ export class ImportConfigurationManagementPageComponent {
       configurationId: NumberUtil.parse(this.configurationId()),
       instanceId: NumberUtil.parse(this.instanceId())
     }),
-    loader: ({request}) => request.configurationId && request.instanceId
+    loader: ({ request }) => request.configurationId && request.instanceId
       ? this.importConfigurationService
         .getById(request.instanceId, request.configurationId)
         .pipe(tap(configuration => this.patchFormValues(configuration)))
@@ -105,7 +103,7 @@ export class ImportConfigurationManagementPageComponent {
         instanceId: NumberUtil.parse(this.instanceId())!
       };
     },
-    loader: ({request}) => request.dataTypeIds && request.instanceId
+    loader: ({ request }) => request.dataTypeIds && request.instanceId
       ? this.dataEntryService.getAllByDataTypeIds(request.instanceId, request.dataTypeIds)
       : of(undefined)
   });
@@ -114,7 +112,7 @@ export class ImportConfigurationManagementPageComponent {
     request: () => ({
       instanceId: NumberUtil.parse(this.instanceId())
     }),
-    loader: ({request}) => request.instanceId
+    loader: ({ request }) => request.instanceId
       ? this.dataTypeService.getAllByInstanceId(request.instanceId)
       : of(undefined)
   });
@@ -132,12 +130,12 @@ export class ImportConfigurationManagementPageComponent {
         closable: true
       });
       if (this.configurationId()) {
-        this.router.navigate(['../'], {relativeTo: this.route});
+        this.router.navigate(['../'], { relativeTo: this.route });
       } else {
-        this.router.navigate(['../', id], {relativeTo: this.route});
+        this.router.navigate(['../', id], { relativeTo: this.route });
       }
     } else {
-      this.messages.set({error: [message]});
+      this.messages.set({ error: [message] });
     }
   }
 
@@ -205,14 +203,19 @@ export class ImportConfigurationManagementPageComponent {
 
   protected changeFormFieldsByConfiguration(dataType: DataType, configuration?: ImportConfigurationJoined) {
     this.form.controls.fields.clear();
-    configuration?.fields
-      .sort((a, b) => a.order - b.order)
-      .forEach(field => {
-        const dataTypeField = dataType.fields.find(dtField => dtField.id === field.dataTypeFieldId);
-        if (dataTypeField) {
-          this.addFormField(dataTypeField, field);
-        }
-      });
+
+    if (configuration) {
+      configuration?.fields
+        .sort((a, b) => a.order - b.order)
+        .forEach(field => {
+          const dataTypeField = dataType.fields.find(dtField => dtField.id === field.dataTypeFieldId);
+          if (dataTypeField) {
+            this.addFormField(dataTypeField, field);
+          }
+        });
+    } else {
+      dataType.fields.forEach(field => this.addFormField(field));
+    }
   }
 
   protected getDataEntries(index: number): Signal<{ id: number, label: string }[]> {
@@ -272,7 +275,7 @@ export class ImportConfigurationManagementPageComponent {
 
   protected save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill in all required fields."]});
+      this.messages.set({ error: ["Please fill in all required fields."] });
       return;
     }
 

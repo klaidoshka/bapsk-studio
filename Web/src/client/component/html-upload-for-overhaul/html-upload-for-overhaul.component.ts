@@ -1,6 +1,7 @@
 import {Component, inject} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {FileUpload} from 'primeng/fileupload';
+import {ApiRouter} from '../../service/api-router.service';
 
 @Component({
   selector: 'html-upload-for-overhaul',
@@ -11,6 +12,7 @@ import {FileUpload} from 'primeng/fileupload';
   styles: ``
 })
 export class HtmlUploadForOverhaulComponent {
+  private readonly apiRouter = inject(ApiRouter);
   private readonly httpClient = inject(HttpClient);
 
   protected onHtmlSelect(files: File[]) {
@@ -28,8 +30,9 @@ export class HtmlUploadForOverhaulComponent {
     const reader = new FileReader();
 
     reader.onload = () => {
+
       this.httpClient
-        .post(`https://0.0.0.0:3000/api/v1/misc/beautify-html-table`, reader.result, {
+        .post(this.apiRouter.misc.beautifyHtmlTable(), reader.result, {
           headers: {
             'Content-Type': 'text/html'
           },

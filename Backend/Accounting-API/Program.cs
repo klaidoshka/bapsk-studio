@@ -11,9 +11,13 @@ using Accounting.Contract.Validator;
 using Accounting.Services.FieldHandler;
 using Accounting.Services.Service;
 using Accounting.Services.Validator;
+using DotNetEnv;
+using DotNetEnv.Configuration;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddDotNetEnv(".env", LoadOptions.TraversePath());
 
 builder.AddConfiguration<Butenta>("Butenta");
 builder.AddConfiguration<Email>("Email");

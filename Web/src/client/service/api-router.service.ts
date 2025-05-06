@@ -36,7 +36,8 @@ const buildUrl = (
   providedIn: 'root'
 })
 export class ApiRouter {
-  private readonly base = 'https://localhost:5000/api/v1';
+  private readonly base = process.env['ASPNET__SERVER__API']!;
+  private readonly baseWeb = process.env['WEB__SERVER__API']!;
   private readonly accounting = this.base + '/accounting';
   private readonly accountingIsolated = this.accounting + '/instance/:instanceId';
 
@@ -101,6 +102,10 @@ export class ApiRouter {
     getById: (id: number) => buildUrl(this.accounting, '/instance/:id', { id }),
     getByUser: () => buildUrl(this.accounting, '/instance'),
   };
+
+  readonly misc = {
+    beautifyHtmlTable: () => buildUrl(this.baseWeb, '/misc/beautify-html-table'),
+  }
 
   readonly report = {
     generateDataEntries: (instanceId: number) =>

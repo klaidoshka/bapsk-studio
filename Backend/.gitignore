@@ -7,3 +7,5 @@
 *.user
 riderModule.iml
 /_ReSharper.Caches/
+.env
+!.env.example

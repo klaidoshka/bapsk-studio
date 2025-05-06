@@ -153,6 +153,8 @@ public class DataTypeService : IDataTypeService
             );
         }
 
+        await _database.SaveChangesAsync();
+
         if (newFields.Count > 0)
         {
             await _dataEntryService.AddMissingDataTypeFieldsWithoutSaveAsync(dataType.Id);

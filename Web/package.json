@@ -3,13 +3,13 @@
   "version": "0.0.0",
   "scripts": {
     "build": "ng build",
-    "start": "ng serve",
+    "start": "ng serve -ssl {SSL__ENABLED} --sslCert {SSL__CERTIFICATE} -sslKey {SSL__KEY}",
     "build:client": "tsup ./src/client/server.ts --format esm --target node22 --out-dir ./dist/client-server --shims --clean",
     "build:start:client": "npm run build && npm run build:client && npm run start:client",
-    "start:client": "node ./dist/client-server/server.js",
+    "start:client": "node --env-file ./.env ./dist/client-server/server.js",
     "build:server": "tsup ./src/server/server.ts --format esm --out-dir ./dist/out-tsc/server --shims --clean",
     "build:start:server": "npm run build:server && npm run start:server",
-    "start:server": "node ./dist/out-tsc/server/server.js"
+    "start:server": "node --env-file ./.env ./dist/out-tsc/server/server.js"
   },
   "type": "module",
   "private": true,

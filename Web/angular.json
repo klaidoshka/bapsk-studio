@@ -98,11 +98,6 @@
               "buildTarget": "web:build:development"
             }
           },
-          "options": {
-            "ssl": true,
-            "sslKey": "/certs/Server.key",
-            "sslCert": "/certs/Server.crt"
-          },
           "defaultConfiguration": "development"
         },
         "extract-i18n": {

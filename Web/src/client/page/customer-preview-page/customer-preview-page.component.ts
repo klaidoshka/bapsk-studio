@@ -5,7 +5,7 @@ import {getIsoCountryLabel} from '../../model/iso-country.model';
 import {getIdentityDocumentTypeLabel} from '../../model/identity-document-type.model';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {CustomerService} from '../../service/customer.service';
-import {of, tap} from 'rxjs';
+import {of} from 'rxjs';
 import {NumberUtil} from '../../util/number.util';
 import {
   CustomerPageHeaderSectionComponent
@@ -44,7 +44,6 @@ export class CustomerPreviewPageComponent {
     }),
     loader: ({request}) => request.customerId && request.instanceId
       ? this.customerService.getById(request.instanceId, request.customerId)
-      .pipe(tap(customer => console.log(customer.birthdate)))
       : of(undefined)
   });
 }

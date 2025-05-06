@@ -1,14 +1,18 @@
 import express from "express";
 import cors from "cors";
 import {HtmlService} from './service/html.service';
+import os from "os";
 
-const apiPort = process.env["PORT"] || 3000;
-const apiPrefix = "/api/v1";
+const apiPort = process.env["WEB__SERVER__PORT"] || 3000;
 const application = express();
+
+const routes = {
+  beautifyHtmlTable: "/api/v1/misc/beautify-html-table",
+};
 
 application.use(cors(
   {
-    origin: "*",
+    origin: process.env["WEB__SERVER__CORS_ORIGINS"]?.split(",") || "*",
     methods: ["POST", "OPTIONS"],
   }
 ));
@@ -16,7 +20,7 @@ application.use(cors(
 application.use(express.json());
 application.use(express.text({type: "text/html"}));
 
-application.post(`${apiPrefix}/misc/beautify-html-table`, (req, res) => {
+application.post(routes.beautifyHtmlTable, (req, res) => {
   const html = req.body;
 
   if (!html) {
@@ -41,4 +45,7 @@ application.post(`${apiPrefix}/misc/beautify-html-table`, (req, res) => {
   }
 });
 
-application.listen(apiPort, () => console.log(`Server running at port https://0.0.0.0:${apiPort}`));
+application.listen(apiPort, () => {
+  const ip = os.networkInterfaces()?.["en0"]?.find((iface) => iface.family === "IPv4")?.address || "localhost";
+  console.log(`Server is running on http://${ip}:${apiPort}`);
+});

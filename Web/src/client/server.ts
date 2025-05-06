@@ -1,19 +1,32 @@
-import express from 'express';
-import path from 'path';
-import {fileURLToPath} from 'url';
-import fs from 'node:fs';
-import * as https from 'node:https';
+import express from "express";
+import path from "path";
+import {fileURLToPath} from "url";
+import fs from "node:fs";
+import os from "os";
+import * as https from "node:https";
 
-const app = express();
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const dist = path.join(__dirname, '../../dist/client/browser');
+const directory = path.dirname(fileURLToPath(import.meta.url));
+const ui = path.join(directory, "../../dist/client/browser");
+const sslEnabled = process.env["SSL__ENABLED"] === "true";
+const port = process.env["CLIENT__PORT"] ?? 4200;
 
 const sslOptions = {
-  key: fs.readFileSync('/certs/Server.key'),
-  cert: fs.readFileSync('/certs/Server.crt'),
+  key: fs.readFileSync(process.env["SSL__KEY"] ?? ""),
+  cert: fs.readFileSync(process.env["SSL__CERTIFICATE"] ?? "")
 };
 
-app.use(express.static(dist));
-app.get('*', (_, res) => res.sendFile(path.join(dist, 'index.html')));
+const app = express();
 
-https.createServer(sslOptions, app).listen(4200);
+app.use(express.static(ui));
+app.get("*", (_, res) => res.sendFile(path.join(ui, "index.html")));
+
+const informIp = () => {
+  const ip = os.networkInterfaces()?.["en0"]?.find((iface) => iface.family === "IPv4")?.address || "localhost";
+  console.log(`Server is running on http://${ip}:${port}`);
+}
+
+if (sslEnabled) {
+  https.createServer(sslOptions, app).listen(port, () => informIp());
+} else {
+  app.listen(port, () => informIp());
+}
