@@ -135,11 +135,9 @@ application.UseCors(cors => cors
     .AllowAnyMethod()
     .AllowCredentials()
     .AllowAnyHeader()
-    .SetIsOriginAllowed(origin => 
-            origin.StartsWith("https://localhost:") ||
-            origin.StartsWith("https://bapsk.studio") ||
-            origin.EndsWith(".bapsk.studio") ||
-            origin.EndsWith(".bapsk.studio/")
+    .WithOrigins(
+        Environment.GetEnvironmentVariable("CORS_ORIGINS") 
+        ?? throw new ArgumentException("CORS_ORIGINS environment variable is not set")
     )
 );
 
