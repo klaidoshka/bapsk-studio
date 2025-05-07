@@ -124,6 +124,21 @@ export class VatReturnService {
       );
   }
 
+  mockExport(instanceId: number, saleId: number) {
+    return this.httpClient
+      .post<void>(this.apiRouter.vatReturn.mockExport(instanceId, saleId), {})
+      .pipe(
+        tap(() => {
+          this.cacheBySaleIdService.invalidate(saleId);
+
+          this
+            .getBySaleId(instanceId, saleId)
+            .pipe(first())
+            .subscribe();
+        })
+      );
+  }
+
   submit(request: VatReturnDeclarationSubmitRequest): Observable<VatReturnDeclaration> {
     return this.httpClient
       .post<VatReturnDeclaration>(this.apiRouter.vatReturn.submit(request.instanceId), request)

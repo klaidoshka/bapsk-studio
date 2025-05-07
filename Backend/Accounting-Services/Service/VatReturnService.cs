@@ -281,8 +281,7 @@ public class VatReturnService : IVatReturnService
 
         return QrGeneratorUtil
             .CreateQrCodeEnvelopeChunks(json)
-            .Select(
-                it => QrGeneratorUtil.GenerateQrCode(
+            .Select(it => QrGeneratorUtil.GenerateQrCode(
                     JsonSerializer
                         .Serialize(it, JsonOptions)
                         .Squash()
@@ -344,6 +343,49 @@ public class VatReturnService : IVatReturnService
         var salesmanCountry = _countryService.GetCountryCode(trade.Supplier.Country);
 
         return trade.ToEntity(customerCountry, salesmanCountry);
+    }
+
+    public async Task MockExportAsync(int saleId)
+    {
+        var declaration = await GetBySaleIdAsync(saleId);
+
+        declaration!.Export = new StiVatReturnDeclarationExport
+        {
+            AssessmentDate = declaration.SubmitDate,
+            Conditions =
+            [
+                new StiVatReturnDeclarationExportAssessmentCondition
+                {
+                    Code = "T1",
+                    Description = "Ar prekės išgabentos per nustatytą laikotarpį?",
+                    IsMet = true
+                },
+                new StiVatReturnDeclarationExportAssessmentCondition
+                {
+                    Code = "T2",
+                    Description = "Ar išgabentų prekių vertė ne mažesnė kaip nustatyta riba?",
+                    IsMet = true
+                }
+            ],
+            CustomsOfficeCode = "ABCDEFGH",
+            DeclarationCorrectionNo = declaration.Correction,
+            VerificationDate = declaration.SubmitDate,
+            VerifiedSoldGoods = declaration.Sale.SoldGoods
+                .Select(sg => new StiVatReturnDeclarationExportVerifiedGood
+                    {
+                        Quantity = sg.Quantity,
+                        QuantityVerified = sg.Quantity,
+                        SequenceNo = sg.SequenceNo,
+                        TotalAmount = sg.TotalAmount,
+                        UnitOfMeasure = sg.UnitOfMeasure,
+                        UnitOfMeasureType = sg.UnitOfMeasureType
+                    }
+                )
+                .ToList(),
+            VerificationResult = StiVatReturnDeclarationExportVerificationResult.A1
+        };
+
+        await _database.SaveChangesAsync();
     }
 
     public PreviewCodeValues ReadPreviewCodeValues(string code)
@@ -452,7 +494,7 @@ public class VatReturnService : IVatReturnService
                 }
             );
         }
-        
+
         await _database.SaveChangesAsync();
     }
 

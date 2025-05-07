@@ -1,5 +1,6 @@
 using Accounting.API.Configuration;
 using Accounting.API.Util;
+using Accounting.Contract.Configuration;
 using Accounting.Contract.Dto.Sti.VatReturn;
 using Accounting.Contract.Dto.Sti.VatReturn.Payment;
 using Accounting.Contract.Entity;
@@ -20,6 +21,11 @@ public static class VatReturnEndpoints
         builder
             .MapPost("/{saleId:int}/cancel", Cancel)
             .RequireInstancePermission(InstancePermission.VatReturn.Cancel)
+            .RequireInstanceOwnsEntity<Sale>("saleId");
+
+        builder
+            .MapPost("/{saleId:int}/mock-export", MockExport)
+            .RequireAuthorization(o => o.RequireClaim(Claims.Role, Roles.Admin))
             .RequireInstanceOwnsEntity<Sale>("saleId");
 
         builder
@@ -55,6 +61,16 @@ public static class VatReturnEndpoints
     )
     {
         await vatReturnService.CancelAsync(saleId);
+
+        return Results.Ok();
+    }
+
+    private static async Task<IResult> MockExport(
+        int saleId,
+        IVatReturnService vatReturnService
+    )
+    {
+        await vatReturnService.MockExportAsync(saleId);
 
         return Results.Ok();
     }

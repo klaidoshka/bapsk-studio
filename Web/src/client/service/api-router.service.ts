@@ -162,6 +162,8 @@ export class ApiRouter {
       buildUrl(this.accountingIsolated, '/vat-return/:saleId', { instanceId, saleId }),
     getByCode: (code: string) =>
       buildUrl(this.accounting, '/vat-return', {}, { code }),
+    mockExport: (instanceId: number, saleId: number) =>
+      buildUrl(this.accountingIsolated, '/vat-return/:saleId/mock-export', { instanceId, saleId }),
     payment: (instanceId: number, saleId: number) =>
       buildUrl(this.accountingIsolated, '/vat-return/:saleId/payment', { instanceId, saleId }),
     update: (instanceId: number, saleId: number) =>

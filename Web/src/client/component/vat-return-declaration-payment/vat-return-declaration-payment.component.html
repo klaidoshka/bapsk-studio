@@ -1,7 +1,7 @@
 <confirmation [key]="'submit-confirmation'" [header]="'Are you sure? No later changes can be made!'"/>
 <form [formGroup]="form" class="flex flex-col gap-4">
   <div formArrayName="payments" class="flex flex-col gap-8">
-    @for (_ of getFormPayments().controls; track $index; let i = $index) {
+    @for (control of getFormPayments().controls; track $index; let i = $index) {
       <div [formGroupName]="i" class="flex flex-wrap gap-4">
         <!-- Type Dropdown -->
         <div>
@@ -11,6 +11,7 @@
                       appendTo="body" dropdownIcon="pi pi-objects-column"/>
             <label for="type">Payment Type</label>
           </p-float-label>
+          <form-input-error [control]="control.controls.type"/>
         </div>
 
         <!-- Amount Input -->
@@ -18,11 +19,12 @@
           <p-float-label variant="on" class="w-60">
             <p-icon-field>
               <p-inputicon class="pi pi-euro"/>
-              <input pInputText class="w-60" id="amount" type="number" formControlName="amount" [min]="0" [step]="0.05"
-                     class="w-full"/>
+              <p-input-number inputId="amount" formControlName="amount" currency="EUR" mode="currency" [min]="0"
+                              [showButtons]="true" [step]="0.05" class="w-full" inputStyleClass="pl-10! w-60!"/>
             </p-icon-field>
             <label for="amount">Amount</label>
           </p-float-label>
+            <form-input-error [control]="control.controls.amount"/>
         </div>
 
         <!-- Date Input -->
@@ -32,18 +34,19 @@
                            iconDisplay="input" class="w-full" appendTo="body"/>
             <label for="date">Date</label>
           </p-float-label>
+          <form-input-error [control]="control.controls.date"/>
         </div>
 
         <!-- Remove Button -->
         @if (getFormPayments().length > 1) {
-          <p-button title="Remove" variant="text" icon="pi pi-trash" type="button" (click)="removePaymentInfo(i)"/>
+          <p-button title="Remove" variant="text" icon="pi pi-trash" type="button" (onClick)="removePaymentInfo(i)"/>
         }
       </div>
     }
 
     <!-- Add Payment Info Button -->
     <p-button title="Add Payment Info Entry" label="Add Payment Info" size="small" type="button"
-              (click)="addFormPaymentInfo()"/>
+              (onClick)="addFormPaymentInfo()"/>
   </div>
 
   <!-- Submit Button -->
