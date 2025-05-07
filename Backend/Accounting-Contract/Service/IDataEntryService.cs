@@ -1,11 +1,12 @@
 using Accounting.Contract.Dto.DataEntry;
+using Accounting.Contract.Entity;
 using DataEntry = Accounting.Contract.Entity.DataEntry;
 
 namespace Accounting.Contract.Service;
 
 public interface IDataEntryService
 {
-    public Task AddMissingDataTypeFieldsWithoutSaveAsync(int dataTypeId);
+    public Task AddMissingDataTypeFieldsAsync(DataType dataType);
 
     public Task<DataEntry> CreateAsync(DataEntryCreateRequest request);
 

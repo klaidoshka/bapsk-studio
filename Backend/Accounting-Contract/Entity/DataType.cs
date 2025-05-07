@@ -38,11 +38,6 @@ public class DataType
     public int Id { get; set; }
 
     /// <summary>
-    /// Marks the data type as soft-deleted, but does not remove it from the database.
-    /// </summary>
-    public bool IsDeleted { get; set; }
-
-    /// <summary>
     /// Navigation property for the instance that the data type belongs to.
     /// </summary>
     [ForeignKey(nameof(InstanceId))]
@@ -52,6 +47,11 @@ public class DataType
     /// Unique identifier of the instance that the data type belongs to.
     /// </summary>
     public int InstanceId { get; set; }
+
+    /// <summary>
+    /// Marks the data type as soft-deleted, but does not remove it from the database.
+    /// </summary>
+    public bool IsDeleted { get; set; }
 
     /// <summary>
     /// Name of the data type.

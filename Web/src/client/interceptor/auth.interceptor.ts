@@ -45,9 +45,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
         return authService.renewAccess().pipe(
           switchMap(response => {
-            if (!response) {
-              throw new Error('Refresh failed');
-            }
             authService.acceptAuthResponse(response);
             retryQueue
               .pipe(
@@ -60,12 +57,16 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
               .subscribe();
             return retryRequest();
           }),
-          catchError(err => {
-            retryQueue.error(err);
+          catchError(error => {
+            retryQueue.error(error);
             retryQueue.complete();
             retryQueue = new Subject();
-            authService.logout().subscribe();
-            return throwError(() => err);
+
+            if (error instanceof HttpErrorResponse && error.status === 401) {
+              authService.logout().subscribe();
+            }
+
+            return throwError(() => error);
           }),
           finalize(() => isRefreshing.next(false))
         );
