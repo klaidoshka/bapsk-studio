@@ -2,29 +2,16 @@ import {Component, inject, input, signal} from '@angular/core';
 import {DataEntryService} from '../../service/data-entry.service';
 import {DataTypeService} from '../../service/data-type.service';
 import {MessageHandlingService} from '../../service/message-handling.service';
-import {
-  AbstractControl,
-  FormArray,
-  FormBuilder,
-  ReactiveFormsModule,
-  ValidationErrors,
-  Validators
-} from '@angular/forms';
+import {AbstractControl, FormArray, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators} from '@angular/forms';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../../model/data-type.model';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {first, of, tap} from 'rxjs';
 import Option from '../../model/options.model';
 import Messages from '../../model/messages.model';
-import DataTypeField, {
-  DataTypeFieldEditRequest,
-  FieldType,
-  fieldTypes
-} from '../../model/data-type-field.model';
+import DataTypeField, {DataTypeFieldEditRequest, FieldType, fieldTypes} from '../../model/data-type-field.model';
 import {FormInputErrorComponent} from '../../component/form-input-error/form-input-error.component';
 import {Select} from 'primeng/select';
-import {
-  MessagesShowcaseComponent
-} from '../../component/messages-showcase/messages-showcase.component';
+import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
 import {
   DataTypeEntryFieldInputComponent
 } from '../../component/data-type-entry-field-input/data-type-entry-field-input.component';
@@ -78,7 +65,7 @@ export class DataTypeManagementPageComponent {
   private readonly messageService = inject(MessageService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  protected readonly customErrorMessages = {'noFields': () => 'At least one field is required.'};
+  protected readonly customErrorMessages = { 'noFields': () => 'At least one field is required.' };
   protected readonly dataTypeId = input<string>();
   protected readonly fieldTypes = fieldTypes;
   protected readonly form = this.createForm();
@@ -91,7 +78,7 @@ export class DataTypeManagementPageComponent {
       dataTypeId: NumberUtil.parse(this.dataTypeId()),
       instanceId: NumberUtil.parse(this.instanceId())
     }),
-    loader: ({request}) =>
+    loader: ({ request }) =>
       request.dataTypeId && request.instanceId
         ? this.dataTypeService
           .getById(request.instanceId, request.dataTypeId)
@@ -103,7 +90,7 @@ export class DataTypeManagementPageComponent {
     request: () => ({
       instanceId: NumberUtil.parse(this.instanceId())
     }),
-    loader: ({request}) => request.instanceId
+    loader: ({ request }) => request.instanceId
       ? this.dataTypeService.getAllByInstanceId(request.instanceId)
       : of(undefined)
   });
@@ -122,12 +109,12 @@ export class DataTypeManagementPageComponent {
         closable: true
       });
       if (this.dataTypeId()) {
-        this.router.navigate(['../'], {relativeTo: this.route});
+        this.router.navigate(['../'], { relativeTo: this.route });
       } else {
-        this.router.navigate(['../', id], {relativeTo: this.route});
+        this.router.navigate(['../', id], { relativeTo: this.route });
       }
     } else {
-      this.messages.set({error: [message]});
+      this.messages.set({ error: [message] });
     }
   }
 
@@ -181,7 +168,7 @@ export class DataTypeManagementPageComponent {
   }
 
   private fieldsValidator(control: AbstractControl): ValidationErrors | null {
-    return (control as FormArray).length === 0 ? {noFields: true} : null;
+    return (control as FormArray).length === 0 ? { noFields: true } : null;
   };
 
   private patchFormValues(dataType: DataType) {
@@ -204,6 +191,18 @@ export class DataTypeManagementPageComponent {
 
     dataType.fields.forEach(field => this.addField(dataType, field));
     this.form.markAsPristine();
+  }
+
+  protected consumeChange(index: number, fieldType: FieldType) {
+    const fieldControl = this.form.controls.fields.at(index);
+    if (fieldType === FieldType.Reference) {
+      fieldControl.controls.isRequired.disable();
+      fieldControl.patchValue({
+        isRequired: true
+      });
+    } else {
+      fieldControl.controls.isRequired.enable();
+    }
   }
 
   protected getFieldType(id: number): FieldType {
@@ -256,7 +255,7 @@ export class DataTypeManagementPageComponent {
 
   protected save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill out the form."]});
+      this.messages.set({ error: ["Please fill out the form."] });
       return;
     }
 

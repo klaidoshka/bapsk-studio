@@ -1,6 +1,6 @@
 @switch (type()) {
   @case (FieldType.Check) {
-    <p-check-box (onChange)="callOnChange()" (onBlur)="markAsTouched()" [(ngModel)]="value" binary/>
+    <p-check-box [inputId]="inputId()" (onChange)="callOnChange()" (onBlur)="markAsTouched()" [(ngModel)]="value" binary/>
   }
   @case (FieldType.Currency) {
     <p-icon-field>
@@ -10,12 +10,13 @@
     </p-icon-field>
   }
   @case (FieldType.Date) {
-    <p-date-picker (onSelect)="callOnChange()" (blur)="markAsTouched()" [(ngModel)]="value" hideOnDateTimeSelect="true"
-                   appendTo="body" [showTime]="true" [showIcon]="true" [showClear]="true" class="w-full"
-                   (onClear)="value.set(undefined); callOnChange(); markAsTouched();" iconDisplay="input"/>
+    <p-date-picker appendTo="body" [showTime]="true" [showIcon]="true" [showClear]="true" class="w-full"
+                   (onInput)="callOnChange()" (onBlur)="markAsTouched()" (onSelect)="callOnChange()" [(ngModel)]="value"
+                   hideOnDateTimeSelect="true" (onClear)="value.set(undefined); callOnChange(); markAsTouched();"
+                   iconDisplay="input"/>
   }
   @case (FieldType.IsoCountryCode) {
-    <p-select (onChange)="callOnChange()" (blur)="markAsTouched()" [(ngModel)]="value" [options]="IsoCountries"
+    <p-select (onChange)="callOnChange()" (onBlur)="markAsTouched()" [(ngModel)]="value" [options]="IsoCountries"
               optionLabel="name" optionValue="code" appendTo="body" class="w-full" dropdownIcon="pi pi-globe"/>
   }
   @case (FieldType.Number) {
@@ -24,8 +25,7 @@
   @default {
     <p-icon-field>
       <p-inputicon class="pi pi-pencil"/>
-      <input pInputText (input)="callOnChange()" (blur)="markAsTouched()" [(ngModel)]="value" type="text"
-             class="w-full"/>
+      <input pInputText (input)="callOnChange()" (blur)="markAsTouched()" [(ngModel)]="value" type="text" class="w-full"/>
     </p-icon-field>
   }
 }

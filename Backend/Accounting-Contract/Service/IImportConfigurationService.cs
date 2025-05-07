@@ -1,11 +1,12 @@
 using Accounting.Contract.Dto.ImportConfiguration;
+using Accounting.Contract.Entity;
 using ImportConfiguration = Accounting.Contract.Entity.ImportConfiguration;
 
 namespace Accounting.Contract.Service;
 
 public interface IImportConfigurationService
 {
-    public Task AddMissingDataTypeFieldsWithoutSaveAsync(int dataTypeId);
+    public Task AddMissingDataTypeFieldsAsync(DataType dataType);
     
     public Task<ImportConfiguration> CreateAsync(ImportConfigurationCreateRequest request);
 

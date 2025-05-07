@@ -14,7 +14,8 @@ import {ConfirmationComponent} from '../confirmation/confirmation.component';
 import {FloatLabel} from 'primeng/floatlabel';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
-import {InputText} from 'primeng/inputtext';
+import {InputNumber} from 'primeng/inputnumber';
+import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
 
 @Component({
   selector: 'vat-return-declaration-payment',
@@ -28,7 +29,8 @@ import {InputText} from 'primeng/inputtext';
     FloatLabel,
     IconField,
     InputIcon,
-    InputText
+    InputNumber,
+    FormInputErrorComponent
   ],
   templateUrl: './vat-return-declaration-payment.component.html',
   styles: ``
@@ -50,7 +52,7 @@ export class VatReturnDeclarationPaymentComponent {
 
   private createFormPaymentInfo() {
     return this.formBuilder.group({
-      amount: [0, [Validators.required]],
+      amount: [0, [Validators.required, Validators.min(0.01)]],
       date: [new Date(), [Validators.required]],
       type: [PaymentType.Bank, [Validators.required]]
     });

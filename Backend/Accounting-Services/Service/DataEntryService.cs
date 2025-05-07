@@ -35,26 +35,20 @@ public class DataEntryService : IDataEntryService
         _fieldTypeValidator = fieldTypeValidator;
     }
 
-    public async Task AddMissingDataTypeFieldsWithoutSaveAsync(int dataTypeId)
+    public async Task AddMissingDataTypeFieldsAsync(DataType dataType)
     {
-        var dataType = await _database.DataTypes
-            .Include(it => it.Fields)
-            .Include(it => it.Entries)
-            .ThenInclude(it => it.Fields)
-            .AsSplitQuery()
-            .FirstOrDefaultAsync(it => it.Id == dataTypeId);
-
-        if (dataType is null)
-        {
-            return;
-        }
-
-        foreach (var dataEntry in dataType.Entries)
+        var entries = await _database.DataEntries
+            .Include(de => de.Fields)
+            // .Where(de => de.IsDeleted)
+            .Where(de => de.DataTypeId == dataType.Id)
+            .ToListAsync();
+        
+        foreach (var dataEntry in entries)
         {
             var missingFields = dataType.Fields
                 .Select(it => it.Id)
-                .Except(dataEntry.Fields.Select(it => it.Id))
-                .Select(fieldId => dataType.Fields.First(it => it.Id == fieldId))
+                .Except(dataEntry.Fields.Select(it => it.DataTypeFieldId))
+                .SelectMany(fieldId => dataType.Fields.Where(it => it.Id == fieldId))
                 .ToList();
 
             foreach (var field in missingFields)

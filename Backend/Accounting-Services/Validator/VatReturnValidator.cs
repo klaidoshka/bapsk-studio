@@ -77,9 +77,9 @@ public class VatReturnValidator : IVatReturnValidator
         }
 
         var customerEntity = customer.Id is not null
-            ? await _database.Customers.FirstOrDefaultAsync(
-                it => it.Id == customer.Id && !it.IsDeleted
-            )
+            ? await _database.Customers
+                .Include(it => it.OtherDocuments)
+                .FirstOrDefaultAsync(it => it.Id == customer.Id && !it.IsDeleted)
             : await _database.Sales
                 .Include(it => it.Customer)
                 .ThenInclude(it => it.OtherDocuments)

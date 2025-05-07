@@ -26,19 +26,11 @@ public class SaleValidator : ISaleValidator
 
         if (
             String.IsNullOrWhiteSpace(sale.InvoiceNo) &&
-            sale.CashRegister is not null &&
-            String.IsNullOrWhiteSpace(sale.CashRegister.CashRegisterNo) &&
-            String.IsNullOrWhiteSpace(sale.CashRegister.ReceiptNo)
-        )
-        {
-            failures.Add("Either InvoiceNo or CashRegisterNo and ReceiptNo both must be provided.");
-        }
-
-        if (
-            String.IsNullOrWhiteSpace(sale.InvoiceNo) &&
-            sale.CashRegister is not null &&
-            (String.IsNullOrWhiteSpace(sale.CashRegister.CashRegisterNo) ||
-             String.IsNullOrWhiteSpace(sale.CashRegister.ReceiptNo))
+            (
+                sale.CashRegister is null ||
+                String.IsNullOrWhiteSpace(sale.CashRegister.CashRegisterNo) ||
+                String.IsNullOrWhiteSpace(sale.CashRegister.ReceiptNo)
+            )
         )
         {
             failures.Add("Both CashRegisterNo and ReceiptNo must be provided if InvoiceNo is not provided.");

@@ -88,10 +88,11 @@ public class DataTypeService : IDataTypeService
         (await _dataTypeValidator.ValidateDataTypeEditRequestAsync(request)).AssertValid();
 
         var dataType = await _database.DataTypes
-            .Include(dt => dt.Entries)
             .Include(dt => dt.Instance)
             .Include(dt => dt.Fields)
             .FirstAsync(dt => dt.Id == request.DataTypeId);
+
+        await using var transaction = await _database.Database.BeginTransactionAsync();
 
         // Update data-type
         dataType.Description = request.Description;
@@ -129,22 +130,21 @@ public class DataTypeService : IDataTypeService
         dataType.Fields
             .Where(f => !requestFieldsById.ContainsKey(f.Id))
             .ToList()
-            .ForEach(f => _database.DataTypeFields.Remove(f));
+            .ForEach(f => dataType.Fields.Remove(f));
 
         // Add new fields
         var newFields = request.Fields
-            .Where(rf => !matchedFields.ContainsKey(rf.DataTypeFieldId ?? -1))
+            .Where(rf => !matchedFields.ContainsKey(rf.DataTypeFieldId ?? 0))
             .ToList();
 
         foreach (var field in newFields)
         {
-            var value = _fieldTypeService.Serialize(field.Type, field.DefaultValue);
-
-            await _database.DataTypeFields.AddAsync(
+            dataType.Fields.Add(
                 new DataTypeField
                 {
-                    DataTypeId = dataType.Id,
-                    DefaultValue = value,
+                    DefaultValue = field.DefaultValue.IsNull()
+                        ? null
+                        : _fieldTypeService.Serialize(field.Type, field.DefaultValue),
                     IsRequired = field.IsRequired,
                     Name = field.Name,
                     ReferenceId = field.Type == FieldType.Reference ? field.ReferenceId : null,
@@ -153,10 +153,12 @@ public class DataTypeService : IDataTypeService
             );
         }
 
+        await transaction.CommitAsync();
+
         if (newFields.Count > 0)
         {
-            await _dataEntryService.AddMissingDataTypeFieldsWithoutSaveAsync(dataType.Id);
-            await _importConfigurationService.AddMissingDataTypeFieldsWithoutSaveAsync(dataType.Id);
+            await _dataEntryService.AddMissingDataTypeFieldsAsync(dataType);
+            await _importConfigurationService.AddMissingDataTypeFieldsAsync(dataType);
         }
 
         dataType.DisplayFieldId = request.DisplayFieldIndex is not null

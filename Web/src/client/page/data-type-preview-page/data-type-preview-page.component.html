@@ -35,9 +35,7 @@
         <card>
           <p card-header>Fields</p>
           <p card-subHeader>Fields of this specific data type.</p>
-          <p-table card-body [value]="dataType.fields || []"
-
-                  >
+          <p-table card-body [value]="dataType.fields || []">
             <ng-template #header>
               <tr>
                 <th>Name</th>
@@ -49,12 +47,8 @@
             <ng-template #body let-field>
               @let isReferenceField = field.type === FieldType.Reference;
               <tr>
-                <td><p [ngClass]="{'mt-7': isReferenceField}">{{ field.name }}</p></td>
-                <td>
-                  <p [ngClass]="{'mt-7': isReferenceField}">
-                    <badge-contrasted [value]="toFieldTypeLabel(field.type)"/>
-                  </p>
-                </td>
+                <td><p>{{ field.name }}</p></td>
+                <td><p><badge-contrasted [value]="toFieldTypeLabel(field.type)"/></p></td>
                 <td>
                   <p-badge [severity]="!field.isRequired ? 'contrast' : 'danger'"
                            [value]="field.isRequired ? 'Required' : 'Optional'"/>

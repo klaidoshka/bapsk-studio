@@ -20,6 +20,8 @@ public interface IVatReturnService
     public Task<StiVatReturnDeclaration?> GetBySaleIdAsync(int saleId);
 
     public Task<Sale> MapButentaTradeToSaleAsync(int tradeId);
+    
+    public Task MockExportAsync(int saleId);
 
     public PreviewCodeValues ReadPreviewCodeValues(string code);
 

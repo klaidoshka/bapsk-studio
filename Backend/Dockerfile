@@ -14,5 +14,6 @@ RUN apt-get update && apt-get install -y libgdiplus
 WORKDIR /app
 
 COPY --from=build /app/publish .
+COPY .env .env
 
 ENTRYPOINT ["dotnet", "Accounting-API.dll", "--urls", "https://0.0.0.0:5000"]

@@ -12,7 +12,7 @@
   </div>
   <!-- Content -->
   <div class="flex flex-col gap-4 md:flex-row">
-    <div class="md:w-3/5 flex flex-col gap-4">
+    <div class="md:w-4/7 flex flex-col gap-4">
       <!-- FAQ Section -->
       <card class="flex-1">
         <p card-header>Frequently Asked Questions</p>
@@ -39,7 +39,7 @@
       </card>
     </div>
 
-    <div class="md:w-2/5 flex flex-col gap-4">
+    <div class="md:w-3/7 flex flex-col gap-4">
       <!-- Getting Started -->
       <card class="flex-1">
         <p card-header>Getting Started</p>
@@ -48,12 +48,12 @@
           <div class="grid grid-cols-2">
             @for (step of gettingStartedSteps; track $index) {
               <div class="contents space-x-10">
-                <div class="flex row gap-2 items-center">
-                  <i class="pi pi-map-marker"></i>
+                <div class="flex row gap-2 items-start">
+                  {{ $index + 1 }}.
                   <p class="font-semibold">{{ step.title }}</p>
                   <p class="text-end ml-auto">—</p>
                 </div>
-                <div class="flex items-center">
+                <div class="flex items-start">
                   <p class="text-sm opacity-70">{{ step.description }}</p>
                 </div>
               </div>

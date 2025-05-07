@@ -1,16 +1,27 @@
 export class DateUtil {
-  public static parseUTC = (date: Date | string) => {
-    const value = typeof date === "string" ? date : date.toISOString();
-
-    if (value.endsWith("Z") || value.match(/[+-]\d{2}:\d{2}$/)) {
-      return new Date(value);
+  public static parseUTC = (date: Date | string): Date => {
+    if (date instanceof Date) {
+      return date;
     }
 
-    return new Date(value + "Z");
+    const iso = date.replace(" ", "T");
+    const withTZ = /Z$|[+-]\d{2}:\d{2}$/.test(iso) ? iso : iso + "Z";
+
+    return new Date(withTZ);
   };
 
-  public static adjustToLocalDate = (date: Date | string): Date =>
-    new Date((DateUtil.parseUTC(date)).toLocaleString());
+  public static adjustToLocalDate = (date: Date | string): Date => {
+    const utc = DateUtil.parseUTC(date);
+    return new Date(
+      utc.getFullYear(),
+      utc.getMonth(),
+      utc.getDate(),
+      utc.getHours(),
+      utc.getMinutes(),
+      utc.getSeconds(),
+      utc.getMilliseconds()
+    );
+  }
 
   public static toString = (date: Date | string): string => {
     if (typeof date === "string") {

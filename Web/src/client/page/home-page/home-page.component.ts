@@ -45,6 +45,14 @@ export class HomePageComponent {
       description: 'Use the import configuration to import data from files.'
     },
     {
+      title: 'Create Occurred Sales',
+      description: 'Create sale entries to be used for VAT returns.'
+    },
+    {
+      title: 'Submit VAT Return',
+      description: 'Submit sale TaxFree declaration for the customer to get the VAT return.'
+    },
+    {
       title: 'Generate Report',
       description: 'Generate and export reports based on your data.'
     }

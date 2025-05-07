@@ -18,6 +18,7 @@ import {
   FailedToLoadPleaseReloadComponent
 } from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
 import {CardComponent} from '../../component/card/card.component';
+import {FieldType} from '../../model/data-type-field.model';
 
 @Component({
   selector: 'data-entry-preview-page',
@@ -40,6 +41,7 @@ export class DataEntryPreviewPageComponent {
   protected readonly dataEntryId = input.required<string>();
   protected readonly instanceId = input.required<string>();
   protected readonly instanceIdAsNumber = computed(() => NumberUtil.parse(this.instanceId()));
+  protected readonly FieldType = FieldType;
 
   protected readonly dataEntry = rxResource({
     request: () => ({

@@ -23,19 +23,19 @@ public class IsoCountryCodeFieldHandler() : FieldHandler(FieldType.IsoCountryCod
             JsonElement jsonElement => jsonElement.ValueKind switch
             {
                 JsonValueKind.String => ToCountry(jsonElement.GetString()!),
-                JsonValueKind.Number => ToCountry(jsonElement.GetDouble()),
+                JsonValueKind.Number => ToCountry(jsonElement.GetInt32()),
                 _ => null
             },
-            string stringValue => Enum.TryParse<IsoCountryCode>(
-                stringValue,
-                true,
-                out var candidate
-            )
-                ? candidate
-                : null,
-            int intValue => Enum.IsDefined(typeof(IsoCountryCode), intValue)
-                ? (IsoCountryCode)intValue
-                : null,
+            string stringValue => Int32.TryParse(stringValue, out var stringAsIntValue)
+                ? ToCountry(stringAsIntValue)
+                : Enum.TryParse<IsoCountryCode>(
+                    stringValue,
+                    true,
+                    out var candidate
+                )
+                    ? candidate
+                    : null,
+            int intValue => (IsoCountryCode)intValue,
             _ => null
         };
 

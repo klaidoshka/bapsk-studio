@@ -11,9 +11,13 @@ using Accounting.Contract.Validator;
 using Accounting.Services.FieldHandler;
 using Accounting.Services.Service;
 using Accounting.Services.Validator;
+using DotNetEnv;
+using DotNetEnv.Configuration;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddDotNetEnv(".env", LoadOptions.TraversePath());
 
 builder.AddConfiguration<Butenta>("Butenta");
 builder.AddConfiguration<Email>("Email");
@@ -132,14 +136,9 @@ application.UseCors(cors => cors
     .AllowCredentials()
     .AllowAnyHeader()
     .WithOrigins(
-        "https://localhost:3000",
-        "https://localhost:4200",
-        "https://localhost:5000",
-        "https://*.bapsk.studio:3000",
-        "https://*.bapsk.studio:4200",
-        "https://*.bapsk.studio:5000"
+        Environment.GetEnvironmentVariable("CORS_ORIGINS")?.Split(",")
+        ?? throw new ArgumentException("CORS_ORIGINS environment variable is not set")
     )
-    .SetIsOriginAllowedToAllowWildcardSubdomains()
 );
 
 application.UseAuthentication();

@@ -1,4 +1,5 @@
 import {Injectable} from '@angular/core';
+import {environment} from '../environments/environment';
 
 const routePlaceholderRegex = /:([a-zA-Z]+)/g;
 
@@ -36,7 +37,8 @@ const buildUrl = (
   providedIn: 'root'
 })
 export class ApiRouter {
-  private readonly base = 'https://localhost:5000/api/v1';
+  private readonly base = environment.ASPNET__SERVER__API;
+  private readonly baseWeb = environment.WEB__SERVER__API;
   private readonly accounting = this.base + '/accounting';
   private readonly accountingIsolated = this.accounting + '/instance/:instanceId';
 
@@ -102,6 +104,10 @@ export class ApiRouter {
     getByUser: () => buildUrl(this.accounting, '/instance'),
   };
 
+  readonly misc = {
+    beautifyHtmlTable: () => buildUrl(this.baseWeb, '/misc/beautify-html-table'),
+  }
+
   readonly report = {
     generateDataEntries: (instanceId: number) =>
       buildUrl(this.accountingIsolated, '/report/generate-data-entries', { instanceId }),
@@ -156,6 +162,8 @@ export class ApiRouter {
       buildUrl(this.accountingIsolated, '/vat-return/:saleId', { instanceId, saleId }),
     getByCode: (code: string) =>
       buildUrl(this.accounting, '/vat-return', {}, { code }),
+    mockExport: (instanceId: number, saleId: number) =>
+      buildUrl(this.accountingIsolated, '/vat-return/:saleId/mock-export', { instanceId, saleId }),
     payment: (instanceId: number, saleId: number) =>
       buildUrl(this.accountingIsolated, '/vat-return/:saleId/payment', { instanceId, saleId }),
     update: (instanceId: number, saleId: number) =>

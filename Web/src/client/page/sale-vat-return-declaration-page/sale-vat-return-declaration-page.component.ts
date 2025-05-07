@@ -12,7 +12,7 @@ import {toCustomerFullName} from '../../model/customer.model';
 import {SubmitDeclarationState, toExportResultLabel, toSubmitDeclarationStateLabel} from '../../model/vat-return.model';
 import {NumberUtil} from '../../util/number.util';
 import {Button} from 'primeng/button';
-import {CurrencyPipe, DatePipe, NgClass} from '@angular/common';
+import {CurrencyPipe, DatePipe} from '@angular/common';
 import {Badge} from 'primeng/badge';
 import {TableModule} from 'primeng/table';
 import {RoundPipe} from '../../pipe/round.pipe';
@@ -29,6 +29,7 @@ import {
 } from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
 import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {Tooltip} from 'primeng/tooltip';
+import {Accordion, AccordionContent, AccordionHeader, AccordionPanel} from 'primeng/accordion';
 
 @Component({
   selector: 'sale-vat-return-declaration-page',
@@ -38,7 +39,6 @@ import {Tooltip} from 'primeng/tooltip';
     Badge,
     DatePipe,
     CurrencyPipe,
-    NgClass,
     TableModule,
     RoundPipe,
     VatReturnPaymentTableComponent,
@@ -49,7 +49,11 @@ import {Tooltip} from 'primeng/tooltip';
     CardHeadlessComponent,
     FailedToLoadPleaseReloadComponent,
     LoadingSpinnerComponent,
-    Tooltip
+    Tooltip,
+    Accordion,
+    AccordionPanel,
+    AccordionHeader,
+    AccordionContent
   ],
   templateUrl: './sale-vat-return-declaration-page.component.html',
   styles: ``
@@ -68,15 +72,13 @@ export class SaleVatReturnDeclarationPageComponent {
   protected readonly isCancelling = signal<boolean>(false);
   protected readonly isRefreshing = signal<boolean>(false);
   protected readonly saleId = input.required<string>();
-  protected readonly showQrCodes = signal<boolean>(false);
-  protected readonly submissionForm = viewChild(VatReturnDeclarationSubmissionComponent);
 
   readonly declaration = rxResource({
     request: () => ({
       instanceId: this.instanceIdAsNumber(),
       saleId: NumberUtil.parse(this.saleId())
     }),
-    loader: ({request}) => request.instanceId && request.saleId
+    loader: ({ request }) => request.instanceId && request.saleId
       ? this.vatReturnService.getWithDeclarerBySaleId(request.instanceId, request.saleId)
       : of(undefined)
   });
@@ -86,7 +88,7 @@ export class SaleVatReturnDeclarationPageComponent {
       instanceId: this.instanceIdAsNumber(),
       saleId: NumberUtil.parse(this.saleId())
     }),
-    loader: ({request}) => request.instanceId && request.saleId
+    loader: ({ request }) => request.instanceId && request.saleId
       ? this.saleService.getById(request.instanceId, request.saleId)
       : of(undefined)
   });

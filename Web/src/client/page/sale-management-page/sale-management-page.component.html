@@ -27,7 +27,7 @@
             <!-- Salesman -->
             <div>
               <p-floatlabel variant="on" class="w-60">
-                <p-select dropdownIcon="pi pi-shopping-cart" formControlName="salesmanId" id="salesmanId"
+                <p-select dropdownIcon="pi pi-shop" formControlName="salesmanId" id="salesmanId"
                           [options]="salesmenLabeled.value()" optionValue="value" optionLabel="label"
                           class="w-full"/>
                 <label for="salesmanId">Salesman</label>
@@ -41,7 +41,7 @@
                 <p-date-picker inputId="date" formControlName="date" iconDisplay="input" [showIcon]="true"
                                [showTime]="true" variant="filled" styleClass="w-full" appendTo="body"
                                inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-inherit!"/>
-                <label for="date" class="block text-sm font-medium">Date</label>
+                <label for="date">Date</label>
               </p-floatlabel>
               <form-input-error [control]="form.controls.date"/>
             </div>
@@ -137,7 +137,8 @@
                   <p-float-label variant="on" class="w-60">
                     <p-iconfield>
                       <p-inputicon class="pi pi-euro"/>
-                      <input id="unitPrice" formControlName="unitPrice" pInputText type="number" class="w-full"/>
+                      <p-input-number inputId="unitPrice" formControlName="unitPrice" currency="EUR" mode="currency" [min]="0"
+                                      [showButtons]="true" [step]="0.05" class="w-full" inputStyleClass="pl-10! w-60!"/>
                     </p-iconfield>
                     <label for="unitPrice">Unit Price</label>
                   </p-float-label>

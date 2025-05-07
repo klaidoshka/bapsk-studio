@@ -2,9 +2,7 @@ import {Component, inject, input, signal, viewChild} from '@angular/core';
 import {Button} from "primeng/button";
 import {ConfirmationComponent} from "../../component/confirmation/confirmation.component";
 import {DatePipe} from "@angular/common";
-import {
-  MessagesShowcaseComponent
-} from "../../component/messages-showcase/messages-showcase.component";
+import {MessagesShowcaseComponent} from "../../component/messages-showcase/messages-showcase.component";
 import {TableModule} from "primeng/table";
 import {CustomerService} from '../../service/customer.service';
 import {MessageHandlingService} from '../../service/message-handling.service';
@@ -40,8 +38,6 @@ export class CustomerPageComponent {
   private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  protected readonly getIdentityDocumentTypeLabel = getIdentityDocumentTypeLabel;
-  protected readonly getIsoCountryLabel = getIsoCountryLabel;
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});

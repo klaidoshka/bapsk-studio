@@ -1,22 +1,36 @@
 import express from "express";
 import cors from "cors";
 import {HtmlService} from './service/html.service';
+import os from "os";
+import fs from 'node:fs';
+import https from 'node:https';
 
-const apiPort = process.env["PORT"] || 3000;
-const apiPrefix = "/api/v1";
+const routes = {
+  beautifyHtmlTable: "/api/v1/misc/beautify-html-table",
+};
+
+const port = process.env["WEB__SERVER__PORT"] ?? 3000;
+const sslEnabled = process.env["SSL__ENABLED"] === "true";
+
+const sslOptions = {
+  key: fs.readFileSync(process.env["SSL__KEY"] ?? ""),
+  cert: fs.readFileSync(process.env["SSL__CERTIFICATE"] ?? "")
+};
+
 const application = express();
 
 application.use(cors(
   {
-    origin: "*",
+    origin: process.env["WEB__SERVER__CORS_ORIGINS"]?.split(",") || "*",
     methods: ["POST", "OPTIONS"],
+    credentials: true
   }
 ));
 
 application.use(express.json());
 application.use(express.text({type: "text/html"}));
 
-application.post(`${apiPrefix}/misc/beautify-html-table`, (req, res) => {
+application.post(routes.beautifyHtmlTable, (req, res) => {
   const html = req.body;
 
   if (!html) {
@@ -41,4 +55,15 @@ application.post(`${apiPrefix}/misc/beautify-html-table`, (req, res) => {
   }
 });
 
-application.listen(apiPort, () => console.log(`Server running at port https://0.0.0.0:${apiPort}`));
+const informIp = () => {
+  const ip = os.networkInterfaces()?.["en0"]?.find((iface) => iface.family === "IPv4")?.address || "localhost";
+  const host = `${sslEnabled ? "https" : "http"}://${ip}:${port}`;
+  console.log(host);
+}
+
+if (sslEnabled) {
+  https.createServer(sslOptions, application).listen(port, () => informIp());
+} else {
+  application.listen(port, () => informIp());
+}
+

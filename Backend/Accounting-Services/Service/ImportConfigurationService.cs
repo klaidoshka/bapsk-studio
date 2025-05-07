@@ -1,6 +1,7 @@
 using Accounting.Contract;
 using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.ImportConfiguration;
+using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Microsoft.EntityFrameworkCore;
 using ImportConfiguration = Accounting.Contract.Entity.ImportConfiguration;
@@ -22,41 +23,35 @@ public class ImportConfigurationService : IImportConfigurationService
         _fieldTypeService = fieldTypeService;
     }
 
-    public async Task AddMissingDataTypeFieldsWithoutSaveAsync(int dataTypeId)
+    public async Task AddMissingDataTypeFieldsAsync(DataType dataType)
     {
-        var dataType = await _database.DataTypes
-            .Include(it => it.Fields)
-            .FirstOrDefaultAsync(it => it.Id == dataTypeId);
-
-        if (dataType is null)
-        {
-            return;
-        }
-
         var configurations = await _database.ImportConfigurations
             .Include(it => it.Fields)
-            .Where(it => it.DataTypeId == dataTypeId)
+            .Where(it => it.DataTypeId == dataType.Id)
             .ToListAsync();
 
-        var defaultValues = dataType.Fields.ToDictionary(it => it.Id, it => it.DefaultValue);
+        var dataTypeFields = dataType.Fields
+            .GroupBy(it => it.Id)
+            .ToDictionary(it => it.Key, it => it.ToList());
 
         foreach (var configuration in configurations)
         {
-            var missingFieldIds = defaultValues.Keys
+            var missingFields = dataTypeFields.Keys
                 .Except(
                     configuration.Fields
                         .Select(it => it.DataTypeFieldId)
                         .ToHashSet()
                 )
+                .SelectMany(id => dataTypeFields[id])
                 .ToList();
 
-            foreach (var missingFieldId in missingFieldIds)
+            foreach (var missingField in missingFields)
             {
                 configuration.Fields.Add(
                     new ImportConfigurationField
                     {
-                        DataTypeFieldId = missingFieldId,
-                        DefaultValue = defaultValues[missingFieldId],
+                        DataTypeField = missingField,
+                        DefaultValue = missingField.DefaultValue,
                         Order = configuration.Fields.Count
                     }
                 );
