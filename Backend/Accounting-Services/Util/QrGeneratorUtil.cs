@@ -76,6 +76,6 @@ public static class QrGeneratorUtil
         using var data = generator.CreateQrCode(text, QRCodeGenerator.ECCLevel.M);
         using var code = new Base64QRCode(data);
 
-        return code.GetGraphic(20);
+        return code.GetGraphic(4);
     }
 }

@@ -4,9 +4,7 @@ import {DatePicker} from "primeng/datepicker";
 import {FormInputErrorComponent} from "../../component/form-input-error/form-input-error.component";
 import {FormBuilder, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
 import {InputText} from "primeng/inputtext";
-import {
-  MessagesShowcaseComponent
-} from "../../component/messages-showcase/messages-showcase.component";
+import {MessagesShowcaseComponent} from "../../component/messages-showcase/messages-showcase.component";
 import {Select} from "primeng/select";
 import {UnitOfMeasureType} from '../../model/unit-of-measure-type.model';
 import {MessageHandlingService} from '../../service/message-handling.service';
@@ -17,16 +15,10 @@ import {first, map, of, tap} from 'rxjs';
 import {NumberUtil} from '../../util/number.util';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {SaleReceiptType, saleReceiptTypes} from './sale-receipt-type.model';
-import {
-  defaultStandardMeasurement,
-  measurementUnits,
-  StandardMeasurements
-} from './standard-measurement.model';
+import {defaultStandardMeasurement, measurementUnits, StandardMeasurements} from './standard-measurement.model';
 import {CustomerService} from '../../service/customer.service';
 import {SalesmanService} from '../../service/salesman.service';
-import {
-  SalePageHeaderSectionComponent
-} from "../../component/sale-page-header-section/sale-page-header-section.component";
+import {SalePageHeaderSectionComponent} from "../../component/sale-page-header-section/sale-page-header-section.component";
 import {CardComponent} from '../../component/card/card.component';
 import {FloatLabel} from 'primeng/floatlabel';
 import {IconField} from 'primeng/iconfield';
@@ -113,7 +105,7 @@ export class SaleManagementPageComponent {
       ? this.salesmanService
         .getAllByInstanceId(request.instanceId)
         .pipe(map(salesmen => salesmen.map(salesman => ({
-          label: `${salesman.name} (${salesman.vatPayerCode.value})`,
+          label: `${salesman.name} (Code ${salesman.vatPayerCode.value})`,
           value: salesman.id
         }))))
       : of(undefined)

@@ -8,16 +8,12 @@ import Sale, {SaleWithVatReturnDeclaration, SoldGood} from '../../model/sale.mod
 import {first, map, of} from 'rxjs';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, Router} from '@angular/router';
-import {
-  MessagesShowcaseComponent
-} from '../../component/messages-showcase/messages-showcase.component';
+import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
 import {Button} from 'primeng/button';
 import {TableModule} from 'primeng/table';
 import {CurrencyPipe, DatePipe} from '@angular/common';
 import {NumberUtil} from '../../util/number.util';
-import {
-  SalePageHeaderSectionComponent
-} from '../../component/sale-page-header-section/sale-page-header-section.component';
+import {SalePageHeaderSectionComponent} from '../../component/sale-page-header-section/sale-page-header-section.component';
 import {CardComponent} from '../../component/card/card.component';
 import {SubmitDeclarationState} from '../../model/vat-return.model';
 import {Badge} from 'primeng/badge';
@@ -44,7 +40,6 @@ export class SalePageComponent {
   private readonly router = inject(Router);
   private readonly saleService = inject(SaleService);
   protected readonly SubmitDeclarationState = SubmitDeclarationState;
-  protected readonly toCustomerFullName = toCustomerFullName;
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});

@@ -67,18 +67,12 @@ export class VatReturnService {
       .get<VatReturnDeclaration | null>(this.apiRouter.vatReturn.getBySaleId(instanceId, saleId))
       .pipe(
         map(declaration => declaration ? this.updateProperties(declaration) : undefined),
-        tap(declaration => {
-          if (declaration) {
-            this.cacheBySaleIdService.setToKey(saleId, declaration);
-          }
-        }),
-        switchMap(declaration => declaration
-          ? this.cacheBySaleIdService
-            .get(saleId)
-            .pipe(
-              map(declaration => declaration ? declaration : undefined)
-            )
-          : of(undefined)
+        tap(declaration => this.cacheBySaleIdService.setToKey(saleId, declaration ?? null)),
+        switchMap(_ => this.cacheBySaleIdService
+          .get(saleId)
+          .pipe(
+            map(declaration => declaration ? declaration : undefined)
+          )
         )
       );
   }
@@ -120,18 +114,12 @@ export class VatReturnService {
           })
           : null
         ),
-        tap(declaration => {
-          if (declaration) {
-            this.cacheByCodeService.setToKey(code, declaration);
-          }
-        }),
-        switchMap(declaration => declaration
-          ? this.cacheByCodeService
-            .get(code)
-            .pipe(
-              map(declaration => declaration ? declaration : undefined)
-            )
-          : of(undefined)
+        tap(declaration => this.cacheByCodeService.setToKey(code, declaration)),
+        switchMap(_ => this.cacheByCodeService
+          .get(code)
+          .pipe(
+            map(declaration => declaration ? declaration : undefined)
+          )
         )
       );
   }
@@ -141,10 +129,7 @@ export class VatReturnService {
       .post<VatReturnDeclaration>(this.apiRouter.vatReturn.submit(request.instanceId), request)
       .pipe(
         map(declaration => this.updateProperties(declaration)),
-        tap(declaration => {
-          this.cacheBySaleIdService.invalidate(declaration.saleId);
-          this.cacheBySaleIdService.setToKey(declaration.saleId, declaration);
-        }),
+        tap(declaration => this.cacheBySaleIdService.setToKey(declaration.saleId, declaration)),
         catchError(response => {
           if (containsFailureCode(response, FailureCode.VatReturnDeclarationSubmitRejectedButUpdated)) {
             this.cacheBySaleIdService.invalidate(request.sale.id);

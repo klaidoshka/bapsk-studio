@@ -8,12 +8,12 @@
     <confirmation key="cancel-confirmation" header="Are you sure about cancelling this declaration?"/>
     <div class="flex flex-col gap-4">
       <!-- Row of actions -->
-      <div>
+      <div class="flex flex-wrap gap-2">
         @if (declaration.value() && !declaration.value()!.isCancelled) {
           <p-button title="Refresh declaration" icon="pi pi-refresh" label="Refresh" (click)="refresh()" size="small"
                     [disabled]="isRefreshing()"/>
           @if (!declaration.value()!.export) {
-            <p-button title="Cancel declaration" size="small" icon="pi pi-ban" class="ml-2" label="Cancel" (click)="cancel()"
+            <p-button title="Cancel declaration" size="small" icon="pi pi-ban" label="Cancel" (click)="cancel()"
                       [disabled]="isCancelling()" severity="danger"/>
           }
         }
@@ -83,27 +83,26 @@
 
       @if (declaration.value()?.qrCodes?.length) {
         <card-headless>
-          <div card-body class="dark:bg-surface-950 bg-surface-50">
-            <div
-              class="p-4 cursor-pointer flex justify-between items-center border-b border-b-primary-950/20 dark:border-b-primary-50/20"
-              (click)="showQrCodes.set(!showQrCodes())">
-              <p class="font-bold text-lg">QR Codes</p>
-              <svg class="w-6 h-6 transform transition-transform" [ngClass]="{'rotate-180': showQrCodes()}"
-                   xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-              </svg>
-            </div>
-            @if (showQrCodes()) {
-              <div class="flex flex-wrap gap-4 p-2">
-                @for (qrCode of declaration.value()!.qrCodes; track $index; let i = $index) {
-                  <div class="flex justify-center w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
-                    <img [src]="'data:image/png;base64,' + qrCode"
-                         [alt]="'Declaration\'s #' + (i + 1) + ' QR code chunk'" class="w-48 h-48"/>
-                  </div>
-                }
-              </div>
-            }
-          </div>
+          <p-accordion card-body>
+            <p-accordion-panel [value]="0">
+              <p-accordion-header>
+                <div class="flex items-center gap-3 w-full text-primary-950 dark:text-primary-50">
+                  <i class="pi pi-qrcode"></i>
+                  <span class="font-semibold">QR Codes</span>
+                </div>
+              </p-accordion-header>
+              <p-accordion-content>
+                <div class="flex flex-wrap gap-4 p-2">
+                  @for (qrCode of declaration.value()!.qrCodes; track $index; let i = $index) {
+                    <div class="flex justify-center w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
+                      <img [src]="'data:image/png;base64,' + qrCode"
+                           [alt]="'Declaration\'s #' + (i + 1) + ' QR code chunk'" class="w-48 h-48"/>
+                    </div>
+                  }
+                </div>
+              </p-accordion-content>
+            </p-accordion-panel>
+          </p-accordion>
         </card-headless>
       }
 

@@ -51,6 +51,10 @@ export class SessionShowcaseComponent {
       activeTime += `${timeParts.hours}h `;
     }
 
+    if (timeParts.days === 0 && timeParts.hours === 0) {
+      activeTime = 'Less than an hour';
+    }
+
     return activeTime;
   }
 

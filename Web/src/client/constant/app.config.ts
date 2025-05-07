@@ -1,10 +1,5 @@
 import {provideHttpClient, withFetch, withInterceptors} from "@angular/common/http";
-import {
-  ApplicationConfig,
-  inject,
-  provideAppInitializer,
-  provideExperimentalZonelessChangeDetection
-} from "@angular/core";
+import {ApplicationConfig, inject, provideAppInitializer, provideExperimentalZonelessChangeDetection} from "@angular/core";
 import {provideAnimationsAsync} from "@angular/platform-browser/animations/async";
 import {provideRouter, withComponentInputBinding, withRouterConfig} from "@angular/router";
 import {providePrimeNG} from "primeng/config";
@@ -32,7 +27,6 @@ export const appConfig: ApplicationConfig = {
     ),
     provideAnimationsAsync(),
     providePrimeNG({
-      ripple: true,
       theme: {
         preset: ThemePreset,
         options: {
