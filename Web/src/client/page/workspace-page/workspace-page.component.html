@@ -8,10 +8,10 @@
 } @else {
   <p-button variant="text" icon="pi pi-bars" size="small"
             styleClass="rounded-xs! bg-primary-950/70! dark:bg-primary-50/70! text-primary-50! dark:text-primary-950! p-1!"
-            class="fixed! l-0 top-15 left-1 z-20 md:hidden" (onClick)="isMobileSidebarOpen.set(true)"
+            class="fixed! top-15 left-1 z-10 md:hidden" (onClick)="isMobileSidebarOpen.set(true)"
             [class.hidden]="isMobileSidebarOpen()"/>
   <div class="h-full w-full container mx-auto flex flex-col relative">
-    <div class="flex flex-row w-full h-full gap-4">
+    <div class="flex flex-row w-full h-full gap-4 relative">
       <!-- Sidebar -->
       <div class="flex flex-col min-w-60 w-60 gap-6 h-full overflow-y-auto bg-primary-50 dark:bg-primary-950
       border border-y-0 border-primary-950/20 dark:border-primary-50/20 relative"
@@ -65,10 +65,10 @@
             }
           </nav>
         </div>
-        <p-button variant="text" icon="pi pi-bars" size="small" class="fixed! left-60 top-15 z-20 md:hidden"
-                  styleClass="rounded-xs! bg-primary-950/70! dark:bg-primary-50/70! text-primary-50! dark:text-primary-950! p-1!"
-                  (onClick)="isMobileSidebarOpen.set(false)"/>
       </div>
+      <p-button variant="text" icon="pi pi-bars" size="small" class="absolute! left-60 top-1 z-10 md:hidden"
+                styleClass="rounded-xs! bg-primary-950/70! dark:bg-primary-50/70! text-primary-50! dark:text-primary-950! p-1!"
+                (onClick)="isMobileSidebarOpen.set(false)" [class.hidden]="!isMobileSidebarOpen()"/>
       <!-- Main Content -->
       <div class="flex-1 min-w-0 overflow-hidden">
         <div class="h-full w-full overflow-auto">
