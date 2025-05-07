@@ -29,6 +29,7 @@ import {
 import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {MessageService} from 'primeng/api';
 import {ActivatedRoute, Router} from '@angular/router';
+import {InputNumber} from 'primeng/inputnumber';
 
 @Component({
   selector: 'sale-management-page',
@@ -47,7 +48,8 @@ import {ActivatedRoute, Router} from '@angular/router';
     IconField,
     InputIcon,
     FailedToLoadPleaseReloadComponent,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    InputNumber
   ],
   templateUrl: './sale-management-page.component.html',
   styles: ``

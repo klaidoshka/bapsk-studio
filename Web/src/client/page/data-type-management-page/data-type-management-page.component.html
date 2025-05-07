@@ -69,16 +69,15 @@
                   </td>
                   <td>
                     <p-select formControlName="type" [options]="fieldTypes" optionLabel="label" optionValue="value"
-                              placeholder="Select a type" appendTo="body" styleClass="w-48"
-                              [class]="{'mt-7': isReference}"/>
+                              placeholder="Select a type" appendTo="body" styleClass="w-48" [class]="{'mt-7': isReference}"
+                              (onChange)="consumeChange(i, $event.value)"/>
                   </td>
                   <td>
                     @if (isReference) {
                       <div class="flex flex-col">
                         <label for="referencedType" class="font-semibold">Referenced Type</label>
                         <p-select id="referencedType" placeholder="Select a referenced type"
-                                  formControlName="referencedType" [options]="dataTypes.value() || []"
-                                  optionLabel="name"
+                                  formControlName="referencedType" [options]="dataTypes.value() || []" optionLabel="name"
                                   optionValue="id" appendTo="body" class="mt-1 w-full"/>
                       </div>
                     } @else {

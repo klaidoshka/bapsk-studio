@@ -8,7 +8,6 @@ import {DataTypeService} from '../../service/data-type.service';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {of} from 'rxjs';
 import {NumberUtil} from '../../util/number.util';
-import {NgClass} from '@angular/common';
 import {
   DataTypePageHeaderSectionComponent
 } from '../../component/data-type-page-header-section/data-type-page-header-section.component';
@@ -25,7 +24,6 @@ import {Badge} from 'primeng/badge';
   imports: [
     DataTypeEntryFieldDisplayComponent,
     TableModule,
-    NgClass,
     DataTypePageHeaderSectionComponent,
     LoadingSpinnerComponent,
     FailedToLoadPleaseReloadComponent,

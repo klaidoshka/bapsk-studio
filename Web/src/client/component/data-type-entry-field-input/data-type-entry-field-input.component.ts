@@ -5,7 +5,7 @@ import {DatePicker} from 'primeng/datepicker';
 import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule} from '@angular/forms';
 import {InputText} from 'primeng/inputtext';
 import {InputNumber} from 'primeng/inputnumber';
-import {getDefaultIsoCountry, IsoCountries} from '../../model/iso-country.model';
+import {IsoCountries} from '../../model/iso-country.model';
 import {Select} from 'primeng/select';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
@@ -37,6 +37,7 @@ export class DataTypeEntryFieldInputComponent implements ControlValueAccessor {
   protected readonly FieldType = FieldType;
   protected readonly IsoCountries = IsoCountries;
   readonly type = input.required<FieldType>();
+  readonly inputId = input<string>();
   protected readonly oldType = signal<FieldType | undefined>(undefined);
 
   protected readonly onChange = signal<(value: string) => void>(() => {
@@ -102,10 +103,8 @@ export class DataTypeEntryFieldInputComponent implements ControlValueAccessor {
         return 0;
 
       case FieldType.Date:
-        return undefined;
-
       case FieldType.IsoCountryCode:
-        return getDefaultIsoCountry().code;
+        return undefined;
 
       default:
         return '';

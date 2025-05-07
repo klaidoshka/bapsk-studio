@@ -13,18 +13,26 @@
         <div class="flex flex-wrap gap-4" formArrayName="values">
           @for (field of formFields(); track $index) {
             @let isReferenceField = field.type === FieldType.Reference;
-
+            @let isCheckbox = field.type === FieldType.Check;
             <div>
-              <p-floatlabel variant="on" class="w-60">
-                @if (isReferenceField) {
-                  <p-select placeholder="Select a referenced entry" [options]="getDataEntries(field.referenceId)()"
-                            optionLabel="label" optionValue="id" appendTo="body" dropdownIcon="pi pi-reference"
-                            [formControl]="field.control.controls.value" class="w-full" [required]="field.isRequired!"/>
-                } @else {
-                  <data-type-entry-field-input [formControl]="field.control.controls.value" [type]="field.type!"/>
-                }
-                <label [for]="field.field" class="block text-sm font-medium">{{ field.field }}</label>
-              </p-floatlabel>
+              @if (!isCheckbox) {
+                <p-floatlabel variant="on" class="w-60">
+                  @if (isReferenceField) {
+                    <p-select [options]="getDataEntries(field.referenceId)()" optionLabel="label" optionValue="id" appendTo="body"
+                              dropdownIcon="pi pi-reference" [formControl]="field.control.controls.value" class="w-full"
+                              [required]="field.isRequired!"/>
+                  } @else {
+                    <data-type-entry-field-input [formControl]="field.control.controls.value" [type]="field.type!"/>
+                  }
+                  <label [for]="field.field">{{ field.field }}</label>
+                </p-floatlabel>
+              } @else {
+                <div class="p-inputtext flex flex-row gap-2">
+                  <data-type-entry-field-input [inputId]="field.field ?? undefined" [formControl]="field.control.controls.value"
+                                               [type]="field.type!"/>
+                  <label class="text-primary-950 dark:text-primary-50 opacity-70" [for]="field.field">{{ field.field }}</label>
+                </div>
+              }
               <form-input-error [control]="field.control.controls.value"/>
             </div>
           }
