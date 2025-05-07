@@ -23,6 +23,7 @@ application.use(cors(
   {
     origin: process.env["WEB__SERVER__CORS_ORIGINS"]?.split(",") || "*",
     methods: ["POST", "OPTIONS"],
+    credentials: true
   }
 ));
 
