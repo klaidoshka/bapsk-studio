@@ -136,7 +136,7 @@ application.UseCors(cors => cors
     .AllowCredentials()
     .AllowAnyHeader()
     .WithOrigins(
-        Environment.GetEnvironmentVariable("CORS_ORIGINS") 
+        Environment.GetEnvironmentVariable("CORS_ORIGINS")?.Split(",")
         ?? throw new ArgumentException("CORS_ORIGINS environment variable is not set")
     )
 );

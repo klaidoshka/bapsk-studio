@@ -25,3 +25,4 @@ testem.log
 Thumbs.db
 .env
 !.env.example
+**/environments/*.*.ts

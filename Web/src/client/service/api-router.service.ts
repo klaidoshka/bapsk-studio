@@ -1,4 +1,5 @@
 import {Injectable} from '@angular/core';
+import {environment} from '../environments/environment';
 
 const routePlaceholderRegex = /:([a-zA-Z]+)/g;
 
@@ -36,8 +37,8 @@ const buildUrl = (
   providedIn: 'root'
 })
 export class ApiRouter {
-  private readonly base = process.env['ASPNET__SERVER__API']!;
-  private readonly baseWeb = process.env['WEB__SERVER__API']!;
+  private readonly base = environment.ASPNET__SERVER__API;
+  private readonly baseWeb = environment.WEB__SERVER__API;
   private readonly accounting = this.base + '/accounting';
   private readonly accountingIsolated = this.accounting + '/instance/:instanceId';
 
