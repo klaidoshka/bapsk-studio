@@ -11,9 +11,7 @@ import {ReportTemplateService} from '../../service/report-template.service';
 import {Button} from 'primeng/button';
 import {FormInputErrorComponent} from '../../component/form-input-error/form-input-error.component';
 import {InputText} from 'primeng/inputtext';
-import {
-  MessagesShowcaseComponent
-} from '../../component/messages-showcase/messages-showcase.component';
+import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
 import {Select} from 'primeng/select';
 import {TableModule} from 'primeng/table';
 import DataType from '../../model/data-type.model';
@@ -29,9 +27,7 @@ import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-s
 import {FloatLabel} from 'primeng/floatlabel';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
-import {
-  BadgeContrastedComponent
-} from '../../component/badge-contrasted/badge-contrasted.component';
+import {BadgeContrastedComponent} from '../../component/badge-contrasted/badge-contrasted.component';
 import {MessageService} from 'primeng/api';
 import {ActivatedRoute, Router} from '@angular/router';
 
@@ -74,8 +70,10 @@ export class ReportTemplateManagementPageComponent {
     request: () => ({
       instanceId: NumberUtil.parse(this.instanceId())
     }),
-    loader: ({request}) => request.instanceId
-      ? this.dataTypeService.getAllByInstanceId(request.instanceId)
+    loader: ({ request }) => request.instanceId
+      ? this.dataTypeService
+        .getAllByInstanceId(request.instanceId)
+        .pipe(tap(dataTypes => this.consumeLoadedDataTypes(dataTypes)))
       : of([])
   });
 
@@ -84,12 +82,18 @@ export class ReportTemplateManagementPageComponent {
       instanceId: NumberUtil.parse(this.instanceId()),
       templateId: NumberUtil.parse(this.templateId())
     }),
-    loader: ({request}) => request.instanceId && request.templateId
+    loader: ({ request }) => request.instanceId && request.templateId
       ? this.reportTemplateService
         .getById(request.instanceId, request.templateId)
         .pipe(tap(template => this.patchFormValues(template)))
       : of(undefined)
   });
+
+  private consumeLoadedDataTypes(dataTypes: DataType[]) {
+    if (dataTypes.length > 0) {
+      this.changeFormFields(dataTypes[0]);
+    }
+  }
 
   private consumeResult(message: string, id?: string | number, success: boolean = true) {
     if (success) {
@@ -100,12 +104,12 @@ export class ReportTemplateManagementPageComponent {
         closable: true
       });
       if (this.templateId()) {
-        this.router.navigate(['../'], {relativeTo: this.route});
+        this.router.navigate(['../'], { relativeTo: this.route });
       } else {
-        this.router.navigate(['../', id], {relativeTo: this.route});
+        this.router.navigate(['../', id], { relativeTo: this.route });
       }
     } else {
-      this.messages.set({error: [message]});
+      this.messages.set({ error: [message] });
     }
   }
 
@@ -146,7 +150,7 @@ export class ReportTemplateManagementPageComponent {
 
   protected save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill in all required fields."]});
+      this.messages.set({ error: ["Please fill in all required fields."] });
       return;
     }
 
@@ -169,7 +173,7 @@ export class ReportTemplateManagementPageComponent {
         });
     } else {
       this.reportTemplateService
-        .create({...request})
+        .create({ ...request })
         .pipe(first())
         .subscribe({
           next: (value) => this.consumeResult("Report template created successfully.", value.id),

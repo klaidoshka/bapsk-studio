@@ -2,13 +2,22 @@ import express from "express";
 import cors from "cors";
 import {HtmlService} from './service/html.service';
 import os from "os";
-
-const apiPort = process.env["WEB__SERVER__PORT"] || 3000;
-const application = express();
+import fs from 'node:fs';
+import https from 'node:https';
 
 const routes = {
   beautifyHtmlTable: "/api/v1/misc/beautify-html-table",
 };
+
+const port = process.env["WEB__SERVER__PORT"] ?? 3000;
+const sslEnabled = process.env["SSL__ENABLED"] === "true";
+
+const sslOptions = {
+  key: fs.readFileSync(process.env["SSL__KEY"] ?? ""),
+  cert: fs.readFileSync(process.env["SSL__CERTIFICATE"] ?? "")
+};
+
+const application = express();
 
 application.use(cors(
   {
@@ -45,7 +54,15 @@ application.post(routes.beautifyHtmlTable, (req, res) => {
   }
 });
 
-application.listen(apiPort, () => {
+const informIp = () => {
   const ip = os.networkInterfaces()?.["en0"]?.find((iface) => iface.family === "IPv4")?.address || "localhost";
-  console.log(`Server is running on http://${ip}:${apiPort}`);
-});
+  const host = `${sslEnabled ? "https" : "http"}://${ip}:${port}`;
+  console.log(host);
+}
+
+if (sslEnabled) {
+  https.createServer(sslOptions, application).listen(port, () => informIp());
+} else {
+  application.listen(port, () => informIp());
+}
+

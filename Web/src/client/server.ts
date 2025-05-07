@@ -15,18 +15,19 @@ const sslOptions = {
   cert: fs.readFileSync(process.env["SSL__CERTIFICATE"] ?? "")
 };
 
-const app = express();
+const application = express();
 
-app.use(express.static(ui));
-app.get("*", (_, res) => res.sendFile(path.join(ui, "index.html")));
+application.use(express.static(ui));
+application.get("*", (_, res) => res.sendFile(path.join(ui, "index.html")));
 
 const informIp = () => {
   const ip = os.networkInterfaces()?.["en0"]?.find((iface) => iface.family === "IPv4")?.address || "localhost";
-  console.log(`Server is running on http://${ip}:${port}`);
+  const host = `${sslEnabled ? "https" : "http"}://${ip}:${port}`;
+  console.log(host);
 }
 
 if (sslEnabled) {
-  https.createServer(sslOptions, app).listen(port, () => informIp());
+  https.createServer(sslOptions, application).listen(port, () => informIp());
 } else {
-  app.listen(port, () => informIp());
+  application.listen(port, () => informIp());
 }
