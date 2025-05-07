@@ -3,19 +3,13 @@ import {Button} from "primeng/button";
 import {DatePicker} from "primeng/datepicker";
 import {FormInputErrorComponent} from "../../component/form-input-error/form-input-error.component";
 import {InputText} from "primeng/inputtext";
-import {
-  MessagesShowcaseComponent
-} from "../../component/messages-showcase/messages-showcase.component";
+import {MessagesShowcaseComponent} from "../../component/messages-showcase/messages-showcase.component";
 import {FormBuilder, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Select} from "primeng/select";
 import {getDefaultIsoCountry, IsoCountries} from '../../model/iso-country.model';
 import {CustomerService} from '../../service/customer.service';
 import {MessageHandlingService} from '../../service/message-handling.service';
-import Customer, {
-  CustomerCreateRequest,
-  CustomerEditRequest,
-  CustomerOtherDocument
-} from '../../model/customer.model';
+import Customer, {CustomerCreateRequest, CustomerEditRequest, CustomerOtherDocument} from '../../model/customer.model';
 import {IdentityDocumentType} from '../../model/identity-document-type.model';
 import Messages from '../../model/messages.model';
 import {first, of, tap} from 'rxjs';
@@ -155,6 +149,8 @@ export class CustomerManagementPageComponent {
   private updateForm(customer: Customer) {
     this.form.reset();
     this.form.patchValue({...customer});
+    customer.otherDocuments.forEach(document => this.addOtherDocument(document));
+    this.form.markAsPristine();
   }
 
   protected addOtherDocument(document?: CustomerOtherDocument) {
