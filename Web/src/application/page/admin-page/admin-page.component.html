@@ -2,13 +2,15 @@
           styleClass="rounded-xs! bg-primary-950/70! dark:bg-primary-50/70! text-primary-50! dark:text-primary-950! p-1!"
           class="fixed! top-15 left-1 z-10 md:hidden" (onClick)="isMobileSidebarOpen.set(true)"
           [class.hidden]="isMobileSidebarOpen()"/>
+
 <div class="h-full w-full container mx-auto flex flex-col">
   <div class="flex flex-row w-full h-full gap-4 relative">
     <!-- Sidebar -->
     <div
-      class="not-md:hidden flex flex-col min-w-60 w-60 gap-6 h-full bg-primary-50 dark:bg-primary-950 border border-y-0
-      border-primary-950/20 dark:border-primary-50/20 relative" [class.not-md:hidden]="!isMobileSidebarOpen()">
-      <div class="flex flex-col gap-1 mx-4">
+      class="not-md:hidden flex flex-col min-w-60 w-60 gap-6 bg-primary-50 dark:bg-primary-950 border border-y-0 not-md:mt-14
+      border-primary-950/20 dark:border-primary-50/20 md:relative fixed inset-y-0 left-0 md:inset-auto h-full z-20 md:z-auto"
+      [class.not-md:hidden]="!isMobileSidebarOpen()" (clickOutside)="isMobileSidebarOpen.set(false)">
+      <div class="flex flex-col gap-1 mx-4 h-full overflow-y-auto">
         <h4 class="p-2 text-sm font-semibold">Admin Panel</h4>
         <!-- Sidebar Navigation -->
         <nav class="flex flex-col w-full gap-0.5">
@@ -23,9 +25,12 @@
         </div>
       </div>
     </div>
-    <p-button variant="text" icon="pi pi-bars" size="small" class="absolute! left-60 top-1 z-10 md:hidden"
+
+    <!-- Close Button -->
+    <p-button variant="text" icon="pi pi-bars" size="small" class="fixed! left-60 z-30 md:hidden"
               styleClass="rounded-xs! bg-primary-950/70! dark:bg-primary-50/70! text-primary-50! dark:text-primary-950! p-1!"
               (onClick)="isMobileSidebarOpen.set(false)" [class.hidden]="!isMobileSidebarOpen()"/>
+
     <!-- Main Content -->
     <div class="flex-1 min-w-0 overflow-hidden">
       <div class="h-full w-full overflow-auto">
