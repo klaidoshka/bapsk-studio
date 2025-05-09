@@ -19,7 +19,7 @@
         }
       },
       "root": "",
-      "sourceRoot": "src/client",
+      "sourceRoot": "src/application",
       "prefix": "",
       "architect": {
         "build": {
@@ -48,10 +48,10 @@
               "html2canvas",
               "html2canvas-pro"
             ],
-            "outputPath": "dist/client",
-            "index": "src/client/index.html",
-            "browser": "src/client/main.ts",
-            "tsConfig": "tsconfig.client.json",
+            "outputPath": "dist/application",
+            "index": "src/application/index.html",
+            "browser": "src/application/main.ts",
+            "tsConfig": "tsconfig.json",
             "inlineStyleLanguage": "css",
             "assets": [
               {
@@ -60,7 +60,7 @@
               }
             ],
             "styles": [
-              "src/client/styles.css"
+              "src/application/styles.css"
             ],
             "scripts": []
           },
@@ -81,8 +81,8 @@
               "outputHashing": "all",
               "fileReplacements": [
                 {
-                  "replace": "src/client/environments/environment.ts",
-                  "with": "src/client/environments/environment.production.ts"
+                  "replace": "src/application/environments/environment.ts",
+                  "with": "src/application/environments/environment.production.ts"
                 }
               ]
             },
@@ -92,8 +92,8 @@
               "sourceMap": true,
               "fileReplacements": [
                 {
-                  "replace": "src/client/environments/environment.ts",
-                  "with": "src/client/environments/environment.development.ts"
+                  "replace": "src/application/environments/environment.ts",
+                  "with": "src/application/environments/environment.development.ts"
                 }
               ]
             }

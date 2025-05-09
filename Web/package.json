@@ -2,14 +2,9 @@
   "name": "web",
   "version": "0.0.0",
   "scripts": {
-    "build": "ng build",
-    "start": "ng serve",
-    "build:client": "tsup ./src/client/server.ts --format esm --target node22 --out-dir ./dist/client-server --shims --clean",
-    "build:start:client": "npm run build && npm run build:client && npm run start:client",
-    "start:client": "node --env-file ./.env ./dist/client-server/server.js",
-    "build:server": "tsup ./src/server/server.ts --format esm --out-dir ./dist/out-tsc/server --shims --clean",
-    "build:start:server": "npm run build:server && npm run start:server",
-    "start:server": "node --env-file ./.env ./dist/out-tsc/server/server.js"
+    "build": "ng build && tsup ./src/application/server.ts --format esm --target node22 --out-dir ./dist/server --shims --clean",
+    "build:start": "npm run build && npm run start",
+    "start": "node --env-file ./.env ./dist/server/server.js"
   },
   "type": "module",
   "private": true,

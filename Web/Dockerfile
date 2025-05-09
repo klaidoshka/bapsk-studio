@@ -1,4 +1,4 @@
-FROM node:22 AS base
+FROM node:22
 
 WORKDIR /web
 COPY package*.json ./
@@ -13,10 +13,4 @@ RUN npm install
 
 COPY . .
 
-FROM base AS client
-EXPOSE 4200
-CMD ["npm", "run", "build:start:client"]
-
-FROM base AS server
-EXPOSE 3000
-CMD ["npm", "run", "build:start:server"]
+CMD ["npm", "run", "build:start"]
