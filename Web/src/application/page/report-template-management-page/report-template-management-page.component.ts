@@ -3,7 +3,7 @@ import {DataTypeService} from '../../service/data-type.service';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MessageHandlingService} from '../../service/message-handling.service';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {first, of, tap} from 'rxjs';
+import {first, map, of, switchMap, tap} from 'rxjs';
 import Messages from '../../model/messages.model';
 import DataTypeField from '../../model/data-type-field.model';
 import ReportTemplate, {ReportTemplateEditRequest} from '../../model/report-template.model';
@@ -71,9 +71,19 @@ export class ReportTemplateManagementPageComponent {
       instanceId: NumberUtil.parse(this.instanceId())
     }),
     loader: ({ request }) => request.instanceId
-      ? this.dataTypeService
+      ? this.reportTemplateService
         .getAllByInstanceId(request.instanceId)
-        .pipe(tap(dataTypes => this.consumeLoadedDataTypes(dataTypes)))
+        .pipe(
+          map(templates => templates.flatMap(template => template.fields.map(f => f.dataTypeId))),
+          map(dataTypeIds => Array.from(new Set(dataTypeIds))),
+          switchMap(dataTypeIds => this.dataTypeService
+              .getAllByInstanceId(request.instanceId!)
+              .pipe(
+                map(dataTypes => dataTypes.filter(dataType => !dataTypeIds.includes(dataType.id))),
+                tap(dataTypes => this.consumeLoadedDataTypes(dataTypes))
+              )
+          )
+        )
       : of([])
   });
 

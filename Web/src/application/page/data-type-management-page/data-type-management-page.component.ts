@@ -33,6 +33,8 @@ import {CardComponent} from '../../component/card/card.component';
 import {TableModule} from 'primeng/table';
 import {MessageService} from 'primeng/api';
 import {ActivatedRoute, Router} from '@angular/router';
+import {ReportTemplateService} from '../../service/report-template.service';
+import {ImportConfigurationService} from '../../service/import-configuration.service';
 
 @Component({
   selector: 'data-type-management-page',
@@ -61,8 +63,10 @@ export class DataTypeManagementPageComponent {
   private readonly dataEntryService = inject(DataEntryService);
   private readonly dataTypeService = inject(DataTypeService);
   private readonly formBuilder = inject(FormBuilder);
+  private readonly importConfigurationService = inject(ImportConfigurationService);
   private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly messageService = inject(MessageService);
+  private readonly reportTemplateService = inject(ReportTemplateService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   protected readonly customErrorMessages = { 'noFields': () => 'At least one field is required.' };
@@ -156,10 +160,26 @@ export class DataTypeManagementPageComponent {
       .pipe(first())
       .subscribe({
         next: () => {
+          const instanceId = NumberUtil.parse(this.instanceId())!;
           this.consumeResult("Data type has been edited successfully.");
+          this.dataEntryService.unmarkDataTypeIdAsFetched(request.dataTypeId);
 
           this.dataEntryService
-            .getAllByDataTypeId(NumberUtil.parse(this.instanceId())!, request.dataTypeId)
+            .getAllByDataTypeId(instanceId, request.dataTypeId)
+            .pipe(first())
+            .subscribe();
+
+          this.importConfigurationService.unmarkDataTypeIdAsFetched(request.dataTypeId);
+
+          this.importConfigurationService
+            .getAllByDataTypeId(instanceId, request.dataTypeId)
+            .pipe(first())
+            .subscribe();
+
+          this.reportTemplateService.unmarkInstanceIdAsFetched(instanceId)
+
+          this.reportTemplateService
+            .getAllByDataTypeId(instanceId, request.dataTypeId)
             .pipe(first())
             .subscribe();
         },

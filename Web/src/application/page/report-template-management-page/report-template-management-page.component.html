@@ -7,7 +7,10 @@
   } @else {
     <card>
       <p card-header>Manage Report Template</p>
-      <p card-subHeader>Fill in the form below to create a new report template or modify an existing one.</p>
+      <div card-subHeader class="flex flex-col">
+        <p>Fill in the form below to create a new report template or modify an existing one.</p>
+        <p>At the moment, one data type can have <strong>only one</strong> report template.</p>
+      </div>
       <form card-body class="flex flex-col gap-4" [formGroup]="form">
         <div class="flex flex-wrap gap-4">
           <!-- Name -->

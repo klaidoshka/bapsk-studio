@@ -208,6 +208,10 @@ export class DataEntryService {
       );
   }
 
+  unmarkDataTypeIdAsFetched(dataTypeId: number) {
+    this.dataTypesFetched.delete(dataTypeId);
+  }
+
   updateProperties(instanceId: number, dataEntry: DataEntry): Observable<DataEntry> {
     return combineLatest(
       dataEntry.fields.map(field => this.updateFieldProperty(field, instanceId, dataEntry.dataTypeId))

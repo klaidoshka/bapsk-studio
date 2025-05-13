@@ -1,6 +1,7 @@
 using Accounting.Contract;
 using Accounting.Contract.Dto;
 using Accounting.Contract.Dto.ReportTemplate;
+using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using Microsoft.EntityFrameworkCore;
 using ReportTemplate = Accounting.Contract.Entity.ReportTemplate;
@@ -10,15 +11,34 @@ namespace Accounting.Services.Service;
 public class ReportTemplateService : IReportTemplateService
 {
     private readonly AccountingDatabase _database;
-    private readonly IInstanceAuthorizationService _instanceAuthorizationService;
 
-    public ReportTemplateService(
-        AccountingDatabase database,
-        IInstanceAuthorizationService instanceAuthorizationService
-    )
+    public ReportTemplateService(AccountingDatabase database)
     {
         _database = database;
-        _instanceAuthorizationService = instanceAuthorizationService;
+    }
+
+    public async Task AddMissingDataTypeFieldsAsync(DataType dataType)
+    {
+        var templates = await _database.ReportTemplates
+            .Include(rt => rt.Fields)
+            .Where(rt => rt.Fields.Any(f => f.DataTypeId == dataType.Id))
+            .ToListAsync();
+
+        foreach (var template in templates)
+        {
+            var templateDataTypeFields = template.Fields
+                .Where(f => f.DataTypeId == dataType.Id)
+                .ToList();
+            
+            var missingFields = dataType.Fields
+                .Where(f => templateDataTypeFields.All(tf => tf.Id != f.Id))
+                .ToList();
+
+            foreach (var field in missingFields)
+            {
+                template.Fields.Add(field);
+            }
+        }
     }
 
     public async Task<ReportTemplate> CreateAsync(ReportTemplateCreateRequest request)

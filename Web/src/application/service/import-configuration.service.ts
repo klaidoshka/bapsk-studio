@@ -206,6 +206,10 @@ export class ImportConfigurationService {
       );
   }
 
+  unmarkDataTypeIdAsFetched(dataTypeId: number) {
+    this.dataTypesFetched.delete(dataTypeId);
+  }
+
   updateProperties(configuration: ImportConfiguration, instanceId: number): Observable<ImportConfiguration> {
     return this.dataTypeService
       .getById(instanceId, configuration.dataTypeId)

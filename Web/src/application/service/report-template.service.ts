@@ -136,6 +136,10 @@ export class ReportTemplateService {
       );
   }
 
+  unmarkInstanceIdAsFetched(instanceId: number) {
+    this.instancesFetched.delete(instanceId);
+  }
+
   updateProperties(template: ReportTemplate): ReportTemplate {
     return {
       ...template,
