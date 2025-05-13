@@ -1,14 +1,51 @@
-<p-table paginatorDropdownAppendTo="body" [value]="dataEntriesModified()" [columns]="dataType().fields" [paginator]="true"
-         [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" scrollable="true" scrollHeight="flex" sortMode="multiple"
-         (sortFunction)="onSort($event)" [customSort]="true">
+<p-table paginatorDropdownAppendTo="body" [value]="(dataEntriesModified | async) ?? []" [columns]="dataType().fields" [paginator]="true"
+         [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" scrollable="true" scrollHeight="flex" sortMode="multiple">
   <ng-template #header let-columns>
     <tr>
       @for (field of columns; track field.id) {
-        <th pSortableColumn="{{field.id}}">{{ field.name }} <p-sortIcon field="{{field.id}}" /></th>
+        <th pSortableColumn="field_{{field.id}}">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-0.5">
+              {{ field.name }}
+              <p-sortIcon field="field_{{field.id}}"/>
+            </div>
+            @if (field.type === FieldType.Date) {
+              <p-columnFilter type="date" field="field_{{field.id}}" display="menu"/>
+            } @else if (field.type === FieldType.Number || field.type === FieldType.Currency) {
+              <p-columnFilter type="numeric" field="field_{{field.id}}" display="menu"/>
+            } @else {
+              <p-columnFilter type="text" field="field_{{field.id}}" display="menu"/>
+            }
+          </div>
+        </th>
       }
-      <th pSortableColumn="createdAt">Created <p-sortIcon field="createdAt" /></th>
-      <th pSortableColumn="modifiedAt">Modified <p-sortIcon field="modifiedAt" /></th>
-      <th pSortableColumn="modifiedByFullName">Last Modified By <p-sortIcon field="modifiedByFullName" /></th>
+      <th pSortableColumn="createdAt">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-0.5">
+            Created
+            <p-sortIcon field="createdAt"/>
+          </div>
+          <p-columnFilter type="date" field="createdAt" display="menu"/>
+        </div>
+      </th>
+      <th pSortableColumn="modifiedAt">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-0.5">
+            Modified
+            <p-sortIcon field="modifiedAt"/>
+          </div>
+          <p-columnFilter type="date" field="modifiedAt" display="menu"/>
+        </div>
+      </th>
+      <th pSortableColumn="modifiedByFullName">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-0.5">
+            Last Modified By
+            <p-sortIcon field="modifiedByFullName"/>
+          </div>
+          <p-columnFilter type="text" field="modifiedByFullName" display="menu"/>
+        </div>
+      </th>
       <th *ngIf="containsActions()"></th>
     </tr>
   </ng-template>

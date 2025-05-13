@@ -11,26 +11,68 @@
                [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" sortMode="multiple">
         <ng-template #header>
           <tr>
-            <th pSortableColumn="firstName">First Name
-              <p-sortIcon field="firstName"/>
+            <th pSortableColumn="firstName">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  First Name
+                  <p-sortIcon field="firstName"/>
+                </div>
+                <p-columnFilter type="text" field="firstName" display="menu"/>
+              </div>
             </th>
-            <th pSortableColumn="lastName">Last Name
-              <p-sortIcon field="lastName"/>
+            <th pSortableColumn="lastName">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Last Name
+                  <p-sortIcon field="lastName"/>
+                </div>
+                <p-columnFilter type="text" field="lastName" display="menu"/>
+              </div>
             </th>
-            <th pSortableColumn="email">Email
-              <p-sortIcon field="email"/>
+            <th pSortableColumn="email">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Email
+                  <p-sortIcon field="email"/>
+                </div>
+                <p-columnFilter type="text" field="email" display="menu"/>
+              </div>
             </th>
-            <th pSortableColumn="birthdate">Birthdate
-              <p-sortIcon field="birthdate"/>
+            <th pSortableColumn="birthdate">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Birthdate
+                  <p-sortIcon field="birthdate"/>
+                </div>
+                <p-columnFilter type="text" field="birthdate" display="menu"/>
+              </div>
             </th>
-            <th pSortableColumn="residenceCountryLabel">Reside In
-              <p-sortIcon field="residenceCountryLabel"/>
+            <th pSortableColumn="residenceCountryLabel">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Reside In
+                  <p-sortIcon field="residenceCountryLabel"/>
+                </div>
+                <p-columnFilter type="text" field="residenceCountryLabel" display="menu"/>
+              </div>
             </th>
-            <th pSortableColumn="identityDocument.typeLabel">Identity Document
-              <p-sortIcon field="identityDocument.typeLabel"/>
+            <th pSortableColumn="identityDocument.typeLabel">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Identity Document
+                  <p-sortIcon field="identityDocument.typeLabel"/>
+                </div>
+                <p-columnFilter type="text" field="identityDocument.typeLabel" display="menu"/>
+              </div>
             </th>
-            <th pSortableColumn="identityDocument.value">Personal Code
-              <p-sortIcon field="identityDocument.value"/>
+            <th pSortableColumn="identityDocument.value">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Personal Code
+                  <p-sortIcon field="identityDocument.value"/>
+                </div>
+                <p-columnFilter type="text" field="identityDocument.value" display="menu"/>
+              </div>
             </th>
             <th></th>
           </tr>

@@ -11,20 +11,44 @@
                [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" sortMode="multiple">
         <ng-template #header>
           <tr>
-            <th pSortableColumn="customer.fullName">Customer
-              <p-sortIcon field="customer.fullName"/>
+            <th pSortableColumn="customer.fullName">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Customer
+                  <p-sortIcon field="customer.fullName" />
+                </div>
+                <p-columnFilter type="text" field="customer.fullName" display="menu" />
+              </div>
             </th>
-            <th pSortableColumn="salesman.name">Salesman
-              <p-sortIcon field="salesman.name"/>
+            <th pSortableColumn="salesman.name">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Salesman
+                  <p-sortIcon field="salesman.name" />
+                </div>
+                <p-columnFilter type="text" field="salesman.name" display="menu" />
+              </div>
             </th>
-            <th pSortableColumn="date">Sale Date
-              <p-sortIcon field="date"/>
+            <th pSortableColumn="date">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Sale Date
+                  <p-sortIcon field="date" />
+                </div>
+                <p-columnFilter type="date" field="date" display="menu" />
+              </div>
             </th>
             <th>Sold Goods</th>
             <th>Total Price</th>
             <th>Returnable VAT</th>
-            <th pSortableColumn="vatReturnDeclarationStatus.value">VAT Return Declaration
-              <p-sortIcon field="vatReturnDeclarationStatus.value"/>
+            <th pSortableColumn="vatReturnDeclarationStatus.value">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  VAT Return Declaration
+                  <p-sortIcon field="vatReturnDeclarationStatus.value" />
+                </div>
+                <p-columnFilter type="text" field="vatReturnDeclarationStatus.value" display="menu" />
+              </div>
             </th>
             <th></th>
           </tr>

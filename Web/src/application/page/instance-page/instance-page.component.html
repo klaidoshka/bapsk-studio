@@ -11,10 +11,42 @@
                [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" sortMode="multiple">
         <ng-template #header>
           <tr>
-            <th pSortableColumn="name">Name <p-sortIcon field="name" /></th>
-            <th pSortableColumn="description">Description <p-sortIcon field="description" /></th>
-            <th pSortableColumn="ownerName">Owner <p-sortIcon field="ownerName" /></th>
-            <th pSortableColumn="createdAt">Created <p-sortIcon field="createdAt" /></th>
+            <th pSortableColumn="name">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Name
+                  <p-sortIcon field="name"/>
+                </div>
+                <p-columnFilter type="text" field="name" display="menu"/>
+              </div>
+            </th>
+            <th pSortableColumn="description">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Description
+                  <p-sortIcon field="description"/>
+                </div>
+                <p-columnFilter type="text" field="description" display="menu"/>
+              </div>
+            </th>
+            <th pSortableColumn="ownerName">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Owner
+                  <p-sortIcon field="ownerName"/>
+                </div>
+                <p-columnFilter type="text" field="ownerName" display="menu"/>
+              </div>
+            </th>
+            <th pSortableColumn="createdAt">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Created
+                  <p-sortIcon field="createdAt"/>
+                </div>
+                <p-columnFilter type="text" field="createdAt" display="menu"/>
+              </div>
+            </th>
             <th>Last Activity</th>
             <th>Users</th>
             <th></th>

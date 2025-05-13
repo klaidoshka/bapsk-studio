@@ -10,18 +10,42 @@
            [value]="sessions.value() || []" sortMode="multiple">
     <ng-template #header>
       <tr>
-        <th pSortableColumn="agent">Agent
-          <p-sortIcon field="agent"/>
+        <th pSortableColumn="agent">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-0.5">
+              Agent
+              <p-sortIcon field="agent"/>
+            </div>
+            <p-columnFilter type="text" field="agent" display="menu"/>
+          </div>
         </th>
-        <th pSortableColumn="createdAt">Created At
-          <p-sortIcon field="createdAt"/>
+        <th pSortableColumn="createdAt">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-0.5">
+              Created At
+              <p-sortIcon field="createdAt"/>
+            </div>
+            <p-columnFilter type="text" field="createdAt" display="menu"/>
+          </div>
         </th>
         <th>Active Time</th>
-        <th pSortableColumn="ipAddress">IP Address
-          <p-sortIcon field="ipAddress"/>
+        <th pSortableColumn="ipAddress">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-0.5">
+              IP Address
+              <p-sortIcon field="ipAddress"/>
+            </div>
+            <p-columnFilter type="text" field="ipAddress" display="menu"/>
+          </div>
         </th>
-        <th pSortableColumn="location">Location
-          <p-sortIcon field="location"/>
+        <th pSortableColumn="location">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-0.5">
+              Location
+              <p-sortIcon field="location"/>
+            </div>
+            <p-columnFilter type="text" field="location" display="menu"/>
+          </div>
         </th>
         <th></th>
       </tr>

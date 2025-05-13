@@ -11,17 +11,41 @@
                [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" sortMode="multiple">
         <ng-template #header>
           <tr>
-            <th pSortableColumn="fullName">Name
-              <p-sortIcon field="fullName"/>
+            <th pSortableColumn="fullName">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Name
+                  <p-sortIcon field="fullName"/>
+                </div>
+                <p-columnFilter type="text" field="fullName" display="menu"/>
+              </div>
             </th>
-            <th pSortableColumn="email">Email
-              <p-sortIcon field="email"/>
+            <th pSortableColumn="email">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Email
+                  <p-sortIcon field="email"/>
+                </div>
+                <p-columnFilter type="text" field="email" display="menu"/>
+              </div>
             </th>
-            <th pSortableColumn="birthDate">Birthdate
-              <p-sortIcon field="birthDate"/>
+            <th pSortableColumn="birthDate">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Birthdate
+                  <p-sortIcon field="birthDate"/>
+                </div>
+                <p-columnFilter type="text" field="birthDate" display="menu"/>
+              </div>
             </th>
-            <th pSortableColumn="countryLabel">Country
-              <p-sortIcon field="countryLabel"/>
+            <th pSortableColumn="countryLabel">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Country
+                  <p-sortIcon field="countryLabel"/>
+                </div>
+                <p-columnFilter type="text" field="countryLabel" display="menu"/>
+              </div>
             </th>
             <th></th>
           </tr>

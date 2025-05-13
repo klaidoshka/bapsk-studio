@@ -1,18 +1,18 @@
 <div class="w-full h-full p-4">
   <!-- No Reports -->
-  @if (!reports || reports.reports.length === 0) {
+  @if (reportsModified.length === 0) {
     <card>
       <p card-header>No reports available</p>
       <p card-subHeader>Unfortunately, there are no reports available for the provided report template.</p>
     </card>
   } @else {
-    <div *ngFor="let report of reports.reports; let i = index; let count = count" class="flex flex-col gap-4">
+    <div *ngFor="let report of reportsModified; let i = index; let count = count" class="flex flex-col gap-4">
       <div class="flex flex-row justify-between items-center" [ngClass]="{'mt-16': i > 0}">
         <div class="space-x-2">
-          <p-button title="Export" size="small" label="Export PDF" icon="pi pi-file-export"
-                    (onClick)="export(i, 'pdf')"/>
-          <p-button title="Export" size="small" label="Export CSV" icon="pi pi-file-export"
-                    (onClick)="export(i, 'csv')"/>
+          <p-button title="Export" size="small" label="Export PDF" icon="pi pi-file-export" (onClick)="export(i, 'pdf')"
+                    variant="text"/>
+          <p-button title="Export" size="small" label="Export CSV" icon="pi pi-file-export" (onClick)="export(i, 'csv')"
+                    variant="text"/>
         </div>
         <p class="self-end font-semibold">{{ i + 1 }} / {{ count }}</p>
       </div>
@@ -43,13 +43,26 @@
             <p card-header>Report Entries</p>
             <p card-subHeader>This section contains report's entries. These entries can be exported into .CSV file if
               needed.</p>
-            <p-table card-body [value]="report.entries" sortMode="multiple" (sortFunction)="onSort($event)"
-                     [customSort]="true">
+            <p-table card-body [value]="report.entries" sortMode="multiple">
               <ng-template #header>
                 <tr>
                   @for (field of report.header; track $index) {
-                    <th pSortableColumn="{{$index}}">{{ field }}
-                      <p-sortIcon field="{{$index}}"/>
+                    <th pSortableColumn="field_{{$index}}">
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-0.5">
+                          {{ field }}
+                          <p-sortIcon field="field_{{$index}}"/>
+                        </div>
+                          @let type = getType(report.entries, $index);
+
+                          @if (type === FieldType.Date) {
+                            <p-columnFilter type="date" field="field_{{$index}}" display="menu"/>
+                          } @else if (type === FieldType.Number || type === FieldType.Currency) {
+                            <p-columnFilter type="numeric" field="field_{{$index}}" display="menu"/>
+                          } @else {
+                            <p-columnFilter type="text" field="field_{{$index}}" display="menu"/>
+                          }
+                      </div>
                     </th>
                   }
                 </tr>

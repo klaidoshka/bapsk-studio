@@ -1,20 +1,16 @@
+@let value = valueDisplay();
+
 @switch (typeResolved()) {
   @case (FieldType.Check) {
-    <p-badge [value]="value() === true ? 'Yes' : 'No'" [severity]="value() === true ? 'success' : 'danger'"/>
+    <p-badge [value]="value + ''" [severity]="this.value() ? 'success' : 'danger'"/>
   }
   @case (FieldType.Currency) {
-    <p>{{ value() | currency: 'EUR':'symbol':'1.2-2' }}</p>
+    <p>{{ (valueDisplay() + '') | currency: 'EUR':'symbol':'1.2-2' }}</p>
   }
   @case (FieldType.Date) {
-    <p>{{ value() | date: 'medium' }}</p>
-  }
-  @case (FieldType.IsoCountryCode) {
-    <p>{{ getIsoCountryLabel(value()) }}</p>
-  }
-  @case (FieldType.Reference) {
-    <p>{{ referencedDataEntry.value()?.display() }}</p>
+    <p>{{ valueDisplay() | date: 'medium' }}</p>
   }
   @default {
-    <p>{{ value() }}</p>
+    <p>{{ valueDisplay() }}</p>
   }
 }

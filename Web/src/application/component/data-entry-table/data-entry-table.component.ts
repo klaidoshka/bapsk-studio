@@ -1,13 +1,20 @@
-import {Component, computed, input} from '@angular/core';
+import {Component, computed, inject, input} from '@angular/core';
 import {DataEntryJoined} from '../../model/data-entry.model';
 import DataType from '../../model/data-type.model';
 import {TableModule} from 'primeng/table';
 import {DataTypeEntryFieldDisplayComponent} from '../data-type-entry-field-display/data-type-entry-field-display.component';
 import {toUserIdentityFullName} from '../../model/user.model';
 import {Button} from 'primeng/button';
-import {DatePipe, NgIf} from '@angular/common';
-import {SortEvent} from 'primeng/api';
+import {AsyncPipe, DatePipe, NgIf} from '@angular/common';
 import {FieldType} from '../../model/data-type-field.model';
+import {FieldTypeUtil} from '../../util/field-type.util';
+import {DataEntryService} from '../../service/data-entry.service';
+import {combineLatest, map, of, switchMap} from 'rxjs';
+import {toObservable} from '@angular/core/rxjs-interop';
+
+interface DataEntryJoinedModified extends DataEntryJoined {
+  [key: string]: any;
+}
 
 @Component({
   selector: 'data-entry-table',
@@ -16,93 +23,67 @@ import {FieldType} from '../../model/data-type-field.model';
     DataTypeEntryFieldDisplayComponent,
     Button,
     DatePipe,
-    NgIf
+    NgIf,
+    AsyncPipe
   ],
   templateUrl: './data-entry-table.component.html',
   styles: ``
 })
 export class DataEntryTableComponent {
-  private readonly defaultSortFields = ['createdAt', 'modifiedAt', 'modifiedByFullName'];
-  protected readonly toUserIdentityFullName = toUserIdentityFullName;
+  private readonly dataEntryService = inject(DataEntryService);
   protected readonly containsActions = computed(() => !!this.delete() || !!this.manage() || !!this.preview());
+  protected readonly FieldType = FieldType;
   readonly dataEntries = input.required<DataEntryJoined[]>();
-  readonly dataEntriesModified = computed(() => this.dataEntries().map(entry => ({
-    ...entry,
-    modifiedByFullName: toUserIdentityFullName(entry.modifiedBy)
-  })));
   readonly dataType = input.required<DataType>();
   readonly delete = input<(entry: DataEntryJoined) => void>();
   readonly instanceId = input.required<number>();
   readonly manage = input<(entry: DataEntryJoined) => void>();
   readonly preview = input<(entry: DataEntryJoined) => void>();
+  protected readonly dataEntries$ = toObservable(this.dataEntries);
 
-  onSort(event: SortEvent) {
-    if (!event.data) {
-      return;
-    }
+  protected readonly dataEntriesModified = toObservable(this.dataType)
+    .pipe(
+      map(dataType => dataType.fields),
+      switchMap(typeFields => this.dataEntries$.pipe(
+          switchMap(entries =>
+            combineLatest(entries.map(entry =>
+              combineLatest(entry.fields.map(field => {
+                const dataTypeField = typeFields.find(it => it.id === field.dataTypeFieldId)!;
 
-    event.data.sort((a: any, b: any) => {
-      if (!event.multiSortMeta || event.multiSortMeta.length === 0) {
-        return 0;
-      }
+                return dataTypeField.type === FieldType.Reference
+                  ? this.dataEntryService
+                    .getAllByDataTypeId(this.instanceId(), dataTypeField.referenceId!)
+                    .pipe(
+                      map(entries => entries.find(it => it.id === field.value)),
+                      map(reference => ({
+                        ...field,
+                        reference: reference,
+                        type: dataTypeField.type,
+                      }))
+                    )
+                  : of({
+                    ...field,
+                    reference: undefined,
+                    type: dataTypeField.type
+                  });
+              }))
+                .pipe(
+                  map(entryFields => {
+                    const entryModified: DataEntryJoinedModified = {
+                      ...entry,
+                      modifiedByFullName: toUserIdentityFullName(entry.modifiedBy)
+                    };
 
-      for (const meta of event.multiSortMeta) {
-        const field = meta.field;
-        const order = meta.order;
-        let comparisonResult = 0;
+                    entryFields.forEach(field => {
+                      entryModified[`field_${field.dataTypeFieldId}`] = FieldTypeUtil.toDisplayValue(field.value, field.type, field.reference);
+                    });
 
-        if (this.defaultSortFields.includes(field)) {
-          comparisonResult = this.handleDefaultFieldSort(field, a[field], b[field]);
-        } else {
-          comparisonResult = this.handleDataTypeFieldSort(field, a, b);
-        }
-
-        comparisonResult *= order;
-
-        if (comparisonResult !== 0) {
-          return comparisonResult;
-        }
-      }
-
-      return 0;
-    });
-  }
-
-  private handleDataTypeFieldSort(field: string, a: any, b: any) {
-    const fieldType = this.dataType()?.fields.find(f => f.id.toString() === field)?.type;
-    const fieldA = a.fields?.find((f: any) => f.dataTypeFieldId.toString() === field)?.value;
-    const fieldB = b.fields?.find((f: any) => f.dataTypeFieldId.toString() === field)?.value;
-
-    if (fieldA == null && fieldB != null) {
-      return -1;
-    } else if (fieldA != null && fieldB == null) {
-      return 1;
-    } else if (fieldA == null && fieldB == null) {
-      return 0;
-    } else {
-      switch (fieldType) {
-        case FieldType.Currency:
-        case FieldType.Number:
-          return Number(fieldA) - Number(fieldB);
-        case FieldType.Date:
-          return new Date(fieldA).getTime() - new Date(fieldB).getTime();
-        default:
-          return fieldA.toString().localeCompare(fieldB!.toString());
-      }
-    }
-  }
-
-  private handleDefaultFieldSort(field: string, valueA: any, valueB: any) {
-    if (valueA == null && valueB != null) {
-      return -1;
-    } else if (valueA != null && valueB == null) {
-      return 1;
-    } else if (valueA == null && valueB == null) {
-      return 0;
-    } else if (valueA instanceof Date || field === 'createdAt' || field === 'modifiedAt') {
-      return new Date(valueA).getTime() - new Date(valueB).getTime();
-    } else {
-      return valueA.toString().localeCompare(valueB.toString());
-    }
-  }
+                    return entryModified;
+                  })
+                )
+            ))
+          )
+        )
+      )
+    );
 }

@@ -7,6 +7,7 @@ import {CurrencyPipe, DatePipe} from '@angular/common';
 import {getIsoCountryLabel} from '../../model/iso-country.model';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {map, of} from 'rxjs';
+import {FieldTypeUtil} from '../../util/field-type.util';
 
 @Component({
   selector: 'data-type-entry-field-display',
@@ -33,6 +34,12 @@ export class DataTypeEntryFieldDisplayComponent {
     ?.fields.find(it => it.id === this.dataTypeFieldId())
   );
 
+  protected readonly valueDisplay = computed(() => FieldTypeUtil.toDisplayValue(
+    this.value(),
+    this.typeResolved(),
+    this.referencedDataEntry.value()
+  ));
+
   protected readonly referencedDataEntry = rxResource({
     request: () => {
       const referenceId = this.dataTypeField()?.referenceId;
@@ -48,7 +55,7 @@ export class DataTypeEntryFieldDisplayComponent {
         value
       };
     },
-    loader: ({request}) => request?.instanceId
+    loader: ({ request }) => request?.instanceId
       ? this.dataEntryService
         .getAllByDataTypeId(request.instanceId, request.referenceId)
         .pipe(

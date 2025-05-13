@@ -100,7 +100,7 @@ export class DataTypeEntryFieldInputComponent implements ControlValueAccessor {
 
       case FieldType.Currency:
       case FieldType.Number:
-        return 0;
+        return undefined;
 
       case FieldType.Date:
       case FieldType.IsoCountryCode:

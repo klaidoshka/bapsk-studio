@@ -12,11 +12,23 @@
                [rowsPerPageOptions]="[10, 20, 50]" sortMode="multiple">
         <ng-template #header>
           <tr>
-            <th pSortableColumn="name">Name
-              <p-sortIcon field="name"/>
+            <th pSortableColumn="name">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Name
+                  <p-sortIcon field="name"/>
+                </div>
+                <p-columnFilter type="text" field="name" display="menu"/>
+              </div>
             </th>
-            <th pSortableColumn="description">Description
-              <p-sortIcon field="description"/>
+            <th pSortableColumn="description">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Description
+                  <p-sortIcon field="description"/>
+                </div>
+                <p-columnFilter type="text" field="description" display="menu"/>
+              </div>
             </th>
             <th>Fields</th>
             <th></th>

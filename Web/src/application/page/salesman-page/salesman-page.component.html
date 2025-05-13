@@ -11,14 +11,32 @@
                [rowsPerPageOptions]="[10, 20, 50]" styleClass="mt-4" sortMode="multiple">
         <ng-template #header>
           <tr>
-            <th pSortableColumn="name">Name
-              <p-sortIcon field="name"/>
+            <th pSortableColumn="name">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Name
+                  <p-sortIcon field="name"/>
+                </div>
+                <p-columnFilter type="text" field="name" display="menu"/>
+              </div>
             </th>
-            <th pSortableColumn="vatPayerCode.value">Vat Payer Code
-              <p-sortIcon field="vatPayerCode.value"/>
+            <th pSortableColumn="vatPayerCode.value">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Vat Payer Code
+                  <p-sortIcon field="vatPayerCode.value"/>
+                </div>
+                <p-columnFilter type="text" field="vatPayerCode.value" display="menu"/>
+              </div>
             </th>
-            <th pSortableColumn="salesman.vatPayerCode.issuedByLabel">Vat Payer Code Issued By
-              <p-sortIcon field="salesman.vatPayerCode.issuedByLabel"/>
+            <th pSortableColumn="vatPayerCode.issuedByLabel">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  Vat Payer Code Issued By
+                  <p-sortIcon field="vatPayerCode.issuedByLabel"/>
+                </div>
+                <p-columnFilter type="text" field="vatPayerCode.issuedByLabel" display="menu"/>
+              </div>
             </th>
             <th>Customers Served</th>
             <th></th>
