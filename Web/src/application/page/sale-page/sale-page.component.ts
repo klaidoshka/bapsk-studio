@@ -85,7 +85,9 @@ export class SalePageComponent {
     } else if (sale.vatReturnDeclaration.isCancelled) {
       return {value: 'Cancelled', severity: 'danger' };
     } else if (sale.vatReturnDeclaration.state === SubmitDeclarationState.REJECTED) {
-      return {value: 'Rejected', severity: 'danger' };
+      return {value: 'Rejected', severity: 'warn' };
+    } else if (sale.vatReturnDeclaration.export) {
+      return {value: 'Exported', severity: 'info' };
     } else {
       return {value: 'Accepted', severity: 'success' };
     }
