@@ -51,7 +51,13 @@
                   <td>{{ toUserFullName(instanceUser.user) }}</td>
                   <td>{{ instanceUser.user.email }}</td>
                   <td>
-                    <badge-contrasted [value]="getPermissionsCount(instanceUser.id) + ' / ' + permissionsCount"/>
+                    <badge-contrasted [value]="'View ' + getPermissionsCount(instanceUser.id) + ' / ' + permissionsCount"
+                                      class="cursor-pointer" (click)="instanceUser.showPermissions.set(true)"/>
+
+                    <p-dialog [(visible)]="instanceUser.showPermissions" [closable]="true" [modal]="true" styleClass="w-128 h-128"
+                              [header]="toUserFullName(instanceUser.user) + ' permissions'">
+                      <instance-user-permission-preview [permissions]="instanceUser.permissions"/>
+                    </p-dialog>
                   </td>
                   <td>
                     <badge-contrasted [value]="(getDataEntriesCreated(instanceUser.userId) | async) ?? 0"/>

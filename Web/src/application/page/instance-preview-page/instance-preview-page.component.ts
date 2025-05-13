@@ -1,4 +1,4 @@
-import {Component, inject, input} from '@angular/core';
+import {Component, inject, input, signal} from '@angular/core';
 import {AsyncPipe, DatePipe} from "@angular/common";
 import {TableModule} from "primeng/table";
 import {toUserFullName} from '../../model/user.model';
@@ -18,6 +18,10 @@ import {instanceUserPermissions} from '../../constant/instance-user.permissions'
 import {BadgeContrastedComponent} from '../../component/badge-contrasted/badge-contrasted.component';
 import {DataTypeService} from '../../service/data-type.service';
 import {DataEntryService} from '../../service/data-entry.service';
+import {Dialog} from 'primeng/dialog';
+import {
+  InstanceUserPermissionPreviewComponent
+} from '../../component/instance-user-permission-preview/instance-user-permission-preview.component';
 
 @Component({
   selector: 'instance-preview-page',
@@ -29,7 +33,9 @@ import {DataEntryService} from '../../service/data-entry.service';
     FailedToLoadPleaseReloadComponent,
     CardComponent,
     BadgeContrastedComponent,
-    AsyncPipe
+    AsyncPipe,
+    Dialog,
+    InstanceUserPermissionPreviewComponent
   ],
   templateUrl: './instance-preview-page.component.html',
   styles: ``
@@ -45,7 +51,18 @@ export class InstancePreviewPageComponent {
   protected readonly instance = rxResource({
     request: () => ({instanceId: NumberUtil.parse(this.instanceId())}),
     loader: ({request}) => request.instanceId
-      ? this.instanceService.getWithUsersById(request.instanceId)
+      ? this.instanceService
+        .getWithUsersById(request.instanceId)
+        .pipe(
+          map(instance => ({
+            ...instance,
+            users: instance.users.map(u => ({
+              ...u,
+              permissions: u.userId === instance.createdById ? instanceUserPermissions.map(p => p.value) : u.permissions,
+              showPermissions: signal(false)
+            }))
+          }))
+        )
       : of(undefined)
   });
 

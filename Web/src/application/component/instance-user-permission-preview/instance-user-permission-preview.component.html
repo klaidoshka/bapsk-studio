@@ -1,0 +1,12 @@
+<table class="w-full table-auto text-sm overflow-auto">
+  <tbody>
+    @for (perm of allPermissions(); track $index) {
+      <tr>
+        <td>{{ perm.label }}</td>
+        <td class="py-1 w-24">
+          <p-badge [value]="perm.toggled ? 'Enabled' : 'Disabled'" [severity]="perm.toggled ? 'success' : 'danger'"/>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>
