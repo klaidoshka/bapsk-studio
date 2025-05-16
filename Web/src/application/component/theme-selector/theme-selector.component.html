@@ -1,4 +1,5 @@
-<button class="h-6 w-6 flex items-center justify-center rounded cursor-pointer text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80" (click)="toggleTheme()">
+<button [title]="'component.theme-selector.button.select' | translate" (click)="toggleTheme()"
+        class="h-6 w-6 flex items-center justify-center rounded cursor-pointer text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80">
   @if (!isDarkTheme()) {
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round">

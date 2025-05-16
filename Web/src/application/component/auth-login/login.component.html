@@ -1,6 +1,6 @@
-<h2 class="text-2xl font-bold mb-4">Login</h2>
+<h2 class="text-2xl font-bold mb-4">{{ 'component.login.title' | translate }}</h2>
 
-<p-dialog header="Reset Password" [(visible)]="showResetDialog" [modal]="true" [closeOnEscape]="true"
+<p-dialog [header]="'component.login.reset-password.header' | translate" [(visible)]="showResetDialog" [modal]="true" [closeOnEscape]="true"
           styleClass="max-w-xl w-full dark:bg-primary-950! bg-primary-50!">
   <auth-reset-password/>
 </p-dialog>
@@ -11,9 +11,9 @@
     <p-floatlabel variant="on" class="w-full">
       <p-iconfield>
         <p-inputicon class="pi pi-envelope"/>
-        <input pInputText class="w-60" id="email" formControlName="email" type="email" class="w-full"/>
+        <input pInputText class="w-full" id="email" formControlName="email" type="email"/>
       </p-iconfield>
-      <label for="email">Email</label>
+      <label for="email">{{ 'component.login.input.email' | translate }}</label>
     </p-floatlabel>
     <form-input-error [control]="form.controls.email"/>
   </div>
@@ -26,21 +26,23 @@
         <p-password id="password" formControlName="password" inputStyleClass="pl-10! w-full!" class="w-full" styleClass="w-full"
                     toggleMask="true" feedback="false"/>
       </p-iconfield>
-      <label for="password">Password</label>
+      <label for="password">{{ 'component.login.input.password' | translate }}</label>
     </p-floatlabel>
     <form-input-error [control]="form.controls.password"/>
   </div>
   <messages-showcase [messages]="messages()"/>
-  <p-button title="Login" size="small" type="submit" label="Login" icon="pi pi-check" [disabled]="form.invalid"
+  <p-button [title]="'component.login.button.login' | translate" size="small" type="submit"
+            [label]="'component.login.button.login' | translate" icon="pi pi-check" [disabled]="form.invalid"
             [loading]="isSubmitting()" styleClass="w-full!" class="w-full"/>
 </form>
-<p class="mt-4 text-sm text-center">Don't have an account yet?</p>
+<p class="mt-4 text-sm text-center">{{ 'component.login.no-account-yet' | translate }}</p>
 <div class="flex flex-col justify-center items-center">
   <p class="text-center">
-    <a routerLink="/auth/register" class="dark:text-indigo-400 text-indigo-600 hover:underline">Register here</a>
+    <a routerLink="/auth/register"
+       class="dark:text-indigo-400 text-indigo-600 hover:underline">{{ 'component.login.redirect.register-here' | translate }}</a>
   </p>
   <p (click)="showResetDialog.set(true)"
      class="hover:cursor-pointer dark:text-indigo-400 text-indigo-600 hover:underline">
-    Reset password
+    {{ 'component.login.redirect.reset-password' | translate }}
   </p>
 </div>

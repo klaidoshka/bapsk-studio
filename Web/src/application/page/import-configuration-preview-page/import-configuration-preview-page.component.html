@@ -7,36 +7,36 @@
   } @else {
     @let configuration = this.configuration.value()!;
     <card>
-      <p card-header>{{ configuration.name }}</p>
-      <p card-subHeader>Preview of this unique import configuration.</p>
+      <p card-header>{{ ('page.import-configuration-preview.title' | translate:{ name: configuration.name }) }}</p>
+      <p card-subHeader>{{ 'page.import-configuration-preview.description' | translate }}</p>
       <div card-body class="flex flex-col gap-4">
         <card>
-          <p card-header>Details</p>
-          <p card-subHeader>Details of this specific import configuration.</p>
+          <p card-header>{{ 'page.import-configuration-preview.details.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.import-configuration-preview.details.description' | translate }}</p>
           <div card-body class="flex flex-col">
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">ID</p>
+              <p class="font-semibold">{{ 'page.import-configuration-preview.details.label.id' | translate }}</p>
               <p>{{ configuration.id }}</p>
             </div>
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">Name</p>
+              <p class="font-semibold">{{ 'page.import-configuration-preview.details.label.name' | translate }}</p>
               <p>{{ configuration.name }}</p>
             </div>
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">Data Type</p>
+              <p class="font-semibold">{{ 'page.import-configuration-preview.details.label.data-type' | translate }}</p>
               <p>{{ configuration.dataType.name }}</p>
             </div>
           </div>
         </card>
         <card>
-          <p card-header>Fields</p>
-          <p card-subHeader>Fields of this specific import configuration.</p>
+          <p card-header>{{ 'page.import-configuration-preview.fields.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.import-configuration-preview.fields.description' | translate }}</p>
           <p-table card-body [value]="configuration.fields">
             <ng-template #header>
               <tr>
-                <th class="text-left">Order</th>
-                <th class="text-left">Field Name</th>
-                <th class="text-left">Default Value</th>
+                <th class="text-left">{{ 'page.import-configuration-preview.fields.header.order' | translate }}</th>
+                <th class="text-left">{{ 'page.import-configuration-preview.fields.header.name' | translate }}</th>
+                <th class="text-left">{{ 'page.import-configuration-preview.fields.header.default' | translate }}</th>
               </tr>
             </ng-template>
             <ng-template #body let-field>
@@ -45,8 +45,7 @@
                 <td>{{ field.order + 1 }}</td>
                 <td>{{ dataTypeField.name }}</td>
                 <td>
-                  <data-type-entry-field-display [dataType]="configuration.dataType"
-                                                 [dataTypeFieldId]="dataTypeField.id"
+                  <data-type-entry-field-display [dataType]="configuration.dataType" [dataTypeFieldId]="dataTypeField.id"
                                                  [value]="field.defaultValue" [instanceId]="instanceIdAsNumber()"/>
                 </td>
               </tr>
@@ -54,8 +53,8 @@
           </p-table>
         </card>
         <card>
-          <p card-header>Example CSV Format</p>
-          <p card-subHeader>Example CSV format for this specific import configuration.</p>
+          <p card-header>{{ 'page.import-configuration-preview.example.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.import-configuration-preview.example.description' | translate }}</p>
           <div card-body class="flex flex-col">
             @let csv = getExampleCSV();
             <textarea class="mt-2 p-1 dark:bg-primary-700 bg-primary-300 rounded-md min-h-14 max-h-32"

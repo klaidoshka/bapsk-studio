@@ -21,6 +21,7 @@ import {
   InstancePageHeaderSectionComponent
 } from '../../component/instance-page-header-section/instance-page-header-section.component';
 import {CardComponent} from '../../component/card/card.component';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'instance-page',
@@ -36,7 +37,8 @@ import {CardComponent} from '../../component/card/card.component';
     MessagesShowcaseComponent,
     AsyncPipe,
     InstancePageHeaderSectionComponent,
-    CardComponent
+    CardComponent,
+    TranslatePipe
   ],
   providers: [MessageService, ConfirmationService]
 })
@@ -46,6 +48,7 @@ export class InstancePageComponent {
   private readonly dataTypeService = inject(DataTypeService);
   private readonly instanceService = inject(InstanceService);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly messages = signal<Messages>({});
 
@@ -66,7 +69,7 @@ export class InstancePageComponent {
         .delete(instance.id!)
         .pipe(first())
         .subscribe({
-          next: () => this.messages.set({success: ['Instance deleted successfully']}),
+          next: () => this.messages.set({ success: ['action.instance.deleted'] }),
           error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     });
@@ -104,6 +107,4 @@ export class InstancePageComponent {
   protected preview(instance: InstanceWithUsers) {
     this.router.navigate(['home/instance/' + instance.id]);
   }
-
-  protected readonly toUserFullName = toUserFullName;
 }

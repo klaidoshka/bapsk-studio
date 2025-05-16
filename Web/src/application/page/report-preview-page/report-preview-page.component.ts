@@ -12,6 +12,7 @@ import {NumberUtil} from '../../util/number.util';
 import {CardComponent} from '../../component/card/card.component';
 import {FieldTypeUtil} from '../../util/field-type.util';
 import {FieldType} from '../../model/data-type-field.model';
+import {TranslatePipe} from '@ngx-translate/core';
 
 interface ReportEntryModified extends ReportEntry {
   [key: string]: any;
@@ -25,7 +26,8 @@ interface ReportEntryModified extends ReportEntry {
     DataTypeEntryFieldDisplayComponent,
     Button,
     NgClass,
-    CardComponent
+    CardComponent,
+    TranslatePipe
   ],
   templateUrl: './report-preview-page.component.html',
   styles: ``

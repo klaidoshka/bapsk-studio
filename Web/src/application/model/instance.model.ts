@@ -1,4 +1,4 @@
-import {User} from './user.model';
+import {User, UserIdentity} from './user.model';
 
 export default interface Instance {
   createdAt: Date;
@@ -16,6 +16,10 @@ export interface InstanceWithUsers {
   id?: number;
   name: string;
   users: InstanceUserWithUser[];
+}
+
+export interface InstanceWithUsersAndOwner extends InstanceWithUsers {
+  createdBy: UserIdentity;
 }
 
 export interface InstanceUser {

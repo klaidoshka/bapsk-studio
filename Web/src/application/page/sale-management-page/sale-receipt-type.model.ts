@@ -4,6 +4,6 @@ export enum SaleReceiptType {
 }
 
 export const saleReceiptTypes = [
-  {label: 'Invoice', value: SaleReceiptType.Invoice},
-  {label: 'Receipt', value: SaleReceiptType.CashRegister}
+  {label: 'page.sale.receipt-type.invoice', value: SaleReceiptType.Invoice},
+  {label: 'page.sale.receipt-type.receipt', value: SaleReceiptType.CashRegister}
 ]

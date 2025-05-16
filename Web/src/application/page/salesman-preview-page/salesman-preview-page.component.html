@@ -7,36 +7,36 @@
   } @else {
     @let salesman = this.salesman.value()!;
     <card>
-      <p card-header>Salesman</p>
-      <p card-subHeader>Preview of this unique salesman entry.</p>
+      <p card-header>{{ 'page.salesman-preview.title' | translate }}</p>
+      <p card-subHeader>{{ 'page.salesman-preview.description' | translate }}</p>
       <div card-body class="flex flex-col gap-4">
         <card>
-          <p card-header>Details</p>
-          <p card-subHeader>Details of this specific salesman.</p>
+          <p card-header>{{ 'page.salesman-preview.details.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.salesman-preview.details.description' | translate }}</p>
           <div card-body class="flex flex-col gap-4">
             <div class="flex flex-col">
               <div class="flex flex-row gap-2">
-                <p class="font-semibold">ID</p>
+                <p class="font-semibold">{{ 'page.salesman-preview.details.label.id' | translate }}</p>
                 <p>{{ salesman.id }}</p>
               </div>
               <div class="flex flex-row gap-2">
-                <p class="font-semibold">Name</p>
+                <p class="font-semibold">{{ 'page.salesman-preview.details.label.name' | translate }}</p>
                 <p>{{ salesman.name }}</p>
               </div>
             </div>
           </div>
         </card>
         <card>
-          <p card-header>VAT Payer Code</p>
-          <p card-subHeader>VAT payer information of this specific salesman.</p>
+          <p card-header>{{ 'page.salesman-preview.vat.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.salesman-preview.vat.description' | translate }}</p>
           <div card-body class="flex flex-col gap-4">
             <div class="flex flex-col">
               <div class="flex flex-row gap-2">
-                <p class="font-semibold">Issued By</p>
-                <p>{{ getIsoCountryLabel(salesman.vatPayerCode.issuedBy) }}</p>
+                <p class="font-semibold">{{ 'page.salesman-preview.vat.label.issued-by' | translate }}</p>
+                <p>{{ getIsoCountryLabel(salesman.vatPayerCode.issuedBy) | translate }}</p>
               </div>
               <div class="flex flex-row gap-2">
-                <p class="font-semibold">Code</p>
+                <p class="font-semibold">{{ 'page.salesman-preview.vat.label.code' | translate }}</p>
                 <p>{{ salesman.vatPayerCode.value }}</p>
               </div>
             </div>

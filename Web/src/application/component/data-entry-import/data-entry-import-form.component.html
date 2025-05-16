@@ -9,14 +9,14 @@
       <p-floatlabel variant="on" class="w-60">
         <p-select formControlName="importConfigurationId" [options]="importConfigurations.value()" optionLabel="label"
                   optionValue="id" appendTo="body" class="w-full"/>
-        <label for="importConfigurationId">Import Configuration</label>
+        <label for="importConfigurationId">{{ 'component.data-entry-import-form.input.import-configuration' | translate }}</label>
       </p-floatlabel>
       <form-input-error [control]="form.controls.importConfigurationId"/>
     </div>
 
     <!-- File -->
     <div class="flex flex-col gap-1">
-      <label for="file" class="block text-sm font-medium">File</label>
+      <label for="file" class="block text-sm font-medium">{{ 'component.data-entry-import-form.input.file' | translate }}</label>
       <div class="flex flex-col w-fit justify-start gap-1">
         <p *ngIf="form.value.file">
           <span class="text-sm dark:text-primary-50 text-primary-900">
@@ -30,11 +30,14 @@
     </div>
 
     <div class="flex flex-col gap-1">
-      <label for="skipHeader" class="block text-sm font-medium">Skip Header (First row)</label>
+      <label for="skipHeader"
+             class="block text-sm font-medium">{{ 'component.data-entry-import-form.input.skip-header' | translate }}</label>
       <p-checkbox formControlName="skipHeader" inputId="skipHeader" binary/>
     </div>
   </div>
 
   <messages-showcase [messages]="messages()"/>
-  <p-button title="Import" size="small" label="Import" [disabled]="form.invalid || !form.dirty" (onClick)="import()"/>
+  <p-button [title]="'component.data-entry-import-form.button.import' | translate" size="small"
+            [label]="'component.data-entry-import-form.button.import' | translate" [disabled]="form.invalid || !form.dirty"
+            (onClick)="import()"/>
 </div>

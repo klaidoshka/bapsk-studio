@@ -9,6 +9,7 @@ import {ConfirmationComponent} from '../confirmation/confirmation.component';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {map} from 'rxjs';
 import {ClickOutsideDirective} from '../../directive/click-outside.directive';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'profile-dropdown',
@@ -18,7 +19,8 @@ import {ClickOutsideDirective} from '../../directive/click-outside.directive';
     ToastModule,
     ConfirmationComponent,
     RouterLink,
-    ClickOutsideDirective
+    ClickOutsideDirective,
+    TranslatePipe
   ],
   templateUrl: './profile-dropdown.component.html'
 })
@@ -26,6 +28,7 @@ export class ProfileDropdownComponent {
   private readonly authService = inject(AuthService);
   private readonly messageService = inject(MessageService);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly isProfileMenuOpen = signal<boolean>(false);
 
@@ -33,7 +36,10 @@ export class ProfileDropdownComponent {
     loader: () => this.authService
       .getUser()
       .pipe(
-        map(user => user != null ? user.firstName + ' ' + user.lastName : 'Profile')
+        map(user => user != null
+          ? user.firstName + ' ' + user.lastName
+          : this.translateService.instant("component.profile-dropdown.option.profile")
+        )
       )
   });
 
@@ -44,8 +50,8 @@ export class ProfileDropdownComponent {
           this.messageService.add({
             key: "root",
             severity: "success",
-            summary: "Logged out",
-            detail: "You have logged out from the system"
+            summary: this.translateService.instant('action.auth.summary'),
+            detail: this.translateService.instant('action.auth.logged-out')
           });
           this.router.navigate(["/auth/login"]);
         }

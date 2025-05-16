@@ -1,11 +1,11 @@
 <card>
   @let role = user()!.role;
-  <p card-header>Profile</p>
+  <p card-header>{{ 'component.profile-showcase.title' | translate }}</p>
   <div card-subHeader class="flex flex-col">
-    <div class="flex flex-row gap-0.5">
-      <p class="font-semibold">You are an </p>
-      <p-badge [value]="toRoleLabel(role)" [severity]="role === Role.Admin ? 'danger' : 'info'" size="small"/>
-      <p>.</p>
+    <div class="flex items-center flex-row gap-1">
+      <p class="font-semibold">{{ 'component.profile-showcase.your-role' | translate }}</p>
+      @let roleInfo = toRoleInfo(role);
+      <p-badge [value]="roleInfo.label | translate" [severity]="roleInfo.severity" size="small"/>
     </div>
   </div>
   <div card-body>

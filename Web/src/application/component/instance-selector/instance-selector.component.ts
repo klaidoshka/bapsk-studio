@@ -11,6 +11,7 @@ import {first} from 'rxjs';
 import {NumberUtil} from '../../util/number.util';
 import {Splitter} from 'primeng/splitter';
 import {FloatLabel} from 'primeng/floatlabel';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'instance-selector',
@@ -22,7 +23,8 @@ import {FloatLabel} from 'primeng/floatlabel';
     Select,
     Splitter,
     RouterLink,
-    FloatLabel
+    FloatLabel,
+    TranslatePipe
   ],
   templateUrl: './instance-selector.component.html'
 })

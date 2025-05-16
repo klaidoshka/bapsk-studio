@@ -1,4 +1,4 @@
-<confirmation [key]="'submit-confirmation'" [header]="'Are you sure? No later changes can be made!'"/>
+<confirmation [key]="'submit-confirmation'" [summary]="'Are you sure? No later changes can be made!'"/>
 <form [formGroup]="form" class="flex flex-col gap-4">
   <div formArrayName="payments" class="flex flex-col gap-8">
     @for (control of getFormPayments().controls; track $index; let i = $index) {
@@ -9,7 +9,7 @@
             <p-select inputId="type" formControlName="type" [options]="types" optionLabel="label" optionValue="id"
                       class="w-full"
                       appendTo="body" dropdownIcon="pi pi-objects-column"/>
-            <label for="type">Payment Type</label>
+            <label for="type">{{ 'component.vat-return-payment.input.type' | translate }}</label>
           </p-float-label>
           <form-input-error [control]="control.controls.type"/>
         </div>
@@ -22,9 +22,9 @@
               <p-input-number inputId="amount" formControlName="amount" currency="EUR" mode="currency" [min]="0"
                               [showButtons]="true" [step]="0.05" class="w-full" inputStyleClass="pl-10! w-60!"/>
             </p-icon-field>
-            <label for="amount">Amount</label>
+            <label for="amount">{{ 'component.vat-return-payment.input.amount' | translate }}</label>
           </p-float-label>
-            <form-input-error [control]="control.controls.amount"/>
+          <form-input-error [control]="control.controls.amount"/>
         </div>
 
         <!-- Date Input -->
@@ -32,24 +32,27 @@
           <p-float-label variant="on" class="w-60">
             <p-date-picker inputId="date" formControlName="date" [showIcon]="true" [showTime]="true" variant="filled"
                            iconDisplay="input" class="w-full" appendTo="body"/>
-            <label for="date">Date</label>
+            <label for="date">{{ 'component.vat-return-payment.input.date' | translate }}</label>
           </p-float-label>
           <form-input-error [control]="control.controls.date"/>
         </div>
 
         <!-- Remove Button -->
         @if (getFormPayments().length > 1) {
-          <p-button title="Remove" variant="text" icon="pi pi-trash" type="button" (onClick)="removePaymentInfo(i)"/>
+          <p-button [title]="'component.vat-return-payment.button.remove' | translate" variant="text" icon="pi pi-trash"
+                    type="button" (onClick)="removePaymentInfo(i)"/>
         }
       </div>
     }
 
     <!-- Add Payment Info Button -->
-    <p-button title="Add Payment Info Entry" label="Add Payment Info" size="small" type="button"
+    <p-button [title]="'component.vat-return-payment.button.add' | translate"
+              [label]="'component.vat-return-payment.button.add' | translate" size="small" type="button"
               (onClick)="addFormPaymentInfo()"/>
   </div>
 
   <!-- Submit Button -->
   <messages-showcase [messages]="messages()"/>
-  <p-button title="Submit" label="Submit Payments" size="small" type="submit" (onClick)="submit()"/>
+  <p-button [title]="'component.vat-return-payment.button.submit' | translate"
+            [label]="'component.vat-return-payment.button.submit' | translate" size="small" type="submit" (onClick)="submit()"/>
 </form>

@@ -2,30 +2,29 @@
   <!-- No Reports -->
   @if (reportsModified.length === 0) {
     <card>
-      <p card-header>No reports available</p>
-      <p card-subHeader>Unfortunately, there are no reports available for the provided report template.</p>
+      <p card-header>{{ 'page.report-preview.no-reports.title' | translate }}</p>
+      <p card-subHeader>{{ 'page.report-preview.no-reports.description' | translate }}</p>
     </card>
   } @else {
     <div *ngFor="let report of reportsModified; let i = index; let count = count" class="flex flex-col gap-4">
-      <div class="flex flex-row justify-between items-center" [ngClass]="{'mt-16': i > 0}">
-        <div class="space-x-2">
-          <p-button title="Export" size="small" label="Export PDF" icon="pi pi-file-export" (onClick)="export(i, 'pdf')"
-                    variant="text"/>
-          <p-button title="Export" size="small" label="Export CSV" icon="pi pi-file-export" (onClick)="export(i, 'csv')"
-                    variant="text"/>
-        </div>
-        <p class="self-end font-semibold">{{ i + 1 }} / {{ count }}</p>
+      <div class="flex flex-row w-full items-center gap-2" [ngClass]="{'mt-16': i > 0}">
+        <p class="justify-self-end font-semibold">{{ i + 1 }} / {{ count }}</p>
+        <p-button [title]="'page.report-preview.button.export-pdf' | translate" size="small"
+                  [label]="'page.report-preview.button.export-pdf' | translate" icon="pi pi-file-export"
+                  (onClick)="export(i, 'pdf')" variant="text"/>
+        <p-button [title]="'page.report-preview.button.export-csv' | translate" size="small"
+                  [label]="'page.report-preview.button.export-csv' | translate" icon="pi pi-file-export"
+                  (onClick)="export(i, 'csv')" variant="text"/>
       </div>
-
       <div #reportContainer class="flex flex-col gap-4">
         <!-- Info -->
         @if (report.info.fields.length) {
           <card>
-            <p card-header>Report Info</p>
-            <p card-subHeader>This section contains the following report's metadata.</p>
+            <p card-header>{{ 'page.report-preview.info.title' | translate }}</p>
+            <p card-subHeader>{{ 'page.report-preview.info.description' | translate }}</p>
             <div card-body class="flex flex-row gap-8 w-fit p-4 dark:text-primary-50 text-primary-950/70">
               <div class="flex flex-col gap-4 items-start w-fit">
-                <p *ngFor="let field of report.info.fields" class="font-semibold min-w-max">
+                <p *ngFor="let field of report.info.fields" class="font-semibold">
                   {{ field.name }}
                 </p>
               </div>
@@ -40,9 +39,8 @@
         <!-- Entries -->
         @if (report.entries.length) {
           <card>
-            <p card-header>Report Entries</p>
-            <p card-subHeader>This section contains report's entries. These entries can be exported into .CSV file if
-              needed.</p>
+            <p card-header>{{ 'page.report-preview.entries.title' | translate }}</p>
+            <p card-subHeader>{{ 'page.report-preview.entries.description' | translate }}</p>
             <p-table card-body [value]="report.entries" sortMode="multiple">
               <ng-template #header>
                 <tr>
@@ -53,15 +51,15 @@
                           {{ field }}
                           <p-sortIcon field="field_{{$index}}"/>
                         </div>
-                          @let type = getType(report.entries, $index);
+                        @let type = getType(report.entries, $index);
 
-                          @if (type === FieldType.Date) {
-                            <p-columnFilter type="date" field="field_{{$index}}" display="menu"/>
-                          } @else if (type === FieldType.Number || type === FieldType.Currency) {
-                            <p-columnFilter type="numeric" field="field_{{$index}}" display="menu"/>
-                          } @else {
-                            <p-columnFilter type="text" field="field_{{$index}}" display="menu"/>
-                          }
+                        @if (type === FieldType.Date) {
+                          <p-columnFilter type="date" field="field_{{$index}}" display="menu"/>
+                        } @else if (type === FieldType.Number || type === FieldType.Currency) {
+                          <p-columnFilter type="numeric" field="field_{{$index}}" display="menu"/>
+                        } @else {
+                          <p-columnFilter type="text" field="field_{{$index}}" display="menu"/>
+                        }
                       </div>
                     </th>
                   }
@@ -80,8 +78,8 @@
         } @else {
           <!-- No Entries -->
           <card>
-            <p card-header>No Entries</p>
-            <p card-subHeader>There are no entries within this report.</p>
+            <p card-header>{{ 'page.report-preview.no-entries.title' | translate }}</p>
+            <p card-subHeader>{{ 'page.report-preview.no-entries.description' | translate }}</p>
           </card>
         }
       </div>

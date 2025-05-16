@@ -15,8 +15,9 @@ import {CurrencyPipe, DatePipe} from '@angular/common';
 import {NumberUtil} from '../../util/number.util';
 import {SalePageHeaderSectionComponent} from '../../component/sale-page-header-section/sale-page-header-section.component';
 import {CardComponent} from '../../component/card/card.component';
-import {SubmitDeclarationState} from '../../model/vat-return.model';
+import {SubmitDeclarationState, toSubmitDeclarationStateInfo} from '../../model/vat-return.model';
 import {Badge} from 'primeng/badge';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'sale-page',
@@ -29,7 +30,8 @@ import {Badge} from 'primeng/badge';
     DatePipe,
     SalePageHeaderSectionComponent,
     CardComponent,
-    Badge
+    Badge,
+    TranslatePipe
   ],
   templateUrl: './sale-page.component.html',
   styles: ``
@@ -39,22 +41,30 @@ export class SalePageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly saleService = inject(SaleService);
+  private readonly translateService = inject(TranslateService);
   protected readonly SubmitDeclarationState = SubmitDeclarationState;
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});
 
   protected readonly sales = rxResource({
-    request: () => ({instanceId: NumberUtil.parse(this.instanceId())}),
-    loader: ({request}) => request.instanceId
+    request: () => ({ instanceId: NumberUtil.parse(this.instanceId()) }),
+    loader: ({ request }) => request.instanceId
       ? this.saleService
         .getAllWithVatDeclarationByInstanceId(request.instanceId)
         .pipe(
-          map(sales => sales.map(sale => ({
-            ...sale,
-            customer: {...sale.customer, fullName: toCustomerFullName(sale.customer)},
-            vatReturnDeclarationStatus: this.getVatDeclarationStatus(sale)
-          })))
+          map(sales => sales.map(sale => {
+            const vatStateInfo = toSubmitDeclarationStateInfo(sale.vatReturnDeclaration);
+
+            return {
+              ...sale,
+              customer: { ...sale.customer, fullName: toCustomerFullName(sale.customer) },
+              vatStateInfo: {
+                ...vatStateInfo,
+                label: this.translateService.instant(vatStateInfo.label)
+              }
+            };
+          }))
         )
       : of(undefined)
   });
@@ -65,7 +75,7 @@ export class SalePageComponent {
         .delete(NumberUtil.parse(this.instanceId())!, sale.id)
         .pipe(first())
         .subscribe({
-          next: () => this.messages.set({success: ['Sale deleted successfully']}),
+          next: () => this.messages.set({ success: ['action.sale.deleted'] }),
           error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     });
@@ -79,29 +89,15 @@ export class SalePageComponent {
     return soldGoods.reduce((total, soldGood) => total + soldGood.vatAmount, 0);
   }
 
-  protected getVatDeclarationStatus(sale: SaleWithVatReturnDeclaration) {
-    if (!sale.vatReturnDeclaration) {
-      return {value: 'Not Submitted', severity: 'contrast' };
-    } else if (sale.vatReturnDeclaration.isCancelled) {
-      return {value: 'Cancelled', severity: 'danger' };
-    } else if (sale.vatReturnDeclaration.state === SubmitDeclarationState.REJECTED) {
-      return {value: 'Rejected', severity: 'warn' };
-    } else if (sale.vatReturnDeclaration.export) {
-      return {value: 'Exported', severity: 'info' };
-    } else {
-      return {value: 'Accepted', severity: 'success' };
-    }
-  }
-
   protected manage(sale?: Sale) {
-    this.router.navigate(['./' + (sale ? `${sale.id}/edit` : 'create')], {relativeTo: this.route});
+    this.router.navigate(['./' + (sale ? `${sale.id}/edit` : 'create')], { relativeTo: this.route });
   }
 
   protected preview(sale: SaleWithVatReturnDeclaration) {
-    this.router.navigate(['./' + sale.id], {relativeTo: this.route});
+    this.router.navigate(['./' + sale.id], { relativeTo: this.route });
   }
 
   protected vatReturnDeclaration(sale: SaleWithVatReturnDeclaration) {
-    this.router.navigate(['./' + sale.id + '/vat-return-declaration'], {relativeTo: this.route});
+    this.router.navigate(['./' + sale.id + '/vat-return-declaration'], { relativeTo: this.route });
   }
 }

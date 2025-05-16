@@ -4,6 +4,8 @@ import {HtmlUploadForOverhaulComponent} from '../../component/html-upload-for-ov
 import {Button} from 'primeng/button';
 import {MockSaleButtonFormComponent} from '../../component/mock-sale-button-form/mock-sale-button-form.component';
 import {ClickOutsideDirective} from '../../directive/click-outside.directive';
+import {ScrollToTopComponent} from '../../component/scroll-to-top/scroll-to-top.component';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'admin-page',
@@ -14,7 +16,9 @@ import {ClickOutsideDirective} from '../../directive/click-outside.directive';
     HtmlUploadForOverhaulComponent,
     Button,
     MockSaleButtonFormComponent,
-    ClickOutsideDirective
+    ClickOutsideDirective,
+    ScrollToTopComponent,
+    TranslatePipe
   ],
   templateUrl: './admin-page.component.html',
   styles: ``

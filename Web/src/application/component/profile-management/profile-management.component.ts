@@ -16,6 +16,7 @@ import {FloatLabel} from 'primeng/floatlabel';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
 import {Select} from 'primeng/select';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'profile-management',
@@ -31,7 +32,8 @@ import {Select} from 'primeng/select';
     FloatLabel,
     IconField,
     InputIcon,
-    Select
+    Select,
+    TranslatePipe
   ],
   templateUrl: './profile-management.component.html',
   styles: ``
@@ -68,7 +70,7 @@ export class ProfileManagementComponent implements OnInit {
 
   protected save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill out the form."]});
+      this.messages.set({error: ["error.fill-all-fields."]});
       return;
     }
 
@@ -84,7 +86,7 @@ export class ProfileManagementComponent implements OnInit {
       .pipe(first())
       .subscribe({
         next: () => {
-          this.messages.set({success: ["Your profile has been saved successfully."]});
+          this.messages.set({success: ["action.profile.saved"]});
           this.form.markAsUntouched();
           this.form.markAsPristine();
         },

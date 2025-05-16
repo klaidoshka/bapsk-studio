@@ -1,6 +1,6 @@
 <card>
-  <p card-header>Details</p>
-  <p card-subHeader>Details of your profile. Unfortunately, your email cannot be changed. To change it contact the support.</p>
+  <p card-header>{{ 'component.profile-management.title' | translate }}</p>
+  <p card-subHeader>{{ 'component.profile-management.description' | translate }}</p>
   <form card-body class="flex flex-col gap-4" [formGroup]="form">
     <div class="flex flex-wrap gap-4">
       <!-- First Name -->
@@ -10,7 +10,7 @@
             <p-inputicon class="pi pi-tag"/>
             <input pInputText class="w-60" id="firstName" formControlName="firstName" type="text"/>
           </p-iconfield>
-          <label for="firstName">First Name</label>
+          <label for="firstName">{{ 'component.profile-management.input.first-name' | translate }}</label>
         </p-floatlabel>
         <form-input-error [control]="form.controls.firstName"/>
       </div>
@@ -22,7 +22,7 @@
             <p-inputicon class="pi pi-tag"/>
             <input pInputText class="w-60" id="lastName" formControlName="lastName" type="text"/>
           </p-iconfield>
-          <label for="lastName">Last Name</label>
+          <label for="lastName">{{ 'component.profile-management.input.last-name' | translate }}</label>
         </p-floatlabel>
         <form-input-error [control]="form.controls.lastName"/>
       </div>
@@ -34,7 +34,7 @@
             <p-inputicon class="pi pi-envelope"/>
             <input pInputText class="w-60" id="email" formControlName="email" type="email"/>
           </p-iconfield>
-          <label for="email">Email</label>
+          <label for="email">{{ 'component.profile-management.input.email' | translate }}</label>
         </p-floatlabel>
         <form-input-error [control]="form.controls.email"/>
       </div>
@@ -44,7 +44,7 @@
         <p-float-label variant="on" class="w-60">
           <p-date-picker icon="pi pi-calendar" iconDisplay="input" showIcon formControlName="birthDate"
                          styleClass="w-60" inputId="birthDate" appendTo="body"/>
-          <label for="birthDate">Birthdate</label>
+          <label for="birthDate">{{ 'component.profile-management.input.birthdate' | translate }}</label>
         </p-float-label>
         <form-input-error [control]="form.controls.birthDate"/>
       </div>
@@ -55,18 +55,19 @@
           <p-select dropdownIcon="pi pi-globe" [options]="countries" formControlName="country" optionLabel="name"
                     styleClass="w-60"
                     appendTo="body"/>
-          <label for="country">Country</label>
+          <label for="country">{{ 'component.profile-management.input.country' | translate }}</label>
         </p-float-label>
         <form-input-error [control]="form.controls.birthDate"/>
       </div>
     </div>
     <messages-showcase [messages]="messages()"/>
     <div class="flex flex-row gap-1">
-      <p-button title="Reset" label="Reset" [disabled]="!form.dirty" (onClick)="reset()" type="button" class="mr-2"
-                size="small"
-                severity="danger"/>
-      <p-button title="Save" label="Save" [disabled]="form.invalid || !form.dirty" (onClick)="save()" type="submit"
-                size="small"/>
+      <p-button [title]="'component.profile-management.button.reset' | translate"
+                [label]="'component.profile-management.button.reset' | translate" [disabled]="!form.dirty" (onClick)="reset()"
+                type="button" class="mr-2" size="small" severity="danger"/>
+      <p-button [title]="'component.profile-management.button.save' | translate"
+                [label]="'component.profile-management.button.save' | translate" [disabled]="form.invalid || !form.dirty"
+                (onClick)="save()" type="submit" size="small"/>
     </div>
   </form>
 </card>

@@ -1,7 +1,5 @@
-<p-confirm-dialog
-  [key]="key()"
-  [header]="header()"
-  closeOnEscape="true"
-  closable="true"
-  rejectButtonStyleClass="p-button-text"
+<p-confirm-dialog [key]="key()" [header]="'component.confirmation.title' | translate" [message]="summary()"
+                  icon="pi pi-exclamation-triangle" closeOnEscape="true" closable="true" rejectButtonStyleClass="p-button-text"
+                  [acceptLabel]="'component.confirmation.button.accept' | translate"
+                  [rejectLabel]="'component.confirmation.button.reject' | translate"
 />

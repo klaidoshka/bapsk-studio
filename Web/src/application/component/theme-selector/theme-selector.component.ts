@@ -1,11 +1,13 @@
 import {Component, inject} from '@angular/core';
 import {ThemeService} from '../../service/theme.service';
 import {FormsModule} from '@angular/forms';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'theme-selector',
   imports: [
-    FormsModule
+    FormsModule,
+    TranslatePipe
   ],
   templateUrl: './theme-selector.component.html'
 })

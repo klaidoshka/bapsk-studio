@@ -27,9 +27,10 @@ import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-s
 import {FloatLabel} from 'primeng/floatlabel';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
-import {BadgeContrastedComponent} from '../../component/badge-contrasted/badge-contrasted.component';
 import {MessageService} from 'primeng/api';
 import {ActivatedRoute, Router} from '@angular/router';
+import {Badge} from 'primeng/badge';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'report-template-management-page',
@@ -48,7 +49,8 @@ import {ActivatedRoute, Router} from '@angular/router';
     FloatLabel,
     IconField,
     InputIcon,
-    BadgeContrastedComponent
+    Badge,
+    TranslatePipe
   ],
   templateUrl: './report-template-management-page.component.html',
   styles: ``
@@ -61,6 +63,7 @@ export class ReportTemplateManagementPageComponent {
   private readonly messageService = inject(MessageService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
   protected readonly form = this.createForm();
   protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});
@@ -110,6 +113,7 @@ export class ReportTemplateManagementPageComponent {
       this.messageService.add({
         key: 'root',
         detail: message,
+        summary: this.translateService.instant('action.report-template.summary'),
         severity: 'success',
         closable: true
       });
@@ -146,6 +150,7 @@ export class ReportTemplateManagementPageComponent {
       id: template.id,
       name: template.name
     });
+    this.form.controls.fields.clear();
     template.fields.forEach(field => this.form.controls.fields.push(this.createFormField(field)));
   }
 
@@ -160,7 +165,7 @@ export class ReportTemplateManagementPageComponent {
 
   protected save() {
     if (!this.form.valid) {
-      this.messages.set({ error: ["Please fill in all required fields."] });
+      this.messages.set({ error: ["error.fill-all-fields."] });
       return;
     }
 
@@ -178,7 +183,7 @@ export class ReportTemplateManagementPageComponent {
         .edit(request)
         .pipe(first())
         .subscribe({
-          next: () => this.consumeResult("Report template edited successfully."),
+          next: () => this.consumeResult(this.translateService.instant("action.report-template.edited")),
           error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     } else {
@@ -186,7 +191,7 @@ export class ReportTemplateManagementPageComponent {
         .create({ ...request })
         .pipe(first())
         .subscribe({
-          next: (value) => this.consumeResult("Report template created successfully.", value.id),
+          next: (value) => this.consumeResult(this.translateService.instant("action.report-template.created"), value.id),
           error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     }

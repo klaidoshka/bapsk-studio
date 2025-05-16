@@ -1,11 +1,13 @@
 import {Component, computed, input} from '@angular/core';
 import {Badge} from "primeng/badge";
 import {instanceUserPermissions} from '../../constant/instance-user.permissions';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'instance-user-permission-preview',
   imports: [
-    Badge
+    Badge,
+    TranslatePipe
   ],
   templateUrl: './instance-user-permission-preview.component.html',
   styles: ``

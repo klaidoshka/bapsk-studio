@@ -2,11 +2,15 @@
   <p-float-label variant="on" class="w-60">
     <p-select dropdownIcon="pi pi-home" (onChange)="onChange($event.value)" [options]="instances.value() || []" optionLabel="name"
               [ngModel]="selectedInstance()" styleClass="w-full" appendTo="body"/>
-    <label for="instance">Workspace (Instance)</label>
+    <label for="instance">{{ 'component.instance-selector.input.instance' | translate }}</label>
   </p-float-label>
   <p-splitter/>
   <div class="flex flex-col gap-1">
-    <p-button title="Create Instance" label="Create Instance" styleClass="w-full" routerLink="/home/instance/create" size="small"/>
-    <p-button title="Exit Workspace" label="Exit Workspace" styleClass="w-full" routerLink="/home" size="small" severity="danger"/>
+    <p-button [title]="'component.instance-selector.button.create' | translate"
+              [label]="'component.instance-selector.button.create' | translate" styleClass="w-full"
+              routerLink="/home/instance/create" size="small"/>
+    <p-button [title]="'component.instance-selector.button.exit' | translate"
+              [label]="'component.instance-selector.button.exit' | translate" styleClass="w-full" routerLink="/home" size="small"
+              severity="danger"/>
   </div>
 </div>

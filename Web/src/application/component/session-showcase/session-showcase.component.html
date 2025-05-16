@@ -1,11 +1,7 @@
-<confirmation key="session-revokation" header="Are you sure about revoking this session?"/>
-<p-toast key="session-revokation"/>
+<confirmation key="session-revokation" [summary]="'component.session-showcase.confirm-revokation' | translate"/>
 <card>
-  <p card-header>Sessions</p>
-  <div card-subHeader class="flex flex-col">
-    <p>These are your sessions (times and devices you logged in with).</p>
-    <p>If you want to revoke a session, click on the revoke button. Current session cannot be revoked.</p>
-  </div>
+  <p card-header>{{ 'component.session-showcase.title' | translate }}</p>
+  <div card-subHeader class="flex flex-col" [innerHtml]="'component.session-showcase.description' | translate"></div>
   <p-table card-body paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]"
            [value]="sessions.value() || []" sortMode="multiple">
     <ng-template #header>
@@ -13,7 +9,7 @@
         <th pSortableColumn="agent">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-0.5">
-              Agent
+              {{ 'component.session-showcase.header.agent' | translate }}
               <p-sortIcon field="agent"/>
             </div>
             <p-columnFilter type="text" field="agent" display="menu"/>
@@ -22,17 +18,17 @@
         <th pSortableColumn="createdAt">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-0.5">
-              Created At
+              {{ 'component.session-showcase.header.created-at' | translate }}
               <p-sortIcon field="createdAt"/>
             </div>
-            <p-columnFilter type="text" field="createdAt" display="menu"/>
+            <p-columnFilter type="date" field="createdAt" display="menu"/>
           </div>
         </th>
-        <th>Active Time</th>
+        <th>{{ 'component.session-showcase.header.active-time' | translate }}</th>
         <th pSortableColumn="ipAddress">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-0.5">
-              IP Address
+              {{ 'component.session-showcase.header.ip-address' | translate }}
               <p-sortIcon field="ipAddress"/>
             </div>
             <p-columnFilter type="text" field="ipAddress" display="menu"/>
@@ -41,7 +37,7 @@
         <th pSortableColumn="location">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-0.5">
-              Location
+              {{ 'component.session-showcase.header.location' | translate }}
               <p-sortIcon field="location"/>
             </div>
             <p-columnFilter type="text" field="location" display="menu"/>
@@ -59,8 +55,9 @@
         <td>{{ session.location }}</td>
         <td>
           <div class="flex items-center">
-            <p-button title="Revoke" [disabled]="session.id === currentSessionId.value()" icon="pi pi-ban"
-                      type="button" variant="text" (onClick)="revoke(session)"/>
+            <p-button [title]="'component.session-showcase.button.revoke' | translate"
+                      [disabled]="session.id === currentSessionId.value()" icon="pi pi-ban" type="button" variant="text"
+                      (onClick)="revoke(session)"/>
           </div>
         </td>
       </tr>

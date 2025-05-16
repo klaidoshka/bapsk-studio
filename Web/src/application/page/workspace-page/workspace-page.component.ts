@@ -11,11 +11,13 @@ import {Button} from 'primeng/button';
 import {Dialog} from 'primeng/dialog';
 import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {ClickOutsideDirective} from '../../directive/click-outside.directive';
+import {ScrollToTopComponent} from '../../component/scroll-to-top/scroll-to-top.component';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'workspace-page',
   templateUrl: './workspace-page.component.html',
-  imports: [DropdownModule, FormsModule, RouterOutlet, InstanceSelectorComponent, RouterLink, RouterLinkActive, Button, Dialog, LoadingSpinnerComponent, LoadingSpinnerComponent, ClickOutsideDirective],
+  imports: [DropdownModule, FormsModule, RouterOutlet, InstanceSelectorComponent, RouterLink, RouterLinkActive, Button, Dialog, LoadingSpinnerComponent, LoadingSpinnerComponent, ClickOutsideDirective, ScrollToTopComponent, TranslatePipe],
   providers: []
 })
 export class WorkspacePageComponent {

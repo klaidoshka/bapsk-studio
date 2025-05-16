@@ -10,7 +10,7 @@ import {getDefaultIsoCountry, IsoCountries} from '../../model/iso-country.model'
 import {CustomerService} from '../../service/customer.service';
 import {MessageHandlingService} from '../../service/message-handling.service';
 import Customer, {CustomerCreateRequest, CustomerEditRequest, CustomerOtherDocument} from '../../model/customer.model';
-import {IdentityDocumentType} from '../../model/identity-document-type.model';
+import {IdentityDocumentType, identityDocumentTypes} from '../../model/identity-document-type.model';
 import Messages from '../../model/messages.model';
 import {first, of, tap} from 'rxjs';
 import {rxResource} from '@angular/core/rxjs-interop';
@@ -28,6 +28,7 @@ import {
 import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {MessageService} from 'primeng/api';
 import {ActivatedRoute, Router} from '@angular/router';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'customer-management-page',
@@ -45,7 +46,8 @@ import {ActivatedRoute, Router} from '@angular/router';
     IconField,
     InputIcon,
     FailedToLoadPleaseReloadComponent,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    TranslatePipe
   ],
   templateUrl: './customer-management-page.component.html',
   styles: ``
@@ -57,10 +59,17 @@ export class CustomerManagementPageComponent {
   private readonly messageService = inject(MessageService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
   protected readonly IsoCountries = IsoCountries;
   protected readonly customerId = input<string>();
   protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});
+  protected readonly form = this.createForm();
+
+  protected readonly identityDocumentTypes = identityDocumentTypes.map(type => ({
+    ...type,
+    label: this.translateService.instant(type.label)
+  }));
 
   protected readonly customer = rxResource({
     request: () => ({
@@ -74,18 +83,12 @@ export class CustomerManagementPageComponent {
       : of(undefined)
   });
 
-  protected readonly form = this.createForm();
-
-  protected readonly identityDocumentTypes = [
-    {label: 'ID Card', value: IdentityDocumentType.NationalId},
-    {label: 'Passport', value: IdentityDocumentType.Passport}
-  ]
-
   private consumeResult(message: string, id?: string | number, success: boolean = true) {
     if (success) {
       this.messageService.add({
         key: 'root',
         detail: message,
+        summary: this.translateService.instant('action.customer.summary'),
         severity: 'success',
         closable: true
       });
@@ -104,7 +107,7 @@ export class CustomerManagementPageComponent {
       .create(request)
       .pipe(first())
       .subscribe({
-        next: (value) => this.consumeResult("Customer has been created successfully.", value.id),
+        next: (value) => this.consumeResult(this.translateService.instant("action.customer.created"), value.id),
         error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
@@ -141,7 +144,7 @@ export class CustomerManagementPageComponent {
       .edit(request)
       .pipe(first())
       .subscribe({
-        next: () => this.consumeResult("Customer has been edited successfully."),
+        next: () => this.consumeResult(this.translateService.instant("action.customer.edited")),
         error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
@@ -169,7 +172,7 @@ export class CustomerManagementPageComponent {
 
   protected save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill out the form."]});
+      this.messages.set({error: ["error.fill-all-fields."]});
       return;
     }
 

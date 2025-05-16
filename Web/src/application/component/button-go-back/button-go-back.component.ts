@@ -1,11 +1,13 @@
 import {Component, inject} from '@angular/core';
 import {Button} from "primeng/button";
 import {Location} from '@angular/common';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'button-go-back',
   imports: [
-    Button
+    Button,
+    TranslatePipe
   ],
   templateUrl: './button-go-back.component.html',
   styles: ``

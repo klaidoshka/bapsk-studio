@@ -15,6 +15,7 @@ import {MessageService} from 'primeng/api';
 import {FloatLabel} from 'primeng/floatlabel';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'reset-password-page',
@@ -28,7 +29,8 @@ import {InputIcon} from 'primeng/inputicon';
     FormInputErrorComponent,
     FloatLabel,
     IconField,
-    InputIcon
+    InputIcon,
+    TranslatePipe
   ],
   templateUrl: './reset-password-page.component.html',
   providers: [MessageService]
@@ -38,6 +40,7 @@ export class ResetPasswordPageComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly route = inject(ActivatedRoute);
+  private readonly translateService = inject(TranslateService);
   protected readonly messages = signal<Messages>({});
 
   protected readonly isTokenProvided = rxResource({
@@ -49,14 +52,10 @@ export class ResetPasswordPageComponent {
     confirmPassword: ['', [this.validatePasswordConfirmed()]]
   });
 
-  protected readonly customErrorMessages = {
-    'mismatchPassword': () => "Passwords do not match."
-  }
-
   private validatePasswordConfirmed(): ValidatorFn {
     return (control): ValidationErrors | null => {
       if (this.form?.value?.password !== control.value) {
-        return { mismatchPassword: true };
+        return { "mismatch-password": true };
       }
 
       return null;
@@ -65,7 +64,7 @@ export class ResetPasswordPageComponent {
 
   protected changePassword() {
     if (this.form.invalid) {
-      this.messages.set({ error: ["Please fill in all fields."] });
+      this.messages.set({ error: ["error.fill-all-fields"] });
       return;
     }
 
@@ -78,7 +77,7 @@ export class ResetPasswordPageComponent {
       .subscribe({
         next: () => {
           this.form.reset();
-          this.messages.set({ success: ["Password changed successfully."] });
+          this.messages.set({ success: ["action.auth.password-changed"] });
         },
         error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });

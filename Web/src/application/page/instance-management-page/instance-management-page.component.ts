@@ -1,4 +1,4 @@
-import {Component, inject, input, signal} from '@angular/core';
+import {Component, effect, inject, input, signal} from '@angular/core';
 import {Badge} from "primeng/badge";
 import {Button} from "primeng/button";
 import {FormInputErrorComponent} from "../../component/form-input-error/form-input-error.component";
@@ -42,6 +42,7 @@ import {
 import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {MessageService} from 'primeng/api';
 import {ActivatedRoute, Router} from '@angular/router';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'instance-management-page',
@@ -62,7 +63,8 @@ import {ActivatedRoute, Router} from '@angular/router';
     Dialog,
     InstanceUserPermissionTogglerComponent,
     FailedToLoadPleaseReloadComponent,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    TranslatePipe
   ],
   templateUrl: './instance-management-page.component.html',
   styles: ``
@@ -75,19 +77,20 @@ export class InstanceManagementPageComponent {
   private readonly messageService = inject(MessageService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
   private readonly userService = inject(UserService);
   private readonly allPermissions = instanceUserPermissions;
   protected readonly form = this.createForm();
   protected readonly instanceId = input<string>();
   protected readonly messages = signal<Messages>({});
   protected readonly messagesUsers = signal<Messages>({});
-  protected readonly user = rxResource({loader: () => this.authService.getUser()});
+  protected readonly user = rxResource({ loader: () => this.authService.getUser() });
 
   protected readonly instance = rxResource({
     request: () => ({
       instanceId: NumberUtil.parse(this.instanceId())
     }),
-    loader: ({request}) => request.instanceId
+    loader: ({ request }) => request.instanceId
       ? this.instanceService
         .getWithUsersById(request.instanceId)
         .pipe(tap(instance => this.patchFormValues(instance)))
@@ -98,9 +101,20 @@ export class InstanceManagementPageComponent {
     email: ["", [Validators.required, Validators.email, this.validateEmailExists(this.form.controls.users)]]
   });
 
-  protected readonly customErrorMessages = {
-    'emailExists': () => 'User with this email already exists in the list.'
-  };
+  constructor() {
+    const effectRef = effect(() => {
+      const user = this.user.value();
+
+      if (user) {
+        if (this.instanceId()) {
+          effectRef.destroy();
+        } else {
+          this.addUserInForm(user, user.email);
+          effectRef.destroy();
+        }
+      }
+    });
+  }
 
   private addUserInForm(user: UserIdentity, email: string, permissions?: string[]) {
     const isOwnerOrSelf = this.instance.value()?.createdById === user.id || this.user.value()!.id === user.id;
@@ -131,16 +145,17 @@ export class InstanceManagementPageComponent {
       this.messageService.add({
         key: 'root',
         detail: message,
+        summary: this.translateService.instant('action.instance.summary'),
         severity: 'success',
         closable: true
       });
       if (this.instanceId()) {
-        this.router.navigate(['../'], {relativeTo: this.route});
+        this.router.navigate(['../'], { relativeTo: this.route });
       } else {
-        this.router.navigate(['../', id], {relativeTo: this.route});
+        this.router.navigate(['../', id], { relativeTo: this.route });
       }
     } else {
-      this.messages.set({error: [message]});
+      this.messages.set({ error: [message] });
     }
   }
 
@@ -149,7 +164,7 @@ export class InstanceManagementPageComponent {
       .create(request)
       .pipe(first())
       .subscribe({
-        next: (value) => this.consumeResult("Instance has been created successfully.", value.id),
+        next: (value) => this.consumeResult(this.translateService.instant("action.instance.created"), value.id),
         error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
@@ -183,7 +198,7 @@ export class InstanceManagementPageComponent {
       .edit(request)
       .pipe(first())
       .subscribe({
-        next: () => this.consumeResult("Instance has been edited successfully."),
+        next: () => this.consumeResult(this.translateService.instant("action.instance.edited")),
         error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
@@ -212,7 +227,7 @@ export class InstanceManagementPageComponent {
         return null;
       }
       if (formArray.controls.some(um => um.value.email.trim().toLowerCase() === email)) {
-        return {emailExists: true};
+        return { "instance-management.email-exists": true };
       }
       return null;
     };
@@ -228,7 +243,7 @@ export class InstanceManagementPageComponent {
       .pipe(first())
       .subscribe(user => {
         if (!user) {
-          this.messagesUsers.set({error: [`User with email '${email}' does not exist.`]});
+          this.messagesUsers.set({ error: [this.translateService.instant('error.instance-management.email-invalid', { email })] });
           return;
         } else if (this.messagesUsers().error) {
           this.messagesUsers.set({});
@@ -248,7 +263,7 @@ export class InstanceManagementPageComponent {
 
   protected save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill out the form."]});
+      this.messages.set({ error: ["error.fill-all-fields."] });
       return;
     }
 

@@ -11,6 +11,7 @@ import {FormInputErrorComponent} from '../form-input-error/form-input-error.comp
 import {FloatLabel} from 'primeng/floatlabel';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'auth-reset-password',
@@ -22,7 +23,8 @@ import {InputIcon} from 'primeng/inputicon';
     FormInputErrorComponent,
     FloatLabel,
     IconField,
-    InputIcon
+    InputIcon,
+    TranslatePipe
   ],
   templateUrl: './auth-reset-password.component.html',
   styles: ``
@@ -39,7 +41,7 @@ export class AuthResetPasswordComponent {
 
   protected resetPassword() {
     if (this.form.invalid) {
-      this.messages.set({ error: ["Please fill in a valid email address."] });
+      this.messages.set({ error: ["error.fill-all-fields"] });
       return;
     }
 
@@ -49,11 +51,7 @@ export class AuthResetPasswordComponent {
       .subscribe({
         next: () => {
           this.form.reset();
-          this.messages.set({
-            success: [
-              "Request has been sent! Please check your email, request will be valid for 10 minutes."
-            ]
-          });
+          this.messages.set({ success: ["action.auth.reset-password-sent"] });
         },
         error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });

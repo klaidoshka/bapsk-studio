@@ -2,9 +2,10 @@
   <tbody>
     @for (perm of allPermissions(); track $index) {
       <tr>
-        <td>{{ perm.label }}</td>
+        <td>{{ perm.label | translate }}</td>
         <td class="py-1 w-24">
-          <p-badge [value]="perm.toggled ? 'Enabled' : 'Disabled'" [severity]="perm.toggled ? 'success' : 'danger'"/>
+          <p-badge [value]="(perm.toggled ? 'misc.state.enabled'  : 'misc.state.disabled') | translate"
+                   [severity]="perm.toggled ? 'success' : 'danger'"/>
         </td>
       </tr>
     }

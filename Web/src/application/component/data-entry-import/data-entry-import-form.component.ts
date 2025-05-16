@@ -18,6 +18,7 @@ import {TableModule} from 'primeng/table';
 import {DataEntryTableComponent} from '../data-entry-table/data-entry-table.component';
 import {FloatLabel} from 'primeng/floatlabel';
 import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'data-entry-import-form',
@@ -32,7 +33,8 @@ import {FormInputErrorComponent} from '../form-input-error/form-input-error.comp
     TableModule,
     DataEntryTableComponent,
     FloatLabel,
-    FormInputErrorComponent
+    FormInputErrorComponent,
+    TranslatePipe
   ],
   templateUrl: './data-entry-import-form.component.html',
   styles: ``
@@ -100,7 +102,7 @@ export class DataEntryImportFormComponent {
 
   protected import() {
     if (this.form.invalid) {
-      this.messages.set({error: ["Please fill in all required fields."]});
+      this.messages.set({error: ["error.fill-all-fields."]});
       return;
     }
 
@@ -114,7 +116,7 @@ export class DataEntryImportFormComponent {
     this.dataEntryService.import(request).pipe(first()).subscribe({
       next: (entries) => {
         this.importedEntries.set(entries);
-        this.messages.set({success: ['Data entries imported successfully.']});
+        this.messages.set({success: ['action.data-entry.imported']});
       },
       error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
     });

@@ -7,9 +7,10 @@ import {DatePipe} from '@angular/common';
 import {AuthService} from '../../service/auth.service';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
 import {MessageService} from 'primeng/api';
-import {Toast} from 'primeng/toast';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {CardComponent} from '../card/card.component';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import {first} from 'rxjs';
 
 @Component({
   selector: 'session-showcase',
@@ -18,8 +19,8 @@ import {CardComponent} from '../card/card.component';
     Button,
     DatePipe,
     ConfirmationComponent,
-    Toast,
-    CardComponent
+    CardComponent,
+    TranslatePipe
   ],
   templateUrl: './session-showcase.component.html',
   providers: [MessageService],
@@ -29,9 +30,10 @@ export class SessionShowcaseComponent {
   private readonly authService = inject(AuthService);
   private readonly messageService = inject(MessageService);
   private readonly sessionService = inject(SessionService);
+  private readonly translateService = inject(TranslateService);
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
-  protected readonly currentSessionId = rxResource({loader: () => this.authService.getSessionId()});
-  protected readonly sessions = rxResource({loader: () => this.sessionService.getByUser()});
+  protected readonly currentSessionId = rxResource({ loader: () => this.authService.getSessionId() });
+  protected readonly sessions = rxResource({ loader: () => this.sessionService.getByUser() });
 
   protected getActiveTime(session: Session): string {
     const diffInSeconds = Math.floor(((new Date()).getTime() - session.createdAt.getTime()) / 1000);
@@ -52,7 +54,7 @@ export class SessionShowcaseComponent {
     }
 
     if (timeParts.days === 0 && timeParts.hours === 0) {
-      activeTime = 'Less than an hour';
+      activeTime = this.translateService.instant('misc.time.less-than-hour-ago');
     }
 
     return activeTime;
@@ -60,14 +62,15 @@ export class SessionShowcaseComponent {
 
   protected revoke(session: Session) {
     this.confirmationComponent().request(() => {
-      this.sessionService.revoke(session.id).subscribe(() =>
-        this.messageService.add({
-          key: 'session-revokation',
+      this.sessionService.revoke(session.id).pipe(first()).subscribe({
+        next: () => this.messageService.add({
+          key: 'root',
           severity: 'success',
-          summary: "Session",
-          detail: "Session has been successfully revoked"
+          closable: true,
+          summary: this.translateService.instant('action.auth.summary'),
+          detail: this.translateService.instant('action.auth.session-revoked')
         })
-      );
+      });
     });
   }
 }

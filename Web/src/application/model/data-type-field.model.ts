@@ -19,13 +19,13 @@ export enum FieldType {
 }
 
 export const fieldTypes = [
-  {label: 'Check', value: FieldType.Check},
-  {label: 'Date', value: FieldType.Date},
-  {label: 'Number', value: FieldType.Number},
-  {label: 'Text', value: FieldType.Text},
-  {label: 'Reference', value: FieldType.Reference},
-  {label: 'Country', value: FieldType.IsoCountryCode},
-  {label: 'Currency', value: FieldType.Currency}
+  {label: 'misc.field-type.check', value: FieldType.Check},
+  {label: 'misc.field-type.date', value: FieldType.Date},
+  {label: 'misc.field-type.number', value: FieldType.Number},
+  {label: 'misc.field-type.text', value: FieldType.Text},
+  {label: 'misc.field-type.reference', value: FieldType.Reference},
+  {label: 'misc.field-type.country', value: FieldType.IsoCountryCode},
+  {label: 'misc.field-type.currency', value: FieldType.Currency}
 ].sort((a, b) => a.label.localeCompare(b.label));
 
 export const toFieldTypeLabel = (type: FieldType): string => {

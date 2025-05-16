@@ -15,6 +15,7 @@ import {
   FailedToLoadPleaseReloadComponent
 } from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
 import {CardComponent} from '../../component/card/card.component';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'customer-preview-page',
@@ -24,7 +25,8 @@ import {CardComponent} from '../../component/card/card.component';
     CustomerPageHeaderSectionComponent,
     LoadingSpinnerComponent,
     FailedToLoadPleaseReloadComponent,
-    CardComponent
+    CardComponent,
+    TranslatePipe
   ],
   templateUrl: './customer-preview-page.component.html',
   styles: ``

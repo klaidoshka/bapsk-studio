@@ -8,44 +8,44 @@
     @let dataEntry = this.dataEntry.value()!;
     @let dataType = this.dataType.value()!;
     <card>
-      <p card-header>{{ dataType.name }}</p>
-      <p card-subHeader>Preview of this unique {{ dataType.name }} data type entry.</p>
+      <p card-header>{{ ('page.data-entry-preview.title' | translate:{ name: dataType.name }) }}</p>
+      <p card-subHeader>{{ ('page.data-entry-preview.description' | translate:{ name: dataType.name }) }}</p>
       <div card-body class="flex flex-col gap-4">
         <card>
-          <p card-header>Details</p>
-          <p card-subHeader>Details of this specific data entry.</p>
+          <p card-header>{{ 'page.data-entry-preview.details.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.data-entry-preview.details.description' | translate }}</p>
           <div card-body class="flex flex-col">
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">ID</p>
+              <p class="font-semibold">{{ 'page.data-entry-preview.details.label.id' | translate }}</p>
               <p>{{ dataEntry.id }}</p>
             </div>
             @if (dataType.displayFieldId) {
               <div class="flex flex-row gap-2">
-                <p class="font-semibold">Displayed As</p>
+                <p class="font-semibold">{{ 'page.data-entry-preview.details.label.display' | translate }}</p>
                 <p>{{ dataEntry.display() }}</p>
               </div>
             }
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">Created At</p>
+              <p class="font-semibold">{{ 'page.data-entry-preview.details.label.created-at' | translate }}</p>
               <p>{{ dataEntry.createdAt | date:'short' }}</p>
             </div>
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">Created By</p>
+              <p class="font-semibold">{{ 'page.data-entry-preview.details.label.created-by' | translate }}</p>
               <p>{{ toUserIdentityFullName(dataEntry.createdBy) }}</p>
             </div>
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">Last Modified At</p>
+              <p class="font-semibold">{{ 'page.data-entry-preview.details.label.modified-at' | translate }}</p>
               <p>{{ dataEntry.modifiedAt | date:'short' }}</p>
             </div>
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">Last Modified By</p>
+              <p class="font-semibold">{{ 'page.data-entry-preview.details.label.modified-by' | translate }}</p>
               <p>{{ toUserIdentityFullName(dataEntry.modifiedBy) }}</p>
             </div>
           </div>
         </card>
         <card>
-          <p card-header>Values</p>
-          <p card-subHeader>Values of this specific data entry.</p>
+          <p card-header>{{ 'page.data-entry-preview.values.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.data-entry-preview.values.description' | translate }}</p>
           <p-table card-body [columns]="dataType?.fields || []" [value]="[dataEntry.fields]">
             <ng-template #header let-fields>
               <tr>

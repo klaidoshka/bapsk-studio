@@ -1,20 +1,21 @@
 <div class="h-full w-full relative container mx-auto flex flex-col">
   <customer-page-header-section/>
-  <confirmation [key]='"customer-delete-confirmation"' [header]='"Are you sure about deleting this customer?"'/>
+  <confirmation [key]='"customer-delete-confirmation"' [summary]="'page.customer.confirm-delete' | translate"/>
   <messages-showcase [messages]="messages()"/>
   <card>
-    <p card-header>Customers</p>
-    <p card-subHeader>Manage your customers — create, preview, edit or delete.</p>
+    <p card-header>{{ 'page.customer.title' | translate }}</p>
+    <p card-subHeader>{{ 'page.customer.description' | translate }}</p>
     <div card-body>
-      <p-button title="Create" size="small" label="Create Customer" type="button" (onClick)="manage()"/>
-      <p-table paginatorDropdownAppendTo="body" styleClass="mt-4" [value]="customers.value() || []" [paginator]="true"
-               [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" sortMode="multiple">
+      <p-button [title]="'page.customer.button.create' | translate" size="small"
+                [label]="'page.customer.button.create' | translate" type="button" (onClick)="manage()"/>
+      <p-table paginatorDropdownAppendTo="body" styleClass="mt-4" [value]="customers.value() || []" [paginator]="true" [rows]="10"
+               [rowsPerPageOptions]="[10, 20, 50]" sortMode="multiple">
         <ng-template #header>
           <tr>
             <th pSortableColumn="firstName">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-0.5">
-                  First Name
+                  {{ 'page.customer.header.first-name' | translate }}
                   <p-sortIcon field="firstName"/>
                 </div>
                 <p-columnFilter type="text" field="firstName" display="menu"/>
@@ -23,7 +24,7 @@
             <th pSortableColumn="lastName">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-0.5">
-                  Last Name
+                  {{ 'page.customer.header.last-name' | translate }}
                   <p-sortIcon field="lastName"/>
                 </div>
                 <p-columnFilter type="text" field="lastName" display="menu"/>
@@ -32,7 +33,7 @@
             <th pSortableColumn="email">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-0.5">
-                  Email
+                  {{ 'page.customer.header.email' | translate }}
                   <p-sortIcon field="email"/>
                 </div>
                 <p-columnFilter type="text" field="email" display="menu"/>
@@ -41,7 +42,7 @@
             <th pSortableColumn="birthdate">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-0.5">
-                  Birthdate
+                  {{ 'page.customer.header.birthdate' | translate }}
                   <p-sortIcon field="birthdate"/>
                 </div>
                 <p-columnFilter type="text" field="birthdate" display="menu"/>
@@ -50,7 +51,7 @@
             <th pSortableColumn="residenceCountryLabel">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-0.5">
-                  Reside In
+                  {{ 'page.customer.header.reside-in' | translate }}
                   <p-sortIcon field="residenceCountryLabel"/>
                 </div>
                 <p-columnFilter type="text" field="residenceCountryLabel" display="menu"/>
@@ -59,7 +60,7 @@
             <th pSortableColumn="identityDocument.typeLabel">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-0.5">
-                  Identity Document
+                  {{ 'page.customer.header.identity-document' | translate }}
                   <p-sortIcon field="identityDocument.typeLabel"/>
                 </div>
                 <p-columnFilter type="text" field="identityDocument.typeLabel" display="menu"/>
@@ -68,7 +69,7 @@
             <th pSortableColumn="identityDocument.value">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-0.5">
-                  Personal Code
+                  {{ 'page.customer.header.personal-code' | translate }}
                   <p-sortIcon field="identityDocument.value"/>
                 </div>
                 <p-columnFilter type="text" field="identityDocument.value" display="menu"/>
@@ -83,14 +84,17 @@
             <td>{{ customer.lastName }}</td>
             <td>{{ customer.email }}</td>
             <td>{{ customer.birthdate | date:'mediumDate' }}</td>
-            <td>{{ customer.residenceCountryLabel }}</td>
-            <td>{{ customer.identityDocument.typeLabel }}</td>
-            <td>{{ customer.identityDocument.value || 'Unprovided' }}</td>
+            <td>{{ customer.residenceCountryLabel | translate }}</td>
+            <td>{{ customer.identityDocument.typeLabel | translate }}</td>
+            <td>{{ customer.identityDocument.value ?? ('misc.not-provided' | translate) }}</td>
             <td>
               <div class="flex items-center">
-                <p-button title="Preview" icon="pi pi-eye" type="button" variant="text" (onClick)="preview(customer)"/>
-                <p-button title="Edit" icon="pi pi-pencil" type="button" variant="text" (onClick)="manage(customer)"/>
-                <p-button title="Delete" icon="pi pi-trash" type="button" variant="text" (onClick)="delete(customer)"/>
+                <p-button [title]="'page.customer.button.preview' | translate" icon="pi pi-eye" type="button" variant="text"
+                          (onClick)="preview(customer)"/>
+                <p-button [title]="'page.customer.button.edit' | translate" icon="pi pi-pencil" type="button" variant="text"
+                          (onClick)="manage(customer)"/>
+                <p-button [title]="'page.customer.button.delete' | translate" icon="pi pi-trash" type="button" variant="text"
+                          (onClick)="delete(customer)"/>
               </div>
             </td>
           </tr>

@@ -2,12 +2,14 @@ import {Component, computed, input} from '@angular/core';
 import {ReportGenerateFormComponent} from '../../component/report-generate-form/report-generate-form.component';
 import {NumberUtil} from '../../util/number.util';
 import {CardComponent} from '../../component/card/card.component';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'report-generate-page',
   imports: [
     ReportGenerateFormComponent,
-    CardComponent
+    CardComponent,
+    TranslatePipe
   ],
   templateUrl: './report-generate-page.component.html',
   styles: ``

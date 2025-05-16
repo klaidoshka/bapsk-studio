@@ -7,61 +7,61 @@
   } @else {
     @let sale = this.sale.value()!;
     <card>
-      <p card-header>Sale</p>
-      <p card-subHeader>Preview of this unique sale entry.</p>
+      <p card-header>{{ 'page.sale-preview.title' | translate }}</p>
+      <p card-subHeader>{{ 'page.sale-preview.description' | translate }}</p>
       <div card-body class="flex flex-col gap-4">
         <card>
-          <p card-header>Details</p>
-          <p card-subHeader>Details of this specific sale.</p>
+          <p card-header>{{ 'page.sale-preview.details.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.sale-preview.details.description' | translate }}</p>
           <div card-body class="flex flex-col md:flex-row gap-4">
             <div class="flex flex-1 flex-col">
               <div class="flex flex-row gap-2">
-                <p class="font-semibold">ID</p>
+                <p class="font-semibold">{{ 'page.sale-preview.details.label.id' | translate }}</p>
                 <p>{{ sale.id }}</p>
               </div>
               <div class="flex flex-row gap-2">
-                <p class="font-semibold">Customer</p>
+                <p class="font-semibold">{{ 'page.sale-preview.details.label.customer' | translate }}</p>
                 <p>{{ sale.customer.firstName + ' ' + sale.customer.lastName }}</p>
               </div>
               <div class="flex flex-row gap-2">
-                <p class="font-semibold">Salesman</p>
+                <p class="font-semibold">{{ 'page.sale-preview.details.label.salesman' | translate }}</p>
                 <p>{{ sale.salesman.name }}</p>
               </div>
               <div class="flex flex-row gap-2">
-                <p class="font-semibold">Sale Date</p>
+                <p class="font-semibold">{{ 'page.sale-preview.details.label.date' | translate }}</p>
                 <p>{{ sale.date | date: 'medium' }}</p>
               </div>
             </div>
             <div class="flex flex-1 flex-col">
               <div class="flex flex-row gap-2">
-                <p class="font-semibold">Invoice No</p>
-                <p>{{ sale.invoiceNo || '-' }}</p>
+                <p class="font-semibold">{{ 'page.sale-preview.details.label.invoice-no' | translate }}</p>
+                <p>{{ sale.invoiceNo || ('misc.not-provided' | translate) }}</p>
               </div>
               <div class="flex flex-row gap-2">
-                <p class="font-semibold">Cash Register No</p>
-                <p>{{ sale.cashRegister?.cashRegisterNo || '-' }}</p>
+                <p class="font-semibold">{{ 'page.sale-preview.details.label.cash-register-no' | translate }}</p>
+                <p>{{ sale.cashRegister?.cashRegisterNo || ('misc.not-provided' | translate) }}</p>
               </div>
               <div class="flex flex-row gap-2">
-                <p class="font-semibold">Receipt No</p>
-                <p>{{ sale.cashRegister?.receiptNo || '-' }}</p>
+                <p class="font-semibold">{{ 'page.sale-preview.details.label.receipt-no' | translate }}</p>
+                <p>{{ sale.cashRegister?.receiptNo || ('misc.not-provided' | translate) }}</p>
               </div>
             </div>
           </div>
         </card>
         <card>
-          <p card-header>Sold Goods</p>
-          <p card-subHeader>Goods that were sold to the customer of this specific sale.</p>
+          <p card-header>{{ 'page.sale-preview.sold-goods.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.sale-preview.sold-goods.description' | translate }}</p>
           <p-table card-body [value]="sale.soldGoods" paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10"
                    [rowsPerPageOptions]="[10, 20, 50]">
             <ng-template #header>
               <tr>
-                <th>Sequence No</th>
-                <th>Description</th>
-                <th>Quantity</th>
-                <th>Measure Unit</th>
-                <th>Unit Price</th>
-                <th>VAT Amount</th>
-                <th>Total Amount</th>
+                <th>{{ 'page.sale-preview.sold-goods.header.sequence-no' | translate }}</th>
+                <th>{{ 'page.sale-preview.sold-goods.header.description' | translate }}</th>
+                <th>{{ 'page.sale-preview.sold-goods.header.quantity' | translate }}</th>
+                <th>{{ 'page.sale-preview.sold-goods.header.measure-unit' | translate }}</th>
+                <th>{{ 'page.sale-preview.sold-goods.header.unit-price' | translate }}</th>
+                <th>{{ 'page.sale-preview.sold-goods.header.vat-amount' | translate }}</th>
+                <th>{{ 'page.sale-preview.sold-goods.header.total-amount' | translate }}</th>
               </tr>
             </ng-template>
             <ng-template #body let-soldGood>

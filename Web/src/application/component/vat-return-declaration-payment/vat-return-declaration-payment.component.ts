@@ -16,6 +16,7 @@ import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
 import {InputNumber} from 'primeng/inputnumber';
 import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'vat-return-declaration-payment',
@@ -30,25 +31,32 @@ import {FormInputErrorComponent} from '../form-input-error/form-input-error.comp
     IconField,
     InputIcon,
     InputNumber,
-    FormInputErrorComponent
+    FormInputErrorComponent,
+    TranslatePipe
   ],
   templateUrl: './vat-return-declaration-payment.component.html',
   styles: ``
 })
 export class VatReturnDeclarationPaymentComponent {
-  protected readonly types = PaymentTypes;
   private readonly formBuilder = inject(FormBuilder);
   private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly messageService = inject(MessageService);
+  private readonly translateService = inject(TranslateService);
   private readonly vatReturnService = inject(VatReturnService);
+
   protected readonly confirmation = viewChild.required(ConfirmationComponent);
   protected readonly messages = signal<Messages>({});
   readonly instanceId = input.required<number>();
   readonly saleId = input.required<number>();
 
+  protected readonly types = PaymentTypes.map(type => ({
+    ...type,
+    label: this.translateService.instant(type.label)
+  }));
+
   protected readonly form = this.formBuilder.group({
     payments: this.formBuilder.array([this.createFormPaymentInfo()])
-  })
+  });
 
   private createFormPaymentInfo() {
     return this.formBuilder.group({
@@ -74,7 +82,7 @@ export class VatReturnDeclarationPaymentComponent {
 
   protected submit() {
     if (this.form.invalid) {
-      this.messages.set({error: ['Please fill in all required fields']});
+      this.messages.set({error: ['error.fill-all-fields']});
       return;
     }
 
@@ -93,8 +101,8 @@ export class VatReturnDeclarationPaymentComponent {
         .subscribe({
           next: () => this.messageService.add({
             key: 'root',
-            summary: 'Payment Successful',
-            detail: 'You have successfully submitted the payment info.',
+            summary: this.translateService.instant('action.sale.summary'),
+            detail: this.translateService.instant('action.sale.payment-submitted'),
             severity: 'success'
           }),
           error: response => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)

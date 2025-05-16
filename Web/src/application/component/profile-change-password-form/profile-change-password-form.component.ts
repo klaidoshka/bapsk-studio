@@ -11,6 +11,7 @@ import {MessageHandlingService} from '../../service/message-handling.service';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {CardComponent} from '../card/card.component';
 import {FloatLabel} from 'primeng/floatlabel';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'profile-change-password-form',
@@ -22,7 +23,8 @@ import {FloatLabel} from 'primeng/floatlabel';
     ReactiveFormsModule,
     MessagesShowcaseComponent,
     CardComponent,
-    FloatLabel
+    FloatLabel,
+    TranslatePipe
   ],
   templateUrl: './profile-change-password-form.component.html',
   styles: ``
@@ -38,7 +40,7 @@ export class ProfileChangePasswordFormComponent {
     password: ['', [Validators.required, Validators.minLength(8)]],
     confirmPassword: ['', [(control: AbstractControl) => {
       if (this.form?.value?.password !== control.value) {
-        return {'mismatchPassword': true};
+        return { "mismatch-passwords": true };
       }
 
       return undefined;
@@ -46,13 +48,9 @@ export class ProfileChangePasswordFormComponent {
     currentPassword: ['', [Validators.required]]
   });
 
-  protected readonly customErrorMessages = {
-    'mismatchPassword': () => "Passwords do not match."
-  }
-
   protected changePassword() {
     if (this.form.invalid) {
-      this.messages.set({error: ["Please fill in all fields."]});
+      this.messages.set({ error: ["error.fill-all-fields"] });
       return;
     }
 
@@ -65,7 +63,7 @@ export class ProfileChangePasswordFormComponent {
       .subscribe({
         next: () => {
           this.form.reset();
-          this.messages.set({success: ["Password changed successfully."]});
+          this.messages.set({ success: ["action.auth.password-changed"] });
         },
         error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       })

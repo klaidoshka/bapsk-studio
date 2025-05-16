@@ -49,13 +49,13 @@ export enum PaymentType {
 }
 
 export const PaymentTypes = [
-  {id: PaymentType.Cash, label: 'Cash'},
-  {id: PaymentType.Bank, label: 'Bank'},
-  {id: PaymentType.Other, label: 'Other'}
+  { id: PaymentType.Cash, label: 'misc.payment-type.cash' },
+  { id: PaymentType.Bank, label: 'misc.payment-type.bank' },
+  { id: PaymentType.Other, label: 'misc.payment-type.other' }
 ]
 
 export const toPaymentTypeLabel = (type: PaymentType): string => {
-  return PaymentTypes.find(paymentType => paymentType.id === type)?.label || '';
+  return PaymentTypes.find(paymentType => paymentType.id === type)?.label || type.toString();
 }
 
 export interface VatReturnDeclarationExportAssessmentCondition {
@@ -100,26 +100,43 @@ export enum SubmitDeclarationState {
   REJECTED
 }
 
-export const toSubmitDeclarationStateLabel = (state?: SubmitDeclarationState | null): string => {
-  switch (state) {
+export interface VatDeclarationStateInfo {
+  label: string;
+  severity: 'success' | 'warn' | 'info' | 'danger' | 'contrast';
+}
+
+export const toSubmitDeclarationStateLabel = (declaration?: VatReturnDeclaration): string => {
+  return toSubmitDeclarationStateInfo(declaration).label;
+}
+
+export const toSubmitDeclarationStateInfo = (declaration?: VatReturnDeclaration): VatDeclarationStateInfo => {
+  if (declaration?.isCancelled) {
+    return { label: 'misc.declaration.state.cancelled', severity: 'danger' };
+  }
+
+  if (declaration?.export) {
+    return { label: 'misc.declaration.state.exported', severity: 'info' };
+  }
+
+  switch (declaration?.state) {
     case SubmitDeclarationState.ACCEPTED_CORRECT:
-      return 'Accepted (Correct)';
+      return { label: 'misc.declaration.state.accepted-correct', severity: 'success' };
     case SubmitDeclarationState.ACCEPTED_INCORRECT:
-      return 'Accepted (Incorrect)';
+      return { label: 'misc.declaration.state.accepted-incorrect', severity: 'success' };
     case SubmitDeclarationState.REJECTED:
-      return 'Rejected';
+      return { label: 'misc.declaration.state.rejected', severity: 'warn' };
     default:
-      return '';
+      return { label: 'misc.declaration.state.not-submitted', severity: 'contrast' };
   }
 }
 
 export const toExportResultLabel = (result?: VatReturnDeclarationExportVerificationResult | null): string => {
   switch (result) {
     case VatReturnDeclarationExportVerificationResult.A1:
-      return 'A1';
+      return 'misc.declaration.export-result.A1';
     case VatReturnDeclarationExportVerificationResult.A4:
-      return 'A4';
+      return 'misc.declaration.export-result.A4';
     default:
-      return '';
+      return 'misc.declaration.export-result.invalid';
   }
 }

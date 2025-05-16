@@ -7,8 +7,8 @@
   } @else {
     @let dataType = this.dataType.value()!;
     <card>
-      <p card-header>Manage {{ dataType.name }}</p>
-      <p card-subHeader>Fill in the form below to create a new {{ dataType.name }} or modify an existing one.</p>
+      <p card-header>{{ ('page.data-entry-management.title' | translate:{ name: dataType.name }) }}</p>
+      <p card-subHeader>{{ ('page.data-entry-management.description' | translate:{ name: dataType.name }) }}</p>
       <form card-body [formGroup]="form" class="flex flex-col gap-4">
         <div class="flex flex-wrap gap-4" formArrayName="values">
           @for (field of formFields(); track $index) {
@@ -30,7 +30,9 @@
                 <div class="p-inputtext flex flex-row gap-2">
                   <data-type-entry-field-input [inputId]="field.field ?? undefined" [formControl]="field.control.controls.value"
                                                [type]="field.type!"/>
-                  <label class="text-primary-950 dark:text-primary-50 opacity-70" [for]="field.field">{{ field.field }}</label>
+                  <label class="text-primary-950/80 dark:text-primary-50/80 opacity-70" [for]="field.field">
+                    {{ field.field }}
+                  </label>
                 </div>
               }
               <form-input-error [control]="field.control.controls.value"/>
@@ -38,8 +40,9 @@
           }
         </div>
         <messages-showcase [messages]="messages()"/>
-        <p-button [label]="dataEntry.value() ? 'Create' : 'Save'" [disabled]="form.invalid || !form.dirty"
-                  (onClick)="save()" type="submit"/>
+        <p-button [title]="'page.data-entry-management.button.submit' | translate" size="small"
+                  [label]="('page.data-entry-management.button.' + (!dataEntryId() ? 'create' : 'save')) | translate"
+                  [disabled]="form.invalid || !form.dirty" (onClick)="save()" type="submit"/>
       </form>
     </card>
   }

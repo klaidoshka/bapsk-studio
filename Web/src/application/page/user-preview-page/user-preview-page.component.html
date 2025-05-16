@@ -7,27 +7,31 @@
   } @else {
     @let userValue = user.value()!;
     <card>
-      <p card-header>User</p>
-      <p card-subHeader>Preview of this unique user entry.</p>
+      <p card-header>{{ 'page.user-preview.title' | translate }}</p>
+      <p card-subHeader>{{ 'page.user-preview.description' | translate }}</p>
       <card card-body>
-        <p card-header>Details</p>
-        <p card-subHeader>Details of this specific user.</p>
+        <p card-header>{{ 'page.user-preview.details.title' | translate }}</p>
+        <p card-subHeader>{{ 'page.user-preview.details.description' | translate }}</p>
         <div card-body class="flex flex-col">
           <div class="flex flex-row gap-2">
-            <p class="font-semibold">Name</p>
-            <p>{{ userValue.firstName + ' ' + userValue.lastName }}</p>
+            <p class="font-semibold">{{ 'page.user-preview.details.label.id' | translate }}</p>
+            <p>{{ userValue.id }}</p>
           </div>
           <div class="flex flex-row gap-2">
-            <p class="font-semibold">Email</p>
+            <p class="font-semibold">{{ 'page.user-preview.details.label.name' | translate }}</p>
+            <p>{{ toUserFullName(userValue) }}</p>
+          </div>
+          <div class="flex flex-row gap-2">
+            <p class="font-semibold">{{ 'page.user-preview.details.label.email' | translate }}</p>
             <p>{{ userValue.email }}</p>
           </div>
           <div class="flex flex-row gap-2">
-            <p class="font-semibold">Birthdate</p>
+            <p class="font-semibold">{{ 'page.user-preview.details.label.birthdate' | translate }}</p>
             <p>{{ userValue.birthDate | date:'mediumDate' }}</p>
           </div>
           <div class="flex flex-row gap-2">
-            <p class="font-semibold">Country</p>
-            <p>{{ getCountryName(userValue) }}</p>
+            <p class="font-semibold">{{ 'page.user-preview.details.label.country' | translate }}</p>
+            <p>{{ getCountryName(userValue) | translate }}</p>
           </div>
         </div>
       </card>

@@ -1,15 +1,6 @@
-import {Component, computed, input} from '@angular/core';
+import {Component, inject, input} from '@angular/core';
 import {AbstractControl} from '@angular/forms';
-
-const defaultErrorMessages: { [key: string]: (error: any) => string } = {
-  email: () => "Invalid email address format.",
-  max: (error) => `Maximum value is ${error.max}.`,
-  maxlength: (error) => `Maximum length is ${error.requiredLength}.`,
-  min: (error) => `Minimum value is ${error.min}.`,
-  minlength: (error) => `Minimum length is ${error.requiredLength}.`,
-  pattern: (error) => `Invalid format. Supported: ${error.requiredPattern}.`,
-  required: () => "Input is required."
-};
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'form-input-error',
@@ -18,22 +9,16 @@ const defaultErrorMessages: { [key: string]: (error: any) => string } = {
   styles: ``
 })
 export class FormInputErrorComponent {
+  private readonly translateService = inject(TranslateService);
   readonly control = input.required<AbstractControl>();
-  readonly customErrorMessages = input<{ [key: string]: (error: any) => string } | undefined>();
 
-  protected readonly errorMessages = computed(() => ({
-    ...defaultErrorMessages,
-    ...this.customErrorMessages()
-  }));
-
-  protected getErrorMessage(control: AbstractControl, messages: {
-    [key: string]: (error: any) => string
-  }): string | undefined {
+  protected getErrorMessage(): string | undefined {
+    const control = this.control();
     if (control.untouched || control.valid || !control.errors) {
       return undefined;
     }
     const key = Object.keys(control.errors)[0];
-    const mapper = messages[key];
-    return mapper ? mapper(control.errors[key]) : undefined;
+    const params = control.errors[key];
+    return this.translateService.instant('error.' + key, params);
   }
 }

@@ -8,6 +8,6 @@
   }">
   @let values = messages().success || messages().error || messages().warning || [];
   @for (message of values; track $index) {
-    <p>{{ message }}</p>
+    <p>{{ message | translate }}</p>
   }
 </div>

@@ -1,6 +1,11 @@
 import {computed, inject, Injectable, signal, Signal} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import Instance, {InstanceCreateRequest, InstanceEditRequest, InstanceWithUsers} from '../model/instance.model';
+import Instance, {
+  InstanceCreateRequest,
+  InstanceEditRequest,
+  InstanceWithUsers,
+  InstanceWithUsersAndOwner
+} from '../model/instance.model';
 import {ApiRouter} from './api-router.service';
 import {combineLatest, first, map, Observable, of, switchMap, tap} from 'rxjs';
 import {AuthService} from './auth.service';
@@ -172,6 +177,22 @@ export class InstanceService {
                 users
               }))
             )
+        )
+      );
+  }
+
+  getWithUsersAndOwnerById(id: number): Observable<InstanceWithUsersAndOwner> {
+    return this
+      .getWithUsersById(id)
+      .pipe(
+        switchMap(instance => this.userService
+          .getIdentityById(id)
+          .pipe(
+            map(user => ({
+              ...instance,
+              createdBy: user
+            }))
+          )
         )
       );
   }

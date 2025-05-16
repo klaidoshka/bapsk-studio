@@ -15,7 +15,7 @@ import {first, map, of, tap} from 'rxjs';
 import {NumberUtil} from '../../util/number.util';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {SaleReceiptType, saleReceiptTypes} from './sale-receipt-type.model';
-import {defaultStandardMeasurement, measurementUnits, StandardMeasurements} from './standard-measurement.model';
+import {defaultStandardMeasurement, measurementCodeUnits, measurementTypes} from '../../model/standard-measurement.model';
 import {CustomerService} from '../../service/customer.service';
 import {SalesmanService} from '../../service/salesman.service';
 import {SalePageHeaderSectionComponent} from "../../component/sale-page-header-section/sale-page-header-section.component";
@@ -30,6 +30,7 @@ import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-s
 import {MessageService} from 'primeng/api';
 import {ActivatedRoute, Router} from '@angular/router';
 import {InputNumber} from 'primeng/inputnumber';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'sale-management-page',
@@ -49,7 +50,8 @@ import {InputNumber} from 'primeng/inputnumber';
     InputIcon,
     FailedToLoadPleaseReloadComponent,
     LoadingSpinnerComponent,
-    InputNumber
+    InputNumber,
+    TranslatePipe
   ],
   templateUrl: './sale-management-page.component.html',
   styles: ``
@@ -63,15 +65,28 @@ export class SaleManagementPageComponent {
   private readonly router = inject(Router);
   private readonly saleService = inject(SaleService);
   private readonly salesmanService = inject(SalesmanService);
+  private readonly translateService = inject(TranslateService);
   protected readonly SaleReceiptType = SaleReceiptType;
   protected readonly UnitOfMeasureType = UnitOfMeasureType;
-  protected readonly standardMeasurements = StandardMeasurements;
-  protected readonly saleReceiptTypes = saleReceiptTypes;
-  protected readonly measurementUnits = measurementUnits;
   protected readonly saleId = input<string>();
   protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});
   protected readonly selectedSaleReceiptType = signal<SaleReceiptType>(SaleReceiptType.Invoice);
+
+  protected readonly measurementTypes = measurementTypes.map(type => ({
+    ...type,
+    label: this.translateService.instant(type.label)
+  }));
+
+  protected readonly measurementCodeUnits = measurementCodeUnits.map(unit => ({
+    ...unit,
+    label: this.translateService.instant(unit.label)
+  }));
+
+  protected readonly saleReceiptTypes = saleReceiptTypes.map(type => ({
+    ...type,
+    label: this.translateService.instant(type.label)
+  }));
 
   protected readonly customersLabeled = rxResource({
     request: () => ({instanceId: NumberUtil.parse(this.instanceId())}),
@@ -130,6 +145,7 @@ export class SaleManagementPageComponent {
       this.messageService.add({
         key: 'root',
         detail: message,
+        summary: this.translateService.instant('action.sale.summary'),
         severity: 'success',
         closable: true
       });
@@ -148,7 +164,7 @@ export class SaleManagementPageComponent {
       .create(request)
       .pipe(first())
       .subscribe({
-        next: (value) => this.consumeResult("Sale has been created successfully.", value.id),
+        next: (value) => this.consumeResult(this.translateService.instant("action.sale.created"), value.id),
         error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
@@ -170,7 +186,7 @@ export class SaleManagementPageComponent {
       .edit(request)
       .pipe(first())
       .subscribe({
-        next: () => this.consumeResult("Sale has been edited successfully."),
+        next: () => this.consumeResult(this.translateService.instant("action.sale.edited")),
         error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
@@ -226,12 +242,12 @@ export class SaleManagementPageComponent {
 
   protected save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill out the form."]});
+      this.messages.set({error: ["error.fill-all-fields."]});
       return;
     }
 
     if (this.sale.value()?.vatReturnDeclaration?.export) {
-      this.messages.set({error: ["Cannot edit a sale that has been already exported."]});
+      this.messages.set({error: ["error.sale-management.sale-exported"]});
       return;
     }
 

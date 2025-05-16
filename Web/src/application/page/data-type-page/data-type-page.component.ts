@@ -15,11 +15,12 @@ import {
   DataTypePageHeaderSectionComponent
 } from '../../component/data-type-page-header-section/data-type-page-header-section.component';
 import {CardComponent} from '../../component/card/card.component';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'data-type-page',
   templateUrl: './data-type-page.component.html',
-  imports: [Button, ConfirmationComponent, MessagesShowcaseComponent, RouterLink, TableModule, DataTypePageHeaderSectionComponent, CardComponent],
+  imports: [Button, ConfirmationComponent, MessagesShowcaseComponent, RouterLink, TableModule, DataTypePageHeaderSectionComponent, CardComponent, TranslatePipe],
   providers: []
 })
 export class DataTypePageComponent {
@@ -27,6 +28,7 @@ export class DataTypePageComponent {
   private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
 
   protected readonly dataTypes = rxResource({
@@ -47,7 +49,7 @@ export class DataTypePageComponent {
         .delete(NumberUtil.parse(this.instanceId())!, dataType.id)
         .pipe(first())
         .subscribe({
-          next: () => this.messages.set({success: ['Data type deleted successfully']}),
+          next: () => this.messages.set({success: ['action.data-type.deleted']}),
           error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     });

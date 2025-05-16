@@ -35,6 +35,7 @@ import {MessageService} from 'primeng/api';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ReportTemplateService} from '../../service/report-template.service';
 import {ImportConfigurationService} from '../../service/import-configuration.service';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'data-type-management-page',
@@ -54,7 +55,8 @@ import {ImportConfigurationService} from '../../service/import-configuration.ser
     IconField,
     InputIcon,
     CardComponent,
-    TableModule
+    TableModule,
+    TranslatePipe
   ],
   templateUrl: './data-type-management-page.component.html',
   styles: ``
@@ -69,13 +71,17 @@ export class DataTypeManagementPageComponent {
   private readonly reportTemplateService = inject(ReportTemplateService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  protected readonly customErrorMessages = { 'noFields': () => 'At least one field is required.' };
+  private readonly translateService = inject(TranslateService);
   protected readonly dataTypeId = input<string>();
-  protected readonly fieldTypes = fieldTypes;
   protected readonly form = this.createForm();
   protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});
   protected readonly FieldType = FieldType;
+
+  protected readonly fieldTypes = fieldTypes.map(fieldType => ({
+    ...fieldType,
+    label: this.translateService.instant(fieldType.label)
+  }));
 
   protected readonly dataType = rxResource({
     request: () => ({
@@ -109,6 +115,7 @@ export class DataTypeManagementPageComponent {
       this.messageService.add({
         key: 'root',
         detail: message,
+        summary: this.translateService.instant('action.data-type.summary'),
         severity: 'success',
         closable: true
       });
@@ -127,7 +134,7 @@ export class DataTypeManagementPageComponent {
       .create(request)
       .pipe(first())
       .subscribe({
-        next: (value) => this.consumeResult("Data type has been created successfully.", value.id),
+        next: (value) => this.consumeResult(this.translateService.instant("action.data-type.created"), value.id),
         error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
@@ -161,7 +168,7 @@ export class DataTypeManagementPageComponent {
       .subscribe({
         next: () => {
           const instanceId = NumberUtil.parse(this.instanceId())!;
-          this.consumeResult("Data type has been edited successfully.");
+          this.consumeResult(this.translateService.instant("action.data-type.edited"));
           this.dataEntryService.unmarkDataTypeIdAsFetched(request.dataTypeId);
 
           this.dataEntryService
@@ -188,7 +195,7 @@ export class DataTypeManagementPageComponent {
   }
 
   private fieldsValidator(control: AbstractControl): ValidationErrors | null {
-    return (control as FormArray).length === 0 ? { noFields: true } : null;
+    return (control as FormArray).length === 0 ? { "data-type-management.no-fields": true } : null;
   };
 
   private patchFormValues(dataType: DataType) {
@@ -275,7 +282,7 @@ export class DataTypeManagementPageComponent {
 
   protected save() {
     if (!this.form.valid) {
-      this.messages.set({ error: ["Please fill out the form."] });
+      this.messages.set({ error: ["error.fill-all-fields."] });
       return;
     }
 

@@ -20,6 +20,7 @@ import {FloatLabel} from 'primeng/floatlabel';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
 import {Select} from 'primeng/select';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: "auth-register",
@@ -38,7 +39,8 @@ import {Select} from 'primeng/select';
     FloatLabel,
     IconField,
     InputIcon,
-    Select
+    Select,
+    TranslatePipe
   ]
 })
 export class RegisterComponent {
@@ -47,6 +49,8 @@ export class RegisterComponent {
   private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly messageService = inject(MessageService);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
+  protected readonly IsoCountries = IsoCountries;
   protected readonly filteredCountries = signal<IsoCountry[]>([]);
   protected readonly isSubmitting = signal<boolean>(false);
   protected readonly messages = signal<Messages>({});
@@ -61,17 +65,13 @@ export class RegisterComponent {
     confirmPassword: ["", [this.validatePasswordConfirmed()]]
   });
 
-  protected readonly customErrorsMessages = {
-    passwordConfirmed: () => "Passwords do not match"
-  };
-
   private validatePasswordConfirmed(): ValidatorFn {
     return (control): ValidationErrors | null => {
       const confirmPassword = control.value;
       const password = this.form?.get("password")?.value;
 
       if (password !== confirmPassword) {
-        return {passwordConfirmed: true};
+        return { "mismatch-passwords": true };
       }
 
       return null;
@@ -91,7 +91,7 @@ export class RegisterComponent {
     }
 
     if (this.form.invalid) {
-      this.messages.set({error: ["Please fill out all required fields correctly."]});
+      this.messages.set({ error: ["error.fill-all-fields"] });
       return;
     }
 
@@ -109,12 +109,12 @@ export class RegisterComponent {
     this.authService.register(request).subscribe({
       next: (response) => {
         this.form.reset();
-        this.messages.set({success: ["Registration successful!"]});
+        this.messages.set({ success: ["action.auth.registered"] });
 
         this.messageService.add({
           key: "root",
-          summary: "Logged In",
-          detail: "You have successfully registered",
+          summary: this.translateService.instant('action.auth.summary'),
+          detail: this.translateService.instant("action.auth.registered"),
           severity: "success"
         });
 
@@ -128,6 +128,4 @@ export class RegisterComponent {
       }
     });
   }
-
-  protected readonly IsoCountries = IsoCountries;
 }

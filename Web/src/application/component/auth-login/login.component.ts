@@ -5,7 +5,6 @@ import {Button} from "primeng/button";
 import {LoginRequest} from "../../model/auth.model";
 import ErrorResponse from "../../model/error-response.model";
 import {AuthService} from "../../service/auth.service";
-import {TextService} from "../../service/text.service";
 import {InputText} from "primeng/inputtext";
 import Messages from "../../model/messages.model";
 import {MessageHandlingService} from '../../service/message-handling.service';
@@ -18,11 +17,12 @@ import {FormInputErrorComponent} from '../form-input-error/form-input-error.comp
 import {FloatLabel} from 'primeng/floatlabel';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
+import {TranslateModule, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: "auth-login",
   templateUrl: "./login.component.html",
-  imports: [Button, ReactiveFormsModule, FormsModule, RouterLink, InputText, MessagesShowcaseComponent, Password, Dialog, AuthResetPasswordComponent, FormInputErrorComponent, FloatLabel, IconField, InputIcon],
+  imports: [Button, ReactiveFormsModule, FormsModule, RouterLink, InputText, MessagesShowcaseComponent, Password, Dialog, AuthResetPasswordComponent, FormInputErrorComponent, FloatLabel, IconField, InputIcon, TranslateModule],
   providers: []
 })
 export class LoginComponent {
@@ -31,7 +31,7 @@ export class LoginComponent {
   private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly messageService = inject(MessageService);
   private readonly router = inject(Router);
-  private readonly textService = inject(TextService);
+  private readonly translateService = inject(TranslateService);
   protected readonly isSubmitting = signal<boolean>(false);
   protected readonly messages = signal<Messages>({});
   protected readonly showResetDialog = signal<boolean>(false);
@@ -60,12 +60,12 @@ export class LoginComponent {
     this.authService.login(request).subscribe({
       next: (response) => {
         this.form.reset();
-        this.messages.set({ success: ["Logged in successfully"] });
+        this.messages.set({ success: ["action.auth.logged-in"] });
 
         this.messageService.add({
           key: "root",
-          summary: "Logged In",
-          detail: "You have logged in successfully",
+          summary: this.translateService.instant('action.auth.summary'),
+          detail: this.translateService.instant("action.auth.logged-in"),
           severity: "success"
         });
 

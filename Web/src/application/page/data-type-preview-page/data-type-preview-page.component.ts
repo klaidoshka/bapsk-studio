@@ -16,8 +16,8 @@ import {
   FailedToLoadPleaseReloadComponent
 } from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
 import {CardComponent} from '../../component/card/card.component';
-import {BadgeContrastedComponent} from '../../component/badge-contrasted/badge-contrasted.component';
 import {Badge} from 'primeng/badge';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'data-type-preview-page',
@@ -28,8 +28,8 @@ import {Badge} from 'primeng/badge';
     LoadingSpinnerComponent,
     FailedToLoadPleaseReloadComponent,
     CardComponent,
-    BadgeContrastedComponent,
-    Badge
+    Badge,
+    TranslatePipe
   ],
   templateUrl: './data-type-preview-page.component.html',
   styles: ``

@@ -19,6 +19,7 @@ import {
 } from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
 import {CardComponent} from '../../component/card/card.component';
 import {FieldType} from '../../model/data-type-field.model';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'data-entry-preview-page',
@@ -29,7 +30,8 @@ import {FieldType} from '../../model/data-type-field.model';
     DataEntryPageHeaderSectionComponent,
     LoadingSpinnerComponent,
     FailedToLoadPleaseReloadComponent,
-    CardComponent
+    CardComponent,
+    TranslatePipe
   ],
   templateUrl: './data-entry-preview-page.component.html',
   styles: ``

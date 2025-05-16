@@ -22,6 +22,7 @@ import {Select} from 'primeng/select';
 import {MessagesShowcaseComponent} from '../messages-showcase/messages-showcase.component';
 import {FormInputErrorComponent} from '../form-input-error/form-input-error.component';
 import {FloatLabel} from 'primeng/floatlabel';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'report-generate-form',
@@ -33,7 +34,8 @@ import {FloatLabel} from 'primeng/floatlabel';
     MessagesShowcaseComponent,
     FormInputErrorComponent,
     FormsModule,
-    FloatLabel
+    FloatLabel,
+    TranslatePipe
   ],
   templateUrl: './report-generate-form.component.html',
   styles: ``
@@ -45,6 +47,7 @@ export class ReportGenerateFormComponent {
   private readonly reportTemplateService = inject(ReportTemplateService);
   private readonly router = inject(Router);
   private readonly salesmanService = inject(SalesmanService);
+  private readonly translateService = inject(TranslateService);
   readonly instanceId = input.required<number>();
   protected readonly messages = signal<Messages>({});
   protected readonly selectedType = signal<number>(1);
@@ -53,7 +56,7 @@ export class ReportGenerateFormComponent {
     request: () => ({
       instanceId: this.instanceId()
     }),
-    loader: ({request}) => request.instanceId
+    loader: ({ request }) => request.instanceId
       ? this.customerService
         .getAllByInstanceId(request.instanceId)
         .pipe(
@@ -65,15 +68,11 @@ export class ReportGenerateFormComponent {
       : of(undefined)
   });
 
-  protected readonly customErrorMessages = {
-    reportTypeRequired: () => 'Please fill in all fields.'
-  };
-
   protected readonly reportTemplates = rxResource({
     request: () => ({
       instanceId: this.instanceId()
     }),
-    loader: ({request}) => request.instanceId
+    loader: ({ request }) => request.instanceId
       ? this.reportTemplateService
         .getAllByInstanceId(request.instanceId)
         .pipe(
@@ -89,7 +88,7 @@ export class ReportGenerateFormComponent {
     request: () => ({
       instanceId: this.instanceId()
     }),
-    loader: ({request}) => request.instanceId
+    loader: ({ request }) => request.instanceId
       ? this.salesmanService
         .getAllByInstanceId(request.instanceId)
         .pipe(
@@ -111,16 +110,16 @@ export class ReportGenerateFormComponent {
       salesmanId: [null as number | null]
     }),
     to: [new Date(), [Validators.required]]
-  }, {validators: this.validateFilledReportType()});
+  }, { validators: this.validateFilledReportType() });
 
   protected readonly reportTypes = [
-    {label: 'Data Entry', id: 1},
-    {label: 'Sale', id: 2}
+    { label: this.translateService.instant('component.report-generate-form.type.data-entry'), id: 1 },
+    { label: this.translateService.instant('component.report-generate-form.type.sale'), id: 2 }
   ]
 
   private generateDataEntriesReport() {
     if (this.form.invalid) {
-      this.messages.set({error: ['Please fill all required fields']});
+      this.messages.set({ error: ['error.fill-all-fields'] });
       return;
     }
 
@@ -133,13 +132,13 @@ export class ReportGenerateFormComponent {
       })
       .pipe(first())
       .subscribe(reports => this.router.navigate(['/misc/report-preview'], {
-        state: {reports}
+        state: { reports }
       }));
   }
 
   private generateSalesReport() {
     if (this.form.invalid) {
-      this.messages.set({error: ['Please fill all required fields']});
+      this.messages.set({ error: ['error.fill-all-fields'] });
       return;
     }
 
@@ -153,7 +152,7 @@ export class ReportGenerateFormComponent {
       })
       .pipe(first())
       .subscribe(reports => this.router.navigate(['/misc/report-preview'], {
-        state: {reports}
+        state: { reports }
       }));
   }
 
@@ -168,7 +167,7 @@ export class ReportGenerateFormComponent {
         return null;
       }
 
-      return {reportTypeRequired: true};
+      return { "report-generate-form.type-required": true };
     };
   }
 

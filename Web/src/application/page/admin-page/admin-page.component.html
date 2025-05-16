@@ -11,14 +11,16 @@
       border-primary-950/20 dark:border-primary-50/20 md:relative fixed inset-y-0 left-0 md:inset-auto h-full z-20 md:z-auto"
       [class.not-md:hidden]="!isMobileSidebarOpen()" (clickOutside)="isMobileSidebarOpen.set(false)">
       <div class="flex flex-col gap-1 mx-4 h-full overflow-y-auto">
-        <h4 class="p-2 text-sm font-semibold">Admin Panel</h4>
+        <h4 class="p-2 text-sm font-semibold">{{ 'page.admin.sidebar.name' | translate }}</h4>
         <!-- Sidebar Navigation -->
         <nav class="flex flex-col w-full gap-0.5">
           <a class="flex h-8 p-2 w-full items-center rounded-lg hover:bg-primary-200/50 dark:hover:bg-primary-800/80"
-             routerLink="/home/admin/user" routerLinkActive="underline underline-offset-4">Users</a>
+             routerLink="/home/admin/user" routerLinkActive="underline underline-offset-4">
+            {{ 'page.admin.sidebar.route.users' | translate }}
+          </a>
         </nav>
         <!-- Sidebar Actions -->
-        <h4 class="p-2 text-sm font-semibold">Admin Actions</h4>
+        <h4 class="p-2 text-sm font-semibold">{{ 'page.admin.sidebar.actions' | translate }}</h4>
         <div class="flex flex-col w-full gap-0.5">
           <mock-sale-button-form (click)="isMobileSidebarOpen.set(true)"/>
           <html-upload-for-overhaul (click)="isMobileSidebarOpen.set(true)"/>
@@ -33,7 +35,8 @@
 
     <!-- Main Content -->
     <div class="flex-1 min-w-0 overflow-hidden">
-      <div class="h-full w-full overflow-auto">
+      <div #container class="h-full w-full overflow-auto">
+        <scroll-to-top [container]="container"/>
         <div class="mr-4">
           <router-outlet/>
         </div>

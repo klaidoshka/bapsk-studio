@@ -6,7 +6,7 @@
         <p-select [options]="reportTypes" optionLabel="label" optionValue="id" appendTo="body" inputId="reportType"
                   [(ngModel)]="selectedType" [ngModelOptions]="{standalone: true}" dropdownIcon="pi pi-book"
                   styleClass="w-full"/>
-        <label for="reportType">Report Type</label>
+        <label for="reportType">{{ 'component.report-generate-form.input.type' | translate }}</label>
       </p-floatlabel>
     </div>
 
@@ -17,7 +17,7 @@
           <p-floatlabel variant="on" class="w-60">
             <p-select [options]="reportTemplates.value()" optionLabel="label" optionValue="id" appendTo="body"
                       formControlName="templateId" class="w-full"/>
-            <label for="templateId">Report Template</label>
+            <label for="templateId">{{ 'component.report-generate-form.input.template' | translate }}</label>
           </p-floatlabel>
         </div>
       }
@@ -28,7 +28,7 @@
             <p-floatlabel variant="on" class="w-60">
               <p-select [options]="customers.value()" optionLabel="label" optionValue="id" appendTo="body"
                         styleClass="w-full" formControlName="customerId" dropdownIcon="pi pi-user"/>
-              <label for="customerId">Customer</label>
+              <label for="customerId">{{ 'component.report-generate-form.input.customer' | translate }}</label>
             </p-floatlabel>
           </div>
 
@@ -37,7 +37,7 @@
             <p-floatlabel variant="on" class="w-60">
               <p-select [options]="salesmen.value()" optionLabel="label" optionValue="id" appendTo="body"
                         styleClass="w-full" formControlName="salesmanId" dropdownIcon="pi pi-shop"/>
-              <label for="salesmanId">Salesman</label>
+              <label for="salesmanId">{{ 'component.report-generate-form.input.salesman' | translate }}</label>
             </p-floatlabel>
           </div>
         </ng-container>
@@ -49,7 +49,7 @@
       <p-floatlabel variant="on" class="w-60">
         <p-date-picker inputId="from" formControlName="from" [showIcon]="true" variant="filled" iconDisplay="input"
                        appendTo="body" styleClass="w-full"/>
-        <label for="to">From (Inclusive)</label>
+        <label for="to">{{ 'component.report-generate-form.input.date-from' | translate }}</label>
         <form-input-error [control]="form.controls.from"/>
       </p-floatlabel>
     </div>
@@ -59,13 +59,14 @@
       <p-floatlabel variant="on" class="w-60">
         <p-date-picker inputId="to" formControlName="to" [showIcon]="true" variant="filled" iconDisplay="input"
                        appendTo="body" styleClass="w-full"/>
-        <label for="to">Until (Inclusive)</label>
+        <label for="to">{{ 'component.report-generate-form.input.date-to' | translate }}</label>
         <form-input-error [control]="form.controls.to"/>
       </p-floatlabel>
     </div>
   </div>
-  <form-input-error [control]="form" [customErrorMessages]="customErrorMessages"/>
+  <form-input-error [control]="form"/>
   <messages-showcase [messages]="messages()"/>
-  <p-button title="Submit" size="small" label="Generate" type="submit" (onClick)="generate()"
+  <p-button [title]="'component.report-generate-form.button.generate' | translate" size="small"
+            [label]="'component.report-generate-form.button.generate' | translate" type="submit" (onClick)="generate()"
             [disabled]="form.invalid || !form.dirty"/>
 </form>

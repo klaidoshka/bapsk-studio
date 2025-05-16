@@ -7,80 +7,79 @@
   } @else {
     @let customer = this.customer.value()!;
     <card>
-      <p card-header>Customer</p>
-      <p card-subHeader>Preview of this unique customer entry.</p>
+      <p card-header>{{ 'page.customer-preview.title' | translate }}</p>
+      <p card-subHeader>{{ 'page.customer-preview.description' | translate }}</p>
       <card card-body>
-        <p card-header>Details</p>
-        <p card-subHeader>Details of this specific customer.</p>
+        <p card-header>{{ 'page.customer-preview.details.title' | translate }}</p>
+        <p card-subHeader>{{ 'page.customer-preview.details.description' | translate }}</p>
         <div card-body class="flex flex-col gap-4">
           <div class="flex flex-col">
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">ID</p>
+              <p class="font-semibold">{{ 'page.customer-preview.details.label.id' | translate }}</p>
               <p>{{ customer.id }}</p>
             </div>
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">First Name</p>
+              <p class="font-semibold">{{ 'page.customer-preview.details.label.first-name' | translate }}</p>
               <p>{{ customer.firstName }}</p>
             </div>
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">Last Name</p>
+              <p class="font-semibold">{{ 'page.customer-preview.details.label.last-name' | translate }}</p>
               <p>{{ customer.lastName }}</p>
             </div>
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">Email</p>
+              <p class="font-semibold">{{ 'page.customer-preview.details.label.email' | translate }}</p>
               <p>{{ customer.email }}</p>
             </div>
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">Birthdate</p>
+              <p class="font-semibold">{{ 'page.customer-preview.details.label.birthdate' | translate }}</p>
               <p>{{ customer.birthdate | date:'mediumDate' }}</p>
             </div>
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">Residence Country</p>
-              <p>{{ getIsoCountryLabel(customer.residenceCountry) }}</p>
+              <p class="font-semibold">{{ 'page.customer-preview.details.label.residence-country' | translate }}</p>
+              <p>{{ getIsoCountryLabel(customer.residenceCountry) | translate }}</p>
             </div>
           </div>
 
           <card>
-            <p card-header>Identity Document</p>
-            <p card-subHeader>ID details of this specific customer.</p>
+            <p card-header>{{ 'page.customer-preview.identity-document.title' | translate }}</p>
+            <p card-subHeader>{{ 'page.customer-preview.identity-document.description' | translate }}</p>
             <div card-body>
               <div class="flex flex-row gap-2">
-                <p class="font-semibold">Document Type</p>
-                <p>{{ getIdentityDocumentTypeLabel(customer.identityDocument!.type) }}</p>
+                <p class="font-semibold">{{ 'page.customer-preview.identity-document.label.type' | translate }}</p>
+                <p>{{ getIdentityDocumentTypeLabel(customer.identityDocument!.type) | translate }}</p>
               </div>
               <div class="flex flex-row gap-2">
-                <p class="font-semibold">Document Number</p>
+                <p class="font-semibold">{{ 'page.customer-preview.identity-document.label.number' | translate }}</p>
                 <p>{{ customer.identityDocument!.number }}</p>
               </div>
               <div class="flex flex-row gap-2">
-                <p class="font-semibold">Document Issued By</p>
-                <p>{{ getCountryName(customer.identityDocument!.issuedBy) }}</p>
+                <p class="font-semibold">{{ 'page.customer-preview.identity-document.label.issued-by' | translate }}</p>
+                <p>{{ getCountryName(customer.identityDocument!.issuedBy) | translate }}</p>
               </div>
               <div class="flex flex-row gap-2">
-                <p class="font-semibold">Personal Code</p>
-                <p>{{ customer.identityDocument!.value || "Unprovided" }}</p>
+                <p class="font-semibold">{{ 'page.customer-preview.identity-document.label.value' | translate }}</p>
+                <p>{{ customer.identityDocument!.value ?? ('misc.not-provided' | translate) }}</p>
               </div>
             </div>
           </card>
+
           @if (customer.otherDocuments.length > 0) {
             <card>
-              <p card-header>Other Documents</p>
-              <p card-subHeader>These documents help customs determine whether customer's residence is not within EU
-                country.</p>
+              <p card-header>{{ 'page.customer-preview.other-documents.title' | translate }}</p>
+              <p card-subHeader>{{ 'page.customer-preview.other-documents.description' | translate }}</p>
               <div card-body>
-                <p-table [value]="customer.otherDocuments"                          paginatorDropdownAppendTo="body"
-
-                         [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+                <p-table [value]="customer.otherDocuments" paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10"
+                         [rowsPerPageOptions]="[10, 20, 50]">
                   <ng-template #header>
                     <tr>
-                      <th>Issued By</th>
-                      <th>Type</th>
-                      <th>Number</th>
+                      <th>{{ 'page.customer-preview.other-documents.header.issued-by' | translate }}</th>
+                      <th>{{ 'page.customer-preview.other-documents.header.type' | translate }}</th>
+                      <th>{{ 'page.customer-preview.other-documents.header.value' | translate }}</th>
                     </tr>
                   </ng-template>
                   <ng-template #body let-otherDocument>
                     <tr>
-                      <td>{{ getCountryName(otherDocument.issuedBy) }}</td>
+                      <td>{{ getCountryName(otherDocument.issuedBy) | translate }}</td>
                       <td>{{ otherDocument.type }}</td>
                       <td>{{ otherDocument.value }}</td>
                     </tr>

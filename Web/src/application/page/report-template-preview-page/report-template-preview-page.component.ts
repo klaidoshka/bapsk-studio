@@ -13,8 +13,9 @@ import {
   FailedToLoadPleaseReloadComponent
 } from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
 import {CardComponent} from '../../component/card/card.component';
-import {BadgeContrastedComponent} from '../../component/badge-contrasted/badge-contrasted.component';
 import {AsyncPipe} from '@angular/common';
+import {Badge} from 'primeng/badge';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'report-template-preview-page',
@@ -24,8 +25,9 @@ import {AsyncPipe} from '@angular/common';
     LoadingSpinnerComponent,
     FailedToLoadPleaseReloadComponent,
     CardComponent,
-    BadgeContrastedComponent,
-    AsyncPipe
+    AsyncPipe,
+    Badge,
+    TranslatePipe
   ],
   templateUrl: './report-template-preview-page.component.html',
   styles: ``

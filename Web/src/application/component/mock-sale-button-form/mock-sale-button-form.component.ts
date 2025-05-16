@@ -14,6 +14,7 @@ import {toCustomerFullName} from '../../model/customer.model';
 import {VatReturnService} from '../../service/vat-return.service';
 import Sale from '../../model/sale.model';
 import {MessageHandlingService} from '../../service/message-handling.service';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'mock-sale-button-form',
@@ -24,7 +25,8 @@ import {MessageHandlingService} from '../../service/message-handling.service';
     Select,
     ReactiveFormsModule,
     FormsModule,
-    FloatLabel
+    FloatLabel,
+    TranslatePipe
   ],
   templateUrl: './mock-sale-button-form.component.html',
   styles: ``
@@ -58,7 +60,7 @@ export class MockSaleButtonFormComponent {
     const sale = this.selectedSale();
 
     if (!sale) {
-      this.messages.set({ error: ['Please select a sale.'] });
+      this.messages.set({ error: ['error.fill-all-fields'] });
       return;
     }
 
@@ -66,7 +68,7 @@ export class MockSaleButtonFormComponent {
       .mockExport(sale.instanceId!, sale.id)
       .pipe(first())
       .subscribe({
-        next: () => this.messages.set({ success: ['Mocked successfully.'] }),
+        next: () => this.messages.set({ success: ['action.admin.mocked'] }),
         error: (error) => this.messageHandlingService.consumeHttpErrorResponse(error, this.messages)
       });
   }

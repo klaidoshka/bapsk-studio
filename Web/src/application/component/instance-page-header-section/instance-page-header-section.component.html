@@ -1,11 +1,9 @@
 <div class="container flex flex-col items-start gap-1 py-8 md:py-10 lg:py-12">
   <h1 class="text-2xl font-bold leading-tight tracking-tighter sm:text-3xl md:text-4xl lg:leading-[1.1]">
-    Instances
+    {{ 'component.instance-page-header.title' | translate }}
   </h1>
   <p class="max-w-2xl text-base font-light opacity-70 sm:text-lg">
-    By using instances you can work within different workspaces.
-    Each instance has its own set of users, settings and data.
-    You can create, edit or delete instances as you need.
+    {{ 'component.instance-page-header.description' | translate }}
   </p>
   @if (canGoBack()) {
     <button-go-back/>

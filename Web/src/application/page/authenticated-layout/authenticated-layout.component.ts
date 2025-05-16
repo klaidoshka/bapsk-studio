@@ -7,19 +7,19 @@ import {ThemeSelectorComponent} from '../../component/theme-selector/theme-selec
 import {rxResource} from '@angular/core/rxjs-interop';
 import {Role} from '../../model/role.model';
 import {ClickOutsideDirective} from '../../directive/click-outside.directive';
+import {TranslatePipe} from '@ngx-translate/core';
+import {LanguageSelectorComponent} from '../../component/language-selector/language-selector.component';
 
 @Component({
   selector: "authenticated-layout",
-  imports: [RouterModule, NgIf, ProfileDropdownComponent, ThemeSelectorComponent, ClickOutsideDirective],
+  imports: [RouterModule, NgIf, ProfileDropdownComponent, ThemeSelectorComponent, ClickOutsideDirective, TranslatePipe, LanguageSelectorComponent],
   templateUrl: "./authenticated-layout.component.html",
   providers: []
 })
 export class AuthenticatedLayoutComponent {
   private readonly authService = inject(AuthService);
   protected readonly Role = Role;
-  protected readonly isAdminMenuOpen = signal<boolean>(false);
   protected readonly isAuthenticated = rxResource({loader: () => this.authService.isAuthenticated()});
   protected readonly isMobileNavOpen = signal<boolean>(false);
-  protected readonly isWorkspaceMenuOpen = signal<boolean>(false);
   protected readonly user = rxResource({loader: () => this.authService.getUser()});
 }

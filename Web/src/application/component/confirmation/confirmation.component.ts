@@ -1,11 +1,13 @@
 import {Component, inject, input} from '@angular/core';
 import {ConfirmDialog} from 'primeng/confirmdialog';
 import {ConfirmationService} from 'primeng/api';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'confirmation',
   imports: [
-    ConfirmDialog
+    ConfirmDialog,
+    TranslatePipe
   ],
   templateUrl: './confirmation.component.html',
   styles: ``
@@ -13,7 +15,7 @@ import {ConfirmationService} from 'primeng/api';
 export class ConfirmationComponent {
   private readonly confirmationService = inject(ConfirmationService);
   readonly key = input.required<string>();
-  readonly header = input<string>("Are you sure about this action?");
+  readonly summary = input<string>("Are you sure about this action?");
 
   request(accept: () => void, reject: () => void = () => {}) {
     this.confirmationService.confirm({

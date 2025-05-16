@@ -25,6 +25,7 @@ import {
 import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {MessageService} from 'primeng/api';
 import {ActivatedRoute, Router} from '@angular/router';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'user-management-page',
@@ -43,7 +44,8 @@ import {ActivatedRoute, Router} from '@angular/router';
     Select,
     DatePicker,
     FailedToLoadPleaseReloadComponent,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    TranslatePipe
   ],
   templateUrl: './user-management-page.component.html',
   styles: ``
@@ -54,6 +56,7 @@ export class UserManagementPageComponent {
   private readonly messageService = inject(MessageService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
   private readonly userService = inject(UserService);
   protected readonly countries = IsoCountries;
   protected readonly form = this.createForm();
@@ -76,6 +79,7 @@ export class UserManagementPageComponent {
       this.messageService.add({
         key: 'root',
         detail: message,
+        summary: this.translateService.instant('action.user.summary'),
         severity: 'success',
         closable: true
       });
@@ -106,7 +110,7 @@ export class UserManagementPageComponent {
       .create(request)
       .pipe(first())
       .subscribe({
-        next: (value) => this.consumeResult("User has been created successfully.", value.id),
+        next: (value) => this.consumeResult(this.translateService.instant("action.user.created"), value.id),
         error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
@@ -116,7 +120,7 @@ export class UserManagementPageComponent {
       .edit(request)
       .pipe(first())
       .subscribe({
-        next: () => this.consumeResult("User has been edited successfully."),
+        next: () => this.consumeResult(this.translateService.instant("action.user.edited")),
         error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
@@ -132,7 +136,7 @@ export class UserManagementPageComponent {
 
   protected save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill out the form."]});
+      this.messages.set({error: ["error.fill-all-fields."]});
       return;
     }
 

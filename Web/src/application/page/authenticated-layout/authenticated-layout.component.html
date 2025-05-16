@@ -8,7 +8,7 @@
                 (click)="isMobileNavOpen.set(!isMobileNavOpen())" (clickOutside)="isMobileNavOpen.set(false)">
         <span class="flex flex-row font-bold lg:inline-block text-primary-950 hover:text-primary-950/80
               dark:text-primary-50 dark:hover:text-primary-50/80">
-          Bapsk
+          {{ 'page.authenticated-layout.header.title' | translate }}
           <span class="ml-2 text-xs self-end">
             <i class="pi" [class.pi-chevron-down]="!isMobileNavOpen()" [class.pi-chevron-up]="isMobileNavOpen()"></i>
           </span>
@@ -20,14 +20,20 @@
             <nav class="flex flex-col gap-2">
               <a
                 class="transition-colors text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80"
-                routerLink="/home/instance" routerLinkActive="underline underline-offset-4">Instances</a>
+                routerLink="/home/instance" routerLinkActive="underline underline-offset-4">
+                {{ 'page.authenticated-layout.header.route.instances' | translate }}
+              </a>
               <a
                 class="transition-colors text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80"
-                routerLink="/home/workspace" routerLinkActive="underline underline-offset-4 ">Workspace</a>
+                routerLink="/home/workspace" routerLinkActive="underline underline-offset-4 ">
+                {{ 'page.authenticated-layout.header.route.workspace' | translate }}
+              </a>
               @if (user.value()?.role === Role.Admin) {
                 <a
                   class="transition-colors text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80"
-                  routerLink="/home/admin" routerLinkActive="underline underline-offset-4">Admin</a>
+                  routerLink="/home/admin" routerLinkActive="underline underline-offset-4">
+                  {{ 'page.authenticated-layout.header.route.admin' | translate }}
+                </a>
               }
             </nav>
           </div>
@@ -38,29 +44,35 @@
       <div class="mr-4 not-md:hidden md:flex">
         <a class="mr-4 flex items-center gap-2 lg:mr-6" routerLink="/home">
           <span class="font-bold lg:inline-block text-primary-950 hover:text-primary-950/80
-                dark:text-primary-50 dark:hover:text-primary-50/80">Bapsk</span>
+                dark:text-primary-50 dark:hover:text-primary-50/80">{{ 'page.authenticated-layout.header.title' | translate }}</span>
         </a>
         <nav class="flex items-center gap-4 text-sm xl:gap-6">
           <a
             class="transition-colors text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80"
-            routerLink="/home/instance" routerLinkActive="underline underline-offset-4">Instances</a>
+            routerLink="/home/instance" routerLinkActive="underline underline-offset-4">
+            {{ 'page.authenticated-layout.header.route.instances' | translate }}
+          </a>
           <a
             class="transition-colors text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80"
-            routerLink="/home/workspace" routerLinkActive="underline underline-offset-4 ">Workspace</a>
+            routerLink="/home/workspace" routerLinkActive="underline underline-offset-4 ">
+            {{ 'page.authenticated-layout.header.route.workspace' | translate }}
+          </a>
           @if (user.value()?.role === Role.Admin) {
             <a
               class="transition-colors text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80"
-              routerLink="/home/admin" routerLinkActive="underline underline-offset-4">Admin</a>
+              routerLink="/home/admin" routerLinkActive="underline underline-offset-4">
+              {{ 'page.authenticated-layout.header.route.admin' | translate }}
+            </a>
           }
         </nav>
       </div>
 
-      <div class="ml-auto flex items-center gap-4 md:flex-1 md:justify-end not-md:mr-2">
-        <!-- Profile -->
+      <div class="ml-auto flex items-center gap-2 md:flex-1 md:justify-end not-md:mr-2">
         <profile-dropdown *ngIf="isAuthenticated.value()"/>
-
-        <!-- Theme Selector -->
-        <theme-selector/>
+        <div class="flex flex-row items-center">
+          <theme-selector/>
+          <language-selector/>
+        </div>
       </div>
     </div>
   </header>

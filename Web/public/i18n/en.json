@@ -1,0 +1,1371 @@
+{
+  "action": {
+    "admin": {
+      "mocked": "Sale export has been mocked successfully.",
+      "summary": "Admin"
+    },
+    "auth": {
+      "logged-in": "You have successfully logged in.",
+      "logged-out": "You have successfully logged out.",
+      "password-changed": "Password has been changed successfully.",
+      "reset-password-sent": "Request has been sent! Please check your email, request will be valid for 10 minutes.",
+      "registered": "You have successfully registered and logged in.",
+      "session-revoked": "Session has been revoked successfully.",
+      "summary": "Authentication"
+    },
+    "customer": {
+      "created": "Customer has been created successfully.",
+      "deleted": "Customer has been deleted successfully.",
+      "edited": "Customer has been edited successfully.",
+      "summary": "Customer"
+    },
+    "data-entry": {
+      "created": "Data Entry has been created successfully.",
+      "deleted": "Data Entry has been deleted successfully.",
+      "edited": "Data Entry has been edited successfully.",
+      "imported": "Data entries have been imported successfully.",
+      "summary": "Data Entry"
+    },
+    "data-type": {
+      "created": "Data Type has been created successfully.",
+      "deleted": "Data Type has been deleted successfully.",
+      "edited": "Data Type has been edited successfully.",
+      "summary": "Data Type"
+    },
+    "import-configuration": {
+      "created": "Import Configuration has been created successfully.",
+      "deleted": "Import Configuration has been deleted successfully.",
+      "edited": "Import Configuration has been edited successfully.",
+      "summary": "Import Configuration"
+    },
+    "instance": {
+      "created": "Instance has been created successfully.",
+      "deleted": "Instance has been deleted successfully.",
+      "edited": "Instance has been edited successfully.",
+      "summary": "Instance"
+    },
+    "profile": {
+      "saved": "Your profile has been saved successfully.",
+      "summary": "Profile"
+    },
+    "report-template": {
+      "created": "Report Template has been created successfully.",
+      "deleted": "Report Template has been deleted successfully.",
+      "edited": "Report Template has been edited successfully.",
+      "summary": "Report Template"
+    },
+    "sale": {
+      "created": "Sale has been created successfully.",
+      "deleted": "Sale has been deleted successfully.",
+      "edited": "Sale has been edited successfully.",
+      "payment-submitted": "Payment info has been submitted successfully.",
+      "summary": "Sale",
+      "vat-return-declaration-submitted": "VAT return declaration has been submitted successfully."
+    },
+    "salesman": {
+      "created": "Salesman has been created successfully.",
+      "deleted": "Salesman has been deleted successfully.",
+      "edited": "Salesman has been edited successfully.",
+      "summary": "Salesman"
+    },
+    "user": {
+      "created": "User has been created successfully.",
+      "deleted": "User has been deleted successfully.",
+      "edited": "User has been edited successfully.",
+      "summary": "User"
+    }
+  },
+  "component": {
+    "button": {
+      "go-back": "Go back"
+    },
+    "confirmation": {
+      "button": {
+        "accept": "Yes",
+        "reject": "No"
+      },
+      "title": "Confirmation"
+    },
+    "customer-page-header": {
+      "description": "Customers can be used to manage the clients of your company. You can add, edit, and delete customers as needed. But the must important usage of customers is to create sales with the VAT return support. Only registered customers can be used in sales.",
+      "title": "Customers"
+    },
+    "data-entry-import-form": {
+      "button": {
+        "import": "Import"
+      },
+      "input": {
+        "file": "File",
+        "import-configuration": "Import Configuration",
+        "skip-header": "Skip header (First row)"
+      }
+    },
+    "data-entry-page-header": {
+      "description": "Data entries represent instances of data type structures. Each data entry is associated with a specific data type and contains values for each field defined in that data type. You can create, edit, and delete data entries as needed.",
+      "title": "Data Entries"
+    },
+    "data-entry-table": {
+      "button": {
+        "delete": "Delete",
+        "edit": "Edit",
+        "preview": "Preview"
+      },
+      "header": {
+        "created-at": "Created",
+        "modified-by": "Last Modified By",
+        "modified-at": "Modified"
+      }
+    },
+    "data-type-page-header": {
+      "description": "Data types are used to define the structure of data entries. Each data type can have multiple fields, and each field can have different types of data, including relationships between different data types, allowing you to create complex data models that reflect your business needs. You can create, edit, and delete data types as needed.",
+      "title": "Data Types"
+    },
+    "failed-to-load": {
+      "button": {
+        "reload": "Reload"
+      },
+      "description": "The data you are trying to access failed to load, if this is a temporary issue, you can try reloading the page.",
+      "title": "Failed to load"
+    },
+    "html-upload-for-overhaul": {
+      "button": {
+        "upload": "Overhaul Html Table"
+      }
+    },
+    "import-configuration-page-header": {
+      "description": "Import configurations are used to define how specific data types can be imported into the system via files. You can create, edit, and delete import configurations as needed.",
+      "title": "Import Configurations"
+    },
+    "instance-page-header": {
+      "description": "By using instances you can work within different workspaces. Each instance has its own set of users, settings and data. You can create, edit or delete instances as you need.",
+      "title": "Instances"
+    },
+    "instance-selector": {
+      "button": {
+        "create": "Create Instance",
+        "exit": "Exit Workspace"
+      },
+      "input": {
+        "instance": "Workspace (Instance)"
+      }
+    },
+    "login": {
+      "button": {
+        "login": "Login"
+      },
+      "title": "Login",
+      "input": {
+        "email": "Email",
+        "password": "Password"
+      },
+      "no-account-yet": "Don't have an account yet?",
+      "redirect": {
+        "register-here": "Register here",
+        "reset-password": "Reset password"
+      },
+      "reset-password": {
+        "header": "Reset password"
+      }
+    },
+    "mock-sale-button-form": {
+      "button": {
+        "mock": "Mock Sale Export",
+        "submit": "Submit"
+      },
+      "input": {
+        "sale": "Sale"
+      },
+      "title": "Mock Sale Export"
+    },
+    "profile-change-password": {
+      "button": {
+        "submit": "Submit"
+      },
+      "description": "Form to change your current password. If forgotten, use password reset within Login page.",
+      "title": "Password",
+      "input": {
+        "confirm-new-password": "Confirm New Password",
+        "current-password": "Current Password",
+        "new-password": "New Password"
+      }
+    },
+    "profile-dropdown": {
+      "confirm-logout": "Are you really leaving now?",
+      "option": {
+        "logout": "Logout",
+        "profile": "Profile"
+      }
+    },
+    "profile-management": {
+      "button": {
+        "reset": "Reset",
+        "save": "Save"
+      },
+      "description": "Details of your profile. Unfortunately, your email cannot be changed. To change it contact the support.",
+      "title": "Details",
+      "input": {
+        "birthdate": "Birthdate",
+        "country": "Country",
+        "email": "Email",
+        "first-name": "First Name",
+        "last-name": "Last Name"
+      }
+    },
+    "profile-showcase": {
+      "title": "Profile",
+      "your-role": "Your role"
+    },
+    "register": {
+      "already-have-account": "Already have an account?",
+      "button": {
+        "register": "Register"
+      },
+      "title": "Register",
+      "input": {
+        "birthdate": "Birthdate",
+        "confirm-password": "Confirm Password",
+        "country": "Country",
+        "email": "Email",
+        "first-name": "First Name",
+        "last-name": "Last Name",
+        "password": "Password"
+      },
+      "redirect": {
+        "login-here": "Login here"
+      }
+    },
+    "report-generate-form": {
+      "button": {
+        "generate": "Generate"
+      },
+      "input": {
+        "customer": "Customer",
+        "date-from": "Date From",
+        "date-to": "Date To (Inclusive)",
+        "salesman": "Salesman",
+        "template": "Template",
+        "type": "Report Type"
+      },
+      "type": {
+        "data-entry": "Data Entry",
+        "sale": "Sale"
+      }
+    },
+    "report-template-page-header": {
+      "description": "In case you need to export data from your instance, you can create a report template that will allow you to export specific data type entries. You can create as many report templates as you need.",
+      "title": "Report Templates"
+    },
+    "reset-password": {
+      "button": {
+        "reset": "Reset"
+      },
+      "description": "Please provide your email address to reset your password. Request will be sent to your email which will last for 10 minutes.",
+      "input": {
+        "email": "Email"
+      }
+    },
+    "sale-page-header": {
+      "description": "Sales are transactions of goods being sold to customers. These sales can be submitted for VAT returns. You can create, edit, and delete sales as needed.",
+      "title": "Sales"
+    },
+    "salesman-page-header": {
+      "description": "Salesmen are individuals responsible for selling products or services. They can be associated with specific sales and customers. You can create, edit, and delete salesman as needed.",
+      "title": "Salesmen"
+    },
+    "scroll-to-top": {
+      "button": {
+        "scroll": "Scroll to top"
+      }
+    },
+    "session-showcase": {
+      "button": {
+        "revoke": "Revoke"
+      },
+      "confirm-revokation": "Are you sure about revoking this session?",
+      "description": "<p>These are your sessions (times and devices you logged in with).</p><p>If you want to revoke a session, click on the revoke button. Current session cannot be revoked.</p>",
+      "title": "Sessions",
+      "header": {
+        "active-time": "Active Time",
+        "agent": "Agent",
+        "created-at": "Created At",
+        "ip-address": "IP Address",
+        "location": "Location"
+      }
+    },
+    "theme-selector": {
+      "button": {
+        "select": "Change theme"
+      }
+    },
+    "user-page-header": {
+      "description": "Manage application's users. It includes their details, but not passwords.",
+      "title": "Users"
+    },
+    "vat-return-payment": {
+      "button": {
+        "add": "Add Payment",
+        "submit": "Submit Payments",
+        "remove": "Remove"
+      },
+      "input": {
+        "amount": "Amount",
+        "date": "Date",
+        "type": "Payment Method"
+      }
+    },
+    "vat-return-payment-table": {
+      "header": {
+        "amount": "Amount",
+        "date": "Date",
+        "type": "Payment Method"
+      }
+    },
+    "vat-return-submission": {
+      "button": {
+        "submit": "Submit"
+      },
+      "confirm-resubmit": "Are you sure about resubmitting this declaration?",
+      "description": "Submission requires affirmation that this sale's customer is eligible for such service.",
+      "input": {
+        "affirmation": "Affirmation"
+      }
+    }
+  },
+  "error": {
+    "data-type-management": {
+      "no-fields": "At least one field is required."
+    },
+    "email": "Invalid email address format.",
+    "fill-all-fields": "Fill all required fields before submitting.",
+    "instance-management": {
+      "email-exists": "Member with this email already exists in the list.",
+      "email-invalid": "User with email {{email}} does not exist."
+    },
+    "max": "Maximum value is {{max}}.",
+    "maxlength": "Maximum length is {{requiredLength}}.",
+    "min": "Minimum value is {{min}}.",
+    "minlength": "Minimum length is {{requiredLength}}.",
+    "mismatch-passwords": "Passwords do not match.",
+    "pattern": "Invalid format. Supported: {{requiredPattern}}.",
+    "report-generate-form": {
+      "type-required": "error.fill-all-fields"
+    },
+    "sale-management": {
+      "sale-exported": "Cannot edit this sale, because it has been exported."
+    },
+    "required": "Input is required."
+  },
+  "misc": {
+    "condition": {
+      "met": "Met",
+      "unmet": "Unmet"
+    },
+    "declaration": {
+      "export-result": {
+        "A1": "A1 (Went Through)",
+        "A4": "A4 (Some Errors)",
+        "invalid": "Invalid"
+      },
+      "state": {
+        "accepted-correct": "Accepted (Correct)",
+        "accepted-incorrect": "Accepted (Incorrect)",
+        "cancelled": "Cancelled",
+        "exported": "Exported",
+        "not-submitted": "Not Submitted",
+        "rejected": "Rejected"
+      }
+    },
+    "field-type": {
+      "check": "Check",
+      "date": "Date",
+      "number": "Number",
+      "text": "Text",
+      "reference": "Reference",
+      "country": "Country",
+      "currency": "Currency"
+    },
+    "id-type": {
+      "card": "ID Card",
+      "passport": "Passport"
+    },
+    "measurement": {
+      "type": {
+        "code": "Code (Standard)",
+        "other": "Other"
+      },
+      "unit": {
+        "120": "Max price of retailed trade",
+        "ASV": "% vol",
+        "CEN": "Hundred items",
+        "GRM": "Gram",
+        "HLT": "Hectolitre",
+        "KGM": "Kilogram",
+        "KLT": "1000 litres",
+        "LPA": "Litre pure (100%) alcohol",
+        "LTR": "Litre",
+        "MIL": "1000 items",
+        "NAR": "Number of items",
+        "NPR": "Number of pairs"
+      }
+    },
+    "not-provided": "Not provided",
+    "payment-type": {
+      "cash": "Cash",
+      "bank": "Bank Transfer",
+      "other": "Other"
+    },
+    "state": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "optional": "Optional",
+      "required": "Required"
+    },
+    "time": {
+      "just-now": "Just now",
+      "less-than-hour-ago": "Less than an hour ago",
+      "some-time-ago": "Some time ago"
+    },
+    "user": {
+      "role": {
+        "admin": "Admin",
+        "user": "User"
+      }
+    }
+  },
+  "page": {
+    "admin": {
+      "sidebar": {
+        "actions": "Admin Actions",
+        "name": "Admin Panel",
+        "route": {
+          "users": "Users"
+        }
+      }
+    },
+    "auth": {
+      "description": "Please authenticate yourself to access the application",
+      "title": "Welcome to Bapsk"
+    },
+    "authenticated-layout": {
+      "header": {
+        "route": {
+          "admin": "Admin",
+          "instances": "Instances",
+          "workspace": "Workspace"
+        },
+        "title": "Bapsk"
+      }
+    },
+    "customer": {
+      "button": {
+        "create": "Create Customer",
+        "delete": "Delete",
+        "edit": "Edit",
+        "preview": "Preview"
+      },
+      "confirm-delete": "Are you sure about deleting this customer?",
+      "description": "Manage your customers — create, preview, edit or delete.",
+      "header": {
+        "birthdate": "Birthdate",
+        "email": "Email",
+        "first-name": "First Name",
+        "identity-document": "Identity Document",
+        "last-name": "Last Name",
+        "personal-code": "Personal Code",
+        "reside-in": "Reside In"
+      },
+      "title": "Customers"
+    },
+    "customer-management": {
+      "button": {
+        "create": "Create",
+        "save": "Save",
+        "submit": "Submit"
+      },
+      "description": "Fill in the form below to create a new customer or modify an existing one.",
+      "details": {
+        "description": "Details of this customer. If Email is provided, user may get some information about occurred sales.",
+        "input": {
+          "birthdate": "Birthdate",
+          "email": "Email",
+          "first-name": "First Name",
+          "last-name": "Last Name",
+          "residence-country": "Residence Country"
+        },
+        "title": "Details"
+      },
+      "identity-document": {
+        "description": "Information regarding ID of this customer.",
+        "input": {
+          "issued-by": "Issued By",
+          "number": "Number",
+          "type": "Type",
+          "value": "Value (Personal Code)"
+        },
+        "title": "Identity Document"
+      },
+      "other-documents": {
+        "button": {
+          "add": "Add Document",
+          "remove": "Remove"
+        },
+        "description": "These documents help customs determine whether customer's residence is not within EU country.",
+        "input": {
+          "issued-by": "Issued By",
+          "type": "Type",
+          "value": "Value"
+        },
+        "title": "Other Documents"
+      },
+      "title": "Manage Customer"
+    },
+    "customer-preview": {
+      "description": "Preview of this unique customer entry.",
+      "details": {
+        "description": "Details of this specific customer.",
+        "label": {
+          "birthdate": "Birthdate",
+          "email": "Email",
+          "first-name": "First Name",
+          "id": "ID",
+          "last-name": "Last Name",
+          "residence-country": "Residence Country"
+        },
+        "title": "Details"
+      },
+      "identity-document": {
+        "description": "Information regarding ID of this customer.",
+        "label": {
+          "issued-by": "Issued By",
+          "number": "Number",
+          "type": "Type",
+          "value": "Value (Personal Code)"
+        },
+        "title": "Identity Document"
+      },
+      "other-documents": {
+        "description": "These documents help customs determine whether customer's residence is not within EU country.",
+        "header": {
+          "issued-by": "Issued By",
+          "type": "Type",
+          "value": "Value"
+        },
+        "title": "Other Documents"
+      },
+      "title": "Customer"
+    },
+    "data-entry": {
+      "button": {
+        "create": "Create \"{{name}}\"",
+        "generate": "Generate Report",
+        "import": "Import",
+        "import-configurations": "Show Configurations",
+        "report-templates": "Show Templates"
+      },
+      "confirm-delete": "Are you sure about deleting this data entry?",
+      "description": "Manage your data entries — create, preview, edit or delete.",
+      "dialog": {
+        "import": {
+          "header": "Import Data Entries"
+        }
+      },
+      "title": "Data Entries"
+    },
+    "data-entry-management": {
+      "button": {
+        "create": "Create",
+        "save": "Save",
+        "submit": "Submit"
+      },
+      "description": "Fill in the form below to create a new \"{{ name }}\" or modify an existing one.",
+      "title": "Manage \"{{ name }}\""
+    },
+    "data-entry-preview": {
+      "description": "Preview of this unique \"{{ name }}\" data entry.",
+      "details": {
+        "description": "Details of this specific data entry.",
+        "label": {
+          "display": "Displayed As",
+          "id": "ID",
+          "created-at": "Created At",
+          "created-by": "Created By",
+          "modified-at": "Last Modified At",
+          "modified-by": "Last Modified By"
+        },
+        "title": "Details"
+      },
+      "values": {
+        "description": "Values of this specific data entry.",
+        "title": "Values"
+      },
+      "title": "{{ name }}"
+    },
+    "data-type": {
+      "button": {
+        "create": "Create Data Type",
+        "delete": "Delete",
+        "edit": "Edit",
+        "import-configurations": "Show Configurations",
+        "preview": "Preview",
+        "report-templates": "Show Templates"
+      },
+      "confirm-delete": "Are you sure about deleting this data type?",
+      "description": "Manage your data types — create, preview, edit or delete.",
+      "header": {
+        "description": "Description",
+        "fields": "Fields",
+        "name": "Name"
+      },
+      "title": "Data Types"
+    },
+    "data-type-management": {
+      "button": {
+        "create": "Create",
+        "save": "Save",
+        "submit": "Submit"
+      },
+      "description": "Fill in the form below to create a new data type or modify an existing one.",
+      "details": {
+        "description": "Details of this data type.",
+        "input": {
+          "description": "Description",
+          "display-field": "Displayed By",
+          "name": "Name"
+        },
+        "title": "Details"
+      },
+      "fields": {
+        "button": {
+          "add": "Add Field",
+          "remove": "Remove"
+        },
+        "description": "Fields of this data type.",
+        "header": {
+          "default-value": "Default Value",
+          "name": "Name",
+          "referenced-type": "Referenced Type",
+          "required": "Required",
+          "type": "Type"
+        },
+        "placeholder": {
+          "type": "Select type",
+          "referenced-type": "Select referenced type"
+        },
+        "title": "Fields"
+      },
+      "title": "Manage Data Type"
+    },
+    "data-type-preview": {
+      "description": "Preview of this unique \"{{name}}\" data type.",
+      "details": {
+        "description": "Details of this specific data type.",
+        "label": {
+          "description": "Description",
+          "display-field": "Displayed By",
+          "id": "ID",
+          "name": "Name"
+        },
+        "title": "Details"
+      },
+      "fields": {
+        "description": "Fields of this specific data type.",
+        "header": {
+          "default-value": "Default Value",
+          "name": "Name",
+          "required": "Required",
+          "type": "Type"
+        },
+        "label": {
+          "referenced-type": "Referenced Type"
+        },
+        "title": "Fields"
+      },
+      "title": "{{name}}"
+    },
+    "declaration-preview": {
+      "button": {
+        "cancel": "Cancel",
+        "refresh": "Refresh"
+      },
+      "confirm-cancel": "Are you sure about cancelling this declaration?",
+      "declaration": {
+        "description": "Details of this sale's declaration.",
+        "label": {
+          "corrections": "Correction No.",
+          "date": "Submit Date",
+          "declared-by": "Declared By",
+          "id": "Declaration ID",
+          "state": "State"
+        },
+        "title": "Declaration Information"
+      },
+      "export": {
+        "assessment-conditions": {
+          "title": "Assessment Conditions"
+        },
+        "description": "Details of this sale's sold goods export via customs.",
+        "label": {
+          "assessment-date": "Assessment Date",
+          "assessment-declaration-corrections": "Assessed Declaration Correction No.",
+          "correction-date": "Correction Date",
+          "customs-code": "Customs Office Code",
+          "verification-date": "Verification Date",
+          "verification-result": "Verification Result"
+        },
+        "payment": {
+          "declaration-cancelled": "Because this declaration was cancelled, the payment fact cannot be submitted.",
+          "description": "Returned VAT payment that was executed for the customer.",
+          "title": "VAT Return Payment"
+        },
+        "title": "Export Information",
+        "verified-sold-goods": {
+          "description": "These goods were exported from the country.",
+          "header": {
+            "measure-unit": "Measure Unit",
+            "quantity": "Quantity",
+            "sequence-no": "Sequence No.",
+            "total-amount": "Total Amount",
+            "verified-quantity": "Verified Quantity"
+          },
+          "title": "Verified Sold Goods"
+        }
+      },
+      "invalid": {
+        "description": "<p>Sorry, but your request for the declaration preview page is invalid. Please check the URL and try again.</p><p>If the problem persists, please contact support.</p>",
+        "title": "Invalid Declaration"
+      },
+      "qr-codes": {
+        "qr-alt": "Declaration's #{{index}} QR code chunk",
+        "title": "QR Codes"
+      },
+      "sale": {
+        "description": "Details of this sale.",
+        "label": {
+          "customer": "Customer",
+          "salesman": "Salesman",
+          "sold-goods": "Sold Goods",
+          "vat": "VAT to Return"
+        },
+        "title": "Sale Information"
+      },
+      "sold-goods": {
+        "description": "Goods that were sold in the occurred sale.",
+        "header": {
+          "description": "Description",
+          "measure-unit": "Measure Unit",
+          "quantity": "Quantity",
+          "sequence-no": "Sequence No.",
+          "unit-price": "Unit Price",
+          "total-amount": "Total Amount",
+          "vat-amount": "VAT Amount"
+        },
+        "title": "Sold Goods"
+      },
+      "submit": {
+        "description": "Submit or resubmit to update this sale's VAT return declaration.",
+        "not-submitted": "This sale does not have a submitted declaration.",
+        "title": "Submit Declaration"
+      }
+    },
+    "home": {
+      "description": "Bapsk is a simple yet useful tool for managing your business's accounting and finances needs. You can easily track your business data, generate reports and submit VAT returns for your foreign customers. Want to know more? Let's get started!",
+      "faq": {
+        "data": {
+          "0": {
+            "question": "What is the purpose of this application?",
+            "answer": "This application is designed to help you manage your business data in a simple and effective way. It may look that this is Notepad or TODO application alternative, but no. This application is designed to be more than just a notepad. It provides a structured way to manage your business data, allowing you to define custom data types, import data from files, generate reports and submit VAT returns."
+          },
+          "1": {
+            "question": "How do I create a new workspace instance?",
+            "answer": "You can create a new workspace instance by going into Instances and clicking on the \"Create Instance\" button."
+          },
+          "2": {
+            "question": "Can I invite my team members to collaborate?",
+            "answer": "Yes, you can invite your team members by going to your created workspace instance, editing it and sending them an invitation by email."
+          },
+          "3": {
+            "question": "How do I define my data structure?",
+            "answer": "You can define your data structure by creating custom data types in the \"Data Types\" section within your workspace."
+          },
+          "4": {
+            "question": "How do I import data from files?",
+            "answer": "You can import data from files by defining an import configuration in the \"Import Configurations\" section and then using it to import data from CSV files within specific Data Entry sections."
+          },
+          "5": {
+            "question": "How do I generate reports?",
+            "answer": "You can generate reports by setting up a report template in the \"Report Templates\" section and then using it within Generate Report section to generate reports based on your data entries."
+          },
+          "6": {
+            "question": "How do I submit VAT returns?",
+            "answer": "It is only possible by using the predefined data structures of customers, salesmen and sales. You have to create sale entries and then submit them for VAT returns. VAT return is explicitly integrated into Lithuanian tax system. So, it is only available for Lithuania's salesmen."
+          },
+          "7": {
+            "question": "Is there a limit to the number of entries I can create?",
+            "answer": "No, there is no limit to the number of entries you can create in your workspace instance."
+          },
+          "8": {
+            "question": "Isn't it too much to manage all these steps?",
+            "answer": "At first glance, it may seem overwhelming, but once you get the hang of it, it becomes a simple and effective process. Each step is quite straightforward."
+          }
+        },
+        "description": "Find answers to common questions about using Bapsk.",
+        "title": "Frequently Asked Questions"
+      },
+      "getting-started": {
+        "data": {
+          "0": {
+            "title": "Create your Workspace Instance",
+            "description": "This is where you will manage your business data."
+          },
+          "1": {
+            "title": "Invite your Team",
+            "description": "Collaborate with your team members and share the instance."
+          },
+          "2": {
+            "title": "Define your Data",
+            "description": "Define the structure of your data by creating custom data types."
+          },
+          "3": {
+            "title": "Create Data Entries",
+            "description": "Start adding data to your instance by creating entries."
+          },
+          "4": {
+            "title": "Define Import Configuration",
+            "description": "To import entries from files in defined CSV formats."
+          },
+          "5": {
+            "title": "Setup Report Template",
+            "description": "To visualize your data type entries on a printable report."
+          },
+          "6": {
+            "title": "Import External Data",
+            "description": "Use the import configuration to import data from files."
+          },
+          "7": {
+            "title": "Create Occurred Sales",
+            "description": "Create sale entries to be used for VAT returns."
+          },
+          "8": {
+            "title": "Submit VAT Return",
+            "description": "Submit sale TaxFree declaration for the customer to get the VAT return."
+          },
+          "9": {
+            "title": "Generate Report",
+            "description": "Generate and export reports based on your data."
+          }
+        },
+        "description": "Lets find out how to get started with Bapsk to use it to its full potential.",
+        "title": "Getting Started"
+      },
+      "support": {
+        "description": "Need help? Contact us for support.",
+        "email": "Click to contact us by an email",
+        "here-to-help": "We are here to help you with any questions or issues you may have.",
+        "title": "Support"
+      },
+      "title": "Welcome to Bapsk"
+    },
+    "import-configuration": {
+      "button": {
+        "create": "Create Import Configuration",
+        "delete": "Delete",
+        "edit": "Edit",
+        "preview": "Preview"
+      },
+      "confirm-delete": "Are you sure about deleting this import configuration?",
+      "description": "Manage your import configurations — create, preview, edit or delete.",
+      "header": {
+        "data-type": "Data Type",
+        "fields": "Fields",
+        "name": "Name"
+      },
+      "title": "Import Configurations"
+    },
+    "import-configuration-management": {
+      "button": {
+        "create": "Create",
+        "move-down": "Move Down",
+        "move-up": "Move Up",
+        "save": "Save",
+        "submit": "Submit"
+      },
+      "description": "Fill in the form below to create a new import configuration or modify an existing one.",
+      "fields": {
+        "description": "Fields of this import configuration in specific order with default values.",
+        "header": {
+          "default": "Default Value",
+          "name": "Name",
+          "order": "Order"
+        },
+        "input": {
+          "referenced-entry": "Select referenced entry"
+        },
+        "title": "Fields"
+      },
+      "input": {
+        "data-type": "Data Type",
+        "name": "Name"
+      },
+      "title": "Manage Import Configuration"
+    },
+    "import-configuration-preview": {
+      "description": "Preview of this unique import configuration.",
+      "details": {
+        "description": "Details of this specific import configuration.",
+        "label": {
+          "data-type": "Data Type",
+          "id": "ID",
+          "name": "Name"
+        },
+        "title": "Details"
+      },
+      "example": {
+        "description": "Example CSV format of this specific import configuration.",
+        "title": "Example CSV Format"
+      },
+      "fields": {
+        "description": "Fields of this specific import configuration.",
+        "header": {
+          "default": "Default Value",
+          "name": "Name",
+          "order": "Order"
+        },
+        "title": "Fields"
+      },
+      "title": "{{name}}"
+    },
+    "instance": {
+      "button": {
+        "create": "Create Instance",
+        "delete": "Delete",
+        "edit": "Edit",
+        "preview": "Preview"
+      },
+      "confirm-delete": "Are you sure about deleting this instance?",
+      "description": "Manage your instances — create, preview, edit or delete.",
+      "header": {
+        "created-at": "Created At",
+        "description": "Description",
+        "last-activity": "Last Activity",
+        "name": "Name",
+        "owner": "Owner",
+        "users": "Members"
+      },
+      "title": "Instances"
+    },
+    "instance-management": {
+      "button": {
+        "add": "Add Member",
+        "create": "Create",
+        "remove": "Remove Member",
+        "save": "Save",
+        "submit": "Submit"
+      },
+      "description": "Fill in the form below to create a new instance or modify an existing one.",
+      "input": {
+        "description": "Description",
+        "name": "Name"
+      },
+      "title": "Manage Instance",
+      "members": {
+        "badge": {
+          "all-granted": "Owner. All granted."
+        },
+        "button": {
+          "modify-permissions": "Modify Permissions"
+        },
+        "description": "Members within this specific instance. You can modify their permission to grant or restrict access to certain features.",
+        "dialog": {
+          "permissions": {
+            "title": "{{name}} permissions"
+          }
+        },
+        "header": {
+          "email": "Email",
+          "name": "Name",
+          "permissions": "Permissions",
+          "since": "Member Since"
+        },
+        "input": {
+          "email": "Email"
+        },
+        "title": "Members"
+      }
+    },
+    "instance-preview": {
+      "description": "Preview of this unique instance.",
+      "details": {
+        "description": "Details of this specific instance.",
+        "label": {
+          "created-at": "Created At",
+          "description": "Description",
+          "id": "ID",
+          "name": "Name",
+          "owner": "Owner"
+        },
+        "title": "Details"
+      },
+      "title": "{{name}}",
+      "members": {
+        "badge": {
+          "view-permissions": "View {{count}}"
+        },
+        "description": "Members within this specific instance.",
+        "dialog": {
+          "permissions": {
+            "title": "{{name}} permissions"
+          }
+        },
+        "header": {
+          "data-entries-created": "Data Entries Created",
+          "email": "Email",
+          "name": "Name",
+          "permissions": "Permissions"
+        },
+        "title": "Members"
+      }
+    },
+    "not-found": {
+      "description": "Sorry, the page has been moved or the URL may be incorrect.",
+      "redirect-in": "You will be redirected home in {{seconds}}...",
+      "title": "Oops!",
+      "title-2": "Page Not Found"
+    },
+    "profile": {
+      "description": "This is your profile. Make sure that you keep your password safe and change it once in a while! Also, you can revoke any session that you are not using anymore or that you think are compromised.",
+      "title": "Profile"
+    },
+    "report-generate": {
+      "description": "Generate a report based on the selected report template and period of time. Later you can choose to export the report in different formats: .csv, .pdf.",
+      "generation": {
+        "description": "Choose report type — Data Entry or Sale — and fill in the required fields.",
+        "title": "Report Generation"
+      },
+      "title": "Generate Report"
+    },
+    "report-preview": {
+      "button": {
+        "export-csv": "Export CSV",
+        "export-pdf": "Export PDF"
+      },
+      "entries": {
+        "description": "This section contains report's entries. these entries can be exported into .CSV files if needed.",
+        "title": "Report Entries"
+      },
+      "info": {
+        "description": "This section contains the following report's metadata.",
+        "title": "Report Info"
+      },
+      "no-entries": {
+        "description": "There are no entries within this report.",
+        "title": "No Entries"
+      },
+      "no-reports": {
+        "description": "Unfortunately, there are no reports available for the provided report template.",
+        "title": "No reports available"
+      }
+    },
+    "report-template": {
+      "button": {
+        "create": "Create Report Template",
+        "delete": "Delete",
+        "edit": "Edit",
+        "preview": "Preview"
+      },
+      "confirm-delete": "Are you sure about deleting this report template?",
+      "description": "Manage your report templates — create, preview, edit or delete.",
+      "header": {
+        "data-type": "Data Type",
+        "fields": "Fields",
+        "name": "Name"
+      },
+      "title": "Report Templates"
+    },
+    "report-template-management": {
+      "button": {
+        "create": "Create",
+        "save": "Save",
+        "submit": "Submit"
+      },
+      "description": "<p>Fill in the form below to create a new report template or modify an existing one.</p><p>At the moment, one data type can have <strong>only one</strong> report template.</p>",
+      "fields": {
+        "description": "Fields of this report template.",
+        "title": "Fields"
+      },
+      "input": {
+        "data-type": "Data Type",
+        "name": "Name"
+      },
+      "title": "Manage Report Template"
+    },
+    "report-template-preview": {
+      "description": "Preview of this unique report template.",
+      "details": {
+        "description": "Details of this specific report template.",
+        "label": {
+          "data-type": "Data Type",
+          "fields": "Included Fields",
+          "id": "ID",
+          "name": "Name"
+        },
+        "title": "Details"
+      },
+      "fields": {
+        "description": "Fields of this specific report template.",
+        "title": "Fields"
+      },
+      "title": "{{name}}"
+    },
+    "reset-password": {
+      "button": {
+        "change": "Change Password"
+      },
+      "description": "Please provide your new password. The link you used is valid for 10 minutes.",
+      "input": {
+        "confirm-password": "Confirm Password",
+        "password": "Password"
+      },
+      "invalid": {
+        "description": "The link you used is missing a token. Please check the URL and try again.",
+        "title": "Malfunctioned URL"
+      },
+      "redirect": {
+        "login": "Go to Login"
+      },
+      "title": "Reset Password"
+    },
+    "sale": {
+      "button": {
+        "create": "Create Sale",
+        "vat-management": "Manage VAT Declaration",
+        "delete": "Delete",
+        "edit": "Edit",
+        "preview": "Preview"
+      },
+      "confirm-delete": "Are you sure about deleting this sale?",
+      "description": "Manage your sales — create, preview, edit or delete.",
+      "header": {
+        "customer": "Customer",
+        "date": "Sale Date",
+        "returnable-vat": "Returnable VAT",
+        "salesman": "Salesman",
+        "sold-goods": "Sold Goods",
+        "total-price": "Total Price",
+        "vat": "VAT Return Declaration"
+      },
+      "receipt-type": {
+        "invoice": "Invoice",
+        "receipt": "Receipt"
+      },
+      "title": "Sales"
+    },
+    "sale-management": {
+      "button": {
+        "create": "Create",
+        "save": "Save",
+        "submit": "Submit"
+      },
+      "description": "Fill in the form below to create a new sale or modify an existing one.",
+      "details": {
+        "description": "Sale's customer, salesman and date of occurred sale.",
+        "input": {
+          "customer": "Customer",
+          "date": "Date",
+          "salesman": "Salesman"
+        },
+        "title": "Details"
+      },
+      "receipt": {
+        "description": "Select which type receipt was provided to the customer. In case of cash register, the receipt number and cash register number are required.",
+        "input": {
+          "cash-register-no": "Cash Register No.",
+          "invoice-no": "Invoice No.",
+          "receipt-no": "Receipt No.",
+          "type": "Receipt Type"
+        },
+        "title": "Occurred Sale Receipt"
+      },
+      "sold-goods": {
+        "button": {
+          "add": "Add Sold Good",
+          "remove": "Remove Sold Good"
+        },
+        "description": "Goods that the customer bought. Make sure quantity and measurement type are correct.",
+        "input": {
+          "description": "Description",
+          "measure-type": "Measure Type",
+          "measure-unit": "Measure Unit",
+          "quantity": "Quantity",
+          "unit-price": "Unit Price",
+          "vat-rate": "VAT Rate (%)"
+        },
+        "title": "Sold Goods"
+      },
+      "title": "Manage Sale"
+    },
+    "sale-preview": {
+      "description": "Preview of this unique sale entry.",
+      "details": {
+        "description": "Details of this specific sale.",
+        "label": {
+          "cash-register-no": "Cash Register No.",
+          "customer": "Customer",
+          "date": "Date",
+          "id": "ID",
+          "invoice-no": "Invoice No.",
+          "receipt-no": "Receipt No.",
+          "salesman": "Salesman"
+        },
+        "title": "Details"
+      },
+      "sold-goods": {
+        "description": "Goods that were sold to the customer of this specific sale.",
+        "header": {
+          "description": "Description",
+          "measure-unit": "Measure Unit",
+          "quantity": "Quantity",
+          "sequence-no": "Sequence No.",
+          "unit-price": "Unit Price",
+          "total-amount": "Total Amount",
+          "vat-amount": "VAT Amount"
+        },
+        "title": "Sold Goods"
+      },
+      "title": "Sale"
+    },
+    "salesman": {
+      "button": {
+        "create": "Create Salesman",
+        "delete": "Delete",
+        "edit": "Edit",
+        "preview": "Preview"
+      },
+      "confirm-delete": "Are you sure about deleting this salesman?",
+      "description": "Manage your salesmen — create, preview, edit or delete.",
+      "header": {
+        "vat-code-issued-by": "VAT Payer Code Issued By",
+        "customers-served": "Customers Served",
+        "name": "Name",
+        "vat-payer-code": "VAT Payer Code"
+      },
+      "title": "Salesmen"
+    },
+    "salesman-management": {
+      "button": {
+        "create": "Create",
+        "save": "Save",
+        "submit": "Submit"
+      },
+      "description": "Fill in the form below to create a new salesman or modify an existing one.",
+      "input": {
+        "name": "Name"
+      },
+      "vat": {
+        "description": "VAT payer information of this salesman. To use VAT Return Service salesman must have Lithuanian VAT payer code.",
+        "input": {
+          "code": "Code",
+          "issued-by": "Issued By"
+        },
+        "title": "VAT Payer Code"
+      },
+      "title": "Manage Salesman"
+    },
+    "salesman-preview": {
+      "description": "Preview of this unique salesman entry.",
+      "details": {
+        "description": "Details of this specific salesman.",
+        "label": {
+          "id": "ID",
+          "name": "Name"
+        },
+        "title": "Details"
+      },
+      "title": "Salesman",
+      "vat": {
+        "description": "VAT payer information of this salesman.",
+        "label": {
+          "code": "Code",
+          "issued-by": "Issued By"
+        },
+        "title": "VAT Payer Code"
+      }
+    },
+    "user": {
+      "button": {
+        "create": "Create User",
+        "delete": "Delete",
+        "edit": "Edit",
+        "preview": "Preview"
+      },
+      "confirm-delete": "Are you sure about deleting this user?",
+      "description": "Manage application's users — create, preview, edit or delete.",
+      "header": {
+        "birthdate": "Birthdate",
+        "country": "Country",
+        "email": "Email",
+        "name": "Name"
+      },
+      "title": "Users"
+    },
+    "user-management": {
+      "button": {
+        "create": "Create",
+        "save": "Save",
+        "submit": "Submit"
+      },
+      "description": "Fill in the form below to register a new user or modify an existing one.",
+      "input": {
+        "birthdate": "Birthdate",
+        "country": "Country",
+        "email": "Email",
+        "first-name": "First Name",
+        "last-name": "Last Name",
+        "password": "Password"
+      },
+      "title": "Manage User"
+    },
+    "user-preview": {
+      "description": "Preview of this unique user entry.",
+      "details": {
+        "description": "Details of this specific user.",
+        "label": {
+          "birthdate": "Birthdate",
+          "country": "Country",
+          "email": "Email",
+          "id": "ID",
+          "name": "Name"
+        },
+        "title": "Details"
+      },
+      "title": "User"
+    },
+    "workspace": {
+      "dialog": {
+        "workspace": {
+          "title": "Select Workspace"
+        }
+      },
+      "sidebar": {
+        "name": "Workspace Panel",
+        "route": {
+          "data-types": "Data Types",
+          "generate-report": "Generate Report",
+          "import-configurations": "Import Configurations",
+          "report-templates": "Report Templates"
+        },
+        "vat": {
+          "name": "Workspace VAT Return",
+          "route": {
+            "customers": "Customers",
+            "salesmen": "Salesmen",
+            "sales": "Sales"
+          }
+        },
+        "data-entries": {
+          "name": "Workspace Data Entries",
+          "no-entries": "No data types available. Create one to add entries."
+        }
+      }
+    }
+  }
+}

@@ -22,6 +22,7 @@ import {
   FailedToLoadPleaseReloadComponent
 } from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
 import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'data-entry-page',
@@ -36,7 +37,8 @@ import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-s
     DataEntryPageHeaderSectionComponent,
     CardComponent,
     FailedToLoadPleaseReloadComponent,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    TranslatePipe
   ],
   templateUrl: './data-entry-page.component.html',
   styles: ``
@@ -47,6 +49,7 @@ export class DataEntryPageComponent {
   private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly dataTypeId = input.required<string>();
   protected readonly instanceId = input.required<string>();
@@ -80,7 +83,7 @@ export class DataEntryPageComponent {
         .delete(this.instanceIdAsNumber()!, dataEntry.id)
         .pipe(first())
         .subscribe({
-          next: () => this.messages.set({success: ['Data entry deleted successfully']}),
+          next: () => this.messages.set({success: ['action.data-entry.deleted']}),
           error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     });

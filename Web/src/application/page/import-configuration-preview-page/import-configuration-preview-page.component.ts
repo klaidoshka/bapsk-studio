@@ -18,6 +18,7 @@ import {
 } from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
 import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {CardComponent} from '../../component/card/card.component';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'import-configuration-preview-page',
@@ -27,7 +28,8 @@ import {CardComponent} from '../../component/card/card.component';
     ImportConfigurationPageHeaderSectionComponent,
     FailedToLoadPleaseReloadComponent,
     LoadingSpinnerComponent,
-    CardComponent
+    CardComponent,
+    TranslatePipe
   ],
   templateUrl: './import-configuration-preview-page.component.html',
   styles: ``

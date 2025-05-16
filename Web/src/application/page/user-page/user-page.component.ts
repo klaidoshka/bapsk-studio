@@ -14,6 +14,7 @@ import {first, map} from 'rxjs';
 import {Router} from '@angular/router';
 import {UserPageHeaderSectionComponent} from '../../component/user-page-header-section/user-page-header-section.component';
 import {CardComponent} from '../../component/card/card.component';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'user-page',
@@ -24,7 +25,8 @@ import {CardComponent} from '../../component/card/card.component';
     MessagesShowcaseComponent,
     TableModule,
     UserPageHeaderSectionComponent,
-    CardComponent
+    CardComponent,
+    TranslatePipe
   ],
   templateUrl: './user-page.component.html',
   styles: ``
@@ -32,6 +34,7 @@ import {CardComponent} from '../../component/card/card.component';
 export class UserPageComponent {
   private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
   private readonly userService = inject(UserService);
   protected readonly getCountryName = getUserIsoCountryLabel;
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
@@ -55,7 +58,7 @@ export class UserPageComponent {
         .delete(user.id!!)
         .pipe(first())
         .subscribe({
-          next: () => this.messages.set({success: ['User deleted successfully']}),
+          next: () => this.messages.set({success: ['action.user.deleted']}),
           error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     });

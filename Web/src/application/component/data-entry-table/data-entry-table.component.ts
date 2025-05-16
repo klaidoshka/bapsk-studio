@@ -11,6 +11,7 @@ import {FieldTypeUtil} from '../../util/field-type.util';
 import {DataEntryService} from '../../service/data-entry.service';
 import {combineLatest, map, of, switchMap} from 'rxjs';
 import {toObservable} from '@angular/core/rxjs-interop';
+import {TranslatePipe} from '@ngx-translate/core';
 
 interface DataEntryJoinedModified extends DataEntryJoined {
   [key: string]: any;
@@ -24,7 +25,8 @@ interface DataEntryJoinedModified extends DataEntryJoined {
     Button,
     DatePipe,
     NgIf,
-    AsyncPipe
+    AsyncPipe,
+    TranslatePipe
   ],
   templateUrl: './data-entry-table.component.html',
   styles: ``

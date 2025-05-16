@@ -1,9 +1,9 @@
 <table class="w-full table-auto text-sm overflow-auto">
   <tbody>
   <tr *ngFor="let perm of permissions(); let j = index">
-    <td>{{ perm.label }}</td>
+    <td>{{ perm.label | translate }}</td>
     <td class="py-1 w-24">
-      <p-badge [value]="perm.toggled ? 'Enabled' : 'Disabled'"
+      <p-badge [value]="(perm.toggled ? 'misc.state.enabled' : 'misc.state.disabled') | translate"
                [severity]="perm.toggled ? 'success' : 'danger'"
                class="cursor-pointer px-2 py-1 text-xs" (click)="toggle()(userIndex(), j)"/>
     </td>

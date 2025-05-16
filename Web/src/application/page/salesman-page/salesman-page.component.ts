@@ -18,7 +18,8 @@ import {
 import {CardComponent} from '../../component/card/card.component';
 import {SaleService} from '../../service/sale.service';
 import {AsyncPipe} from '@angular/common';
-import {BadgeContrastedComponent} from '../../component/badge-contrasted/badge-contrasted.component';
+import {Badge} from 'primeng/badge';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'salesman-page',
@@ -30,7 +31,8 @@ import {BadgeContrastedComponent} from '../../component/badge-contrasted/badge-c
     SalesmanPageHeaderSectionComponent,
     CardComponent,
     AsyncPipe,
-    BadgeContrastedComponent
+    Badge,
+    TranslatePipe
   ],
   templateUrl: './salesman-page.component.html',
   styles: ``
@@ -41,6 +43,7 @@ export class SalesmanPageComponent {
   private readonly router = inject(Router);
   private readonly salesmanService = inject(SalesmanService);
   private readonly saleService = inject(SaleService);
+  private readonly translateService = inject(TranslateService);
   protected readonly getCountryLabel = getIsoCountryLabel;
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly instanceId = input.required<string>();
@@ -69,7 +72,7 @@ export class SalesmanPageComponent {
         .delete(NumberUtil.parse(this.instanceId())!, salesman.id!)
         .pipe(first())
         .subscribe({
-          next: () => this.messages.set({success: ['Salesman deleted successfully']}),
+          next: () => this.messages.set({success: ['action.salesman.deleted']}),
           error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     });

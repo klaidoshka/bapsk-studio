@@ -9,7 +9,7 @@ import {
 } from '../../component/vat-return-declaration-submission/vat-return-declaration-submission.component';
 import {toUserIdentityFullName} from '../../model/user.model';
 import {toCustomerFullName} from '../../model/customer.model';
-import {SubmitDeclarationState, toExportResultLabel, toSubmitDeclarationStateLabel} from '../../model/vat-return.model';
+import {SubmitDeclarationState, toExportResultLabel, toSubmitDeclarationStateInfo} from '../../model/vat-return.model';
 import {NumberUtil} from '../../util/number.util';
 import {Button} from 'primeng/button';
 import {CurrencyPipe, DatePipe} from '@angular/common';
@@ -30,6 +30,8 @@ import {
 import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {Tooltip} from 'primeng/tooltip';
 import {Accordion, AccordionContent, AccordionHeader, AccordionPanel} from 'primeng/accordion';
+import {TranslatePipe} from '@ngx-translate/core';
+import {toMeasurementLabel} from '../../model/standard-measurement.model';
 
 @Component({
   selector: 'sale-vat-return-declaration-page',
@@ -53,7 +55,8 @@ import {Accordion, AccordionContent, AccordionHeader, AccordionPanel} from 'prim
     Accordion,
     AccordionPanel,
     AccordionHeader,
-    AccordionContent
+    AccordionContent,
+    TranslatePipe
   ],
   templateUrl: './sale-vat-return-declaration-page.component.html',
   styles: ``
@@ -64,7 +67,8 @@ export class SaleVatReturnDeclarationPageComponent {
   protected readonly SubmitDeclarationState = SubmitDeclarationState;
   protected readonly toCustomerFullName = toCustomerFullName;
   protected readonly toExportResultLabel = toExportResultLabel;
-  protected readonly toSubmitDeclarationStateLabel = toSubmitDeclarationStateLabel;
+  protected readonly toMeasurementLabel = toMeasurementLabel;
+  protected readonly toSubmitDeclarationStateInfo = toSubmitDeclarationStateInfo;
   protected readonly toUserIdentityFullName = toUserIdentityFullName;
   protected readonly cancelConfirmationComponent = viewChild(ConfirmationComponent);
   protected readonly instanceId = input.required<string>();

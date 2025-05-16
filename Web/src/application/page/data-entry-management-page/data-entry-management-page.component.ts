@@ -28,6 +28,7 @@ import {
 import {FloatLabel} from 'primeng/floatlabel';
 import {MessageService} from 'primeng/api';
 import {ActivatedRoute, Router} from '@angular/router';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'data-entry-management-page',
@@ -42,7 +43,8 @@ import {ActivatedRoute, Router} from '@angular/router';
     CardComponent,
     LoadingSpinnerComponent,
     FailedToLoadPleaseReloadComponent,
-    FloatLabel
+    FloatLabel,
+    TranslatePipe
   ],
   templateUrl: './data-entry-management-page.component.html',
   styles: ``
@@ -55,6 +57,7 @@ export class DataEntryManagementPageComponent {
   private readonly messageService = inject(MessageService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
   protected readonly FieldType = FieldType;
   protected readonly dataEntryId = input<string>();
   protected readonly form = this.createForm();
@@ -102,6 +105,7 @@ export class DataEntryManagementPageComponent {
       this.messageService.add({
         key: 'root',
         detail: message,
+        summary: this.translateService.instant('action.data-entry.summary'),
         severity: 'success',
         closable: true
       });
@@ -148,7 +152,7 @@ export class DataEntryManagementPageComponent {
       .create(request)
       .pipe(first())
       .subscribe({
-        next: (value) => this.consumeResult("Data entry has been created successfully.", value.id),
+        next: (value) => this.consumeResult(this.translateService.instant("action.data-entry.created"), value.id),
         error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
@@ -158,7 +162,7 @@ export class DataEntryManagementPageComponent {
       .edit(request)
       .pipe(first())
       .subscribe({
-        next: () => this.consumeResult("Data entry has been edited successfully."),
+        next: () => this.consumeResult(this.translateService.instant("action.data-entry.edited")),
         error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
@@ -194,7 +198,7 @@ export class DataEntryManagementPageComponent {
 
   protected save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill out the form."]});
+      this.messages.set({error: ["error.fill-all-fields."]});
       return;
     }
 

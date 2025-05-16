@@ -1,7 +1,7 @@
 import {Component, inject, input, signal} from '@angular/core';
 import {AsyncPipe, DatePipe} from "@angular/common";
 import {TableModule} from "primeng/table";
-import {toUserFullName} from '../../model/user.model';
+import {toUserFullName, toUserIdentityFullName} from '../../model/user.model';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {map, Observable, of, startWith, switchMap} from 'rxjs';
 import {NumberUtil} from '../../util/number.util';
@@ -15,13 +15,14 @@ import {
 } from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
 import {CardComponent} from '../../component/card/card.component';
 import {instanceUserPermissions} from '../../constant/instance-user.permissions';
-import {BadgeContrastedComponent} from '../../component/badge-contrasted/badge-contrasted.component';
 import {DataTypeService} from '../../service/data-type.service';
 import {DataEntryService} from '../../service/data-entry.service';
 import {Dialog} from 'primeng/dialog';
 import {
   InstanceUserPermissionPreviewComponent
 } from '../../component/instance-user-permission-preview/instance-user-permission-preview.component';
+import {Badge} from 'primeng/badge';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'instance-preview-page',
@@ -32,10 +33,11 @@ import {
     LoadingSpinnerComponent,
     FailedToLoadPleaseReloadComponent,
     CardComponent,
-    BadgeContrastedComponent,
     AsyncPipe,
     Dialog,
-    InstanceUserPermissionPreviewComponent
+    InstanceUserPermissionPreviewComponent,
+    Badge,
+    TranslatePipe
   ],
   templateUrl: './instance-preview-page.component.html',
   styles: ``
@@ -45,6 +47,7 @@ export class InstancePreviewPageComponent {
   private readonly dataEntryService = inject(DataEntryService);
   private readonly instanceService = inject(InstanceService);
   protected readonly toUserFullName = toUserFullName;
+  protected readonly toUserIdentityFullName = toUserIdentityFullName;
   protected readonly instanceId = input.required<string>();
   protected readonly permissionsCount = instanceUserPermissions.length;
 
@@ -52,7 +55,7 @@ export class InstancePreviewPageComponent {
     request: () => ({instanceId: NumberUtil.parse(this.instanceId())}),
     loader: ({request}) => request.instanceId
       ? this.instanceService
-        .getWithUsersById(request.instanceId)
+        .getWithUsersAndOwnerById(request.instanceId)
         .pipe(
           map(instance => ({
             ...instance,

@@ -18,6 +18,7 @@ import {
   CustomerPageHeaderSectionComponent
 } from '../../component/customer-page-header-section/customer-page-header-section.component';
 import {CardComponent} from '../../component/card/card.component';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'customer-page',
@@ -28,7 +29,8 @@ import {CardComponent} from '../../component/card/card.component';
     MessagesShowcaseComponent,
     TableModule,
     CustomerPageHeaderSectionComponent,
-    CardComponent
+    CardComponent,
+    TranslatePipe
   ],
   templateUrl: './customer-page.component.html',
   styles: ``
@@ -38,6 +40,7 @@ export class CustomerPageComponent {
   private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});
@@ -66,7 +69,7 @@ export class CustomerPageComponent {
         .delete(NumberUtil.parse(this.instanceId())!, customer.id!!)
         .pipe(first())
         .subscribe({
-          next: () => this.messages.set({success: ['Customer deleted successfully']}),
+          next: () => this.messages.set({success: ['action.customer.deleted']}),
           error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     });

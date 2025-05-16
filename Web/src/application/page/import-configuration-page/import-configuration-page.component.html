@@ -1,22 +1,22 @@
 <div class="h-full w-full relative container mx-auto flex flex-col">
   <import-configuration-page-header-section [canGoBack]="canGoBack()"/>
   <confirmation key="import-configuration-delete-confirmation"
-                header="Are you sure about deleting this import configuration?"/>
+                [summary]="'page.import-configuration.confirm-delete' | translate"/>
   <messages-showcase [messages]="messages()"/>
   <card>
-    <p card-header>Import Configurations</p>
-    <p card-subHeader>Manage your import configurations — create, preview, edit or delete.</p>
+    <p card-header>{{ 'page.import-configuration.title' | translate }}</p>
+    <p card-subHeader>{{ 'page.import-configuration.description' | translate }}</p>
     <div card-body>
-      <p-button title="Create" size="small" label="Create Import Configuration" type="button" (onClick)="manage()"/>
-      <p-table paginatorDropdownAppendTo="body" styleClass="mt-4" [value]="configurations.value() || []"
-               [paginator]="true"
+      <p-button [title]="'page.import-configuration.button.create' | translate" size="small"
+                [label]="'page.import-configuration.button.create' | translate" type="button" (onClick)="manage()"/>
+      <p-table paginatorDropdownAppendTo="body" styleClass="mt-4" [value]="configurations.value() || []" [paginator]="true"
                [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" sortMode="multiple">
         <ng-template #header>
           <tr>
             <th pSortableColumn="name">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-0.5">
-                  Name
+                  {{ 'page.import-configuration.header.name' | translate }}
                   <p-sortIcon field="name"/>
                 </div>
                 <p-columnFilter type="text" field="name" display="menu"/>
@@ -25,13 +25,13 @@
             <th pSortableColumn="dataType.name">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-0.5">
-                  Data Type
+                  {{ 'page.import-configuration.header.data-type' | translate }}
                   <p-sortIcon field="dataType.name"/>
                 </div>
                 <p-columnFilter type="text" field="dataType.name" display="menu"/>
               </div>
             </th>
-            <th>Fields</th>
+            <th>{{ 'page.import-configuration.header.fields' | translate }}</th>
             <th></th>
           </tr>
         </ng-template>
@@ -42,12 +42,12 @@
             <td>{{ configuration.fields.length }} fields</td>
             <td>
               <div class="flex items-center">
-                <p-button title="Preview" size="small" icon="pi pi-eye" type="button" variant="text"
-                          (onClick)="preview(configuration)"/>
-                <p-button title="Edit" size="small" icon="pi pi-pencil" type="button" variant="text"
-                          (onClick)="manage(configuration)"/>
-                <p-button title="Delete" size="small" icon="pi pi-trash" type="button" variant="text"
-                          (onClick)="delete(configuration)"/>
+                <p-button [title]="'page.import-configuration.button.preview' | translate" size="small" icon="pi pi-eye"
+                          type="button" variant="text" (onClick)="preview(configuration)"/>
+                <p-button [title]="'page.import-configuration.button.edit' | translate" size="small" icon="pi pi-pencil"
+                          type="button" variant="text" (onClick)="manage(configuration)"/>
+                <p-button [title]="'page.import-configuration.button.delete' | translate" size="small" icon="pi pi-trash"
+                          type="button" variant="text" (onClick)="delete(configuration)"/>
               </div>
             </td>
           </tr>

@@ -7,37 +7,37 @@
   } @else {
     @let template = this.template.value()!;
     <card>
-      <p card-header>{{ template.name }}</p>
-      <p card-subHeader>Preview of this unique report template.</p>
+      <p card-header>{{ ('page.report-template-preview.title' | translate:{ name: template.name }) }}</p>
+      <p card-subHeader>{{ 'page.report-template-preview.description' | translate }}</p>
       <div card-body class="flex flex-col gap-4">
         <card>
-          <p card-header>Details</p>
-          <p card-subHeader>Details of this specific report template.</p>
+          <p card-header>{{ 'page.report-template-preview.details.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.report-template-preview.details.description' | translate }}</p>
           <div card-body class="flex flex-col">
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">ID</p>
+              <p class="font-semibold">{{ 'page.report-template-preview.details.label.id' | translate }}</p>
               <p>{{ template.id }}</p>
             </div>
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">Name</p>
+              <p class="font-semibold">{{ 'page.report-template-preview.details.label.name' | translate }}</p>
               <p>{{ template.name }}</p>
             </div>
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">Data Type</p>
+              <p class="font-semibold">{{ 'page.report-template-preview.details.label.data-type' | translate }}</p>
               <p>{{ getDataTypeName(template) | async }}</p>
             </div>
             <div class="flex flex-row gap-2">
-              <p class="font-semibold">Included Fields</p>
+              <p class="font-semibold">{{ 'page.report-template-preview.details.label.fields' | translate }}</p>
               <p>{{ template.fields.length }} field(s)</p>
             </div>
           </div>
         </card>
         <card>
-          <p card-header>Fields</p>
-          <p card-subHeader>Fields of this specific report template.</p>
+          <p card-header>{{ 'page.report-template-preview.fields.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.report-template-preview.fields.description' | translate }}</p>
           <div card-body class="flex flex-wrap gap-4">
             @for (field of template.fields; track field.id) {
-              <badge-contrasted [value]="field.name"/>
+              <p-badge [value]="field.name" severity="contrast"/>
             }
           </div>
         </card>

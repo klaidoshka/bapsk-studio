@@ -15,6 +15,7 @@ import {
   ImportConfigurationPageHeaderSectionComponent
 } from "../../component/import-configuration-page-header-section/import-configuration-page-header-section.component";
 import {CardComponent} from '../../component/card/card.component';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'import-configuration-page',
@@ -24,7 +25,8 @@ import {CardComponent} from '../../component/card/card.component';
     TableModule,
     ConfirmationComponent,
     ImportConfigurationPageHeaderSectionComponent,
-    CardComponent
+    CardComponent,
+    TranslatePipe
   ],
   templateUrl: './import-configuration-page.component.html',
   styles: ``
@@ -34,6 +36,7 @@ export class ImportConfigurationPageComponent {
   private readonly importConfigurationService = inject(ImportConfigurationService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
   protected readonly canGoBack = input<boolean>();
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly dataTypeId = input<string>();
@@ -68,7 +71,7 @@ export class ImportConfigurationPageComponent {
         .delete(NumberUtil.parse(this.instanceId())!, configuration.id!)
         .pipe(first())
         .subscribe({
-          next: () => this.changeMessages("Import configuration deleted successfully"),
+          next: () => this.changeMessages(this.translateService.instant("action.import-configuration.deleted")),
           error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     });

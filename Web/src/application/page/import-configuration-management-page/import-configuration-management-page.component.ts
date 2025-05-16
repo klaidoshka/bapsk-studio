@@ -38,6 +38,7 @@ import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
 import {MessageService} from 'primeng/api';
 import {ActivatedRoute, Router} from '@angular/router';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'import-configuration-management-page',
@@ -56,7 +57,8 @@ import {ActivatedRoute, Router} from '@angular/router';
     CardComponent,
     FloatLabel,
     IconField,
-    InputIcon
+    InputIcon,
+    TranslatePipe
   ],
   templateUrl: './import-configuration-management-page.component.html',
   styles: ``
@@ -70,6 +72,7 @@ export class ImportConfigurationManagementPageComponent {
   private readonly messageService = inject(MessageService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
   protected readonly FieldType = FieldType;
   protected readonly configurationId = input<string>();
   protected readonly form = this.createForm();
@@ -126,6 +129,7 @@ export class ImportConfigurationManagementPageComponent {
       this.messageService.add({
         key: 'root',
         detail: message,
+        summary: this.translateService.instant('action.import-configuration.summary'),
         severity: 'success',
         closable: true
       });
@@ -153,7 +157,7 @@ export class ImportConfigurationManagementPageComponent {
       .create(request)
       .pipe(first())
       .subscribe({
-        next: (value) => this.consumeResult("Import configuration created successfully.", value.id),
+        next: (value) => this.consumeResult(this.translateService.instant("action.import-configuration.created"), value.id),
         error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
@@ -178,7 +182,7 @@ export class ImportConfigurationManagementPageComponent {
       .edit(request)
       .pipe(first())
       .subscribe({
-        next: () => this.consumeResult("Import configuration edited successfully."),
+        next: () => this.consumeResult(this.translateService.instant("action.import-configuration.edited")),
         error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }
@@ -275,7 +279,7 @@ export class ImportConfigurationManagementPageComponent {
 
   protected save() {
     if (!this.form.valid) {
-      this.messages.set({ error: ["Please fill in all required fields."] });
+      this.messages.set({ error: ["error.fill-all-fields."] });
       return;
     }
 

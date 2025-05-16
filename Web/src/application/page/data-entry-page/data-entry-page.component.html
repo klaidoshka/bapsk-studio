@@ -5,37 +5,45 @@
   } @else if (!dataType.value()) {
     <failed-to-load-please-reload/>
   } @else {
-    <p-dialog header="Data Entry Import" closeOnEscape="true" modal="true"
+    <p-dialog [header]="'page.data-entry.dialog.import.header' | translate" closeOnEscape="true" modal="true"
               styleClass="max-w-xl w-full dark:bg-primary-950! bg-primary-50!" closable="true"
               [(visible)]="showImporting" (onHide)="showImporting.set(false)" (close)="showImporting.set(false)">
       <data-entry-import-form [clearImportedValues]="showImporting()" [dataType]="dataType.value()!"
                               [instanceId]="instanceIdAsNumber()!"/>
     </p-dialog>
-    <confirmation [key]='"data-entry-delete-confirmation"' [header]='"Are you sure about deleting this data entry?"'/>
+    <confirmation [key]='"data-entry-delete-confirmation"' [summary]="'page.data-entry.confirm-delete' | translate"/>
     <messages-showcase [messages]="messages()"/>
     <card>
       <p card-header>
         @if (dataType.value()?.name) {
           {{ dataType.value()!.name }}
         } @else {
-          Data Entries
+          {{ 'page.data-entry.title' | translate }}
         }
       </p>
-      <p card-subHeader>Manage your data entries — create, preview, edit or delete.</p>
+      <p card-subHeader>{{ 'page.data-entry.description' | translate }}</p>
       <div card-body class="flex flex-col gap-4">
         <div class="flex flex-col md:flex-row gap-4">
-          <p-button title="Create" size="small" label="Create {{dataType.value()?.name}}" type="button"
+          @let dataTypeName = dataType.value()?.name;
+          <p-button [title]="'page.data-entry.button.create' | translate:{name: dataTypeName}" size="small"
+                    [label]="'page.data-entry.button.create' | translate:{name: dataTypeName}" type="button"
                     (onClick)="manage()"/>
           <div class="flex flex-col md:flex-row gap-1">
-            <p-button title="Import" label="Import" icon="pi pi-file-import" size="small"
+            <p-button [title]="'page.data-entry.button.import' | translate"
+                      [label]="'page.data-entry.button.import' | translate" icon="pi pi-file-import" size="small"
                       (onClick)="showImporting.set(true)"/>
-            <p-button title="Open Configurations" label="Import Configurations" icon="pi pi-file-excel" size="small"
+            <p-button [title]="'page.data-entry.button.import-configurations' | translate"
+                      [label]="'page.data-entry.button.import-configurations' | translate" icon="pi pi-file-excel" size="small"
                       routerLink="../import-configuration" [queryParams]="{dataTypeId: dataType.value()!.id}"/>
           </div>
           <div class="flex flex-col md:flex-row gap-1">
-            <p-button title="Generate" label="Generate Report" icon="pi pi-file-pdf" routerLink="../generate-report"
+            <p-button [title]="'page.data-entry.button.generate' | translate"
+                      [label]="'page.data-entry.button.generate' | translate" icon="pi pi-file-pdf"
+                      routerLink="../generate-report"
                       size="small"/>
-            <p-button title="Open Templates" label="Report Templates" icon="pi pi-file" routerLink="../report-template"
+            <p-button [title]="'page.data-entry.button.report-templates' | translate"
+                      [label]="'page.data-entry.button.report-templates' | translate" icon="pi pi-file"
+                      routerLink="../report-template"
                       [queryParams]="{dataTypeId: dataType.value()!.id}" size="small"/>
           </div>
         </div>

@@ -1,10 +1,14 @@
 import {Component, inject, OnDestroy, OnInit, signal} from '@angular/core';
 import {NavigationEnd, Router} from '@angular/router';
 import {Subscription} from 'rxjs';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'not-found-page',
   templateUrl: './not-found-page.component.html',
+  imports: [
+    TranslatePipe
+  ],
   styleUrls: ['./not-found-page.component.css']
 })
 export class NotFoundPageComponent implements OnInit, OnDestroy {

@@ -6,12 +6,12 @@
     <failed-to-load-please-reload/>
   } @else {
     <card>
-      <p card-header>Manage Sale</p>
-      <p card-subHeader>Fill in the form below to create a new sale or modify an existing one.</p>
+      <p card-header>{{ 'page.sale-management.title' | translate }}</p>
+      <p card-subHeader>{{ 'page.sale-management.description' | translate }}</p>
       <form [formGroup]="form" card-body class="flex flex-col gap-4">
         <card>
-          <p card-header>Details</p>
-          <p card-subHeader>Sale customer, salesman and date of occurred sale.</p>
+          <p card-header>{{ 'page.sale-management.details.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.sale-management.details.description' | translate }}</p>
           <div card-body class="flex flex-wrap gap-4">
             <!-- Customer -->
             <div>
@@ -19,7 +19,7 @@
                 <p-select dropdownIcon="pi pi-user" formControlName="customerId" id="customerId"
                           [options]="customersLabeled.value()" optionValue="value" optionLabel="label"
                           class="w-full"/>
-                <label for="customerId">Customer</label>
+                <label for="customerId">{{ 'page.sale-management.details.input.customer' | translate }}</label>
               </p-floatlabel>
               <form-input-error [control]="form.controls.customerId"/>
             </div>
@@ -30,7 +30,7 @@
                 <p-select dropdownIcon="pi pi-shop" formControlName="salesmanId" id="salesmanId"
                           [options]="salesmenLabeled.value()" optionValue="value" optionLabel="label"
                           class="w-full"/>
-                <label for="salesmanId">Salesman</label>
+                <label for="salesmanId">{{ 'page.sale-management.details.input.salesman' | translate }}</label>
               </p-floatlabel>
               <form-input-error [control]="form.controls.salesmanId"/>
             </div>
@@ -41,7 +41,7 @@
                 <p-date-picker inputId="date" formControlName="date" iconDisplay="input" [showIcon]="true"
                                [showTime]="true" variant="filled" styleClass="w-full" appendTo="body"
                                inputStyleClass="p-2 rounded-md dark:bg-surface-950! bg-inherit!"/>
-                <label for="date">Date</label>
+                <label for="date">{{ 'page.sale-management.details.input.date' | translate }}</label>
               </p-floatlabel>
               <form-input-error [control]="form.controls.date"/>
             </div>
@@ -49,9 +49,8 @@
         </card>
 
         <card>
-          <p card-header>Occurred Sale Receipt</p>
-          <p card-subHeader>Select which type receipt was provided to the customer. In case of cash register,
-            the receipt number and cash register number are required.</p>
+          <p card-header>{{ 'page.sale-management.receipt.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.sale-management.receipt.description' | translate }}</p>
           <div card-body class="flex flex-wrap gap-4">
             <!-- Receipt Type -->
             <div>
@@ -59,7 +58,7 @@
                 <p-select id="saleReceiptType" [(ngModel)]="selectedSaleReceiptType" dropdownIcon="pi pi-receipt"
                           [ngModelOptions]="{ standalone: true }" [options]="saleReceiptTypes" optionValue="value"
                           optionLabel="label" class="w-full"/>
-                <label for="saleReceiptType">Receipt Type</label>
+                <label for="saleReceiptType">{{ 'page.sale-management.receipt.input.type' | translate }}</label>
               </p-floatlabel>
             </div>
 
@@ -71,7 +70,7 @@
                     <p-inputicon class="pi pi-hashtag"/>
                     <input formControlName="invoiceNo" pInputText type="text" id="invoiceNo" class="w-full"/>
                   </p-iconfield>
-                  <label for="invoiceNo">Invoice No</label>
+                  <label for="invoiceNo">{{ 'page.sale-management.receipt.input.invoice-no' | translate }}</label>
                 </p-float-label>
                 <form-input-error [control]="form.controls.invoiceNo"/>
               </div>
@@ -84,7 +83,7 @@
                       <input required formControlName="cashRegisterNo" pInputText type="text" id="cashRegisterNo"
                              class="w-full"/>
                     </p-iconfield>
-                    <label for="cashRegisterNo">Cash Register No</label>
+                    <label for="cashRegisterNo">{{ 'page.sale-management.receipt.input.cash-register-no' | translate }}</label>
                   </p-float-label>
                 </div>
                 <div>
@@ -93,7 +92,7 @@
                       <p-inputicon class="pi pi-hashtag"/>
                       <input required formControlName="receiptNo" pInputText type="text" id="receiptNo" class="w-full"/>
                     </p-iconfield>
-                    <label for="receiptNo">Receipt No</label>
+                    <label for="receiptNo">{{ 'page.sale-management.receipt.input.receipt-no' | translate }}</label>
                   </p-float-label>
                 </div>
               </ng-container>
@@ -103,8 +102,8 @@
 
         <!-- Sold Goods -->
         <card>
-          <p card-header>Sold Goods</p>
-          <p card-subHeader>Goods that the customer bought. Make sure quantity and measurement type are correct.</p>
+          <p card-header>{{ 'page.sale-management.sold-goods.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.sale-management.sold-goods.description' | translate }}</p>
           <div card-body formArrayName="soldGoods" class="flex flex-col gap-8">
             @for (soldGood of form.controls.soldGoods.controls; track $index; let i = $index) {
               <div [formGroupName]="i" class="flex flex-wrap gap-4">
@@ -115,7 +114,7 @@
                       <p-inputicon class="pi pi-book"/>
                       <input id="description" formControlName="description" pInputText type="text" class="w-full"/>
                     </p-iconfield>
-                    <label for="description">Description</label>
+                    <label for="description">{{ 'page.sale-management.sold-goods.input.description' | translate }}</label>
                   </p-float-label>
                   <form-input-error [control]="soldGood.controls.description"/>
                 </div>
@@ -127,7 +126,7 @@
                       <p-inputicon class="pi pi-chart-line"/>
                       <input id="quantity" formControlName="quantity" pInputText type="number" class="w-full"/>
                     </p-iconfield>
-                    <label for="quantity">Quantity</label>
+                    <label for="quantity">{{ 'page.sale-management.sold-goods.input.quantity' | translate }}</label>
                   </p-float-label>
                   <form-input-error [control]="soldGood.controls.quantity"/>
                 </div>
@@ -140,7 +139,7 @@
                       <p-input-number inputId="unitPrice" formControlName="unitPrice" currency="EUR" mode="currency" [min]="0"
                                       [showButtons]="true" [step]="0.05" class="w-full" inputStyleClass="pl-10! w-60!"/>
                     </p-iconfield>
-                    <label for="unitPrice">Unit Price</label>
+                    <label for="unitPrice">{{ 'page.sale-management.sold-goods.input.unit-price' | translate }}</label>
                   </p-float-label>
                   <form-input-error [control]="soldGood.controls.unitPrice"/>
                 </div>
@@ -149,9 +148,9 @@
                 <div>
                   <p-float-label variant="on" class="w-60">
                     <p-select dropdownIcon="pi pi-objects-column" class="w-full" formControlName="unitOfMeasureType"
-                              optionValue="value" optionLabel="label" [options]="measurementUnits"
+                              optionValue="value" optionLabel="label" [options]="measurementTypes"
                               (onChange)="clearMeasurement(i, $event.value)"/>
-                    <label for="unitOfMeasureType">Measure Type</label>
+                    <label for="unitOfMeasureType">{{ 'page.sale-management.sold-goods.input.measure-type' | translate }}</label>
                   </p-float-label>
                   <form-input-error [control]="soldGood.controls.unitOfMeasureType"/>
                 </div>
@@ -166,10 +165,10 @@
                                class="w-full"/>
                       </p-iconfield>
                     } @else {
-                      <p-select formControlName="unitOfMeasure" [options]="standardMeasurements" optionValue="code"
+                      <p-select formControlName="unitOfMeasure" [options]="measurementCodeUnits" optionValue="code"
                                 optionLabel="label" dropdownIcon="pi pi-objects-column" class="w-full" appendTo="body"/>
                     }
-                    <label for="unitOfMeasure">Measure Unit</label>
+                    <label for="unitOfMeasure">{{ 'page.sale-management.sold-goods.input.measure-unit' | translate }}</label>
                   </p-float-label>
                   <form-input-error [control]="soldGood.controls.unitOfMeasure"/>
                 </div>
@@ -183,22 +182,24 @@
                              [step]="1"
                              class="w-full"/>
                     </p-iconfield>
-                    <label for="vatRate">VAT Rate (%)</label>
+                    <label for="vatRate">{{ 'page.sale-management.sold-goods.input.vat-rate' | translate }}</label>
                   </p-float-label>
                   <form-input-error [control]="soldGood.controls.vatRate"/>
                 </div>
 
-                <p-button title="Remove" icon="pi pi-trash" variant="text" class="self-start"
-                          (onClick)="removeSoldGood(i)"/>
+                <p-button [title]="'page.sale-management.sold-goods.button.remove' | translate" icon="pi pi-trash" variant="text"
+                          class="self-start" (onClick)="removeSoldGood(i)"/>
               </div>
             }
 
             <!-- Add Sold Good -->
-            <p-button title="Add Sold Good" size="small" label="Add Sold Good" (onClick)="addSoldGood()"/>
+            <p-button [title]="'page.sale-management.sold-goods.button.add' | translate" size="small"
+                      [label]="'page.sale-management.sold-goods.button.add' | translate" (onClick)="addSoldGood()"/>
           </div>
         </card>
         <messages-showcase [messages]="messages()"/>
-        <p-button title="Submit" size="small" [label]="!sale.value() ? 'Create' : 'Save'"
+        <p-button [title]="'page.sale-management.button.submit' | translate" size="small"
+                  [label]="('page.sale-management.button.' + (!saleId() ? 'create' : 'save')) | translate"
                   [disabled]="!form.valid || !form.dirty" (onClick)="save()" type="submit"/>
       </form>
     </card>

@@ -2,11 +2,13 @@ import {Component, inject} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {FileUpload} from 'primeng/fileupload';
 import {ApiRouter} from '../../service/api-router.service';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'html-upload-for-overhaul',
   imports: [
-    FileUpload
+    FileUpload,
+    TranslatePipe
   ],
   templateUrl: './html-upload-for-overhaul.component.html',
   styles: ``

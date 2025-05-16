@@ -11,6 +11,8 @@ import {
 import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-spinner.component';
 import {UserPageHeaderSectionComponent} from '../../component/user-page-header-section/user-page-header-section.component';
 import {CardComponent} from '../../component/card/card.component';
+import {TranslatePipe} from '@ngx-translate/core';
+import {toUserFullName} from '../../model/user.model';
 
 @Component({
   selector: 'user-preview-page',
@@ -19,13 +21,15 @@ import {CardComponent} from '../../component/card/card.component';
     FailedToLoadPleaseReloadComponent,
     LoadingSpinnerComponent,
     UserPageHeaderSectionComponent,
-    CardComponent
+    CardComponent,
+    TranslatePipe
   ],
   templateUrl: './user-preview-page.component.html',
   styles: ``
 })
 export class UserPreviewPageComponent {
   private readonly userService = inject(UserService);
+  protected readonly toUserFullName = toUserFullName;
   protected readonly getCountryName = getUserIsoCountryLabel;
   protected readonly userId = input.required<string>();
 

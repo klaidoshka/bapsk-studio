@@ -7,6 +7,7 @@ import {LoadingSpinnerComponent} from '../../component/loading-spinner/loading-s
 import {
   FailedToLoadPleaseReloadComponent
 } from '../../component/failed-to-load-please-reload/failed-to-load-please-reload.component';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'profile-page',
@@ -14,7 +15,8 @@ import {
     ProfileShowcaseComponent,
     SessionShowcaseComponent,
     LoadingSpinnerComponent,
-    FailedToLoadPleaseReloadComponent
+    FailedToLoadPleaseReloadComponent,
+    TranslatePipe
   ],
   templateUrl: './profile-page.component.html'
 })

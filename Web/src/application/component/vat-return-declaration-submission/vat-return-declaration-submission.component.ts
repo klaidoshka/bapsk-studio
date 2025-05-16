@@ -9,6 +9,7 @@ import {Checkbox} from 'primeng/checkbox';
 import Sale from '../../model/sale.model';
 import {first} from 'rxjs';
 import {ConfirmationComponent} from '../confirmation/confirmation.component';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'vat-return-declaration-submission',
@@ -17,7 +18,8 @@ import {ConfirmationComponent} from '../confirmation/confirmation.component';
     MessagesShowcaseComponent,
     ReactiveFormsModule,
     Checkbox,
-    ConfirmationComponent
+    ConfirmationComponent,
+    TranslatePipe
   ],
   templateUrl: './vat-return-declaration-submission.component.html',
   styles: ``
@@ -44,7 +46,7 @@ export class VatReturnDeclarationSubmissionComponent {
 
   protected save() {
     if (!this.form.valid) {
-      this.messages.set({error: ["Please fill out the form."]});
+      this.messages.set({error: ["error.fill-all-fields."]});
       return;
     }
 
@@ -75,7 +77,7 @@ export class VatReturnDeclarationSubmissionComponent {
       })
       .pipe(first())
       .subscribe({
-        next: () => this.onSuccess("Declaration for sale's VAT return has been submitted successfully."),
+        next: () => this.onSuccess("action.sale.vat-return-declaration-submitted"),
         error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
       });
   }

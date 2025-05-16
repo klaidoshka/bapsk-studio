@@ -4,7 +4,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {ConfirmationComponent} from '../../component/confirmation/confirmation.component';
 import Messages from '../../model/messages.model';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {combineLatest, first, map, Observable, of, switchMap} from 'rxjs';
+import {combineLatest, first, map, of, switchMap} from 'rxjs';
 import ReportTemplate from '../../model/report-template.model';
 import {Button} from 'primeng/button';
 import {MessagesShowcaseComponent} from '../../component/messages-showcase/messages-showcase.component';
@@ -14,6 +14,7 @@ import {
   ReportTemplatePageHeaderSectionComponent
 } from '../../component/report-template-page-header-section/report-template-page-header-section.component';
 import {CardComponent} from '../../component/card/card.component';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'report-template-page',
@@ -23,7 +24,8 @@ import {CardComponent} from '../../component/card/card.component';
     MessagesShowcaseComponent,
     TableModule,
     ReportTemplatePageHeaderSectionComponent,
-    CardComponent
+    CardComponent,
+    TranslatePipe
   ],
   templateUrl: './report-template-page.component.html',
   styles: ``
@@ -32,6 +34,7 @@ export class ReportTemplatePageComponent {
   private readonly reportTemplateService = inject(ReportTemplateService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly translateService = inject(TranslateService);
   protected readonly canGoBack = input<boolean>();
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly dataTypeId = input<string>();
@@ -43,7 +46,7 @@ export class ReportTemplatePageComponent {
       dataTypeId: NumberUtil.parse(this.dataTypeId()),
       instanceId: NumberUtil.parse(this.instanceId())
     }),
-    loader: ({request}) => {
+    loader: ({ request }) => {
       if (request.dataTypeId && request.instanceId) {
         return this.reportTemplateService
           .getAllByDataTypeId(request.instanceId, request.dataTypeId)
@@ -51,7 +54,7 @@ export class ReportTemplatePageComponent {
             switchMap(templates => combineLatest(templates.map(template =>
               this.reportTemplateService
                 .getDataType(request.instanceId!, template)
-                .pipe(map(dataType => ({...template, dataType})))
+                .pipe(map(dataType => ({ ...template, dataType })))
             )))
           );
       }
@@ -63,7 +66,7 @@ export class ReportTemplatePageComponent {
             switchMap(templates => combineLatest(templates.map(template =>
               this.reportTemplateService
                 .getDataType(request.instanceId!, template)
-                .pipe(map(dataType => ({...template, dataType})))
+                .pipe(map(dataType => ({ ...template, dataType })))
             )))
           )
         : of([])
@@ -71,7 +74,7 @@ export class ReportTemplatePageComponent {
   });
 
   private changeMessages(message: string, success: boolean = true) {
-    this.messages.set(success ? {success: [message]} : {error: [message]});
+    this.messages.set(success ? { success: [message] } : { error: [message] });
   }
 
   protected delete(template: ReportTemplate) {
@@ -79,24 +82,15 @@ export class ReportTemplatePageComponent {
       this.reportTemplateService
         .delete(NumberUtil.parse(this.instanceId())!, template.id!)
         .pipe(first())
-        .subscribe(() => this.changeMessages("Import template deleted successfully"));
+        .subscribe(() => this.changeMessages(this.translateService.instant("action.report-template.deleted")));
     });
   }
 
-  protected getDataTypeName(template: ReportTemplate): Observable<string> {
-    return this.reportTemplateService
-      .getDataType(NumberUtil.parse(this.instanceId())!, template)
-      .pipe(
-        first(),
-        map(dataType => dataType.name)
-      );
-  }
-
   protected manage(template?: ReportTemplate) {
-    this.router.navigate(['./' + (template ? `${template.id}/edit` : 'create')], {relativeTo: this.route});
+    this.router.navigate(['./' + (template ? `${template.id}/edit` : 'create')], { relativeTo: this.route });
   }
 
   protected preview(template: ReportTemplate) {
-    this.router.navigate([`./${template.id}`], {relativeTo: this.route});
+    this.router.navigate([`./${template.id}`], { relativeTo: this.route });
   }
 }
