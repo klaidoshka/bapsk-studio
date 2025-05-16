@@ -1340,6 +1340,9 @@
       "title": "User"
     },
     "workspace": {
+      "button": {
+        "change": "Change Workspace"
+      },
       "dialog": {
         "workspace": {
           "title": "Select Workspace"

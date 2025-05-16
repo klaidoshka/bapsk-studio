@@ -20,7 +20,7 @@
         [class.not-md:hidden]="!isMobileSidebarOpen()" (clickOutside)="isMobileSidebarOpen.set(false)">
         <div class="flex flex-col gap-4 mt-2 mx-4">
           <h4 class="px-1 text-lg font-semibold">{{ instanceName() }}</h4>
-          <p-button title="Change" label="Change Workspace" size="small" styleClass="w-full" (onClick)="exit()"/>
+          <p-button title="Change" [label]="'page.workspace.button.change' | translate" size="small" styleClass="w-full" (onClick)="exit()"/>
         </div>
         <div class="flex flex-col gap-1 mx-4">
           <h4 class="p-2 text-sm font-semibold">{{ 'page.workspace.sidebar.name' | translate }}</h4>

@@ -1340,6 +1340,9 @@
       "title": "Naudotojas"
     },
     "workspace": {
+      "button": {
+        "change": "Keisti darbo aplinką"
+      },
       "dialog": {
         "workspace": {
           "title": "Pasirinkite darbo aplinką"
