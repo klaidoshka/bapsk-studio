@@ -1,0 +1,118 @@
+<div class="h-full w-full relative container mx-auto flex flex-col">
+  <data-type-page-header-section [canGoBack]="true"/>
+  @if (dataType.isLoading() || dataTypes.isLoading()) {
+    <loading-spinner/>
+  } @else if (dataTypeId() && !dataType.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    <card>
+      <p card-header>{{ 'page.data-type-management.title' | translate }}</p>
+      <p card-subHeader>{{ 'page.data-type-management.description' | translate }}</p>
+      <form card-body class="flex flex-col gap-4" [formGroup]="form">
+        <div class="flex flex-wrap gap-4">
+          <!-- Name -->
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-iconfield>
+                <p-inputicon class="pi pi-tag"/>
+                <input pInputText class="w-60" id="name" formControlName="name" type="text"/>
+              </p-iconfield>
+              <label for="name">{{ 'page.data-type-management.details.input.name' | translate }}</label>
+            </p-floatlabel>
+            <form-input-error [control]="form.controls.name"/>
+          </div>
+
+          <!-- Description -->
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-iconfield>
+                <p-inputicon class="pi pi-comment"/>
+                <input pInputText class="w-60" id="description" formControlName="description" type="text"/>
+              </p-iconfield>
+              <label for="description">{{ 'page.data-type-management.details.input.description' | translate }}</label>
+            </p-floatlabel>
+            <form-input-error [control]="form.controls.description"/>
+          </div>
+
+          <!-- Display Field -->
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-select inputId="displayField" formControlName="displayField" [options]="displayFields()"
+                        optionLabel="label" optionValue="value" dropdownIcon="pi pi-book" appendTo="body"
+                        styleClass="w-full"/>
+              <label for="displayField">{{ 'page.data-type-management.details.input.display-field' | translate }}</label>
+            </p-floatlabel>
+            <form-input-error [control]="form.controls.displayField"/>
+          </div>
+        </div>
+        <card>
+          <p card-header>{{ 'page.data-type-management.fields.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.data-type-management.fields.description' | translate }}</p>
+          <div card-body class="flex flex-col gap-4">
+            <p-table [value]="form.controls.fields.controls" formArrayName="fields"
+                     [columns]="[
+                     'page.data-type-management.fields.header.name' | translate,
+                     'page.data-type-management.fields.header.type' | translate,
+                     'page.data-type-management.fields.header.default-value' | translate,
+                     'page.data-type-management.fields.header.required' | translate
+                     ]">
+              <ng-template #header let-columns>
+                <tr>
+                  @for (column of columns; track $index) {
+                    <th>{{ column }}</th>
+                  }
+                  <th></th>
+                </tr>
+              </ng-template>
+              <ng-template #body let-field let-i="rowIndex">
+                @let fieldType = getFieldType(i);
+                @let isReference = fieldType === FieldType.Reference;
+                <tr [formGroup]="field">
+                  <td>
+                    <input formControlName="name" pInputText type="text" class="w-full" [class]="{'mt-7': isReference}"/>
+                  </td>
+                  <td>
+                    <p-select formControlName="type" [options]="fieldTypes" optionLabel="label" optionValue="value"
+                              [placeholder]="'page.data-type-management.fields.placeholder.type' | translate" appendTo="body"
+                              styleClass="w-48" [class]="{'mt-7': isReference}" (onChange)="consumeChange(i, $event.value)"/>
+                  </td>
+                  <td>
+                    @if (isReference) {
+                      <div class="flex flex-col">
+                        <label for="referencedType"
+                               class="font-semibold">{{ 'page.data-type-management.fields.header.referenced-type' | translate }}</label>
+                        <p-select id="referencedType"
+                                  [placeholder]="'page.data-type-management.fields.placeholder.referenced-type' | translate"
+                                  formControlName="referencedType" [options]="dataTypes.value() || []" optionLabel="name"
+                                  optionValue="id" appendTo="body" class="mt-1 w-full"/>
+                      </div>
+                    } @else {
+                      <data-type-entry-field-input formControlName="defaultValue" [type]="fieldType"/>
+                    }
+                  </td>
+                  <td>
+                    <p-checkbox formControlName="isRequired" binary [styleClass]="isReference ? 'mt-7' : ''"/>
+                  </td>
+                  <td>
+                    <div class="flex items-center">
+                      <p-button [title]="'page.data-type-management.fields.button.remove' | translate" icon="pi pi-trash"
+                                type="button" variant="text" (onClick)="removeField(i)"
+                                [styleClass]="isReference ? 'mt-7' : ''"/>
+                    </div>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+            <form-input-error [control]="form.controls.fields"/>
+            <p-button [title]="'page.data-type-management.fields.button.add' | translate"
+                      [label]="'page.data-type-management.fields.button.add' | translate" size="small" (onClick)="addField()"/>
+          </div>
+        </card>
+        <messages-showcase [messages]="messages()"/>
+        <p-button [title]="'page.data-type-management.button.submit' | translate" size="small"
+                  [label]="('page.data-type-management.button.' + (!dataType.value() ? 'create' : 'save')) | translate"
+                  [disabled]="form.invalid || !form.dirty" (onClick)="save()" type="submit"/>
+      </form>
+    </card>
+  }
+</div>

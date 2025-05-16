@@ -1,0 +1,78 @@
+<div class="h-full w-full relative container mx-auto flex flex-col">
+  <data-type-page-header-section [canGoBack]="true"/>
+  @if (dataType.isLoading()) {
+    <loading-spinner/>
+  } @else if (!dataType.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    @let dataType = this.dataType.value()!;
+    <card>
+      <p card-header>{{ ('page.data-type-preview.title' | translate:{ name: dataType.name }) }}</p>
+      <p card-subHeader>{{ ('page.data-type-preview.description' | translate:{ name: dataType.name }) }}</p>
+      <div card-body class="flex flex-col gap-4">
+        <card>
+          <p card-header>{{ 'page.data-type-preview.details.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.data-type-preview.details.description' | translate }}</p>
+          <div card-body class="flex flex-col">
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">{{ 'page.data-type-preview.details.label.id' | translate }}</p>
+              <p>{{ dataType.id }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">{{ 'page.data-type-preview.details.label.name' | translate }}</p>
+              <p>{{ dataType.name }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">{{ 'page.data-type-preview.details.label.description' | translate }}</p>
+              <p>{{ dataType.description }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">{{ 'page.data-type-preview.details.label.display-field' | translate }}</p>
+              <p>{{ getDisplayFieldName() }}</p>
+            </div>
+          </div>
+        </card>
+        <card>
+          <p card-header>{{ 'page.data-type-preview.fields.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.data-type-preview.fields.description' | translate }}</p>
+          <p-table card-body [value]="dataType.fields || []">
+            <ng-template #header>
+              <tr>
+                <th>{{ 'page.data-type-preview.fields.header.name' | translate }}</th>
+                <th>{{ 'page.data-type-preview.fields.header.type' | translate }}</th>
+                <th>{{ 'page.data-type-preview.fields.header.required' | translate }}</th>
+                <th>{{ 'page.data-type-preview.fields.header.default-value' | translate }}</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-field>
+              @let isReferenceField = field.type === FieldType.Reference;
+              <tr>
+                <td><p>{{ field.name }}</p></td>
+                <td>
+                  <p>
+                    <p-badge [value]="toFieldTypeLabel(field.type) | translate" severity="contrast"/>
+                  </p>
+                </td>
+                <td>
+                  <p-badge [severity]="!field.isRequired ? 'contrast' : 'danger'"
+                           [value]="('misc.state.' + (field.isRequired ? 'required' : 'optional')) | translate"/>
+                </td>
+                <td>
+                  @if (isReferenceField) {
+                    <div class="flex flex-col gap-1">
+                      <label class="font-semibold">{{ 'page.data-type-preview.fields.label.referenced-type' | translate }}</label>
+                      {{ getReferencedDataTypeName(field) }}
+                    </div>
+                  } @else {
+                    <data-type-entry-field-display [dataType]="dataType!" [value]="field.defaultValue"
+                                                   [dataTypeFieldId]="field.id" [instanceId]="instanceIdAsNumber()"/>
+                  }
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </card>
+      </div>
+    </card>
+  }
+</div>

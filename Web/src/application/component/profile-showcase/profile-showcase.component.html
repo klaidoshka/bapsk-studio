@@ -1,0 +1,17 @@
+<card>
+  @let role = user()!.role;
+  <p card-header>{{ 'component.profile-showcase.title' | translate }}</p>
+  <div card-subHeader class="flex flex-col">
+    <div class="flex items-center flex-row gap-1">
+      <p class="font-semibold">{{ 'component.profile-showcase.your-role' | translate }}</p>
+      @let roleInfo = toRoleInfo(role);
+      <p-badge [value]="roleInfo.label | translate" [severity]="roleInfo.severity" size="small"/>
+    </div>
+  </div>
+  <div card-body>
+    <div class="flex flex-col w-fit gap-4">
+      <profile-management [user]="user()!"/>
+      <profile-change-password-form [user]="user()!"/>
+    </div>
+  </div>
+</card>

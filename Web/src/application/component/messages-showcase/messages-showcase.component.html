@@ -1,0 +1,13 @@
+<div
+  *ngIf="containsMessage()" class="flex flex-col gap-1 text-md rounded p-1 px-2 w-fit"
+  [ngClass]="{
+    'my-2': containsMessage(),
+    'bg-green-200 dark:bg-green-400/50 text-green-600 dark:text-green-200': messages().success,
+    'bg-red-200 dark:bg-red-300/50 text-red-600 dark:text-red-100': messages().error,
+    'bg-yellow-200 dark:bg-yellow-200/50 text-yellow-800 dark:text-yellow-200': messages().warning
+  }">
+  @let values = messages().success || messages().error || messages().warning || [];
+  @for (message of values; track $index) {
+    <p>{{ message | translate }}</p>
+  }
+</div>

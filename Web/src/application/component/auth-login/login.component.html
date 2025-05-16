@@ -1,0 +1,48 @@
+<h2 class="text-2xl font-bold mb-4">{{ 'component.login.title' | translate }}</h2>
+
+<p-dialog [header]="'component.login.reset-password.header' | translate" [(visible)]="showResetDialog" [modal]="true" [closeOnEscape]="true"
+          styleClass="max-w-xl w-full dark:bg-primary-950! bg-primary-50!">
+  <auth-reset-password/>
+</p-dialog>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+  <!-- Email -->
+  <div class="w-full">
+    <p-floatlabel variant="on" class="w-full">
+      <p-iconfield>
+        <p-inputicon class="pi pi-envelope"/>
+        <input pInputText class="w-full" id="email" formControlName="email" type="email"/>
+      </p-iconfield>
+      <label for="email">{{ 'component.login.input.email' | translate }}</label>
+    </p-floatlabel>
+    <form-input-error [control]="form.controls.email"/>
+  </div>
+
+  <!-- Password -->
+  <div class="w-full">
+    <p-floatlabel variant="on" class="w-full">
+      <p-iconfield>
+        <p-inputicon class="pi pi-lock"/>
+        <p-password id="password" formControlName="password" inputStyleClass="pl-10! w-full!" class="w-full" styleClass="w-full"
+                    toggleMask="true" feedback="false"/>
+      </p-iconfield>
+      <label for="password">{{ 'component.login.input.password' | translate }}</label>
+    </p-floatlabel>
+    <form-input-error [control]="form.controls.password"/>
+  </div>
+  <messages-showcase [messages]="messages()"/>
+  <p-button [title]="'component.login.button.login' | translate" size="small" type="submit"
+            [label]="'component.login.button.login' | translate" icon="pi pi-check" [disabled]="form.invalid"
+            [loading]="isSubmitting()" styleClass="w-full!" class="w-full"/>
+</form>
+<p class="mt-4 text-sm text-center">{{ 'component.login.no-account-yet' | translate }}</p>
+<div class="flex flex-col justify-center items-center">
+  <p class="text-center">
+    <a routerLink="/auth/register"
+       class="dark:text-indigo-400 text-indigo-600 hover:underline">{{ 'component.login.redirect.register-here' | translate }}</a>
+  </p>
+  <p (click)="showResetDialog.set(true)"
+     class="hover:cursor-pointer dark:text-indigo-400 text-indigo-600 hover:underline">
+    {{ 'component.login.redirect.reset-password' | translate }}
+  </p>
+</div>

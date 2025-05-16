@@ -1,0 +1,1374 @@
+{
+  "action": {
+    "admin": {
+      "mocked": "Pardavimo eksportas buvo sėkmingai sugeneruotas.",
+      "summary": "Admin"
+    },
+    "auth": {
+      "logged-in": "Sėkmingai prisijungėte.",
+      "logged-out": "Sėkmingai atsijungėte.",
+      "password-changed": "Slaptažodis sėkmingai pakeistas.",
+      "reset-password-sent": "Užklausa išsiųsta! Patikrinkite el. paštą, nuoroda galios 10 minučių.",
+      "registered": "Sėkmingai užsiregistravote ir prisijungėte.",
+      "session-revoked": "Sesija sėkmingai panaikinta.",
+      "summary": "Prisijungimas"
+    },
+    "customer": {
+      "created": "Klientas sėkmingai sukurtas.",
+      "deleted": "Klientas sėkmingai ištrintas.",
+      "edited": "Klientas sėkmingai paredaguotas.",
+      "summary": "Klientas"
+    },
+    "data-entry": {
+      "created": "Duomenų įrašas sėkmingai sukurtas.",
+      "deleted": "Duomenų įrašas sėkmingai ištrintas.",
+      "edited": "Duomenų įrašas sėkmingai paredaguotas.",
+      "imported": "Duomenų įrašai sėkmingai importuoti.",
+      "summary": "Duomenų įrašas"
+    },
+    "data-type": {
+      "created": "Duomenų tipas sėkmingai sukurtas.",
+      "deleted": "Duomenų tipas sėkmingai ištrintas.",
+      "edited": "Duomenų tipas sėkmingai paredaguotas.",
+      "summary": "Duomenų tipas"
+    },
+    "import-configuration": {
+      "created": "Importo konfigūracija sėkmingai sukurta.",
+      "deleted": "Importo konfigūracija sėkmingai ištrinta.",
+      "edited": "Importo konfigūracija sėkmingai paredaguota.",
+      "summary": "Importo konfigūracija"
+    },
+    "instance": {
+      "created": "Egzempliorius sėkmingai sukurtas.",
+      "deleted": "Egzempliorius sėkmingai ištrintas.",
+      "edited": "Egzempliorius sėkmingai paredaguotas.",
+      "summary": "Egzempliorius"
+    },
+    "profile": {
+      "saved": "Jūsų profilis sėkmingai išsaugotas.",
+      "summary": "Profilis"
+    },
+    "report-template": {
+      "created": "Ataskaitos šablonas sėkmingai sukurtas.",
+      "deleted": "Ataskaitos šablonas sėkmingai ištrintas.",
+      "edited": "Ataskaitos šablonas sėkmingai paredaguotas.",
+      "summary": "Ataskaitos šablonas"
+    },
+    "sale": {
+      "created": "Pardavimas sėkmingai sukurtas.",
+      "deleted": "Pardavimas sėkmingai ištrintas.",
+      "edited": "Pardavimas sėkmingai paredaguotas.",
+      "payment-submitted": "Apmokėjimo informacija sėkmingai pateikta.",
+      "summary": "Pardavimas",
+      "vat-return-declaration-submitted": "PVM susigrąžinimo deklaracija sėkmingai pateikta."
+    },
+    "salesman": {
+      "created": "Pardavėjas sėkmingai sukurtas.",
+      "deleted": "Pardavėjas sėkmingai ištrintas.",
+      "edited": "Pardavėjas sėkmingai paredaguotas.",
+      "summary": "Pardavėjas"
+    },
+    "user": {
+      "created": "Naudotojas sėkmingai sukurtas.",
+      "deleted": "Naudotojas sėkmingai ištrintas.",
+      "edited": "Naudotojas sėkmingai paredaguotas.",
+      "summary": "Naudotojas"
+    }
+  },
+  "component": {
+    "button": {
+      "go-back": "Grįžti atgal"
+    },
+    "confirmation": {
+      "button": {
+        "accept": "Taip",
+        "reject": "Ne"
+      },
+      "title": "Patvirtinimas"
+    },
+    "customer-page-header": {
+      "description": "Klientai naudojami įmonės klientų valdymui. Galima pridėti, redaguoti ir trinti klientus. Tačiau svarbiausia jų paskirtis – pardavimų kūrimas su PVM grąžinimo palaikymu.",
+      "title": "Klientai"
+    },
+    "data-entry-import-form": {
+      "button": {
+        "import": "Importuoti"
+      },
+      "input": {
+        "file": "Failas",
+        "import-configuration": "Importavimo konfigūracija",
+        "skip-header": "Praleisti antraštę (pirma eilutė)"
+      }
+    },
+    "data-entry-page-header": {
+      "description": "Duomenų įrašai atspindi konkrečių duomenų tipų struktūrų egzempliorius. Kiekvienas įrašas turi reikšmes savo laukuose. Galima kurti, redaguoti, trinti.",
+      "title": "Duomenų įrašai"
+    },
+    "data-entry-table": {
+      "button": {
+        "delete": "Ištrinti",
+        "edit": "Redaguoti",
+        "preview": "Peržiūrėti"
+      },
+      "header": {
+        "created-at": "Sukurta",
+        "modified-by": "Paskutinis keitė",
+        "modified-at": "Pakeista"
+      }
+    },
+    "data-type-page-header": {
+      "description": "Duomenų tipai apibrėžia duomenų įrašų struktūrą. Kiekvienas tipas gali turėti kelis laukus, taip pat ryšius su kitais duomenų tipais. Galima kurti, redaguoti, trinti.",
+      "title": "Duomenų tipai"
+    },
+    "failed-to-load": {
+      "button": {
+        "reload": "Krauti iš naujo"
+      },
+      "description": "Nepavyko rasti ieškomų duomenų. Galbūt tai laikina problema – bandykite perkrauti puslapį.",
+      "title": "Nepavyko rasti"
+    },
+    "html-upload-for-overhaul": {
+      "button": {
+        "upload": "Atnaujinti HTML lentelę"
+      }
+    },
+    "import-configuration-page-header": {
+      "description": "Importo konfigūracijos nurodo kaip failuose esantys duomenys importuojami į sistemą. Galima kurti, redaguoti, trinti.",
+      "title": "Importo konfigūracijos"
+    },
+    "instance-page-header": {
+      "description": "Naudodami egzempliorius galite dirbti skirtingose aplinkose. Kiekviena turi atskirus naudotojus, nustatymus ir duomenis.",
+      "title": "Egzemplioriai"
+    },
+    "instance-selector": {
+      "button": {
+        "create": "Sukurti egzempliorių",
+        "exit": "Išeiti iš darbo aplinkos"
+      },
+      "input": {
+        "instance": "Darbo aplinka (egzempliorius)"
+      }
+    },
+    "login": {
+      "button": {
+        "login": "Prisijungti"
+      },
+      "title": "Prisijungimas",
+      "input": {
+        "email": "El. paštas",
+        "password": "Slaptažodis"
+      },
+      "no-account-yet": "Dar neturite paskyros?",
+      "redirect": {
+        "register-here": "Registruokitės čia",
+        "reset-password": "Atstatyti slaptažodį"
+      },
+      "reset-password": {
+        "header": "Atstatyti slaptažodį"
+      }
+    },
+    "mock-sale-button-form": {
+      "button": {
+        "mock": "Sugeneruoti pardavimo eksportą",
+        "submit": "Pateikti"
+      },
+      "input": {
+        "sale": "Pardavimas"
+      },
+      "title": "Sugeneruoti pardavimo eksportą"
+    },
+    "profile-change-password": {
+      "button": {
+        "submit": "Pateikti"
+      },
+      "description": "Forma slaptažodžio pakeitimui. Jei pamiršote slaptažodį, naudokite atstatymą prisijungimo puslapyje.",
+      "title": "Slaptažodis",
+      "input": {
+        "confirm-new-password": "Patvirtinkite naują slaptažodį",
+        "current-password": "Dabartinis slaptažodis",
+        "new-password": "Naujas slaptažodis"
+      }
+    },
+    "profile-dropdown": {
+      "confirm-logout": "Tikrai norite atsijungti?",
+      "option": {
+        "logout": "Atsijungti",
+        "profile": "Profilis"
+      }
+    },
+    "profile-management": {
+      "button": {
+        "reset": "Atstatyti",
+        "save": "Išsaugoti"
+      },
+      "description": "Jūsų profilio informacija. Deja, el. pašto pakeisti negalima – kreipkitės pagalbos į konsultantus.",
+      "title": "Informacija",
+      "input": {
+        "birthdate": "Gimimo data",
+        "country": "Šalis",
+        "email": "El. paštas",
+        "first-name": "Vardas",
+        "last-name": "Pavardė"
+      }
+    },
+    "profile-showcase": {
+      "title": "Profilis",
+      "your-role": "Jūsų rolė"
+    },
+    "register": {
+      "already-have-account": "Jau turite paskyrą?",
+      "button": {
+        "register": "Registruotis"
+      },
+      "title": "Registracija",
+      "input": {
+        "birthdate": "Gimimo data",
+        "confirm-password": "Patvirtinti slaptažodį",
+        "country": "Šalis",
+        "email": "El. paštas",
+        "first-name": "Vardas",
+        "last-name": "Pavardė",
+        "password": "Slaptažodis"
+      },
+      "redirect": {
+        "login-here": "Prisijunkite čia"
+      }
+    },
+    "report-generate-form": {
+      "button": {
+        "generate": "Generuoti"
+      },
+      "input": {
+        "customer": "Klientas",
+        "date-from": "Data nuo",
+        "date-to": "Data iki (imtinai)",
+        "salesman": "Pardavėjas",
+        "template": "Šablonas",
+        "type": "Ataskaitos tipas"
+      },
+      "type": {
+        "data-entry": "Duomenų įrašai",
+        "sale": "Pardavimai"
+      }
+    },
+    "report-template-page-header": {
+      "description": "Norėdami eksportuoti duomenis iš egzemplioriaus, galite sukurti ataskaitų šabloną. Galite turėti tiek šablonų, kiek reikia.",
+      "title": "Ataskaitų šablonai"
+    },
+    "reset-password": {
+      "button": {
+        "reset": "Atstatyti"
+      },
+      "description": "Įveskite el. pašto adresą, kad atstatytumėte slaptažodį. Nuoroda bus aktyvi 10 minučių.",
+      "input": {
+        "email": "El. paštas"
+      }
+    },
+    "sale-page-header": {
+      "description": "Pardavimai – tai parduotų prekių klientams įrašai. Pardavimai gali būti teikiami PVM grąžinimui.",
+      "title": "Pardavimai"
+    },
+    "salesman-page-header": {
+      "description": "Pardavėjai – tai asmenys, atsakingi už pardavimus. Pardavėjai susieti su klientais ir pardavimais.",
+      "title": "Pardavėjai"
+    },
+    "scroll-to-top": {
+      "button": {
+        "scroll": "Į viršų"
+      }
+    },
+    "session-showcase": {
+      "button": {
+        "revoke": "Panaikinti"
+      },
+      "confirm-revokation": "Ar tikrai pašalinti šią sesiją?",
+      "description": "<p>Čia pateiktos jūsų sesijos (laikas ir įrenginiai).</p><p>Norėdami pašalinti – spauskite mygtuką. Dabartinė sesija negali būti panaikinta.</p>",
+      "title": "Sesijos",
+      "header": {
+        "active-time": "Aktyvus laikas",
+        "agent": "Įrenginys",
+        "created-at": "Sukurta",
+        "ip-address": "IP adresas",
+        "location": "Lokacija"
+      }
+    },
+    "theme-selector": {
+      "button": {
+        "select": "Keisti temą"
+      }
+    },
+    "user-page-header": {
+      "description": "Valdykite sistemos naudotojus. Rodoma jų informacija, bet ne slaptažodžiai.",
+      "title": "Naudotojai"
+    },
+    "vat-return-payment": {
+      "button": {
+        "add": "Pridėti mokėjimą",
+        "submit": "Pateikti mokėjimus",
+        "remove": "Pašalinti"
+      },
+      "input": {
+        "amount": "Suma",
+        "date": "Data",
+        "type": "Mokėjimo būdas"
+      }
+    },
+    "vat-return-payment-table": {
+      "header": {
+        "amount": "Suma",
+        "date": "Data",
+        "type": "Mokėjimo būdas"
+      }
+    },
+    "vat-return-submission": {
+      "button": {
+        "submit": "Pateikti"
+      },
+      "confirm-resubmit": "Ar tikrai pateikti deklaraciją iš naujo?",
+      "description": "Būtina patvirtinti, kad šio pardavimo klientas atitinka PVM grąžinimo sąlygas.",
+      "input": {
+        "affirmation": "Patvirtinimas"
+      }
+    }
+  },
+  "error": {
+    "data-type-management": {
+      "no-fields": "Reikalingas bent vienas laukas."
+    },
+    "email": "Netinkamas el. pašto formatas.",
+    "fill-all-fields": "Užpildykite visus laukus prieš pateikdami formą.",
+    "instance-management": {
+      "email-exists": "Narys su šiuo el. paštu jau yra sąraše.",
+      "email-invalid": "Narys pagal '{{email}}' el. paštą buvo nerastas."
+    },
+    "max": "Didžiausia galima reikšmė – {{max}}.",
+    "maxlength": "Maksimalus ilgis – {{requiredLength}} simboliai.",
+    "min": "Mažiausia galima reikšmė – {{min}}.",
+    "minlength": "Minimalus ilgis – {{requiredLength}} simboliai.",
+    "mismatch-passwords": "Slaptažodžiai nesutampa.",
+    "pattern": "Neteisingas formatas. Galimas: {{requiredPattern}}.",
+    "report-generate-form": {
+      "type-required": "Užpildykite visus laukus."
+    },
+    "sale-management": {
+      "sale-exported": "Šis pardavimas neberedaguojamas, nes prekės jau išeksportuotos."
+    },
+    "required": "Laukas yra privalomas."
+  },
+  "misc": {
+    "condition": {
+      "met": "Tenkinama",
+      "unmet": "Netenkinama"
+    },
+    "declaration": {
+      "export-result": {
+        "A1": "A1 (Praėjo)",
+        "A4": "A4 (Yra klaidų)",
+        "invalid": "Nenustatytas rezultatas"
+      },
+      "state": {
+        "accepted-correct": "Priimta (teisinga)",
+        "accepted-incorrect": "Priimta (neteisinga)",
+        "cancelled": "Atšaukta",
+        "exported": "Eksportuota",
+        "not-submitted": "Nepateikta",
+        "rejected": "Atmesta"
+      }
+    },
+    "field-type": {
+      "check": "Taip/Ne",
+      "date": "Data",
+      "number": "Skaičius",
+      "text": "Tekstas",
+      "reference": "Nuoroda",
+      "country": "Šalis",
+      "currency": "Valiuta"
+    },
+    "id-type": {
+      "card": "Asmens Dokumentas",
+      "passport": "Pasas"
+    },
+    "measurement": {
+      "type": {
+        "code": "Kodas (Standartinis)",
+        "other": "Kita"
+      },
+      "unit": {
+        "120": "Maksimali mažmeninė kaina",
+        "ASV": "% vol",
+        "CEN": "Šimtas vienetų",
+        "GRM": "Gramas",
+        "HLT": "Hektolitras",
+        "KGM": "Kilogramas",
+        "KLT": "1000 litrų",
+        "LPA": "1 litras gryno (100%) alk.",
+        "LTR": "Litras",
+        "MIL": "1000 vienetų",
+        "NAR": "Vienetų skaičius",
+        "NPR": "Porų skaičius"
+      }
+    },
+    "not-provided": "Nepateikta",
+    "payment-type": {
+      "cash": "Grynais",
+      "bank": "Bankinis pavedimas",
+      "other": "Kita"
+    },
+    "state": {
+      "enabled": "Įjungta",
+      "disabled": "Išjungta",
+      "optional": "Neprivaloma",
+      "required": "Privaloma"
+    },
+    "time": {
+      "just-now": "Ką tik",
+      "less-than-hour-ago": "Prieš mažiau nei valandą",
+      "some-time-ago": "Jau kurį laiką"
+    },
+    "user": {
+      "role": {
+        "admin": "Administratorius",
+        "user": "Naudotojas"
+      }
+    }
+  },
+  "page": {
+    "admin": {
+      "sidebar": {
+        "actions": "Administravimo veiksmai",
+        "name": "Administravimo skydelis",
+        "route": {
+          "users": "Naudotojai"
+        }
+      }
+    },
+    "auth": {
+      "description": "Prisijunkite, kad galėtumėte naudotis sistema",
+      "title": "Sveiki atvykę į Bapsk"
+    },
+    "authenticated-layout": {
+      "header": {
+        "route": {
+          "admin": "Admin",
+          "instances": "Egzemplioriai",
+          "workspace": "Darbo aplinka"
+        },
+        "title": "Bapsk"
+      }
+    },
+    "customer": {
+      "button": {
+        "create": "Sukurti klientą",
+        "delete": "Ištrinti",
+        "edit": "Redaguoti",
+        "preview": "Peržiūrėti"
+      },
+      "confirm-delete": "Ar tikrai norite ištrinti šį klientą?",
+      "description": "Tvarkykite klientus — kurkite, peržiūrėkite, redaguokite ar trinkite.",
+      "header": {
+        "birthdate": "Gimimo data",
+        "email": "El. paštas",
+        "first-name": "Vardas",
+        "identity-document": "Asmens dokumentas",
+        "last-name": "Pavardė",
+        "personal-code": "Asmens kodas",
+        "reside-in": "Gyvena"
+      },
+      "title": "Klientai"
+    },
+    "customer-management": {
+      "button": {
+        "create": "Sukurti",
+        "save": "Išsaugoti",
+        "submit": "Pateikti"
+      },
+      "description": "Užpildykite formą, norėdami sukurti naują klientą arba redaguoti esamą.",
+      "details": {
+        "description": "Šio kliento informacija. Jei nurodytas el. paštas – naudotojas gali gauti informaciją apie pardavimus.",
+        "input": {
+          "birthdate": "Gimimo data",
+          "email": "El. paštas",
+          "first-name": "Vardas",
+          "last-name": "Pavardė",
+          "residence-country": "Gyvenamoji šalis"
+        },
+        "title": "Informacija"
+      },
+      "identity-document": {
+        "description": "Informacija apie šio kliento asmens dokumentą.",
+        "input": {
+          "issued-by": "Išdavė",
+          "number": "Numeris",
+          "type": "Tipas",
+          "value": "Reikšmė (asmens kodas)"
+        },
+        "title": "Asmens dokumentas"
+      },
+      "other-documents": {
+        "button": {
+          "add": "Pridėti dokumentą",
+          "remove": "Pašalinti"
+        },
+        "description": "Šie dokumentai padeda muitinei nustatyti ar klientas gyvena už ES ribų.",
+        "input": {
+          "issued-by": "Išdavė",
+          "type": "Tipas",
+          "value": "Reikšmė"
+        },
+        "title": "Kiti dokumentai"
+      },
+      "title": "Tvarkyti klientą"
+    },
+    "customer-preview": {
+      "description": "Unikalaus kliento įrašo peržiūra.",
+      "details": {
+        "description": "Konkretaus kliento detalės.",
+        "label": {
+          "birthdate": "Gimimo data",
+          "email": "El. paštas",
+          "first-name": "Vardas",
+          "id": "ID",
+          "last-name": "Pavardė",
+          "residence-country": "Gyvenamoji šalis"
+        },
+        "title": "Informacija"
+      },
+      "identity-document": {
+        "description": "Informacija apie šio kliento asmens dokumentą.",
+        "label": {
+          "issued-by": "Išdavė",
+          "number": "Numeris",
+          "type": "Tipas",
+          "value": "Reikšmė (asmens kodas)"
+        },
+        "title": "Asmens dokumentas"
+      },
+      "other-documents": {
+        "description": "Šie dokumentai padeda muitinei nustatyti ar klientas gyvena už ES ribų.",
+        "header": {
+          "issued-by": "Išdavė",
+          "type": "Tipas",
+          "value": "Reikšmė"
+        },
+        "title": "Kiti dokumentai"
+      },
+      "title": "Klientas"
+    },
+    "data-entry": {
+      "button": {
+        "create": "Sukurti „{{name}}“",
+        "generate": "Generuoti ataskaitą",
+        "import": "Importuoti",
+        "import-configurations": "Rodyti konfigūracijas",
+        "report-templates": "Rodyti šablonus"
+      },
+      "confirm-delete": "Ar tikrai norite ištrinti šį įrašą?",
+      "description": "Tvarkykite įrašus — kurkite, peržiūrėkite, redaguokite ar trinkite.",
+      "dialog": {
+        "import": {
+          "header": "Importuoti įrašus"
+        }
+      },
+      "title": "Duomenų įrašai"
+    },
+    "data-entry-management": {
+      "button": {
+        "create": "Sukurti",
+        "save": "Išsaugoti",
+        "submit": "Pateikti"
+      },
+      "description": "Užpildykite formą, kad sukurtumėte naują „{{name}}“ arba redaguotumėte esamą.",
+      "title": "Tvarkyti „{{name}}“"
+    },
+    "data-entry-preview": {
+      "description": "Unikalaus „{{name}}“ įrašo peržiūra.",
+      "details": {
+        "description": "Šio konkretaus įrašo detalės.",
+        "label": {
+          "display": "Atvaizduojamas kaip",
+          "id": "ID",
+          "created-at": "Sukurta",
+          "created-by": "Sukūrė",
+          "modified-at": "Pakeista",
+          "modified-by": "Pakeitė"
+        },
+        "title": "Informacija"
+      },
+      "values": {
+        "description": "Šio konkretaus įrašo laukų reikšmės.",
+        "title": "Reikšmės"
+      },
+      "title": "{{name}}"
+    },
+    "data-type": {
+      "button": {
+        "create": "Sukurti duomenų tipą",
+        "delete": "Ištrinti",
+        "edit": "Redaguoti",
+        "import-configurations": "Rodyti importavimo konfigūracijas",
+        "preview": "Peržiūrėti",
+        "report-templates": "Rodyti ataskaitų šablonus"
+      },
+      "confirm-delete": "Ar tikrai norite ištrinti šį duomenų tipą?",
+      "description": "Tvarkykite savo duomenų tipus – kurkite, peržiūrėkite, redaguokite arba ištrinkite.",
+      "header": {
+        "description": "Aprašymas",
+        "fields": "Laukai",
+        "name": "Pavadinimas"
+      },
+      "title": "Duomenų tipai"
+    },
+    "data-type-management": {
+      "button": {
+        "create": "Sukurti",
+        "save": "Išsaugoti",
+        "submit": "Pateikti"
+      },
+      "description": "Užpildykite formą naujo tipo kūrimui arba esamo redagavimui.",
+      "details": {
+        "description": "Šio duomenų tipo informacija.",
+        "input": {
+          "description": "Aprašymas",
+          "display-field": "Rodomas laukas",
+          "name": "Pavadinimas"
+        },
+        "title": "Informacija"
+      },
+      "fields": {
+        "button": {
+          "add": "Pridėti lauką",
+          "remove": "Pašalinti"
+        },
+        "description": "Šio duomenų tipo laukai.",
+        "header": {
+          "default-value": "Numatyta reikšmė",
+          "name": "Pavadinimas",
+          "referenced-type": "Susietas tipas",
+          "required": "Privalomas",
+          "type": "Tipas"
+        },
+        "placeholder": {
+          "type": "Pasirinkite tipą",
+          "referenced-type": "Pasirinkite susietą tipą"
+        },
+        "title": "Laukai"
+      },
+      "title": "Tvarkyti duomenų tipą"
+    },
+    "data-type-preview": {
+      "description": "Unikalaus „{{name}}“ tipo peržiūra.",
+      "details": {
+        "description": "Šio konkretaus tipo informacija.",
+        "label": {
+          "description": "Aprašymas",
+          "display-field": "Rodomas laukas",
+          "id": "ID",
+          "name": "Pavadinimas"
+        },
+        "title": "Informacija"
+      },
+      "fields": {
+        "description": "Šio duomenų tipo laukai.",
+        "header": {
+          "default-value": "Numatyta reikšmė",
+          "name": "Pavadinimas",
+          "required": "Privalomas",
+          "type": "Tipas"
+        },
+        "label": {
+          "referenced-type": "Susietas tipas"
+        },
+        "title": "Laukai"
+      },
+      "title": "{{name}}"
+    },
+    "declaration-preview": {
+      "button": {
+        "cancel": "Atšaukti",
+        "refresh": "Atnaujinti"
+      },
+      "confirm-cancel": "Ar tikrai norite atšaukti šią deklaraciją?",
+      "declaration": {
+        "description": "Šio pardavimo deklaracijos detalės.",
+        "label": {
+          "corrections": "Pataisos nr.",
+          "date": "Pateikimo data",
+          "declared-by": "Deklaravo",
+          "id": "Deklaracijos ID",
+          "state": "Būsena"
+        },
+        "title": "Deklaracijos informacija"
+      },
+      "export": {
+        "assessment-conditions": {
+          "title": "Vertinimo sąlygos"
+        },
+        "description": "Eksporto detalės apie prekių išvežimą per muitinę.",
+        "label": {
+          "assessment-date": "Vertinimo data",
+          "assessment-declaration-corrections": "Vertinta pagal pataisos nr.",
+          "correction-date": "Pataisos data",
+          "customs-code": "Muitinės kodas",
+          "verification-date": "Patvirtinimo data",
+          "verification-result": "Patvirtinimo rezultatas"
+        },
+        "payment": {
+          "declaration-cancelled": "Kadangi deklaracija atšaukta, mokėjimo faktas negali būti pateiktas.",
+          "description": "Klientui sumokėtas (grąžintas) PVM.",
+          "title": "PVM grąžinimas"
+        },
+        "title": "Eksporto informacija",
+        "verified-sold-goods": {
+          "description": "Šios prekės buvo eksportuotos iš šalies.",
+          "header": {
+            "measure-unit": "Matavimo vienetas",
+            "quantity": "Kiekis",
+            "sequence-no": "Eilės nr.",
+            "total-amount": "Suma",
+            "verified-quantity": "Patvirtintas kiekis"
+          },
+          "title": "Patvirtintos prekės"
+        }
+      },
+      "invalid": {
+        "description": "<p>Atsiprašome, šios deklaracijos peržiūros puslapio užklausa negalioja. Patikrinkite nuorodą ir bandykite dar kartą.</p><p>Jei problema išlieka – susisiekite su konsultantais.</p>",
+        "title": "Neteisinga deklaracija"
+      },
+      "qr-codes": {
+        "qr-alt": "Deklaracijos #{{index}} QR kodo dalis",
+        "title": "QR kodai"
+      },
+      "sale": {
+        "description": "Šio pardavimo detalės.",
+        "label": {
+          "customer": "Klientas",
+          "salesman": "Pardavėjas",
+          "sold-goods": "Parduotos prekės",
+          "vat": "Grąžintinas PVM"
+        },
+        "title": "Pardavimo informacija"
+      },
+      "sold-goods": {
+        "description": "Prekės parduotos šio pardavimo metu.",
+        "header": {
+          "description": "Aprašymas",
+          "measure-unit": "Matavimo vienetas",
+          "quantity": "Kiekis",
+          "sequence-no": "Eilės nr.",
+          "unit-price": "Vieneto kaina",
+          "total-amount": "Suma",
+          "vat-amount": "PVM suma"
+        },
+        "title": "Parduotos prekės"
+      },
+      "submit": {
+        "description": "Pateikite arba naujai pateikite PVM deklaraciją.",
+        "not-submitted": "Šis pardavimas neturi pateiktos deklaracijos.",
+        "title": "Pateikti deklaraciją"
+      }
+    },
+    "home": {
+      "description": "Bapsk – paprastas, bet naudingas įrankis verslo apskaitos ir finansų valdymui. Lengvai sekite duomenis, generuokite ataskaitas ir teikite PVM grąžinimus užsienio klientams. Norite sužinoti daugiau? Pradėkime!",
+      "faq": {
+        "data": {
+          "0": {
+            "question": "Kokia šios programos paskirtis?",
+            "answer": "Programa padeda paprastai ir efektyviai valdyti verslo duomenis. Tai ne Notepad ar TODO alternatyva. Ji suteikia struktūrizuotą būdą kurti duomenų tipus, importuoti failus, generuoti ataskaitas ir teikti PVM grąžinimus."
+          },
+          "1": {
+            "question": "Kaip sukurti naują darbo aplinką?",
+            "answer": "Eikite į egzempliorių skyrių ir spauskite mygtuką „Sukurti egzempliorių“."
+          },
+          "2": {
+            "question": "Ar galiu pakviesti komandą bendradarbiauti?",
+            "answer": "Taip, galite pakviesti komandos narius redaguodami egzempliorių ir siųsdami kvietimus el. paštu."
+          },
+          "3": {
+            "question": "Kaip apibrėžti duomenų struktūrą?",
+            "answer": "Savo darbo aplinkoje kurkite duomenų tipus skyriuje „Duomenų tipai“."
+          },
+          "4": {
+            "question": "Kaip importuoti duomenis iš failų?",
+            "answer": "Sukurkite importo konfigūraciją skyriuje „Importo konfigūracijos“ ir naudokite ją CSV failų importui."
+          },
+          "5": {
+            "question": "Kaip generuoti ataskaitas?",
+            "answer": "Sukurkite ataskaitos šabloną skyriuje „Ataskaitų šablonai“ ir naudokite jį ataskaitų generavimui pagal duomenų įrašus."
+          },
+          "6": {
+            "question": "Kaip pateikti PVM grąžinimus?",
+            "answer": "Tik naudojant iš anksto apibrėžtus klientų, pardavėjų ir pardavimų tipus. Sukurkite pardavimą ir pateikite PVM deklaraciją. PVM grąžinimas veikia tik Lietuvoje."
+          },
+          "7": {
+            "question": "Ar yra ribojimų įrašų kiekiui?",
+            "answer": "Ne, galite kurti tiek įrašų, kiek norite."
+          },
+          "8": {
+            "question": "Ar tai ne per daug sudėtinga?",
+            "answer": "Iš pradžių gali atrodyti, bet pripratę suprasite, kad procesas yra paprastas ir efektyvus. Kiekvienas proceso žingsnis - aiškus."
+          }
+        },
+        "description": "Dažniausiai užduodami klausimai apie Bapsk naudojimą.",
+        "title": "DUK"
+      },
+      "getting-started": {
+        "data": {
+          "0": {
+            "title": "Sukurkite darbo aplinką",
+            "description": "Čia valdysite savo verslo duomenis."
+          },
+          "1": {
+            "title": "Pakvieskite komandą",
+            "description": "Bendradarbiaukite su komanda ir dalinkitės egzemplioriumi."
+          },
+          "2": {
+            "title": "Apibrėžkite duomenis",
+            "description": "Kurkite duomenų tipus (šablonus) naudojant pasirinktinus laukų tipus."
+          },
+          "3": {
+            "title": "Kurkite duomenų įrašus",
+            "description": "Pradėkite pildyti duomenis pagal duomenų tipus."
+          },
+          "4": {
+            "title": "Sukonfigūruokite importą",
+            "description": "Importui iš failų naudokite CSV formatą."
+          },
+          "5": {
+            "title": "Sukurkite ataskaitos šabloną",
+            "description": "Lengviau atlikite duomenų peržiūrą laiko intervale."
+          },
+          "6": {
+            "title": "Importuokite duomenis",
+            "description": "Naudokite importo konfigūraciją failų importui."
+          },
+          "7": {
+            "title": "Kurti pardavimus",
+            "description": "Sukurkite pardavimus PVM grąžinimui."
+          },
+          "8": {
+            "title": "Pateikite PVM deklaraciją",
+            "description": "Pateikite TaxFree deklaraciją PVM grąžinimui."
+          },
+          "9": {
+            "title": "Generuokite ataskaitą",
+            "description": "Generuokite ir eksportuokite ataskaitas."
+          }
+        },
+        "description": "Pažiūrėkime kaip pradėti naudotis Bapsk visu pajėgumu.",
+        "title": "Pradžia"
+      },
+      "support": {
+        "description": "Reikia pagalbos? Susisiekite su mumis.",
+        "email": "Spauskite norėdami parašyti el. laišką",
+        "here-to-help": "Esame čia, kad padėtume visais klausimais.",
+        "title": "Pagalba (Konsultacija)"
+      },
+      "title": "Sveiki atvykę į Bapsk"
+    },
+    "import-configuration": {
+      "button": {
+        "create": "Sukurti importo konfigūraciją",
+        "delete": "Ištrinti",
+        "edit": "Redaguoti",
+        "preview": "Peržiūrėti"
+      },
+      "confirm-delete": "Ar tikrai norite ištrinti šią importo konfigūraciją?",
+      "description": "Tvarkykite savo importo konfigūracijas – kurkite, peržiūrėkite, redaguokite ar ištrinkite.",
+      "header": {
+        "data-type": "Duomenų tipas",
+        "fields": "Laukai",
+        "name": "Pavadinimas"
+      },
+      "title": "Importo konfigūracijos"
+    },
+    "import-configuration-management": {
+      "button": {
+        "create": "Sukurti",
+        "move-down": "Žemyn",
+        "move-up": "Aukštyn",
+        "save": "Išsaugoti",
+        "submit": "Pateikti"
+      },
+      "description": "Užpildykite formą naujai importo konfigūracijai sukurti arba esamai redaguoti.",
+      "fields": {
+        "description": "Importo konfigūracijos laukai nurodyta tvarka su numatytmis reikšmėmis.",
+        "header": {
+          "default": "Numatyta reikšmė",
+          "name": "Pavadinimas",
+          "order": "Tvarka"
+        },
+        "input": {
+          "referenced-entry": "Pasirinkite susietą įrašą"
+        },
+        "title": "Laukai"
+      },
+      "input": {
+        "data-type": "Duomenų tipas",
+        "name": "Pavadinimas"
+      },
+      "title": "Tvarkyti importo konfigūraciją"
+    },
+    "import-configuration-preview": {
+      "description": "Unikalios importo konfigūracijos peržiūra.",
+      "details": {
+        "description": "Šios importo konfigūracijos informacija.",
+        "label": {
+          "data-type": "Duomenų tipas",
+          "id": "ID",
+          "name": "Pavadinimas"
+        },
+        "title": "Informacija"
+      },
+      "example": {
+        "description": "CSV formato pavyzdys pagal šią importo konfigūraciją.",
+        "title": "CSV formato pavyzdys"
+      },
+      "fields": {
+        "description": "Šios importo konfigūracijos laukai.",
+        "header": {
+          "default": "Numatyta reikšmė",
+          "name": "Pavadinimas",
+          "order": "Tvarka"
+        },
+        "title": "Laukai"
+      },
+      "title": "{{name}}"
+    },
+    "instance": {
+      "button": {
+        "create": "Sukurti egzempliorių",
+        "delete": "Ištrinti",
+        "edit": "Redaguoti",
+        "preview": "Peržiūrėti"
+      },
+      "confirm-delete": "Ar tikrai norite ištrinti šį egzempliorių?",
+      "description": "Tvarkykite egzempliorius – kurkite, peržiūrėkite, redaguokite ar ištrinkite.",
+      "header": {
+        "created-at": "Sukurtas",
+        "description": "Aprašymas",
+        "last-activity": "Paskutinis aktyvumas",
+        "name": "Pavadinimas",
+        "owner": "Savininkas",
+        "users": "Nariai"
+      },
+      "title": "Egzemplioriai"
+    },
+    "instance-management": {
+      "button": {
+        "add": "Pridėti narį",
+        "create": "Sukurti",
+        "remove": "Pašalinti narį",
+        "save": "Išsaugoti",
+        "submit": "Pateikti"
+      },
+      "description": "Užpildykite formą, norėdami sukurti naują egzempliorių arba redaguoti esamą.",
+      "input": {
+        "description": "Aprašymas",
+        "name": "Pavadinimas"
+      },
+      "title": "Tvarkyti egzempliorių",
+      "members": {
+        "badge": {
+          "all-granted": "Savininkas. Visi leidimai."
+        },
+        "button": {
+          "modify-permissions": "Keisti leidimus"
+        },
+        "description": "Šio egzemplioriaus nariai. Galite valdyti jų prieigos teises.",
+        "dialog": {
+          "permissions": {
+            "title": "{{name}} leidimai"
+          }
+        },
+        "header": {
+          "email": "El. paštas",
+          "name": "Vardas",
+          "permissions": "Leidimai",
+          "since": "Narys nuo"
+        },
+        "input": {
+          "email": "El. paštas"
+        },
+        "title": "Nariai"
+      }
+    },
+    "instance-preview": {
+      "description": "Unikalaus egzemplioriaus peržiūra.",
+      "details": {
+        "description": "Šio egzemplioriaus informacija.",
+        "label": {
+          "created-at": "Sukurtas",
+          "description": "Aprašymas",
+          "id": "ID",
+          "name": "Pavadinimas",
+          "owner": "Savininkas"
+        },
+        "title": "Informacija"
+      },
+      "title": "{{name}}",
+      "members": {
+        "badge": {
+          "view-permissions": "Rodyti {{count}}"
+        },
+        "description": "Šio egzemplioriaus nariai.",
+        "dialog": {
+          "permissions": {
+            "title": "{{name}} leidimai"
+          }
+        },
+        "header": {
+          "data-entries-created": "Sukurti įrašai",
+          "email": "El. paštas",
+          "name": "Vardas",
+          "permissions": "Leidimai"
+        },
+        "title": "Nariai"
+      }
+    },
+    "not-found": {
+      "description": "Deja, puslapis buvo perkeltas arba nuoroda neteisinga.",
+      "redirect-in": "Jūs būsite nukreipti į pradžią po {{seconds}} sek...",
+      "title": "Oops!",
+      "title-2": "Puslapis nerastas"
+    },
+    "profile": {
+      "description": "Tai jūsų profilis. Nepamirškite saugoti slaptažodžio ir retkarčiais jį keisti. Taip pat galite atšaukti neaktyvias ar įtartinas sesijas.",
+      "title": "Profilis"
+    },
+    "report-generate": {
+      "description": "Generuokite ataskaitą pagal pasirinktą šabloną ir laikotarpį. Galite eksportuoti .csv arba .pdf formatu.",
+      "generation": {
+        "description": "Pasirinkite ataskaitos tipą – duomenų įrašų arba pardavimų – ir užpildykite privalomus laukus.",
+        "title": "Ataskaitos generavimas"
+      },
+      "title": "Generuoti ataskaitą"
+    },
+    "report-preview": {
+      "button": {
+        "export-csv": "Eksportuoti CSV",
+        "export-pdf": "Eksportuoti PDF"
+      },
+      "entries": {
+        "description": "Čia rodomi ataskaitos įrašai. Juos galima eksportuoti į CSV.",
+        "title": "Ataskaitos įrašai"
+      },
+      "info": {
+        "description": "Šiame skyriuje pateikiama ataskaitos informacija.",
+        "title": "Ataskaitos informacija"
+      },
+      "no-entries": {
+        "description": "Šioje ataskaitoje nėra įrašų.",
+        "title": "Nėra įrašų"
+      },
+      "no-reports": {
+        "description": "Deja, pagal šį šabloną nėra jokių ataskaitų.",
+        "title": "Ataskaitų nėra"
+      }
+    },
+    "report-template": {
+      "button": {
+        "create": "Sukurti ataskaitos šabloną",
+        "delete": "Ištrinti",
+        "edit": "Redaguoti",
+        "preview": "Peržiūrėti"
+      },
+      "confirm-delete": "Ar tikrai norite ištrinti šį ataskaitos šabloną?",
+      "description": "Tvarkykite ataskaitų šablonus – kurkite, peržiūrėkite, redaguokite ar ištrinkite.",
+      "header": {
+        "data-type": "Duomenų tipas",
+        "fields": "Laukai",
+        "name": "Pavadinimas"
+      },
+      "title": "Ataskaitų šablonai"
+    },
+    "report-template-management": {
+      "button": {
+        "create": "Sukurti",
+        "save": "Išsaugoti",
+        "submit": "Pateikti"
+      },
+      "description": "<p>Užpildykite formą naujam ataskaitos šablonui arba esamam redaguoti.</p><p>Šiuo metu vienas tipas gali turėti <strong>tik vieną</strong> šabloną.</p>",
+      "fields": {
+        "description": "Šio šablono laukai.",
+        "title": "Laukai"
+      },
+      "input": {
+        "data-type": "Duomenų tipas",
+        "name": "Pavadinimas"
+      },
+      "title": "Tvarkyti ataskaitos šabloną"
+    },
+    "report-template-preview": {
+      "description": "Unikalaus ataskaitos šablono peržiūra.",
+      "details": {
+        "description": "Šio konkretaus šablono informacija.",
+        "label": {
+          "data-type": "Duomenų tipas",
+          "fields": "Įtraukti laukai",
+          "id": "ID",
+          "name": "Pavadinimas"
+        },
+        "title": "Informacija"
+      },
+      "fields": {
+        "description": "Šio šablono laukai.",
+        "title": "Laukai"
+      },
+      "title": "{{name}}"
+    },
+    "reset-password": {
+      "button": {
+        "change": "Pakeisti slaptažodį"
+      },
+      "description": "Įveskite naują slaptažodį. Nuoroda galioja 10 minučių.",
+      "input": {
+        "confirm-password": "Patvirtinti slaptažodį",
+        "password": "Slaptažodis"
+      },
+      "invalid": {
+        "description": "Naudotoje nuorodoje trūksta žetono. Patikrinkite URL ir bandykite dar kartą.",
+        "title": "Sugedusi nuoroda"
+      },
+      "redirect": {
+        "login": "Eiti į prisijungimą"
+      },
+      "title": "Atstatyti slaptažodį"
+    },
+    "sale": {
+      "button": {
+        "create": "Sukurti pardavimą",
+        "vat-management": "Tvarkyti PVM deklaraciją",
+        "delete": "Ištrinti",
+        "edit": "Redaguoti",
+        "preview": "Peržiūrėti"
+      },
+      "confirm-delete": "Ar tikrai norite ištrinti šį pardavimą?",
+      "description": "Tvarkykite pardavimus — kurkite, peržiūrėkite, redaguokite ar ištrinkite.",
+      "header": {
+        "customer": "Klientas",
+        "date": "Pardavimo data",
+        "returnable-vat": "Grąžintinas PVM",
+        "salesman": "Pardavėjas",
+        "sold-goods": "Parduotos prekės",
+        "total-price": "Bendra suma",
+        "vat": "PVM deklaracija"
+      },
+      "receipt-type": {
+        "invoice": "Sąskaita-faktūra",
+        "receipt": "Kvitas"
+      },
+      "title": "Pardavimai"
+    },
+    "sale-management": {
+      "button": {
+        "create": "Sukurti",
+        "save": "Išsaugoti",
+        "submit": "Pateikti"
+      },
+      "description": "Užpildykite formą naujam pardavimui sukurti arba esamam redaguoti.",
+      "details": {
+        "description": "Klientas, pardavėjas ir pardavimo data.",
+        "input": {
+          "customer": "Klientas",
+          "date": "Data",
+          "salesman": "Pardavėjas"
+        },
+        "title": "Informacija"
+      },
+      "receipt": {
+        "description": "Pasirinkite kvito tipą. Jei naudotas kasos aparatas – nurodykite kvito ir aparato numerį.",
+        "input": {
+          "cash-register-no": "Kasos aparato nr.",
+          "invoice-no": "Sąskaitos-faktūros nr.",
+          "receipt-no": "Kvito nr.",
+          "type": "Kvito tipas"
+        },
+        "title": "Pardavimo kvitas"
+      },
+      "sold-goods": {
+        "button": {
+          "add": "Pridėti prekę",
+          "remove": "Pašalinti prekę"
+        },
+        "description": "Parduotos prekės. Įsitikinkite, kad kiekiai ir matavimo vienetai teisingi.",
+        "input": {
+          "description": "Aprašymas",
+          "measure-type": "Matavimo tipas",
+          "measure-unit": "Matavimo vienetas",
+          "quantity": "Kiekis",
+          "unit-price": "Vieneto kaina",
+          "vat-rate": "PVM tarifas (%)"
+        },
+        "title": "Parduotos prekės"
+      },
+      "title": "Tvarkyti pardavimą"
+    },
+    "sale-preview": {
+      "description": "Unikalaus pardavimo peržiūra.",
+      "details": {
+        "description": "Šio pardavimo detalės.",
+        "label": {
+          "cash-register-no": "Kasos aparato nr.",
+          "customer": "Klientas",
+          "date": "Data",
+          "id": "ID",
+          "invoice-no": "Sąskaitos-faktūros nr.",
+          "receipt-no": "Kvito nr.",
+          "salesman": "Pardavėjas"
+        },
+        "title": "Informacija"
+      },
+      "sold-goods": {
+        "description": "Prekės parduotos klientui.",
+        "header": {
+          "description": "Aprašymas",
+          "measure-unit": "Matavimo vienetas",
+          "quantity": "Kiekis",
+          "sequence-no": "Eilės nr.",
+          "unit-price": "Vieneto kaina",
+          "total-amount": "Suma",
+          "vat-amount": "PVM suma"
+        },
+        "title": "Parduotos prekės"
+      },
+      "title": "Pardavimas"
+    },
+    "salesman": {
+      "button": {
+        "create": "Sukurti pardavėją",
+        "delete": "Ištrinti",
+        "edit": "Redaguoti",
+        "preview": "Peržiūrėti"
+      },
+      "confirm-delete": "Ar tikrai norite ištrinti šį pardavėją?",
+      "description": "Tvarkykite pardavėjus — kurkite, peržiūrėkite, redaguokite ar ištrinkite.",
+      "header": {
+        "vat-code-issued-by": "PVM mokėtojo kodo išdavėjas",
+        "customers-served": "Aptarnauti klientai",
+        "name": "Vardas",
+        "vat-payer-code": "PVM mokėtojo kodas"
+      },
+      "title": "Pardavėjai"
+    },
+    "salesman-management": {
+      "button": {
+        "create": "Sukurti",
+        "save": "Išsaugoti",
+        "submit": "Pateikti"
+      },
+      "description": "Užpildykite formą naujam pardavėjui sukurti arba esamam redaguoti.",
+      "input": {
+        "name": "Vardas"
+      },
+      "vat": {
+        "description": "Pardavėjo PVM mokėtojo duomenys. Norint naudoti PVM grąžinimą, privalomas lietuviškas PVM kodas.",
+        "input": {
+          "code": "Kodas",
+          "issued-by": "Išdavė"
+        },
+        "title": "PVM mokėtojo kodas"
+      },
+      "title": "Tvarkyti pardavėją"
+    },
+    "salesman-preview": {
+      "description": "Unikalaus pardavėjo peržiūra.",
+      "details": {
+        "description": "Šio pardavėjo detalės.",
+        "label": {
+          "id": "ID",
+          "name": "Vardas"
+        },
+        "title": "Informacija"
+      },
+      "title": "Pardavėjas",
+      "vat": {
+        "description": "PVM mokėtojo informacija.",
+        "label": {
+          "code": "Kodas",
+          "issued-by": "Išdavė"
+        },
+        "title": "PVM mokėtojo kodas"
+      }
+    },
+    "user": {
+      "button": {
+        "create": "Sukurti naudotoją",
+        "delete": "Ištrinti",
+        "edit": "Redaguoti",
+        "preview": "Peržiūrėti"
+      },
+      "confirm-delete": "Ar tikrai norite ištrinti šį naudotoją?",
+      "description": "Tvarkykite naudotojus — kurkite, peržiūrėkite, redaguokite ar ištrinkite.",
+      "header": {
+        "birthdate": "Gimimo data",
+        "country": "Šalis",
+        "email": "El. paštas",
+        "name": "Vardas"
+      },
+      "title": "Naudotojai"
+    },
+    "user-management": {
+      "button": {
+        "create": "Sukurti",
+        "save": "Išsaugoti",
+        "submit": "Pateikti"
+      },
+      "description": "Užpildykite formą naujam naudotojui registruoti arba esamam redaguoti.",
+      "input": {
+        "birthdate": "Gimimo data",
+        "country": "Šalis",
+        "email": "El. paštas",
+        "first-name": "Vardas",
+        "last-name": "Pavardė",
+        "password": "Slaptažodis"
+      },
+      "title": "Tvarkyti naudotoją"
+    },
+    "user-preview": {
+      "description": "Unikalaus naudotojo peržiūra.",
+      "details": {
+        "description": "Šio naudotojo informacija.",
+        "label": {
+          "birthdate": "Gimimo data",
+          "country": "Šalis",
+          "email": "El. paštas",
+          "id": "ID",
+          "name": "Vardas"
+        },
+        "title": "Informacija"
+      },
+      "title": "Naudotojas"
+    },
+    "workspace": {
+      "button": {
+        "change": "Keisti darbo aplinką"
+      },
+      "dialog": {
+        "workspace": {
+          "title": "Pasirinkite darbo aplinką"
+        }
+      },
+      "sidebar": {
+        "name": "Darbo aplinkos meniu",
+        "route": {
+          "data-types": "Duomenų tipai",
+          "generate-report": "Generuoti ataskaitą",
+          "import-configurations": "Importo konfigūracijos",
+          "report-templates": "Ataskaitų šablonai"
+        },
+        "vat": {
+          "name": "PVM grąžinimai",
+          "route": {
+            "customers": "Klientai",
+            "salesmen": "Pardavėjai",
+            "sales": "Pardavimai"
+          }
+        },
+        "data-entries": {
+          "name": "Duomenų tipų įrašai",
+          "no-entries": "Nėra sukurtų duomenų tipų. Sukurkite, kad pridėtumėte įrašų."
+        }
+      }
+    }
+  }
+}

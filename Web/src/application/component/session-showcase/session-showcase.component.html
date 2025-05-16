@@ -1,0 +1,66 @@
+<confirmation key="session-revokation" [summary]="'component.session-showcase.confirm-revokation' | translate"/>
+<card>
+  <p card-header>{{ 'component.session-showcase.title' | translate }}</p>
+  <div card-subHeader class="flex flex-col" [innerHtml]="'component.session-showcase.description' | translate"></div>
+  <p-table card-body paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]"
+           [value]="sessions.value() || []" sortMode="multiple">
+    <ng-template #header>
+      <tr>
+        <th pSortableColumn="agent">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-0.5">
+              {{ 'component.session-showcase.header.agent' | translate }}
+              <p-sortIcon field="agent"/>
+            </div>
+            <p-columnFilter type="text" field="agent" display="menu"/>
+          </div>
+        </th>
+        <th pSortableColumn="createdAt">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-0.5">
+              {{ 'component.session-showcase.header.created-at' | translate }}
+              <p-sortIcon field="createdAt"/>
+            </div>
+            <p-columnFilter type="date" field="createdAt" display="menu"/>
+          </div>
+        </th>
+        <th>{{ 'component.session-showcase.header.active-time' | translate }}</th>
+        <th pSortableColumn="ipAddress">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-0.5">
+              {{ 'component.session-showcase.header.ip-address' | translate }}
+              <p-sortIcon field="ipAddress"/>
+            </div>
+            <p-columnFilter type="text" field="ipAddress" display="menu"/>
+          </div>
+        </th>
+        <th pSortableColumn="location">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-0.5">
+              {{ 'component.session-showcase.header.location' | translate }}
+              <p-sortIcon field="location"/>
+            </div>
+            <p-columnFilter type="text" field="location" display="menu"/>
+          </div>
+        </th>
+        <th></th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-session>
+      <tr>
+        <td class="max-w-64">{{ session.agent }}</td>
+        <td>{{ session.createdAt | date: 'medium' }}</td>
+        <td>{{ getActiveTime(session) }}</td>
+        <td>{{ session.ipAddress }}</td>
+        <td>{{ session.location }}</td>
+        <td>
+          <div class="flex items-center">
+            <p-button [title]="'component.session-showcase.button.revoke' | translate"
+                      [disabled]="session.id === currentSessionId.value()" icon="pi pi-ban" type="button" variant="text"
+                      (onClick)="revoke(session)"/>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</card>

@@ -1,0 +1,265 @@
+<div class="h-full w-full relative container mx-auto flex flex-col">
+  <sale-page-header-section [canGoBack]="true"/>
+  @if (sale.isLoading() || declaration.isLoading()) {
+    <loading-spinner/>
+  } @else if (saleId() && !sale.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    <confirmation key="cancel-confirmation" [summary]="'page.declaration-preview.confirm-cancel' | translate"/>
+    <div class="flex flex-col gap-4">
+      <!-- Row of actions -->
+      <div class="flex flex-wrap gap-2">
+        @if (!declaration.value()!.export && declaration.value() && !declaration.value()!.isCancelled) {
+          <p-button [title]="'page.declaration-preview.button.refresh' | translate" icon="pi pi-refresh"
+                    [label]="'page.declaration-preview.button.refresh' | translate" (click)="refresh()" size="small"
+                    [disabled]="isRefreshing()"/>
+          <p-button [title]="'page.declaration-preview.button.cancel' | translate" size="small" icon="pi pi-ban"
+                    [label]="'page.declaration-preview.button.cancel' | translate" (click)="cancel()" [disabled]="isCancelling()"
+                    severity="danger"/>
+        }
+      </div>
+
+      @let hasCorrection = (declaration.value()?.correction || 0) > 1;
+      <div class="flex flex-col md:flex-row gap-4">
+        <!-- Declaration -->
+        @if (declaration.value()) {
+          <card class="flex-1" [class.min-h-62]="hasCorrection">
+            <p card-header>{{ 'page.declaration-preview.declaration.title' | translate }}</p>
+            <p card-subHeader>{{ 'page.declaration-preview.declaration.description' | translate }}</p>
+            <div card-body>
+              <p class="text-lg">
+                <strong>{{ 'page.declaration-preview.declaration.label.id' | translate }}</strong>
+                {{ declaration.value()!.id }}
+              </p>
+              <p class="text-lg">
+                <strong>{{ 'page.declaration-preview.declaration.label.declared-by' | translate }}</strong>
+                {{ toUserIdentityFullName(declaration.value()!.declaredBy) }}
+              </p>
+              <p class="text-lg">
+                <strong>{{ 'page.declaration-preview.declaration.label.date' | translate }}</strong>
+                {{ declaration.value()!.submitDate | date:'medium' }}
+              </p>
+              <p class="text-lg">
+                <strong>{{ 'page.declaration-preview.declaration.label.state' | translate }}</strong>
+                @let vatState = toSubmitDeclarationStateInfo(declaration.value());
+                <p-badge class="ml-1" [value]="vatState.label | translate" [severity]="vatState.severity"/>
+              </p>
+              @if (hasCorrection) {
+                <p class="text-lg">
+                  <strong>{{ 'page.declaration-preview.declaration.label.corrections' | translate }}</strong>
+                  {{ declaration.value()!.correction }}
+                </p>
+              }
+            </div>
+          </card>
+        }
+
+        <!-- Sale -->
+        <card class="flex-1" [class.min-h-62]="hasCorrection">
+          <p card-header>{{ 'page.declaration-preview.sale.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.declaration-preview.sale.description' | translate }}</p>
+          <div card-body [class.md:mb-7]="hasCorrection">
+            @let saleValue = sale.value()!;
+            <p class="text-lg">
+              <strong>{{ 'page.declaration-preview.sale.label.customer' | translate }}</strong>
+              {{ toCustomerFullName(saleValue.customer) }}
+            </p>
+            <p class="text-lg">
+              <strong>{{ 'page.declaration-preview.sale.label.salesman' | translate }}</strong>
+              {{ saleValue.salesman.name }}
+            </p>
+            <p class="text-lg">
+              <strong>{{ 'page.declaration-preview.sale.label.sold-goods' | translate }}</strong>
+              {{ saleValue.soldGoods.length }} good(s)
+            </p>
+            <p class="text-lg">
+              <strong>{{ 'page.declaration-preview.sale.label.vat' | translate }}</strong>
+              {{ getVATToReturn(saleValue) | currency:'EUR':'symbol':'1.2-2' }}
+            </p>
+          </div>
+        </card>
+      </div>
+
+      @if (declaration.value()?.qrCodes?.length) {
+        <card-headless>
+          <p-accordion card-body>
+            <p-accordion-panel [value]="0">
+              <p-accordion-header>
+                <div class="flex items-center gap-3 w-full text-primary-950 dark:text-primary-50">
+                  <i class="pi pi-qrcode"></i>
+                  <span class="font-semibold">{{ 'page.declaration-preview.qr-codes.title' | translate }}</span>
+                </div>
+              </p-accordion-header>
+              <p-accordion-content>
+                <div class="flex flex-wrap gap-4 p-2">
+                  @for (qrCode of declaration.value()!.qrCodes; track $index; let i = $index) {
+                    <div class="flex justify-center w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
+                      <img [src]="'data:image/png;base64,' + qrCode"
+                           [alt]="'page.declaration-preview.qr-codes.qr-alt' | translate:{index: i+1}" class="w-48 h-48"/>
+                    </div>
+                  }
+                </div>
+              </p-accordion-content>
+            </p-accordion-panel>
+          </p-accordion>
+        </card-headless>
+      }
+
+      @if (sale.value()) {
+        <card>
+          <p card-header>{{ 'page.declaration-preview.sold-goods.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.declaration-preview.sold-goods.description' | translate }}</p>
+          <p-table card-body [value]="sale.value()!.soldGoods" paginatorDropdownAppendTo="body" [paginator]="true"
+                   [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+            <ng-template #header>
+              <tr>
+                <th class="text-left p-2">{{ 'page.declaration-preview.sold-goods.header.sequence-no' | translate }}</th>
+                <th class="text-left p-2">{{ 'page.declaration-preview.sold-goods.header.description' | translate }}</th>
+                <th class="text-left p-2">{{ 'page.declaration-preview.sold-goods.header.quantity' | translate }}</th>
+                <th class="text-left p-2">{{ 'page.declaration-preview.sold-goods.header.measure-unit' | translate }}</th>
+                <th class="text-left p-2">{{ 'page.declaration-preview.sold-goods.header.unit-price' | translate }}</th>
+                <th class="text-left p-2">{{ 'page.declaration-preview.sold-goods.header.vat-amount' | translate }}</th>
+                <th class="text-left p-2">{{ 'page.declaration-preview.sold-goods.header.total-amount' | translate }}</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-soldGood>
+              <tr>
+                <td class="p-2"><p class="text-right">{{ soldGood.sequenceNo }}</p></td>
+                <td class="p-2">{{ soldGood.description }}</td>
+                <td class="p-2"><p class="text-right">{{ soldGood.quantity }}</p></td>
+                <td class="p-2">{{ toMeasurementLabel(soldGood.unitOfMeasure) | translate }}</td>
+                <td class="p-2"><p class="text-right">{{
+                    soldGood.taxableAmount / soldGood.quantity | round:2 | currency:'EUR':'symbol':'1.2-2'
+                  }}</p></td>
+                <td class="p-2"><p
+                  class="text-right">{{ soldGood.vatAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}
+                  ({{ soldGood.vatRate | round:2 }}%)</p></td>
+                <td class="p-2"><p
+                  class="text-right">{{ soldGood.totalAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}</p>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </card>
+      }
+
+      @if (declaration.value()?.export) {
+        <card>
+          <p card-header>{{ 'page.declaration-preview.export.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.declaration-preview.export.description' | translate }}</p>
+          <div card-body class="flex flex-col gap-4">
+            <div class="mb-4">
+              <p class="text-lg">
+                <strong>{{ 'page.declaration-preview.export.label.assessment-date' | translate }}</strong>
+                {{ declaration.value()!.export!.assessmentDate | date:'medium' }}
+              </p>
+              <p class="text-lg">
+                <strong>{{ 'page.declaration-preview.export.label.assessment-declaration-corrections' | translate }}</strong>
+                {{ declaration.value()!.export!.declarationCorrectionNo }}
+              </p>
+              @if (declaration.value()!.export!.correctionDate) {
+                <p class="text-lg">
+                  <strong>{{ 'page.declaration-preview.export.label.correction-date' | translate }}</strong>
+                  {{ declaration.value()!.export!.correctionDate | date:'medium' }}
+                </p>
+              }
+              <p class="text-lg">
+                <strong>{{ 'page.declaration-preview.export.label.customs-code' | translate }}</strong>
+                {{ declaration.value()!.export!.customsOfficeCode }}
+              </p>
+              <p class="text-lg">
+                <strong>{{ 'page.declaration-preview.export.label.verification-date' | translate }}</strong>
+                {{ declaration.value()!.export!.verificationDate | date:'medium' }}
+              </p>
+              <p class="text-lg">
+                <strong>{{ 'page.declaration-preview.export.label.verification-result' | translate }}</strong>
+                {{ toExportResultLabel(declaration.value()!.export!.verificationResult) | translate }}
+              </p>
+              <p
+                class="text-lg font-bold mt-4">{{ 'page.declaration-preview.export.assessment-conditions.title' | translate }}</p>
+              <ul card-body class="space-y-1">
+                @for (condition of declaration.value()!.export!.conditions; track condition.code) {
+                  <li class="flex flex-row gap-1 items-center">
+                    <i class="pi pi-exclamation-circle" [pTooltip]="condition.description" tooltipPosition="top"></i>
+                    <p class="text-semibold">{{ condition.code }} - </p>
+                    <p-badge class="ml-0.5" [value]="('misc.condition.' + (condition.isMet ? 'met' : 'unmet')) | translate"
+                             [severity]="condition.isMet ? 'success' : 'danger'"/>
+                  </li>
+                }
+              </ul>
+            </div>
+
+            <card>
+              <p card-header>{{ 'page.declaration-preview.export.verified-sold-goods.title' | translate }}</p>
+              <p card-subHeader>{{ 'page.declaration-preview.export.verified-sold-goods.description' | translate }}</p>
+              <p-table card-body paginatorDropdownAppendTo="body" [value]="declaration.value()!.export!.verifiedSoldGoods"
+                       [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+                <ng-template #header>
+                  <tr>
+                    <th
+                      class="text-left p-2">{{ 'page.declaration-preview.export.verified-sold-goods.header.sequence-no' | translate }}
+                    </th>
+                    <th
+                      class="text-left p-2">{{ 'page.declaration-preview.export.verified-sold-goods.header.quantity' | translate }}
+                    </th>
+                    <th
+                      class="text-left p-2">{{ 'page.declaration-preview.export.verified-sold-goods.header.verified-quantity' | translate }}
+                    </th>
+                    <th
+                      class="text-left p-2">{{ 'page.declaration-preview.export.verified-sold-goods.header.measure-unit' | translate }}
+                    </th>
+                    <th
+                      class="text-left p-2">{{ 'page.declaration-preview.export.verified-sold-goods.header.total-amount' | translate }}
+                    </th>
+                  </tr>
+                </ng-template>
+                <ng-template #body let-verifiedGood>
+                  <tr>
+                    <td class="p-2"><p class="text-right">{{ verifiedGood.sequenceNo }}</p></td>
+                    <td class="p-2"><p class="text-right">{{ verifiedGood.quantity }}</p></td>
+                    <td class="p-2"><p class="text-right">{{ verifiedGood.quantityVerified }}</p></td>
+                    <td class="p-2">{{ toMeasurementLabel(verifiedGood.unitOfMeasure) | translate }}</td>
+                    <td class="p-2"><p
+                      class="text-right">{{ verifiedGood.totalAmount | currency:'EUR':'symbol':'1.2-2' }}</p>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </card>
+
+            <card>
+              <p card-header>{{ 'page.declaration-preview.export.payment.title' | translate }}</p>
+              <p card-subHeader>{{ 'page.declaration-preview.export.payment.description' | translate }}</p>
+              <div card-body>
+                @if (declaration.value()!.payments.length) {
+                  <div class="w-fit">
+                    <vat-return-payment-table [payments]="declaration.value()!.payments"/>
+                  </div>
+                } @else if (!declaration.value()!.isCancelled && instanceId()) {
+                  <vat-return-declaration-payment [instanceId]="instanceIdAsNumber()!" [saleId]="sale.value()!.id"/>
+                } @else {
+                  <p>{{ 'page.declaration-preview.export.payment.declaration-cancelled' | translate }}</p>
+                }
+              </div>
+            </card>
+          </div>
+        </card>
+      }
+
+      @if (sale.value() && !declaration.value()?.isCancelled && !declaration.value()?.export && instanceId()) {
+        <card>
+          <p card-header>{{ 'page.declaration-preview.submit.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.declaration-preview.submit.description' | translate }}</p>
+          <div card-body class="flex flex-col gap-4">
+            @if (!declaration.value()) {
+              <p class="font-bold text-lg">{{ 'page.declaration-preview.submit.not-submitted' | translate }}</p>
+            }
+
+            <vat-return-declaration-submission [instanceId]="instanceIdAsNumber()!" [sale]="sale.value()!"
+                                               [hasDeclaration]="!!declaration.value()"/>
+          </div>
+        </card>
+      }
+    </div>
+  }
+</div>

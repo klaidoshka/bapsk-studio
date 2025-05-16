@@ -1,0 +1,16 @@
+<p-dialog [(visible)]="isVisible" [header]="'component.mock-sale-button-form.title' | translate" [closable]="true" [modal]="true" styleClass="min-w-96">
+  <form class="flex flex-col gap-4">
+    <p-float-label>
+      <p-select [options]="sales.value()" optionLabel="label" optionValue="sale" appendTo="body"
+                styleClass="w-full" dropdownIcon="pi pi-shop" [(ngModel)]="selectedSale" [ngModelOptions]="{standalone: true}"/>
+      <label>{{ 'component.mock-sale-button-form.input.sale' | translate }}</label>
+    </p-float-label>
+    <messages-showcase [messages]="messages()"/>
+    <p-button [title]="'component.mock-sale-button-form.button.submit' | translate" size="small"
+              [label]="'component.mock-sale-button-form.button.submit' | translate" type="submit" (onClick)="mock()"/>
+  </form>
+</p-dialog>
+
+<p-button [title]="'component.mock-sale-button-form.button.mock' | translate" size="small" variant="text"
+          [label]="'component.mock-sale-button-form.button.mock' | translate" class="w-full" (onClick)="isVisible.set(true)"
+          styleClass=" w-full text-start! justify-start! rounded-lg! hover:bg-primary-200/50! text-medium! dark:hover:bg-primary-800/80!"/>

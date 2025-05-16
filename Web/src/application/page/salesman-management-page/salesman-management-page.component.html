@@ -1,0 +1,58 @@
+<div class="h-full w-full relative container mx-auto flex flex-col">
+  <salesman-page-header-section [canGoBack]="true"/>
+  @if (salesman.isLoading()) {
+    <loading-spinner/>
+  } @else if (salesmanId() && !salesman.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    <card>
+      <p card-header>{{ 'page.salesman-management.title' | translate }}</p>
+      <p card-subHeader>{{ 'page.salesman-management.description' | translate }}</p>
+      <form [formGroup]="form" card-body class="flex flex-col gap-4">
+        <!-- Name -->
+        <div>
+          <p-floatlabel variant="on" class="w-60">
+            <p-iconfield>
+              <p-inputicon class="pi pi-tag"/>
+              <input pInputText class="w-60" id="name" formControlName="name" type="text"/>
+            </p-iconfield>
+            <label for="name">{{ 'page.salesman-management.input.name' | translate }}</label>
+          </p-floatlabel>
+          <form-input-error [control]="form.controls.name"/>
+        </div>
+
+        <!-- VAT Payer Code -->
+        <card>
+          <p card-header>{{ 'page.salesman-management.vat.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.salesman-management.vat.description' | translate }}</p>
+          <div card-body formGroupName="vatPayerCode" class="flex flex-wrap gap-4">
+            <div>
+              <p-floatlabel variant="on" class="w-60">
+                <p-iconfield>
+                  <p-inputicon class="pi pi-code"/>
+                  <input formControlName="value" pInputText type="text" id="vatPayerCodeValue"/>
+                </p-iconfield>
+                <label for="vatPayerCodeValue">{{ 'page.salesman-management.vat.input.code' | translate }}</label>
+              </p-floatlabel>
+              <form-input-error [control]="form.controls.vatPayerCode.controls.value"/>
+            </div>
+
+            <div>
+              <p-floatlabel variant="on" class="w-60">
+                <p-select dropdownIcon="pi pi-globe" inputId="issuedBy" formControlName="issuedBy"
+                          [options]="IsoCountries"
+                          optionLabel="name" optionValue="code" class="w-full" appendTo="body"/>
+                <label for="vatPayerCodeIssuedBy">{{ 'page.salesman-management.vat.input.issued-by' | translate }}</label>
+              </p-floatlabel>
+              <form-input-error [control]="form.controls.vatPayerCode.controls.issuedBy"/>
+            </div>
+          </div>
+        </card>
+        <messages-showcase [messages]="messages()"/>
+        <p-button [title]="'page.salesman-management.button.submit' | translate" size="small"
+                  [label]="('page.salesman-management.button.' + (!salesmanId() ? 'create' : 'save')) | translate"
+                  [disabled]="!form.valid || !form.dirty" (onClick)="save()" type="submit"/>
+      </form>
+    </card>
+  }
+</div>

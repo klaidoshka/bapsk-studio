@@ -1,0 +1,92 @@
+<div class="h-full w-full container mx-auto flex flex-col">
+  <user-page-header-section [canGoBack]="true"/>
+  @if (user.isLoading()) {
+    <loading-spinner/>
+  } @else if (userId() && !user.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    <card>
+      <p card-header>{{ 'page.user-management.title' | translate }}</p>
+      <p card-subHeader>{{ 'page.user-management.description' | translate }}</p>
+      <form [formGroup]="form" card-body class="flex flex-col gap-4">
+        <div class="flex flex-wrap gap-4">
+          <!-- First Name -->
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-iconfield>
+                <p-inputicon class="pi pi-tag"/>
+                <input pInputText class="w-60" id="firstName" formControlName="firstName" type="text"/>
+              </p-iconfield>
+              <label for="firstName">{{ 'page.user-management.input.first-name' | translate }}</label>
+            </p-floatlabel>
+            <form-input-error [control]="form.controls.firstName"/>
+          </div>
+
+          <!-- Last Name -->
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-iconfield>
+                <p-inputicon class="pi pi-tag"/>
+                <input pInputText class="w-60" id="lastName" formControlName="lastName" type="text"/>
+              </p-iconfield>
+              <label for="lastName">{{ 'page.user-management.input.last-name' | translate }}</label>
+            </p-floatlabel>
+            <form-input-error [control]="form.controls.lastName"/>
+          </div>
+
+          <!-- Email -->
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-iconfield>
+                <p-inputicon class="pi pi-envelope"/>
+                <input pInputText class="w-60" id="email" formControlName="email" type="email"/>
+              </p-iconfield>
+              <label for="email">{{ 'page.user-management.input.email' | translate }}</label>
+            </p-floatlabel>
+            <form-input-error [control]="form.controls.email"/>
+          </div>
+
+          @if (!user.value()) {
+            <!-- Password -->
+            <div>
+              <p-floatlabel variant="on" class="w-60">
+                <p-iconfield>
+                  <p-inputicon class="pi pi-lock"/>
+                  <input pInputText class="w-60" id="password" formControlName="password" type="password"/>
+                </p-iconfield>
+                <label for="password">{{ 'page.user-management.input.password' | translate }}</label>
+              </p-floatlabel>
+              <form-input-error [control]="form.controls.password"/>
+            </div>
+          }
+
+          <!-- Birth Date -->
+          <div class="w-fit">
+            <p-float-label variant="on" class="w-fit">
+              <p-date-picker icon="pi pi-calendar" iconDisplay="input" showIcon formControlName="birthDate"
+                             styleClass="w-full"
+                             inputId="birthDate" appendTo="body"/>
+              <label for="birthDate">{{ 'page.user-management.input.birthdate' | translate }}</label>
+            </p-float-label>
+            <form-input-error [control]="form.controls.birthDate"/>
+          </div>
+
+          <!-- Country Dropdown -->
+          <div class="w-fit">
+            <p-float-label variant="on" class="w-60">
+              <p-select dropdownIcon="pi pi-globe" [options]="countries" formControlName="country" optionLabel="name"
+                        styleClass="w-full"
+                        appendTo="body"/>
+              <label for="country">{{ 'page.user-management.input.country' | translate }}</label>
+            </p-float-label>
+            <form-input-error [control]="form.controls.birthDate"/>
+          </div>
+        </div>
+        <messages-showcase [messages]="messages()"/>
+        <p-button [title]="'page.user-management.button.submit' | translate" size="small"
+                  [label]="('page.user-management.button.' + (!userId() ? 'create' : 'save')) | translate"
+                  [disabled]="!form.valid || !form.dirty" (onClick)="save()" type="submit"/>
+      </form>
+    </card>
+  }
+</div>

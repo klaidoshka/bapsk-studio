@@ -4,28 +4,11 @@ services:
     build:
       context: ./Web
       dockerfile: Dockerfile
-      target: client
     working_dir: /web
     ports:
       - "4200:4200"
     volumes:
       - ./Certificates:/certs:ro
-    networks:
-      - app-network
-
-  web-server:
-    restart: always
-    build:
-      context: ./Web
-      dockerfile: Dockerfile
-      target: server
-    working_dir: /web
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./Certificates:/certs:ro
-    depends_on:
-      - backend
     networks:
       - app-network
 

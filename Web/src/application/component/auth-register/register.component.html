@@ -1,0 +1,98 @@
+<h2 class="text-2xl font-bold mb-4">{{ 'component.register.title' | translate }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+  <div class="flex flex-wrap gap-4">
+    <!-- First Name -->
+    <div>
+      <p-floatlabel variant="on" class="w-60">
+        <p-iconfield>
+          <p-inputicon class="pi pi-tag"/>
+          <input pInputText class="w-60" id="firstName" formControlName="firstName" type="text"/>
+        </p-iconfield>
+        <label for="firstName">{{ 'component.register.input.first-name' | translate }}</label>
+      </p-floatlabel>
+      <form-input-error [control]="form.controls.firstName"/>
+    </div>
+
+    <!-- Last Name -->
+    <div>
+      <p-floatlabel variant="on" class="w-60">
+        <p-iconfield>
+          <p-inputicon class="pi pi-tag"/>
+          <input pInputText class="w-60" id="lastName" formControlName="lastName" type="text"/>
+        </p-iconfield>
+        <label for="lastName">{{ 'component.register.input.last-name' | translate }}</label>
+      </p-floatlabel>
+      <form-input-error [control]="form.controls.lastName"/>
+    </div>
+
+    <!-- Email -->
+    <div>
+      <p-floatlabel variant="on" class="w-60">
+        <p-iconfield>
+          <p-inputicon class="pi pi-envelope"/>
+          <input pInputText class="w-60" id="email" formControlName="email" type="email"/>
+        </p-iconfield>
+        <label for="email">{{ 'component.register.input.email' | translate }}</label>
+      </p-floatlabel>
+      <form-input-error [control]="form.controls.email"/>
+    </div>
+    <!-- Country -->
+    <div>
+      <p-float-label variant="on" class="w-60">
+        <p-select dropdownIcon="pi pi-globe" [options]="IsoCountries" formControlName="country" optionLabel="name"
+                  styleClass="w-full" appendTo="body"/>
+        <label for="country">{{ 'component.register.input.country' | translate }}</label>
+      </p-float-label>
+      <form-input-error [control]="form.controls.country"/>
+    </div>
+
+    <!-- Password -->
+    <div>
+      <p-floatlabel variant="on" class="w-60">
+        <p-iconfield>
+          <p-inputicon class="pi pi-lock"/>
+          <p-password id="password" formControlName="password" inputStyleClass="pl-10! w-60!"
+                      toggleMask="true" feedback="false"/>
+        </p-iconfield>
+        <label for="password">{{ 'component.register.input.password' | translate }}</label>
+      </p-floatlabel>
+      <form-input-error [control]="form.controls.password"/>
+    </div>
+
+    <!-- Confirm Password -->
+    <div>
+      <p-floatlabel variant="on" class="w-60">
+        <p-iconfield>
+          <p-inputicon class="pi pi-lock"/>
+          <p-password id="confirmPassword" formControlName="confirmPassword" inputStyleClass="pl-10! w-60!"
+                      toggleMask="true" feedback="false"/>
+        </p-iconfield>
+        <label for="confirmPassword">{{ 'component.register.input.confirm-password' | translate }}</label>
+      </p-floatlabel>
+      <form-input-error [control]="form.controls.confirmPassword"/>
+    </div>
+
+    <!-- Birth Date -->
+    <div>
+      <p-float-label variant="on">
+        <p-date-picker icon="pi pi-calendar" iconDisplay="input" showIcon formControlName="birthDate"
+                       styleClass="w-60" inputId="birthDate" appendTo="body"/>
+        <label for="birthDate">{{ 'component.register.input.birthdate' | translate }}</label>
+      </p-float-label>
+      <form-input-error [control]="form.controls.birthDate"/>
+    </div>
+  </div>
+  <messages-showcase [messages]="messages()"/>
+  <p-button [title]="'component.register.button.register' | translate" type="submit"
+            [label]="'component.register.button.register' | translate" icon="pi pi-check" [loading]="isSubmitting()"
+            styleClass="w-full" class="w-full" [disabled]="form.invalid"/>
+</form>
+
+<p class="mt-4 text-sm text-center">{{ 'component.register.already-have-account' | translate }}</p>
+
+<p class="text-center">
+  <a routerLink="/auth/login" class="dark:text-indigo-400 text-indigo-600 hover:underline">
+    {{ 'component.register.redirect.login-here' | translate }}
+  </a>
+</p>

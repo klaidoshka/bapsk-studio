@@ -1,0 +1,85 @@
+@if (isLoading()) {
+  <loading-spinner/>
+} @else if (!instanceId()) {
+  <p-dialog [visible]="!instanceId()" [modal]="true" [closable]="false"
+            [header]="'page.workspace.dialog.workspace.title' | translate"
+            styleClass="dark:bg-primary-950! bg-primary-50! shadow-2xl! shadow-primary-800/80! dark:shadow-primary-50!">
+    <instance-selector/>
+  </p-dialog>
+} @else {
+  <p-button variant="text" icon="pi pi-bars" size="small"
+            styleClass="rounded-xs! bg-primary-950/70! dark:bg-primary-50/70! text-primary-50! dark:text-primary-950! p-1!"
+            class="fixed! top-15 left-1 z-10 md:hidden" (onClick)="isMobileSidebarOpen.set(true)"
+            [class.hidden]="isMobileSidebarOpen()"/>
+  <div class="h-full w-full container mx-auto flex flex-col relative">
+    <div class="flex flex-row w-full h-full gap-4 relative">
+      <!-- Sidebar -->
+      <div
+        class="not-md:hidden flex flex-col min-w-60 w-60 gap-6 bg-primary-50 dark:bg-primary-950 border border-y-0 not-md:mt-14
+        border-primary-950/20 dark:border-primary-50/20 md:relative fixed inset-y-0 left-0 md:inset-auto h-full z-20 md:z-auto"
+        [class.not-md:hidden]="!isMobileSidebarOpen()" (clickOutside)="isMobileSidebarOpen.set(false)">
+        <div class="flex flex-col gap-4 mt-2 mx-4">
+          <h4 class="px-1 text-lg font-semibold">{{ instanceName() }}</h4>
+          <p-button title="Change" [label]="'page.workspace.button.change' | translate" size="small" styleClass="w-full" (onClick)="exit()"/>
+        </div>
+        <div class="flex flex-col gap-1 mx-4">
+          <h4 class="p-2 text-sm font-semibold">{{ 'page.workspace.sidebar.name' | translate }}</h4>
+          <!-- Sidebar Navigation -->
+          <nav class="flex flex-col w-full gap-0.5">
+            @for (link of [
+              { label: 'page.workspace.sidebar.route.data-types', path: 'data-type' },
+              { label: 'page.workspace.sidebar.route.import-configurations', path: 'import-configuration' },
+              { label: 'page.workspace.sidebar.route.report-templates', path: 'report-template' },
+              { label: 'page.workspace.sidebar.route.generate-report', path: 'generate-report' }
+            ]; track link.path) {
+              <a
+                class="flex h-8 p-2 w-full items-center rounded-lg hover:bg-primary-200/50 dark:hover:bg-primary-800/80"
+                [routerLink]="['/home/workspace', instanceId(), link.path]"
+                routerLinkActive="underline underline-offset-4">{{ link.label | translate }}</a>
+            }
+          </nav>
+          <!-- Sidebar VAT Return Navigation -->
+          <h4 class="p-2 text-sm font-semibold">{{ 'page.workspace.sidebar.vat.name' | translate }}</h4>
+          <nav class="flex flex-col w-full gap-0.5">
+            @for (link of [
+              { label: 'page.workspace.sidebar.vat.route.customers', path: 'customer' },
+              { label: 'page.workspace.sidebar.vat.route.salesmen', path: 'salesman' },
+              { label: 'page.workspace.sidebar.vat.route.sales', path: 'sale' }
+            ]; track link.path) {
+              <a
+                class="flex h-8 p-2 w-full items-center rounded-lg hover:bg-primary-200/50 dark:hover:bg-primary-800/80"
+                [routerLink]="['/home/workspace', instanceId(), link.path]"
+                routerLinkActive="underline underline-offset-4">{{ link.label | translate }}</a>
+            }
+          </nav>
+          <!-- Sidebar Data Entries Navigation -->
+          <h4 class="p-2 text-sm font-semibold">{{ 'page.workspace.sidebar.data-entries.name' | translate }}</h4>
+          <nav class="flex flex-col w-full gap-0.5">
+            @for (dataType of dataTypes.value() || []; track dataType.id) {
+              <a
+                class="flex h-8 p-2 w-full items-center rounded-lg hover:bg-primary-200/50 dark:hover:bg-primary-800/80"
+                [routerLink]="['/home/workspace', instanceId(), 'data-entry']"
+                [queryParams]="{ dataTypeId: dataType.id }"
+                routerLinkActive="underline underline-offset-4">{{ dataType.name }}</a>
+            }
+            @if ((dataTypes.value()?.length ?? 0) == 0) {
+              <p class="px-2">{{ 'page.workspace.sidebar.data-entries.no-entries' | translate }}</p>
+            }
+          </nav>
+        </div>
+      </div>
+      <p-button variant="text" icon="pi pi-bars" size="small" class="fixed! left-60 z-30 md:hidden"
+                styleClass="rounded-xs! bg-primary-950/70! dark:bg-primary-50/70! text-primary-50! dark:text-primary-950! p-1!"
+                (onClick)="isMobileSidebarOpen.set(false)" [class.hidden]="!isMobileSidebarOpen()"/>
+      <!-- Main Content -->
+      <div class="flex-1 min-w-0 overflow-hidden">
+        <div #container class="h-full w-full overflow-auto">
+          <scroll-to-top [container]="container"/>
+          <div class="mr-4">
+            <router-outlet/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

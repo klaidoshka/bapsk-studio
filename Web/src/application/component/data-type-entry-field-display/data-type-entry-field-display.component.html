@@ -1,0 +1,16 @@
+@let value = valueDisplay();
+
+@switch (typeResolved()) {
+  @case (FieldType.Check) {
+    <p-badge [value]="value + ''" [severity]="this.value() ? 'success' : 'danger'"/>
+  }
+  @case (FieldType.Currency) {
+    <p>{{ (valueDisplay() + '') | currency: 'EUR':'symbol':'1.2-2' }}</p>
+  }
+  @case (FieldType.Date) {
+    <p>{{ valueDisplay() | date: 'medium' }}</p>
+  }
+  @default {
+    <p>{{ valueDisplay() }}</p>
+  }
+}

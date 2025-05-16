@@ -1,0 +1,12 @@
+<div class="flex w-full h-full my-auto justify-center items-center">
+  <div
+    class="dark:bg-primary-950 bg-primary-50 shadow-2xl shadow-primary-800/80 dark:shadow-primary-50 rounded-3xl p-8 max-w-xl w-full space-y-6">
+    <div class="text-center space-y-0.5">
+      <i class="pi pi-lock" style="font-size: 2rem"></i>
+      <h1 class="text-3xl font-bold">{{ 'page.auth.title' | translate }}</h1>
+      <p>{{ 'page.auth.description' | translate }}</p>
+    </div>
+    <hr class="border-surface-300">
+    <router-outlet/>
+  </div>
+</div>

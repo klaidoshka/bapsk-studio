@@ -1,0 +1,5 @@
+<p-fileupload styleClass="flex flex-col items-start! [&_p-button]:w-full!"
+              chooseStyleClass="w-full! text-start! text-sm! dark:bg-primary-950! bg-primary-50! dark:text-primary-50! hover:bg-primary-200/50! dark:hover:bg-primary-800/80! text-primary-900! justify-start! border-none!"
+              [chooseLabel]="'component.html-upload-for-overhaul.button.upload' | translate" chooseIcon="pi pi-upload"
+              accept=".html" name="file" mode="basic" [title]="'component.html-upload-for-overhaul.button.upload' | translate"
+              auto="true" (onSelect)="onHtmlSelect($event.currentFiles)"/>

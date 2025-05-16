@@ -1,0 +1,8 @@
+<div class="flex flex-col gap-4">
+  <div>
+    <h1 class="text-2xl font-bold">{{ 'component.failed-to-load.title' | translate }}</h1>
+    <p class="mt-4">{{ 'component.failed-to-load.description' | translate }}</p>
+  </div>
+  <p-button [title]="'component.failed-to-load.button.reload' | translate"
+            [label]="'component.failed-to-load.button.reload' | translate" size="small" icon="pi pi-refresh" (click)="reload()"/>
+</div>

@@ -1,0 +1,12 @@
+<confirmation key="resubmit-confirmation" [summary]="'component.vat-return-submission.confirm-resubmit' | translate"/>
+<messages-showcase [messages]="messages()"/>
+<form [formGroup]="form">
+  <p>{{ 'component.vat-return-submission.description' | translate }}</p>
+  <label for="affirmation" class="block text-sm font-medium mt-2">
+    {{ 'component.vat-return-submission.input.affirmation' | translate }}
+  </label>
+  <p-checkbox binary="true" formControlName="affirmation" id="affirmation" class="mt-1 block w-fit"/>
+  <p-button [title]="'component.vat-return-submission.button.submit' | translate" size="small"
+            [label]="'component.vat-return-submission.button.submit' | translate" [disabled]="!form.valid || !form.dirty"
+            styleClass="mt-2" (onClick)="save()" type="submit"/>
+</form>

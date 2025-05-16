@@ -1,0 +1,51 @@
+<div class="h-full w-full relative container mx-auto flex flex-col">
+  <report-template-page-header-section [canGoBack]="true"/>
+  @if (template.isLoading() || dataTypes.isLoading()) {
+    <loading-spinner/>
+  } @else if (templateId() && !template.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    <card>
+      <p card-header>{{ 'page.report-template-management.title' | translate }}</p>
+      <div card-subHeader class="flex flex-col" [innerHtml]="'page.report-template-management.description' | translate"></div>
+      <form card-body class="flex flex-col gap-4" [formGroup]="form">
+        <div class="flex flex-wrap gap-4">
+          <!-- Name -->
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-iconfield>
+                <p-inputicon class="pi pi-tag"/>
+                <input pInputText class="w-60" id="name" formControlName="name" type="text"/>
+              </p-iconfield>
+              <label for="name">{{ 'page.report-template-management.input.name' | translate }}</label>
+            </p-floatlabel>
+            <form-input-error [control]="form.controls.name"/>
+          </div>
+
+          <!-- Data Type -->
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-select [options]="dataTypes.value()" optionLabel="name" appendTo="body" styleClass="w-full"
+                        dropdownIcon="pi pi-objects-column" (onChange)="changeFormFields($event.value)"/>
+              <label for="dataType">{{ 'page.report-template-management.input.data-type' | translate }}</label>
+            </p-floatlabel>
+          </div>
+        </div>
+
+        <card>
+          <p card-header>{{ 'page.report-template-management.fields.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.report-template-management.fields.description' | translate }}</p>
+          <div card-body class="flex flex-wrap gap-4" formArrayName="fields">
+            @for (field of form.controls.fields.value; track field.id) {
+              <p-badge [value]="field.name!" severity="contrast"/>
+            }
+          </div>
+        </card>
+        <messages-showcase [messages]="messages()"/>
+        <p-button [title]="'page.report-template-management.button.submit' | translate" size="small"
+                  [label]="('page.report-template-management.button.' + (!templateId() ? 'create' : 'save')) | translate"
+                  [disabled]="form.invalid || !form.dirty" (onClick)="save()" type="submit"/>
+      </form>
+    </card>
+  }
+</div>

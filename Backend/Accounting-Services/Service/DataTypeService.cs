@@ -17,13 +17,15 @@ public class DataTypeService : IDataTypeService
     private readonly IDataTypeValidator _dataTypeValidator;
     private readonly IFieldTypeService _fieldTypeService;
     private readonly IImportConfigurationService _importConfigurationService;
+    private readonly IReportTemplateService _reportTemplateService;
 
     public DataTypeService(
         AccountingDatabase database,
         IDataEntryService dataEntryService,
         IDataTypeValidator dataTypeValidator,
         IFieldTypeService fieldTypeService,
-        IImportConfigurationService importConfigurationService
+        IImportConfigurationService importConfigurationService,
+        IReportTemplateService reportTemplateService
     )
     {
         _database = database;
@@ -31,6 +33,7 @@ public class DataTypeService : IDataTypeService
         _dataTypeValidator = dataTypeValidator;
         _fieldTypeService = fieldTypeService;
         _importConfigurationService = importConfigurationService;
+        _reportTemplateService = reportTemplateService;
     }
 
     public async Task<DataType> CreateAsync(DataTypeCreateRequest request)
@@ -159,6 +162,7 @@ public class DataTypeService : IDataTypeService
         {
             await _dataEntryService.AddMissingDataTypeFieldsAsync(dataType);
             await _importConfigurationService.AddMissingDataTypeFieldsAsync(dataType);
+            await _reportTemplateService.AddMissingDataTypeFieldsAsync(dataType);
         }
 
         dataType.DisplayFieldId = request.DisplayFieldIndex is not null

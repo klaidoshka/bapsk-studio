@@ -1,0 +1,105 @@
+<div class="h-full w-full relative container mx-auto flex flex-col">
+  <customer-page-header-section/>
+  <confirmation [key]='"customer-delete-confirmation"' [summary]="'page.customer.confirm-delete' | translate"/>
+  <messages-showcase [messages]="messages()"/>
+  <card>
+    <p card-header>{{ 'page.customer.title' | translate }}</p>
+    <p card-subHeader>{{ 'page.customer.description' | translate }}</p>
+    <div card-body>
+      <p-button [title]="'page.customer.button.create' | translate" size="small"
+                [label]="'page.customer.button.create' | translate" type="button" (onClick)="manage()"/>
+      <p-table paginatorDropdownAppendTo="body" styleClass="mt-4" [value]="customers.value() || []" [paginator]="true" [rows]="10"
+               [rowsPerPageOptions]="[10, 20, 50]" sortMode="multiple">
+        <ng-template #header>
+          <tr>
+            <th pSortableColumn="firstName">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  {{ 'page.customer.header.first-name' | translate }}
+                  <p-sortIcon field="firstName"/>
+                </div>
+                <p-columnFilter type="text" field="firstName" display="menu"/>
+              </div>
+            </th>
+            <th pSortableColumn="lastName">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  {{ 'page.customer.header.last-name' | translate }}
+                  <p-sortIcon field="lastName"/>
+                </div>
+                <p-columnFilter type="text" field="lastName" display="menu"/>
+              </div>
+            </th>
+            <th pSortableColumn="email">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  {{ 'page.customer.header.email' | translate }}
+                  <p-sortIcon field="email"/>
+                </div>
+                <p-columnFilter type="text" field="email" display="menu"/>
+              </div>
+            </th>
+            <th pSortableColumn="birthdate">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  {{ 'page.customer.header.birthdate' | translate }}
+                  <p-sortIcon field="birthdate"/>
+                </div>
+                <p-columnFilter type="text" field="birthdate" display="menu"/>
+              </div>
+            </th>
+            <th pSortableColumn="residenceCountryLabel">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  {{ 'page.customer.header.reside-in' | translate }}
+                  <p-sortIcon field="residenceCountryLabel"/>
+                </div>
+                <p-columnFilter type="text" field="residenceCountryLabel" display="menu"/>
+              </div>
+            </th>
+            <th pSortableColumn="identityDocument.typeLabel">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  {{ 'page.customer.header.identity-document' | translate }}
+                  <p-sortIcon field="identityDocument.typeLabel"/>
+                </div>
+                <p-columnFilter type="text" field="identityDocument.typeLabel" display="menu"/>
+              </div>
+            </th>
+            <th pSortableColumn="identityDocument.value">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-0.5">
+                  {{ 'page.customer.header.personal-code' | translate }}
+                  <p-sortIcon field="identityDocument.value"/>
+                </div>
+                <p-columnFilter type="text" field="identityDocument.value" display="menu"/>
+              </div>
+            </th>
+            <th></th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-customer>
+          <tr>
+            <td>{{ customer.firstName }}</td>
+            <td>{{ customer.lastName }}</td>
+            <td>{{ customer.email }}</td>
+            <td>{{ customer.birthdate | date:'mediumDate' }}</td>
+            <td>{{ customer.residenceCountryLabel | translate }}</td>
+            <td>{{ customer.identityDocument.typeLabel | translate }}</td>
+            <td>{{ customer.identityDocument.value ?? ('misc.not-provided' | translate) }}</td>
+            <td>
+              <div class="flex items-center">
+                <p-button [title]="'page.customer.button.preview' | translate" icon="pi pi-eye" type="button" variant="text"
+                          (onClick)="preview(customer)"/>
+                <p-button [title]="'page.customer.button.edit' | translate" icon="pi pi-pencil" type="button" variant="text"
+                          (onClick)="manage(customer)"/>
+                <p-button [title]="'page.customer.button.delete' | translate" icon="pi pi-trash" type="button" variant="text"
+                          (onClick)="delete(customer)"/>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </card>
+</div>

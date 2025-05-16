@@ -1,0 +1,212 @@
+<ng-container *ngIf="isLoading(); else content">
+  <loading-spinner/>
+</ng-container>
+
+<ng-template #content>
+  <ng-container *ngIf="declaration.value() !== undefined; else invalidDeclaration">
+    <div class="w-fit mx-auto p-4">
+      <div class="flex flex-wrap gap-4">
+        <!-- Row of actions -->
+        <div *ngIf="!declaration.value()!.export && !declaration.value()!.isCancelled && declaration.value()!.state !== SubmitDeclarationState.REJECTED" class="w-full">
+          <p-button
+            *ngIf="!declaration.value()!.isCancelled"
+            [title]="'page.declaration-preview.button.refresh' | translate"
+            icon="pi pi-refresh"
+            [label]="'page.declaration-preview.button.refresh' | translate"
+            (click)="refresh()"
+            [disabled]="isLoading()"
+          />
+        </div>
+
+        <!-- Left Column -->
+        <div class="flex-1 min-w-42 dark:bg-surface-800/80 bg-surface-50 p-4 rounded-lg shadow-md relative">
+          <p class="font-bold text-lg mb-2">{{ 'page.declaration-preview.declaration.title' | translate }}</p>
+
+          <p class="text-lg">
+            <strong>{{ 'page.declaration-preview.declaration.label.id' | translate }}</strong>
+            {{ declaration.value()!.id }}
+          </p>
+
+          <p class="text-lg">
+            <strong>{{ 'page.declaration-preview.declaration.label.date' | translate }}</strong>
+            {{ declaration.value()!.submitDate | date:'medium' }}
+          </p>
+
+          <p class="text-lg">
+            <strong>{{ 'page.declaration-preview.declaration.label.state' | translate }}</strong>
+            @let vatState = toSubmitDeclarationStateInfo(declaration.value());
+            <p-badge class="ml-1" [value]="vatState.label | translate" [severity]="vatState.severity"/>
+          </p>
+
+          <p *ngIf="declaration.value()!.correction > 1" class="text-lg">
+            <strong>{{ 'page.declaration-preview.declaration.label.corrections' | translate }}</strong>
+            {{ declaration.value()!.correction }}
+          </p>
+        </div>
+
+        <!-- Right Column -->
+        <div class="flex-1 min-w-42 dark:bg-surface-800/80 bg-surface-50 p-4 rounded-lg shadow-md">
+          <p class="font-bold text-lg mb-2">{{ 'page.declaration-preview.sale.title' | translate }}</p>
+
+          <p class="text-lg">
+            <strong>{{ 'page.declaration-preview.sale.label.customer' | translate }}</strong>
+            {{ toCustomerFullName(declaration.value()!.sale!.customer) }}
+          </p>
+
+          <p class="text-lg">
+            <strong>{{ 'page.declaration-preview.sale.label.salesman' | translate }}</strong>
+            {{ declaration.value()!.sale.salesman.name }}
+          </p>
+
+          <p class="text-lg">
+            <strong>{{ 'page.declaration-preview.sale.label.sold-goods' | translate }}</strong>
+            {{ declaration.value()!.sale.soldGoods.length }} good(s)
+          </p>
+
+          <p class="text-lg">
+            <strong>{{ 'page.declaration-preview.sale.label.vat' | translate }}</strong>
+            {{ getVATToReturn(declaration.value()!.sale) | currency:'EUR':'symbol':'1.2-2' }}
+          </p>
+        </div>
+      </div>
+
+      <div *ngIf="declaration.value()!.qrCodes.length" class="mt-4">
+        <div class="dark:bg-surface-800/80 bg-surface-50 rounded-lg shadow-md">
+          <div class="p-4 cursor-pointer flex justify-between items-center" (click)="showQrCodes.set(!showQrCodes())">
+            <p class="font-bold text-lg">{{ 'page.declaration-preview.qr-codes.title' | translate }}</p>
+            <svg class="w-6 h-6 transform transition-transform" [ngClass]="{'rotate-180': showQrCodes()}"
+                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </div>
+          <div class="p-4" *ngIf="showQrCodes()">
+            <div class="flex flex-wrap gap-4">
+              <div *ngFor="let qrCode of declaration.value()!.qrCodes; let i = index"
+                   class="flex justify-center w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
+                <img [src]="'data:image/png;base64,' + qrCode"
+                     [alt]="'page.declaration-preview.qr-codes.qr-alt' | translate:{index: i+1}" class="w-48 h-48"/>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dark:bg-surface-800/80 bg-surface-50 card mt-4 p-4 rounded-lg shadow-md">
+        <p class="font-bold text-lg mb-4">{{ 'page.declaration-preview.sold-goods.title' | translate }}</p>
+        <p-table [value]="declaration.value()!.sale.soldGoods">
+          <ng-template #header>
+            <tr>
+              <th class="text-left p-2">{{ 'page.declaration-preview.sold-goods.header.sequence-no' | translate }}</th>
+              <th class="text-left p-2">{{ 'page.declaration-preview.sold-goods.header.description' | translate }}</th>
+              <th class="text-left p-2">{{ 'page.declaration-preview.sold-goods.header.quantity' | translate }}</th>
+              <th class="text-left p-2">{{ 'page.declaration-preview.sold-goods.header.measure-unit' | translate }}</th>
+              <th class="text-left p-2">{{ 'page.declaration-preview.sold-goods.header.unit-price' | translate }}</th>
+              <th class="text-left p-2">{{ 'page.declaration-preview.sold-goods.header.vat-amount' | translate }}</th>
+              <th class="text-left p-2">{{ 'page.declaration-preview.sold-goods.header.total-amount' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template #body let-soldGood>
+            <tr>
+              <td class="p-2"><p class="text-right">{{ soldGood.sequenceNo }}</p></td>
+              <td class="p-2">{{ soldGood.description }}</td>
+              <td class="p-2"><p class="text-right">{{ soldGood.quantity }}</p></td>
+              <td class="p-2">{{ toMeasurementLabel(soldGood.unitOfMeasure) | translate }}</td>
+              <td class="p-2"><p class="text-right">{{
+                  soldGood.taxableAmount / soldGood.quantity | round:2 | currency:'EUR':'symbol':'1.2-2'
+                }}</p></td>
+              <td class="p-2"><p class="text-right">{{ soldGood.vatAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}
+                ({{ soldGood.vatRate | round:2 }}%)</p></td>
+              <td class="p-2"><p
+                class="text-right">{{ soldGood.totalAmount | round:2 | currency:'EUR':'symbol':'1.2-2' }}</p>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <div class="dark:bg-surface-800/80 bg-surface-50 card mt-4 p-4 rounded-lg shadow-md" *ngIf="declaration?.value()?.export">
+        <p class="font-bold text-lg mb-4">{{ 'page.declaration-preview.export.title' | translate }}</p>
+
+        <div class="mb-4">
+          <p class="text-lg">
+            <strong>{{ 'page.declaration-preview.export.label.assessment-date' | translate }}</strong>
+            {{ declaration.value()!.export!.assessmentDate | date:'medium' }}
+          </p>
+          <p class="text-lg">
+            <strong>{{ 'page.declaration-preview.export.label.assessment-declaration-corrections' | translate }}</strong>
+            {{ declaration.value()!.export!.declarationCorrectionNo }}
+          </p>
+          <p class="text-lg" *ngIf="declaration.value()!.export!.correctionDate">
+            <strong>{{ 'page.declaration-preview.export.label.correction-date' | translate }}</strong>
+            {{ declaration.value()!.export!.correctionDate | date:'medium' }}
+          </p>
+          <p class="text-lg">
+            <strong>{{ 'page.declaration-preview.export.label.customs-code' | translate }}</strong>
+            {{ declaration.value()!.export!.customsOfficeCode }}
+          </p>
+          <p class="text-lg">
+            <strong>{{ 'page.declaration-preview.export.label.verification-date' | translate }}</strong>
+            {{ declaration.value()!.export!.verificationDate | date:'medium' }}
+          </p>
+          <p class="text-lg">
+            <strong>{{ 'page.declaration-preview.export.label.verification-result' | translate }}</strong>
+            {{ toExportResultLabel(declaration.value()!.export!.verificationResult) | translate }}
+          </p>
+        </div>
+
+        <div class="mb-4">
+          <p class="font-bold text-lg mb-2">{{ 'page.declaration-preview.export.assessment-conditions.title' | translate }}</p>
+          <ul class="list-disc pl-6 space-y-1">
+            <li *ngFor="let condition of declaration.value()!.export!.conditions">
+              <p>
+                <strong>{{ condition.code }}:</strong> {{ condition.description }}
+                <p-badge class="ml-1" [value]="('misc.condition.' + (condition.isMet ? 'met' : 'unmet')) | translate"
+                         [severity]="condition.isMet ? 'success' : 'danger'"/>
+              </p>
+            </li>
+          </ul>
+        </div>
+
+        <div class="w-fit">
+          <p class="font-bold text-lg mb-2">{{ 'page.declaration-preview.export.verified-sold-goods.title' | translate }}</p>
+          <p-table [value]="declaration.value()!.export!.verifiedSoldGoods" class="w-fit">
+            <ng-template #header>
+              <tr>
+                <th class="text-left p-2">{{ 'page.declaration-preview.export.verified-sold-goods.header.sequence-no' | translate }}</th>
+                <th class="text-left p-2">{{ 'page.declaration-preview.export.verified-sold-goods.header.quantity' | translate }}</th>
+                <th class="text-left p-2">{{ 'page.declaration-preview.export.verified-sold-goods.header.verified-quantity' | translate }}</th>
+                <th class="text-left p-2">{{ 'page.declaration-preview.export.verified-sold-goods.header.measure-unit' | translate }}</th>
+                <th class="text-left p-2">{{ 'page.declaration-preview.export.verified-sold-goods.header.total-amount' | translate }}</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-verifiedGood>
+              <tr>
+                <td class="p-2"><p class="text-right">{{ verifiedGood.sequenceNo }}</p></td>
+                <td class="p-2"><p class="text-right">{{ verifiedGood.quantity }}</p></td>
+                <td class="p-2"><p class="text-right">{{ verifiedGood.quantityVerified }}</p></td>
+                <td class="p-2">{{ toMeasurementLabel(verifiedGood.unitOfMeasure) | translate }}</td>
+                <td class="p-2"><p
+                  class="text-right">{{ verifiedGood.totalAmount | currency:'EUR':'symbol':'1.2-2' }}</p></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+
+        @if (declaration.value()!.payments.length) {
+          <div class="w-fit mt-4">
+            <p class="font-bold text-lg mb-2">{{ 'page.declaration-preview.export.payment.title' | translate }}</p>
+            <vat-return-payment-table [payments]="declaration.value()!.payments"/>
+          </div>
+        }
+      </div>
+    </div>
+  </ng-container>
+</ng-template>
+
+<ng-template #invalidDeclaration>
+  <div
+    class="flex flex-col gap-2 p-4 bg-red-100 text-red-800 rounded-lg shadow-md border border-red-300 w-full max-w-3xl mx-auto my-4">
+    <h2 class="text-xl font-bold">{{ 'page.declaration-preview.invalid.title' | translate }}</h2>
+    <div [innerHtml]="'page.declaration-preview.invalid.description' | translate"></div>
+  </div>
+</ng-template>

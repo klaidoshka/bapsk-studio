@@ -1,0 +1,95 @@
+<div class="h-full w-full relative container mx-auto flex flex-col">
+  <customer-page-header-section [canGoBack]="true"/>
+  @if (customer.isLoading()) {
+    <loading-spinner/>
+  } @else if (!customer.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    @let customer = this.customer.value()!;
+    <card>
+      <p card-header>{{ 'page.customer-preview.title' | translate }}</p>
+      <p card-subHeader>{{ 'page.customer-preview.description' | translate }}</p>
+      <card card-body>
+        <p card-header>{{ 'page.customer-preview.details.title' | translate }}</p>
+        <p card-subHeader>{{ 'page.customer-preview.details.description' | translate }}</p>
+        <div card-body class="flex flex-col gap-4">
+          <div class="flex flex-col">
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">{{ 'page.customer-preview.details.label.id' | translate }}</p>
+              <p>{{ customer.id }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">{{ 'page.customer-preview.details.label.first-name' | translate }}</p>
+              <p>{{ customer.firstName }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">{{ 'page.customer-preview.details.label.last-name' | translate }}</p>
+              <p>{{ customer.lastName }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">{{ 'page.customer-preview.details.label.email' | translate }}</p>
+              <p>{{ customer.email }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">{{ 'page.customer-preview.details.label.birthdate' | translate }}</p>
+              <p>{{ customer.birthdate | date:'mediumDate' }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">{{ 'page.customer-preview.details.label.residence-country' | translate }}</p>
+              <p>{{ getIsoCountryLabel(customer.residenceCountry) | translate }}</p>
+            </div>
+          </div>
+
+          <card>
+            <p card-header>{{ 'page.customer-preview.identity-document.title' | translate }}</p>
+            <p card-subHeader>{{ 'page.customer-preview.identity-document.description' | translate }}</p>
+            <div card-body>
+              <div class="flex flex-row gap-2">
+                <p class="font-semibold">{{ 'page.customer-preview.identity-document.label.type' | translate }}</p>
+                <p>{{ getIdentityDocumentTypeLabel(customer.identityDocument!.type) | translate }}</p>
+              </div>
+              <div class="flex flex-row gap-2">
+                <p class="font-semibold">{{ 'page.customer-preview.identity-document.label.number' | translate }}</p>
+                <p>{{ customer.identityDocument!.number }}</p>
+              </div>
+              <div class="flex flex-row gap-2">
+                <p class="font-semibold">{{ 'page.customer-preview.identity-document.label.issued-by' | translate }}</p>
+                <p>{{ getCountryName(customer.identityDocument!.issuedBy) | translate }}</p>
+              </div>
+              <div class="flex flex-row gap-2">
+                <p class="font-semibold">{{ 'page.customer-preview.identity-document.label.value' | translate }}</p>
+                <p>{{ customer.identityDocument!.value ?? ('misc.not-provided' | translate) }}</p>
+              </div>
+            </div>
+          </card>
+
+          @if (customer.otherDocuments.length > 0) {
+            <card>
+              <p card-header>{{ 'page.customer-preview.other-documents.title' | translate }}</p>
+              <p card-subHeader>{{ 'page.customer-preview.other-documents.description' | translate }}</p>
+              <div card-body>
+                <p-table [value]="customer.otherDocuments" paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10"
+                         [rowsPerPageOptions]="[10, 20, 50]">
+                  <ng-template #header>
+                    <tr>
+                      <th>{{ 'page.customer-preview.other-documents.header.issued-by' | translate }}</th>
+                      <th>{{ 'page.customer-preview.other-documents.header.type' | translate }}</th>
+                      <th>{{ 'page.customer-preview.other-documents.header.value' | translate }}</th>
+                    </tr>
+                  </ng-template>
+                  <ng-template #body let-otherDocument>
+                    <tr>
+                      <td>{{ getCountryName(otherDocument.issuedBy) | translate }}</td>
+                      <td>{{ otherDocument.type }}</td>
+                      <td>{{ otherDocument.value }}</td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+            </card>
+          }
+        </div>
+      </card>
+    </card>
+  }
+</div>

@@ -1,0 +1,23 @@
+<p-toast key="logout"/>
+
+<confirmation [key]='"logout-confirmation"' [summary]="'component.profile-dropdown.confirm-logout' | translate"/>
+
+<div class="relative inline-block items-center" (clickOutside)="isProfileMenuOpen.set(false)">
+  <button (click)="isProfileMenuOpen.set(!isProfileMenuOpen())"
+          class="text-primary-950 hover:text-primary-950/80 dark:text-primary-50 dark:hover:text-primary-50/80 font-medium hover:cursor-pointer max-w-32">
+    {{ displayName.value() }}
+  </button>
+
+  @if (isProfileMenuOpen()) {
+    <div class="absolute right-0 mt-1 w-24 bg-surface-50 dark:bg-surface-800 rounded shadow-lg z-20"
+         (click)="isProfileMenuOpen.set(false)">
+      <a class="block px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700" routerLink="/home/profile">
+        {{ 'component.profile-dropdown.option.profile' | translate }}
+      </a>
+      <button class="w-full text-left px-4 py-2 hover:bg-surface-100 dark:hover:bg-surface-700 hover:cursor-pointer"
+              (click)="logout()">
+        {{ 'component.profile-dropdown.option.logout' | translate }}
+      </button>
+    </div>
+  }
+</div>

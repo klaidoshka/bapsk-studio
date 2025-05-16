@@ -1,0 +1,116 @@
+<div class="h-full w-full container mx-auto flex flex-col lg:w-4/7">
+  <instance-page-header-section [canGoBack]="true"/>
+  @if (instance.isLoading()) {
+    <loading-spinner/>
+  } @else if (instanceId() && !instance.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    <card>
+      <p card-header>{{ 'page.instance-management.title' | translate }}</p>
+      <p card-subHeader>{{ 'page.instance-management.description' | translate }}</p>
+      <form [formGroup]="form" card-body class="flex flex-col gap-4">
+        <!-- Name -->
+        <div>
+          <p-floatlabel variant="on" class="w-60">
+            <p-iconfield>
+              <p-inputicon class="pi pi-tag"/>
+              <input pInputText class="w-60" id="name" formControlName="name" type="text"/>
+            </p-iconfield>
+            <label for="name">{{ 'page.instance-management.input.name' | translate }}</label>
+          </p-floatlabel>
+          <form-input-error [control]="form.controls.name"/>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <p-floatlabel variant="on" class="w-60">
+            <p-iconfield>
+              <p-inputicon class="pi pi-comment"/>
+              <input pInputText class="w-60" id="description" formControlName="description" type="text"/>
+            </p-iconfield>
+            <label for="description">{{ 'page.instance-management.input.description' | translate }}</label>
+          </p-floatlabel>
+          <form-input-error [control]="form.controls.description"/>
+        </div>
+
+        <!-- Users -->
+        <card>
+          <p card-header>{{ 'page.instance-management.members.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.instance-management.members.description' | translate }}</p>
+          <div card-body class="flex flex-col gap-4">
+            @if (form.controls.users.length > 0) {
+              <p-table [value]="form.controls.users.controls" paginatorDropdownAppendTo="body" [paginator]="true"
+                       [rows]="10" [rowsPerPageOptions]="[10, 20, 50]">
+                <ng-template #header>
+                  <tr>
+                    <th>{{ 'page.instance-management.members.header.email' | translate }}</th>
+                    <th>{{ 'page.instance-management.members.header.name' | translate }}</th>
+                    <th>{{ 'page.instance-management.members.header.permissions' | translate }}</th>
+                    <th>{{ 'page.instance-management.members.header.since' | translate }}</th>
+                    <th></th>
+                  </tr>
+                </ng-template>
+                <ng-template #body let-user let-i="rowIndex">
+                  <tr>
+                    <td>{{ user.value.email }}</td>
+                    <td>{{ user.value.name }}</td>
+                    <td>
+                      @if (!user.value.isOwnerOrSelf) {
+                        @if (!user.value.showPermissions) {
+                          <p-button [title]="'page.instance-management.members.button.modify-permissions' | translate"
+                                    [label]="'page.instance-management.members.button.modify-permissions' | translate"
+                                    size="small" type="button" (click)="user.value.showPermissions = true"/>
+                        }
+                        <p-dialog [(visible)]="user.value.showPermissions" [closable]="true" [modal]="true"
+                                  styleClass="w-128 h-128"
+                                  [header]="'page.instance-management.members.dialog.permissions.title' | translate:{name:user.value.name}">
+                          <instance-user-permission-toggler [permissions]="user.value.permissions"
+                                                            [toggle]="togglePermission" [userIndex]="i"/>
+                        </p-dialog>
+                      } @else {
+                        <p-badge [value]="'page.instance-management.members.badge.all-granted' | translate" severity="success"
+                                 class="px-2 py-1 text-xs"/>
+                      }
+                    </td>
+                    <td>
+                      <p-badge [value]="('misc.time.' + (isOldUser(user.value.email) ? 'some-time-ago' : 'just-now')) | translate"
+                               severity="contrast" class="px-2 py-1 text-xs"/>
+                    </td>
+                    <td>
+                      <p-button [title]="'page.instance-management.button.remove' | translate"
+                                [disabled]="user.value.isOwnerOrSelf" variant="text" icon="pi pi-trash"
+                                (onClick)="removeUser(i)"/>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            }
+            <messages-showcase [messages]="messagesUsers()"/>
+
+            <!-- Users Form -->
+            <form [formGroup]="formUser" class="flex flex-col gap-4">
+              <!-- Email -->
+              <div>
+                <p-floatlabel variant="on" class="w-60">
+                  <p-iconfield>
+                    <p-inputicon class="pi pi-envelope"/>
+                    <input pInputText class="w-60" formControlName="email" type="email" id="email"/>
+                  </p-iconfield>
+                  <label for="email">{{ 'page.instance-management.members.input.email' | translate }}</label>
+                </p-floatlabel>
+                <form-input-error [control]="formUser.controls.email"/>
+              </div>
+              <p-button [title]="'page.instance-management.button.add' | translate" class="mt-1"
+                        [label]="'page.instance-management.button.add' | translate" [disabled]="formUser.invalid"
+                        (onClick)="addUser()" size="small"/>
+            </form>
+          </div>
+        </card>
+        <messages-showcase [messages]="messages()"/>
+        <p-button [title]="'page.instance-management.button.submit' | translate" size="small"
+                  [label]="('page.instance-management.button.' + (!instanceId() ? 'create' : 'save')) | translate"
+                  [disabled]="form.invalid || !form.dirty" (onClick)="save()" type="submit"/>
+      </form>
+    </card>
+  }
+</div>

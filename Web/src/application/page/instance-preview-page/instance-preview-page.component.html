@@ -1,0 +1,78 @@
+<div class="h-full w-full container mx-auto flex flex-col lg:w-4/7">
+  <instance-page-header-section [canGoBack]="true"/>
+  @if (instance.isLoading()) {
+    <loading-spinner/>
+  } @else if (!instance.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    @let instanceValue = instance.value()!;
+    <card>
+      <p card-header>{{ ('page.instance-preview.title' | translate:{ name: instanceValue.name }) }}</p>
+      <p card-subHeader>{{ 'page.instance-preview.description' | translate }}</p>
+      <div card-body class="flex flex-col gap-4">
+        <card>
+          <p card-header>{{ 'page.instance-preview.details.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.instance-preview.details.description' | translate }}</p>
+          <div card-body class="flex flex-col gap-2">
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">{{ 'page.instance-preview.details.label.id' | translate }}</p>
+              <p>{{ instanceValue.id }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">{{ 'page.instance-preview.details.label.name' | translate }}</p>
+              <p>{{ instanceValue.name }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">{{ 'page.instance-preview.details.label.description' | translate }}</p>
+              <p>{{ instanceValue.description }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">{{ 'page.instance-preview.details.label.created-at' | translate }}</p>
+              <p>{{ instanceValue.createdAt | date:'mediumDate' }}</p>
+            </div>
+            <div class="flex flex-row gap-2">
+              <p class="font-semibold">{{ 'page.instance-preview.details.label.owner' | translate }}</p>
+              <p>{{ toUserIdentityFullName(instanceValue.createdBy) }}</p>
+            </div>
+          </div>
+        </card>
+        <card>
+          <p card-header>{{ 'page.instance-preview.members.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.instance-preview.members.description' | translate }}</p>
+          <div card-body>
+            <p-table [value]="instanceValue.users" paginatorDropdownAppendTo="body" [paginator]="true" [rows]="10"
+                     [rowsPerPageOptions]="[10, 20, 50]">
+              <ng-template #header>
+                <tr>
+                  <th>{{ 'page.instance-preview.members.header.name' | translate }}</th>
+                  <th>{{ 'page.instance-preview.members.header.email' | translate }}</th>
+                  <th>{{ 'page.instance-preview.members.header.permissions' | translate }}</th>
+                  <th>{{ 'page.instance-preview.members.header.data-entries-created' | translate }}</th>
+                </tr>
+              </ng-template>
+              <ng-template #body let-instanceUser>
+                <tr>
+                  <td>{{ toUserFullName(instanceUser.user) }}</td>
+                  <td>{{ instanceUser.user.email }}</td>
+                  <td>
+                    <p-badge
+                      [value]="'page.instance-preview.members.badge.view-permissions' | translate:{count: getPermissionsCount(instanceUser.id) + ' / ' + permissionsCount}"
+                      severity="contrast" class="cursor-pointer" (click)="instanceUser.showPermissions.set(true)"/>
+
+                    <p-dialog [(visible)]="instanceUser.showPermissions" [closable]="true" [modal]="true" styleClass="w-128 h-128"
+                              [header]="'page.instance-preview.members.dialog.permissions.title' | translate:{name:toUserFullName(instanceUser.user)}">
+                      <instance-user-permission-preview [permissions]="instanceUser.permissions"/>
+                    </p-dialog>
+                  </td>
+                  <td>
+                    <p-badge [value]="(getDataEntriesCreated(instanceUser.userId) | async) ?? 0" severity="contrast"/>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </card>
+      </div>
+    </card>
+  }
+</div>

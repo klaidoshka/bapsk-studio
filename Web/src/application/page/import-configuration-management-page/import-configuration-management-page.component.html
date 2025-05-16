@@ -1,0 +1,83 @@
+<div class="h-full w-full relative container mx-auto flex flex-col">
+  <import-configuration-page-header-section [canGoBack]="true"/>
+  @if (configuration.isLoading() || dataTypes.isLoading() || dataEntries.isLoading()) {
+    <loading-spinner/>
+  } @else if (configurationId() && !configuration.value()) {
+    <failed-to-load-please-reload/>
+  } @else {
+    <card>
+      <p card-header>{{ 'page.import-configuration-management.title' | translate }}</p>
+      <p card-subHeader>{{ 'page.import-configuration-management.description' | translate }}</p>
+      <form card-body [formGroup]="form" class="flex flex-col gap-4">
+        <div class="flex flex-wrap gap-4">
+          <!-- Name -->
+          <div>
+            <p-floatlabel variant="on" class="w-60">
+              <p-iconfield>
+                <p-inputicon class="pi pi-tag"/>
+                <input pInputText class="w-60" id="name" formControlName="name" type="text"/>
+              </p-iconfield>
+              <label for="name">{{ 'page.import-configuration-management.input.name' | translate }}</label>
+            </p-floatlabel>
+            <form-input-error [control]="form.controls.name"/>
+          </div>
+
+          @if (!configurationId()) {
+            <!-- Data Type -->
+            <div>
+              <p-floatlabel variant="on" class="w-60">
+                <p-select formControlName="dataTypeId" [options]="dataTypes.value()" optionLabel="name" optionValue="id"
+                          appendTo="body" styleClass="w-full" dropdownIcon="pi pi-objects-column"
+                          (onChange)="changeFormFields($event.value, configuration.value())"/>
+                <label for="dataTypeId">{{ 'page.import-configuration-management.input.data-type' | translate }}</label>
+              </p-floatlabel>
+              <form-input-error [control]="form.controls.dataTypeId"/>
+            </div>
+          }
+        </div>
+        <card class="w-fit">
+          <p card-header>{{ 'page.import-configuration-management.fields.title' | translate }}</p>
+          <p card-subHeader>{{ 'page.import-configuration-management.fields.description' | translate }}</p>
+          <p-table card-body formArrayName="fields" [value]="form.controls.fields.controls">
+            <ng-template #header>
+              <tr>
+                <th>{{ 'page.import-configuration-management.fields.header.order' | translate }}</th>
+                <th>{{ 'page.import-configuration-management.fields.header.name' | translate }}</th>
+                <th>{{ 'page.import-configuration-management.fields.header.default' | translate }}</th>
+                <th></th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-field let-i="rowIndex">
+              <tr [formGroup]="field">
+                <td>{{ i + 1 }}</td>
+                <td>{{ getFieldName(i) }}</td>
+                <td>
+                  @let fieldType = getFieldType(i);
+                  @if (fieldType === FieldType.Reference) {
+                    <p-select [placeholder]="'page.import-configuration-management.fields.input.referenced-entry' | translate"
+                              [options]="getDataEntries(i)()" optionLabel="label" optionValue="id" appendTo="body"
+                              formControlName="defaultValue" class="w-60"/>
+                  } @else {
+                    <data-type-entry-field-input formControlName="defaultValue" [type]="fieldType"/>
+                  }
+                </td>
+                <td>
+                  <div class="flex items-center">
+                    <p-button [title]="'page.import-configuration-management.button.move-up' | translate" icon="pi pi-chevron-up"
+                              type="button" variant="text" (onClick)="moveField(i, -1)"/>
+                    <p-button [title]="'page.import-configuration-management.button.move-down' | translate"
+                              icon="pi pi-chevron-down" type="button" variant="text" (onClick)="moveField(i, 1)"/>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </card>
+        <messages-showcase [messages]="messages()"/>
+        <p-button [title]="'page.import-configuration-management.button.submit' | translate" size="small"
+                  [label]="('page.import-configuration-management.button.' + (!configurationId() ? 'create' : 'save')) | translate"
+                  [disabled]="form.invalid || !form.dirty" (onClick)="save()" type="submit"/>
+      </form>
+    </card>
+  }
+</div>
