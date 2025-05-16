@@ -57,9 +57,8 @@
                     <td>
                       @if (!user.value.isOwnerOrSelf) {
                         @if (!user.value.showPermissions) {
-                          <p-button [title]="'page.instance-management.members.button.modify-permissions' | translate"
-                                    [label]="'page.instance-management.members.button.modify-permissions' | translate"
-                                    size="small" type="button" (click)="user.value.showPermissions = true"/>
+                          <p-badge [value]="'page.instance-management.members.button.modify-permissions' | translate"
+                                   (click)="user.value.showPermissions = true" class="cursor-pointer"/>
                         }
                         <p-dialog [(visible)]="user.value.showPermissions" [closable]="true" [modal]="true"
                                   styleClass="w-128 h-128"

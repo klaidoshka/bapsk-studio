@@ -61,7 +61,7 @@
             <td>{{ instance.ownerName }}</td>
             <td>{{ instance.createdAt | date:'mediumDate' }}</td>
             <td>{{ getLastActivity(instance) | async | date:'medium' }}</td>
-            <td>{{ instance.users.length }} user(s)</td>
+            <td>{{ ('page.instance.entry.members' | translate:{ count: instance.users.length }) }}</td>
             <td>
               <div class="flex items-center">
                 <p-button [title]="'page.instance.button.preview' | translate" icon="pi pi-eye" type="button" variant="text"

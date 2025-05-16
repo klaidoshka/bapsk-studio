@@ -388,6 +388,64 @@
       "card": "Asmens Dokumentas",
       "passport": "Pasas"
     },
+    "instance": {
+      "permission": {
+        "customer": {
+          "create": "Leisti kurti klientus",
+          "preview": "Leisti peržiūrėti klientus",
+          "edit": "Leisti redaguoti klientus",
+          "delete": "Leisti ištrinti klientus"
+        },
+        "data-entry": {
+          "create": "Leisti kurti duomenų įrašus",
+          "preview": "Leisti peržiūrėti duomenų įrašus",
+          "edit": "Leisti redaguoti duomenų įrašus",
+          "delete": "Leisti ištrinti duomenų įrašus"
+        },
+        "data-type": {
+          "create": "Leisti kurti duomenų tipus",
+          "preview": "Leisti peržiūrėti duomenų tipus",
+          "edit": "Leisti redaguoti duomenų tipus",
+          "delete": "Leisti ištrinti duomenų tipus"
+        },
+        "import-configuration": {
+          "create": "Leisti kurti importo konfigūracijas",
+          "preview": "Leisti peržiūrėti importo konfigūracijas",
+          "edit": "Leisti redaguoti importo konfigūracijas",
+          "delete": "Leisti ištrinti importo konfigūracijas"
+        },
+        "instance": {
+          "edit": "Leisti redaguoti egzemploriaus nustatymus"
+        },
+        "report-template": {
+          "create": "Leisti kurti ataskaitų šablonus",
+          "preview": "Leisti peržiūrėti ataskaitų šablonus",
+          "edit": "Leisti redaguoti ataskaitų šablonus",
+          "delete": "Leisti ištrinti ataskaitų šablonus"
+        },
+        "report": {
+          "create": "Leisti generuoti ataskaitas"
+        },
+        "sale": {
+          "create": "Leisti kurti pardavimus",
+          "preview": "Leisti peržiūrėti pardavimus",
+          "edit": "Leisti redaguoti pardavimus",
+          "delete": "Leisti ištrinti pardavimus"
+        },
+        "salesman": {
+          "create": "Leisti kurti pardavėjus",
+          "preview": "Leisti peržiūrėti pardavėjus",
+          "edit": "Leisti redaguoti pardavėjus",
+          "delete": "Leisti ištrinti pardavėjus"
+        },
+        "vat-return": {
+          "create": "Leisti kurti PVM grąžinimo deklaracijas",
+          "preview": "Leisti peržiūrėti PVM grąžinimo deklaracijas",
+          "submit-payment": "Leisti pateikti PVM grąžinimo faktus",
+          "cancel": "Leisti atšaukti PVM grąžinimo deklaracijas"
+        }
+      }
+    },
     "measurement": {
       "type": {
         "code": "Kodas (Standartinis)",
@@ -943,6 +1001,9 @@
       },
       "confirm-delete": "Ar tikrai norite ištrinti šį egzempliorių?",
       "description": "Tvarkykite egzempliorius – kurkite, peržiūrėkite, redaguokite ar ištrinkite.",
+      "entry": {
+        "members": "{{count}} nariai"
+      },
       "header": {
         "created-at": "Sukurtas",
         "description": "Aprašymas",

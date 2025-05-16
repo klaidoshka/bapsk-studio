@@ -388,6 +388,64 @@
       "card": "ID Card",
       "passport": "Passport"
     },
+    "instance": {
+      "permission": {
+        "customer": {
+          "create": "Authorize to create customers",
+          "preview": "Authorize to preview customers",
+          "edit": "Authorize to edit customers",
+          "delete": "Authorize to delete customers"
+        },
+        "data-entry": {
+          "create": "Authorize to create data entries",
+          "preview": "Authorize to preview data entries",
+          "edit": "Authorize to edit data entries",
+          "delete": "Authorize to delete data entries"
+        },
+        "data-type": {
+          "create": "Authorize to create data types",
+          "preview": "Authorize to preview data types",
+          "edit": "Authorize to edit data types",
+          "delete": "Authorize to delete data types"
+        },
+        "import-configuration": {
+          "create": "Authorize to create import configurations",
+          "preview": "Authorize to preview import configurations",
+          "edit": "Authorize to edit import configurations",
+          "delete": "Authorize to delete import configurations"
+        },
+        "instance": {
+          "edit": "Authorize to edit instance settings"
+        },
+        "report-template": {
+          "create": "Authorize to create report templates",
+          "preview": "Authorize to preview report templates",
+          "edit": "Authorize to edit report templates",
+          "delete": "Authorize to delete report templates"
+        },
+        "report": {
+          "create": "Authorize to generate reports"
+        },
+        "sale": {
+          "create": "Authorize to create sales",
+          "preview": "Authorize to preview sales",
+          "edit": "Authorize to edit sales",
+          "delete": "Authorize to delete sales"
+        },
+        "salesman": {
+          "create": "Authorize to create salesmen",
+          "preview": "Authorize to preview salesmen",
+          "edit": "Authorize to edit salesmen",
+          "delete": "Authorize to delete salesmen"
+        },
+        "vat-return": {
+          "create": "Authorize to create VAT returns",
+          "preview": "Authorize to preview VAT returns",
+          "submit-payment": "Authorize to submit payment for VAT returns",
+          "cancel": "Authorize to cancel VAT returns"
+        }
+      }
+    },
     "measurement": {
       "type": {
         "code": "Code (Standard)",
@@ -943,6 +1001,9 @@
       },
       "confirm-delete": "Are you sure about deleting this instance?",
       "description": "Manage your instances — create, preview, edit or delete.",
+      "entry": {
+        "members": "{{count}} member(s)"
+      },
       "header": {
         "created-at": "Created At",
         "description": "Description",
