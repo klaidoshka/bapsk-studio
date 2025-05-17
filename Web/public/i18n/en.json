@@ -347,9 +347,6 @@
     "minlength": "Minimum length is {{requiredLength}}.",
     "mismatch-passwords": "Passwords do not match.",
     "pattern": "Invalid format. Supported: {{requiredPattern}}.",
-    "report-generate-form": {
-      "type-required": "error.fill-all-fields"
-    },
     "sale-management": {
       "sale-exported": "Cannot edit this sale, because it has been exported."
     },
