@@ -18,7 +18,7 @@ import {
   CustomerPageHeaderSectionComponent
 } from '../../component/customer-page-header-section/customer-page-header-section.component';
 import {CardComponent} from '../../component/card/card.component';
-import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'customer-page',
@@ -40,7 +40,6 @@ export class CustomerPageComponent {
   private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly translateService = inject(TranslateService);
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly instanceId = input.required<string>();
   protected readonly messages = signal<Messages>({});

@@ -14,7 +14,8 @@ import {
   ReportTemplatePageHeaderSectionComponent
 } from '../../component/report-template-page-header-section/report-template-page-header-section.component';
 import {CardComponent} from '../../component/card/card.component';
-import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
+import {MessageHandlingService} from '../../service/message-handling.service';
 
 @Component({
   selector: 'report-template-page',
@@ -31,10 +32,10 @@ import {TranslatePipe, TranslateService} from '@ngx-translate/core';
   styles: ``
 })
 export class ReportTemplatePageComponent {
+  private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly reportTemplateService = inject(ReportTemplateService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly translateService = inject(TranslateService);
   protected readonly canGoBack = input<boolean>();
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly dataTypeId = input<string>();
@@ -82,7 +83,10 @@ export class ReportTemplatePageComponent {
       this.reportTemplateService
         .delete(NumberUtil.parse(this.instanceId())!, template.id!)
         .pipe(first())
-        .subscribe(() => this.changeMessages(this.translateService.instant("action.report-template.deleted")));
+        .subscribe({
+          next: () => this.messages.set({ success: ['action.report-template.deleted'] }),
+          error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
+        });
     });
   }
 

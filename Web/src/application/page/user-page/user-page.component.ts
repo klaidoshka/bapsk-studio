@@ -14,7 +14,7 @@ import {first, map} from 'rxjs';
 import {Router} from '@angular/router';
 import {UserPageHeaderSectionComponent} from '../../component/user-page-header-section/user-page-header-section.component';
 import {CardComponent} from '../../component/card/card.component';
-import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'user-page',
@@ -34,7 +34,6 @@ import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 export class UserPageComponent {
   private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly router = inject(Router);
-  private readonly translateService = inject(TranslateService);
   private readonly userService = inject(UserService);
   protected readonly getCountryName = getUserIsoCountryLabel;
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);

@@ -19,7 +19,7 @@ import {CardComponent} from '../../component/card/card.component';
 import {SaleService} from '../../service/sale.service';
 import {AsyncPipe} from '@angular/common';
 import {Badge} from 'primeng/badge';
-import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'salesman-page',
@@ -43,7 +43,6 @@ export class SalesmanPageComponent {
   private readonly router = inject(Router);
   private readonly salesmanService = inject(SalesmanService);
   private readonly saleService = inject(SaleService);
-  private readonly translateService = inject(TranslateService);
   protected readonly getCountryLabel = getIsoCountryLabel;
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly instanceId = input.required<string>();

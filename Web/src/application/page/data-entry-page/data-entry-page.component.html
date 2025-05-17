@@ -6,7 +6,7 @@
     <failed-to-load-please-reload/>
   } @else {
     <p-dialog [header]="'page.data-entry.dialog.import.header' | translate" closeOnEscape="true" modal="true"
-              styleClass="max-w-xl w-full dark:bg-primary-950! bg-primary-50!" closable="true"
+              styleClass="max-w-2xl w-full dark:bg-primary-950! bg-primary-50!" closable="true"
               [(visible)]="showImporting" (onHide)="showImporting.set(false)" (close)="showImporting.set(false)">
       <data-entry-import-form [clearImportedValues]="showImporting()" [dataType]="dataType.value()!"
                               [instanceId]="instanceIdAsNumber()!"/>
