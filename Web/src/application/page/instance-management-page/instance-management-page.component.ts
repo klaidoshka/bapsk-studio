@@ -18,7 +18,7 @@ import {instanceUserPermissions} from '../../constant/instance-user.permissions'
 import {AuthService} from '../../service/auth.service';
 import {MessageHandlingService} from '../../service/message-handling.service';
 import {UserService} from '../../service/user.service';
-import {InstanceCreateRequest, InstanceEditRequest, InstanceWithUsers} from '../../model/instance.model';
+import Instance, {InstanceCreateRequest, InstanceEditRequest, InstanceWithUsers} from '../../model/instance.model';
 import Messages from '../../model/messages.model';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {toUserIdentityFullName, UserIdentity} from '../../model/user.model';
@@ -116,8 +116,8 @@ export class InstanceManagementPageComponent {
     });
   }
 
-  private addUserInForm(user: UserIdentity, email: string, permissions?: string[]) {
-    const isOwner = this.instance.value()?.createdById === user.id;
+  private addUserInForm(user: UserIdentity, email: string, permissions?: string[], instance?: Instance) {
+    const isOwner = instance?.createdById === user.id;
     const isSelf = this.user.value()?.id === user.id;
 
     const permissionsToAdd = (isOwner || isSelf) ? [] : this.allPermissions.map(p => ({
@@ -217,7 +217,7 @@ export class InstanceManagementPageComponent {
     this.form.controls.users.clear();
 
     instance.users.forEach(user => {
-      this.addUserInForm(user.user, user.user.email, user.permissions);
+      this.addUserInForm(user.user, user.user.email, user.permissions, instance);
     });
 
     this.form.markAsPristine();
