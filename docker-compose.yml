@@ -34,11 +34,8 @@ services:
     image: mariadb:latest
     ports:
       - "3306:3306"
-    environment:
-      MARIADB_USER: user
-      MARIADB_PASSWORD: "paassword."
-      MARIADB_ROOT_PASSWORD: "paassword."
-      MARIADB_DATABASE: accounting
+    env_file:
+      - ./Database/.env
     volumes:
       - database:/var/lib/mysql
     networks:
