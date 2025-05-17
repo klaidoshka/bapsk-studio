@@ -23,7 +23,7 @@
       </p>
       <p card-subHeader>{{ 'page.data-entry.description' | translate }}</p>
       <div card-body class="flex flex-col gap-4">
-        <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex not-md:flex-col md:flex-wrap gap-4">
           @let dataTypeName = dataType.value()?.name;
           <p-button [title]="'page.data-entry.button.create' | translate:{name: dataTypeName}" size="small"
                     [label]="'page.data-entry.button.create' | translate:{name: dataTypeName}" type="button"

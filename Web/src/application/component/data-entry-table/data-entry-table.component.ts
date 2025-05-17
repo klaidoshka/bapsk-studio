@@ -42,50 +42,54 @@ export class DataEntryTableComponent {
   readonly manage = input<(entry: DataEntryJoined) => void>();
   readonly preview = input<(entry: DataEntryJoined) => void>();
   protected readonly dataEntries$ = toObservable(this.dataEntries);
+  protected readonly dataType$ = toObservable(this.dataType);
 
-  protected readonly dataEntriesModified = toObservable(this.dataType)
+  protected readonly dataEntriesModified = combineLatest([
+    this.dataEntries$,
+    this.dataType$.pipe(map(dataType => dataType.fields))
+  ])
     .pipe(
-      map(dataType => dataType.fields),
-      switchMap(typeFields => this.dataEntries$.pipe(
-          switchMap(entries =>
-            combineLatest(entries.map(entry =>
-              combineLatest(entry.fields.map(field => {
-                const dataTypeField = typeFields.find(it => it.id === field.dataTypeFieldId)!;
+      switchMap(([dataEntries, typeFields]) => {
+        if (!dataEntries || dataEntries.length === 0) {
+          return of([]);
+        }
 
-                return dataTypeField.type === FieldType.Reference
-                  ? this.dataEntryService
-                    .getAllByDataTypeId(this.instanceId(), dataTypeField.referenceId!)
-                    .pipe(
-                      map(entries => entries.find(it => it.id === field.value)),
-                      map(reference => ({
-                        ...field,
-                        reference: reference,
-                        type: dataTypeField.type,
-                      }))
-                    )
-                  : of({
-                    ...field,
-                    reference: undefined,
-                    type: dataTypeField.type
-                  });
-              }))
+        return combineLatest(dataEntries.map(entry =>
+          combineLatest(entry.fields.map(field => {
+            const dataTypeField = typeFields.find(it => it.id === field.dataTypeFieldId)!;
+
+            return dataTypeField.type === FieldType.Reference
+              ? this.dataEntryService
+                .getAllByDataTypeId(this.instanceId(), dataTypeField.referenceId!)
                 .pipe(
-                  map(entryFields => {
-                    const entryModified: DataEntryJoinedModified = {
-                      ...entry,
-                      modifiedByFullName: toUserIdentityFullName(entry.modifiedBy)
-                    };
-
-                    entryFields.forEach(field => {
-                      entryModified[`field_${field.dataTypeFieldId}`] = FieldTypeUtil.toDisplayValue(field.value, field.type, field.reference);
-                    });
-
-                    return entryModified;
-                  })
+                  map(entries => entries.find(it => it.id === field.value)),
+                  map(reference => ({
+                    ...field,
+                    reference: reference,
+                    type: dataTypeField.type,
+                  }))
                 )
-            ))
-          )
-        )
-      )
+              : of({
+                ...field,
+                reference: undefined,
+                type: dataTypeField.type
+              });
+          }))
+            .pipe(
+              map(entryFields => {
+                const entryModified: DataEntryJoinedModified = {
+                  ...entry,
+                  modifiedByFullName: toUserIdentityFullName(entry.modifiedBy)
+                };
+
+                entryFields.forEach(field => {
+                  entryModified[`field_${field.dataTypeFieldId}`] = FieldTypeUtil.toDisplayValue(field.value, field.type, field.reference);
+                });
+
+                return entryModified;
+              })
+            )
+        ));
+      })
     );
 }
