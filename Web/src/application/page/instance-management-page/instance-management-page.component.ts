@@ -117,9 +117,10 @@ export class InstanceManagementPageComponent {
   }
 
   private addUserInForm(user: UserIdentity, email: string, permissions?: string[]) {
-    const isOwnerOrSelf = this.instance.value()?.createdById === user.id || this.user.value()!.id === user.id;
+    const isOwner = this.instance.value()?.createdById === user.id;
+    const isSelf = this.user.value()?.id === user.id;
 
-    const permissionsToAdd = isOwnerOrSelf ? [] : this.allPermissions.map(p => ({
+    const permissionsToAdd = (isOwner || isSelf) ? [] : this.allPermissions.map(p => ({
       ...p,
       toggled: true as boolean
     }));
@@ -131,7 +132,8 @@ export class InstanceManagementPageComponent {
     this.form.controls.users.push(this.formBuilder.group({
       email: [email, [Validators.required, Validators.email]],
       id: [user?.id || undefined],
-      isOwnerOrSelf: [isOwnerOrSelf],
+      isOwner: [isOwner],
+      isSelf: [isSelf],
       name: [toUserIdentityFullName(user!)],
       permissions: [permissionsToAdd],
       showPermissions: [false as boolean]
@@ -177,7 +179,8 @@ export class InstanceManagementPageComponent {
         this.formBuilder.group({
           email: ["", [Validators.required, Validators.email]],
           id: [undefined as number | undefined],
-          isOwnerOrSelf: [false],
+          isOwner: [false],
+          isSelf: [false],
           name: [""],
           permissions: [this.allPermissions.map(p => ({
             ...p,

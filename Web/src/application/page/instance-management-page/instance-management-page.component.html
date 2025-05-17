@@ -55,19 +55,24 @@
                     <td>{{ user.value.email }}</td>
                     <td>{{ user.value.name }}</td>
                     <td>
-                      @if (!user.value.isOwnerOrSelf) {
-                        @if (!user.value.showPermissions) {
-                          <p-badge [value]="'page.instance-management.members.button.modify-permissions' | translate"
-                                   (click)="user.value.showPermissions = true" class="cursor-pointer"/>
+                      @if (!user.value.isOwner) {
+                        @if (!user.value.isSelf) {
+                          @if (!user.value.showPermissions) {
+                            <p-badge [value]="'page.instance-management.members.button.modify-permissions' | translate"
+                                     (click)="user.value.showPermissions = true" class="cursor-pointer"/>
+                          }
+                          <p-dialog [(visible)]="user.value.showPermissions" [closable]="true" [modal]="true"
+                                    styleClass="w-128 h-128"
+                                    [header]="'page.instance-management.members.dialog.permissions.title' | translate:{name:user.value.name}">
+                            <instance-user-permission-toggler [permissions]="user.value.permissions"
+                                                              [toggle]="togglePermission" [userIndex]="i"/>
+                          </p-dialog>
+                        } @else {
+                          <p-badge [value]="'page.instance-management.members.badge.self' | translate" severity="warn"
+                                   class="px-2 py-1 text-xs"/>
                         }
-                        <p-dialog [(visible)]="user.value.showPermissions" [closable]="true" [modal]="true"
-                                  styleClass="w-128 h-128"
-                                  [header]="'page.instance-management.members.dialog.permissions.title' | translate:{name:user.value.name}">
-                          <instance-user-permission-toggler [permissions]="user.value.permissions"
-                                                            [toggle]="togglePermission" [userIndex]="i"/>
-                        </p-dialog>
                       } @else {
-                        <p-badge [value]="'page.instance-management.members.badge.all-granted' | translate" severity="success"
+                        <p-badge [value]="'page.instance-management.members.badge.owner' | translate" severity="success"
                                  class="px-2 py-1 text-xs"/>
                       }
                     </td>

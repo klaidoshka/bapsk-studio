@@ -1030,7 +1030,8 @@
       "title": "Manage Instance",
       "members": {
         "badge": {
-          "all-granted": "Owner. All granted."
+          "owner": "Owner. All granted.",
+          "self": "Cannot modify self"
         },
         "button": {
           "modify-permissions": "Modify Permissions"
