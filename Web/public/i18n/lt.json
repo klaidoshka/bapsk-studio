@@ -347,9 +347,6 @@
     "minlength": "Minimalus ilgis – {{requiredLength}} simboliai.",
     "mismatch-passwords": "Slaptažodžiai nesutampa.",
     "pattern": "Neteisingas formatas. Galimas: {{requiredPattern}}.",
-    "report-generate-form": {
-      "type-required": "Užpildykite visus laukus."
-    },
     "sale-management": {
       "sale-exported": "Šis pardavimas neberedaguojamas, nes prekės jau išeksportuotos."
     },
@@ -1030,7 +1027,8 @@
       "title": "Tvarkyti egzempliorių",
       "members": {
         "badge": {
-          "all-granted": "Savininkas. Visi leidimai."
+          "owner": "Savininkas — visi leidimai",
+          "self": "Negalite redaguoti savęs"
         },
         "button": {
           "modify-permissions": "Keisti leidimus"

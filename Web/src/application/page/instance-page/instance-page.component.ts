@@ -21,7 +21,7 @@ import {
   InstancePageHeaderSectionComponent
 } from '../../component/instance-page-header-section/instance-page-header-section.component';
 import {CardComponent} from '../../component/card/card.component';
-import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'instance-page',
@@ -48,7 +48,6 @@ export class InstancePageComponent {
   private readonly dataTypeService = inject(DataTypeService);
   private readonly instanceService = inject(InstanceService);
   private readonly router = inject(Router);
-  private readonly translateService = inject(TranslateService);
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly messages = signal<Messages>({});
 

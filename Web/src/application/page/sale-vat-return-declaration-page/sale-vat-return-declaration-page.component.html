@@ -9,7 +9,7 @@
     <div class="flex flex-col gap-4">
       <!-- Row of actions -->
       <div class="flex flex-wrap gap-2">
-        @if (!declaration.value()!.export && declaration.value() && !declaration.value()!.isCancelled) {
+        @if (declaration.value() && !declaration.value()!.export && !declaration.value()!.isCancelled) {
           <p-button [title]="'page.declaration-preview.button.refresh' | translate" icon="pi pi-refresh"
                     [label]="'page.declaration-preview.button.refresh' | translate" (click)="refresh()" size="small"
                     [disabled]="isRefreshing()"/>

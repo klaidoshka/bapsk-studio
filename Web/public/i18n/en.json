@@ -347,9 +347,6 @@
     "minlength": "Minimum length is {{requiredLength}}.",
     "mismatch-passwords": "Passwords do not match.",
     "pattern": "Invalid format. Supported: {{requiredPattern}}.",
-    "report-generate-form": {
-      "type-required": "error.fill-all-fields"
-    },
     "sale-management": {
       "sale-exported": "Cannot edit this sale, because it has been exported."
     },
@@ -1030,7 +1027,8 @@
       "title": "Manage Instance",
       "members": {
         "badge": {
-          "all-granted": "Owner. All granted."
+          "owner": "Owner. All granted.",
+          "self": "Cannot modify self"
         },
         "button": {
           "modify-permissions": "Modify Permissions"

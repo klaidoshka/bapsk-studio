@@ -15,7 +15,7 @@ import {
   ImportConfigurationPageHeaderSectionComponent
 } from "../../component/import-configuration-page-header-section/import-configuration-page-header-section.component";
 import {CardComponent} from '../../component/card/card.component';
-import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'import-configuration-page',
@@ -36,7 +36,6 @@ export class ImportConfigurationPageComponent {
   private readonly importConfigurationService = inject(ImportConfigurationService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly translateService = inject(TranslateService);
   protected readonly canGoBack = input<boolean>();
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
   protected readonly dataTypeId = input<string>();
@@ -61,17 +60,13 @@ export class ImportConfigurationPageComponent {
     }
   });
 
-  private changeMessages(message: string, success: boolean = true) {
-    this.messages.set(success ? {success: [message]} : {error: [message]});
-  }
-
   protected delete(configuration: ImportConfigurationJoined) {
     this.confirmationComponent().request(() => {
       this.importConfigurationService
         .delete(NumberUtil.parse(this.instanceId())!, configuration.id!)
         .pipe(first())
         .subscribe({
-          next: () => this.changeMessages(this.translateService.instant("action.import-configuration.deleted")),
+          next: () => this.messages.set({success: ['action.import-configuration.deleted']}),
           error: (response) => this.messageHandlingService.consumeHttpErrorResponse(response, this.messages)
         });
     });

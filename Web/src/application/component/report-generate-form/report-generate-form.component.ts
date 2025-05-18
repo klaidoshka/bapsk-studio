@@ -167,7 +167,7 @@ export class ReportGenerateFormComponent {
         return null;
       }
 
-      return { "report-generate-form.type-required": true };
+      return { "fill-all-fields": true };
     };
   }
 

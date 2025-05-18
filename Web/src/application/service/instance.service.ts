@@ -186,7 +186,7 @@ export class InstanceService {
       .getWithUsersById(id)
       .pipe(
         switchMap(instance => this.userService
-          .getIdentityById(id)
+          .getIdentityById(instance.createdById)
           .pipe(
             map(user => ({
               ...instance,

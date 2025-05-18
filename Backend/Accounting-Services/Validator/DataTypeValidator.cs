@@ -27,6 +27,7 @@ public class DataTypeValidator : IDataTypeValidator
 
         if (
             await _database.DataTypes.AnyAsync(dt => dt.InstanceId == request.InstanceId &&
+                                                     !dt.IsDeleted &&
                                                      dt.Name.Equals(
                                                          request.Name,
                                                          StringComparison.OrdinalIgnoreCase

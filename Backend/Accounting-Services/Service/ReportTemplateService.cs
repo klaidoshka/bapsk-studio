@@ -66,6 +66,7 @@ public class ReportTemplateService : IReportTemplateService
 
         if (await _database.ReportTemplates.AnyAsync(it =>
                 it.Fields.First().DataType.InstanceId == dataTypeFieldsByInstanceId.First().Key &&
+                !it.IsDeleted &&
                 String.Equals(
                     it.Name,
                     request.ReportTemplate.Name,

@@ -15,7 +15,7 @@ import {
   DataTypePageHeaderSectionComponent
 } from '../../component/data-type-page-header-section/data-type-page-header-section.component';
 import {CardComponent} from '../../component/card/card.component';
-import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
   selector: 'data-type-page',
@@ -28,7 +28,6 @@ export class DataTypePageComponent {
   private readonly messageHandlingService = inject(MessageHandlingService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly translateService = inject(TranslateService);
   protected readonly confirmationComponent = viewChild.required(ConfirmationComponent);
 
   protected readonly dataTypes = rxResource({

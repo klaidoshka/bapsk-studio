@@ -18,7 +18,7 @@ import {instanceUserPermissions} from '../../constant/instance-user.permissions'
 import {AuthService} from '../../service/auth.service';
 import {MessageHandlingService} from '../../service/message-handling.service';
 import {UserService} from '../../service/user.service';
-import {InstanceCreateRequest, InstanceEditRequest, InstanceWithUsers} from '../../model/instance.model';
+import Instance, {InstanceCreateRequest, InstanceEditRequest, InstanceWithUsers} from '../../model/instance.model';
 import Messages from '../../model/messages.model';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {toUserIdentityFullName, UserIdentity} from '../../model/user.model';
@@ -116,10 +116,11 @@ export class InstanceManagementPageComponent {
     });
   }
 
-  private addUserInForm(user: UserIdentity, email: string, permissions?: string[]) {
-    const isOwnerOrSelf = this.instance.value()?.createdById === user.id || this.user.value()!.id === user.id;
+  private addUserInForm(user: UserIdentity, email: string, permissions?: string[], instance?: Instance) {
+    const isOwner = instance?.createdById === user.id;
+    const isSelf = this.user.value()?.id === user.id;
 
-    const permissionsToAdd = isOwnerOrSelf ? [] : this.allPermissions.map(p => ({
+    const permissionsToAdd = (isOwner || isSelf) ? [] : this.allPermissions.map(p => ({
       ...p,
       toggled: true as boolean
     }));
@@ -131,7 +132,8 @@ export class InstanceManagementPageComponent {
     this.form.controls.users.push(this.formBuilder.group({
       email: [email, [Validators.required, Validators.email]],
       id: [user?.id || undefined],
-      isOwnerOrSelf: [isOwnerOrSelf],
+      isOwner: [isOwner],
+      isSelf: [isSelf],
       name: [toUserIdentityFullName(user!)],
       permissions: [permissionsToAdd],
       showPermissions: [false as boolean]
@@ -177,7 +179,8 @@ export class InstanceManagementPageComponent {
         this.formBuilder.group({
           email: ["", [Validators.required, Validators.email]],
           id: [undefined as number | undefined],
-          isOwnerOrSelf: [false],
+          isOwner: [false],
+          isSelf: [false],
           name: [""],
           permissions: [this.allPermissions.map(p => ({
             ...p,
@@ -214,7 +217,7 @@ export class InstanceManagementPageComponent {
     this.form.controls.users.clear();
 
     instance.users.forEach(user => {
-      this.addUserInForm(user.user, user.user.email, user.permissions);
+      this.addUserInForm(user.user, user.user.email, user.permissions, instance);
     });
 
     this.form.markAsPristine();
