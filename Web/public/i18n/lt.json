@@ -1210,7 +1210,7 @@
         "salesman": "Pardavėjas",
         "sold-goods": "Parduotos prekės",
         "total-price": "Bendra suma",
-        "vat": "PVM deklaracija"
+        "vat": "PVM susigrąžinimo deklaracija"
       },
       "receipt-type": {
         "invoice": "Sąskaita-faktūra",
