@@ -337,6 +337,14 @@
     },
     "email": "Invalid email address format.",
     "fill-all-fields": "Fill all required fields before submitting.",
+    "http-status": {
+      "400": "Bad Request. Please check your inputs.",
+      "401": "Unauthorized. Please log in again.",
+      "403": "Forbidden. Please check your permissions.",
+      "404": "Not Found. The requested resource could not be found.",
+      "406": "Not Acceptable. Couldn't handle the request.",
+      "500": "Unknown error occurred, please try again later."
+    },
     "instance-management": {
       "email-exists": "Member with this email already exists in the list.",
       "email-invalid": "User with email {{email}} does not exist."

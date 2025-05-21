@@ -337,6 +337,14 @@
     },
     "email": "Netinkamas el. pašto formatas.",
     "fill-all-fields": "Užpildykite visus laukus prieš pateikdami formą.",
+    "http-status": {
+      "400": "Bloga užklausa, patikrinkite pateiktus duomenis.",
+      "401": "Jūs nesate prisijungę, pirmiau prisijunkite.",
+      "403": "Jums uždrausta tai atlikti, reikia leidimo.",
+      "404": "Nepavyko rasti ieškomų duomenų.",
+      "406": "Šiuo metu nepavyko apdoroti užklausos, bandykite vėliau.",
+      "500": "Įvyko nežinoma klaida. Prašome bandyti vėliau."
+    },
     "instance-management": {
       "email-exists": "Narys su šiuo el. paštu jau yra sąraše.",
       "email-invalid": "Narys pagal '{{email}}' el. paštą buvo nerastas."
