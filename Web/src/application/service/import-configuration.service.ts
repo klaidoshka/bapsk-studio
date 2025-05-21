@@ -11,17 +11,28 @@ import {FieldType} from '../model/data-type-field.model';
 import {FieldTypeUtil} from '../util/field-type.util';
 import {DataTypeService} from './data-type.service';
 import {CacheService} from './cache.service';
+import {EventService} from './event.service';
+import {events} from '../model/event.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ImportConfigurationService {
   private readonly apiRouter = inject(ApiRouter);
+  private readonly eventService = inject(EventService);
   private readonly dataTypeService = inject(DataTypeService);
   private readonly httpClient = inject(HttpClient);
   private readonly cacheService = new CacheService<number, ImportConfigurationJoined>(configuration => configuration.id);
   private readonly dataTypesFetched = new Set<number>();
   private readonly instancesFetched = new Set<number>();
+
+  constructor() {
+    this.eventService.subscribe(events.loggedOut, () => {
+      this.dataTypesFetched.clear();
+      this.instancesFetched.clear();
+      this.cacheService.deleteAll();
+    });
+  }
 
   private adjustRequestDateToISO<T extends ImportConfigurationCreateRequest | ImportConfigurationEditRequest>(
     request: T, fieldTypes: Map<number, FieldType>

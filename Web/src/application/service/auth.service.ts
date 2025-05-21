@@ -7,12 +7,15 @@ import {ApiRouter} from "./api-router.service";
 import {UserService} from './user.service';
 import {Router} from "@angular/router";
 import {LocalStorageKeys} from '../constant/local-storage.keys';
+import {EventService} from './event.service';
+import {events} from '../model/event.model';
 
 @Injectable({
   providedIn: "root"
 })
 export class AuthService {
   private readonly apiRouter = inject(ApiRouter);
+  private readonly eventService = inject(EventService);
   private readonly httpClient = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly userService = inject(UserService);
@@ -71,6 +74,8 @@ export class AuthService {
     if (this.access.value !== undefined) {
       this.access.next(undefined);
     }
+
+    this.eventService.call(events.loggedOut);
   }
 
   private getAccess(): AuthResponse | undefined {

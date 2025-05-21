@@ -3,10 +3,12 @@ import Session from '../model/session.model';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
 import {catchError, finalize, map, Observable, of, switchMap, tap, timeout} from 'rxjs';
-import {AuthService} from './auth.service';
 import {Router} from '@angular/router';
 import {DateUtil} from '../util/date.util';
 import {CacheService} from './cache.service';
+import {EventService} from './event.service';
+import {events} from '../model/event.model';
+import {AuthService} from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,13 +16,17 @@ import {CacheService} from './cache.service';
 export class SessionService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly authService = inject(AuthService);
+  private readonly eventService = inject(EventService);
   private readonly httpClient = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly cacheService = new CacheService<string, Session>(s => s.id);
   private readonly userFetched = signal<boolean>(false);
 
   constructor() {
-    this.getByUser().subscribe();
+    this.eventService.subscribe(events.loggedOut, () => {
+      this.userFetched.set(false);
+      this.cacheService.deleteAll();
+    });
   }
 
   getByUser(): Observable<Session[]> {

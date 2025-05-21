@@ -2,27 +2,32 @@ import {inject, Injectable} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {DataTypeService} from './data-type.service';
 import {HttpClient} from '@angular/common/http';
-import {UserService} from './user.service';
-import ReportTemplate, {
-  ReportTemplateCreateRequest,
-  ReportTemplateEditRequest,
-  ReportTemplateWithCreator
-} from '../model/report-template.model';
+import ReportTemplate, {ReportTemplateCreateRequest, ReportTemplateEditRequest} from '../model/report-template.model';
 import {first, map, Observable, switchMap, tap} from 'rxjs';
 import {CacheService} from './cache.service';
 import DataType from '../model/data-type.model';
+import {EventService} from './event.service';
+import {events} from '../model/event.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ReportTemplateService {
   private readonly apiRouter = inject(ApiRouter);
+  private readonly eventService = inject(EventService);
   private readonly dataTypeService = inject(DataTypeService);
   private readonly httpClient = inject(HttpClient);
-  private readonly userService = inject(UserService);
   private readonly cacheService = new CacheService<number, ReportTemplate>(template => template.id);
   private readonly instancesFetched = new Set<number>();
   private readonly templateInstanceId = new Map<number, number>();
+
+  constructor() {
+    this.eventService.subscribe(events.loggedOut, () => {
+      this.instancesFetched.clear();
+      this.templateInstanceId.clear();
+      this.cacheService.deleteAll();
+    });
+  }
 
   create(request: ReportTemplateCreateRequest): Observable<ReportTemplate> {
     return this.httpClient
@@ -78,22 +83,6 @@ export class ReportTemplateService {
   getDataType(instanceId: number, template: ReportTemplate): Observable<DataType> {
     const dataTypeId = template.fields.at(0)!.dataTypeId;
     return this.dataTypeService.getById(instanceId, dataTypeId);
-  }
-
-  getWithCreatorById(instanceId: number, id: number): Observable<ReportTemplateWithCreator> {
-    return this
-      .getById(instanceId, id)
-      .pipe(
-        switchMap(template => this.userService
-          .getIdentityById(template.createdById)
-          .pipe(
-            map(user => ({
-              ...template,
-              createdBy: user
-            }))
-          )
-        )
-      );
   }
 
   getAllByDataTypeId(instanceId: number, dataTypeId: number): Observable<ReportTemplate[]> {

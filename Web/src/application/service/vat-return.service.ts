@@ -19,18 +19,28 @@ import {SaleService} from './sale.service';
 import {UnitOfMeasureType} from '../model/unit-of-measure-type.model';
 import {DateUtil} from '../util/date.util';
 import {CacheService} from './cache.service';
+import {EventService} from './event.service';
+import {events} from '../model/event.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VatReturnService {
   private readonly apiRouter = inject(ApiRouter);
+  private readonly eventService = inject(EventService);
   private readonly httpClient = inject(HttpClient);
   private readonly injector = inject(Injector);
   private readonly userService = inject(UserService);
   private readonly cacheBySaleIdService = new CacheService<number, VatReturnDeclaration | null>();
   private readonly cacheByCodeService = new CacheService<string, VatReturnDeclarationWithSale | null>();
   private _saleService?: SaleService;
+
+  constructor() {
+    this.eventService.subscribe(events.loggedOut, () => {
+      this.cacheBySaleIdService.deleteAll();
+      this.cacheByCodeService.deleteAll();
+    });
+  }
 
   private get saleService(): SaleService {
     if (!this._saleService) {
