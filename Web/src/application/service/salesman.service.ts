@@ -6,15 +6,25 @@ import {first, map, switchMap, tap} from 'rxjs';
 import {EnumUtil} from '../util/enum.util';
 import {IsoCountryCode} from '../model/iso-country.model';
 import {CacheService} from './cache.service';
+import {EventService} from './event.service';
+import {events} from '../model/event.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SalesmanService {
   private readonly apiRouter = inject(ApiRouter);
+  private readonly eventService = inject(EventService);
   private readonly httpClient = inject(HttpClient);
   private readonly cacheService = new CacheService<number, Salesman>(salesman => salesman.id!);
   private readonly instancesFetched = new Set<number>();
+
+  constructor() {
+    this.eventService.subscribe(events.loggedOut, () => {
+      this.instancesFetched.clear();
+      this.cacheService.deleteAll();
+    });
+  }
 
   create(request: SalesmanCreateRequest) {
     return this.httpClient

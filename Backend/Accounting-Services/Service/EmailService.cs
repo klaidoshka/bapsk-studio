@@ -2,16 +2,19 @@ using System.Net;
 using System.Net.Mail;
 using Accounting.Contract.Configuration;
 using Accounting.Contract.Service;
+using Microsoft.Extensions.Logging;
 
 namespace Accounting.Services.Service;
 
 public class EmailService : IEmailService
 {
     private readonly Email _email;
+    private readonly ILogger<EmailService> _logger;
 
-    public EmailService(Email email)
+    public EmailService(Email email, ILogger<EmailService> logger)
     {
         _email = email;
+        _logger = logger;
     }
 
     public async Task SendAsync(
@@ -41,6 +44,13 @@ public class EmailService : IEmailService
             message.Attachments.Add(attachment);
         }
 
-        await client.SendMailAsync(message);
+        try
+        {
+            await client.SendMailAsync(message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Error sending email: {Message}", ex.Message);
+        }
     }
 }

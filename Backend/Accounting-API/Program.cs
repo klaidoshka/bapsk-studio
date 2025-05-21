@@ -14,6 +14,7 @@ using Accounting.Services.Validator;
 using DotNetEnv;
 using DotNetEnv.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Resend;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +53,27 @@ builder.Services.AddScoped<Dictionary<FieldType, FieldHandler>>(provider => new(
     }
 );
 
+var emailResendEnabled = Environment.GetEnvironmentVariable("EMAIL__RESEND__ENABLED")?.ToLower() == "true";
+
+if (emailResendEnabled)
+{
+    builder.Services.AddHttpClient<ResendClient>();
+
+    builder.Services.Configure<ResendClientOptions>(o =>
+        {
+            o.ApiToken = Environment.GetEnvironmentVariable("EMAIL__RESEND__APIKEY")
+                         ?? throw new ArgumentException("EMAIL__RESEND__APIKEY environment variable is not set");
+        }
+    );
+
+    builder.Services.AddScoped<IResend, ResendClient>();
+    builder.Services.AddScoped<IEmailService, ResendEmailService>();
+}
+else
+{
+    builder.Services.AddScoped<IEmailService, EmailService>();
+}
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthValidator, AuthValidator>();
 builder.Services.AddScoped<IButentaService, ButentaService>();
@@ -63,7 +85,6 @@ builder.Services.AddScoped<IDataEntryService, DataEntryService>();
 builder.Services.AddScoped<IDataEntryValidator, DataEntryValidator>();
 builder.Services.AddScoped<IDataTypeService, DataTypeService>();
 builder.Services.AddScoped<IDataTypeValidator, DataTypeValidator>();
-builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IEncryptService, EncryptService>();
 builder.Services.AddScoped<IFieldTypeService, FieldTypeService>();
 builder.Services.AddScoped<IFieldTypeValidator, FieldTypeValidator>();

@@ -17,6 +17,10 @@ export class CacheService<K, V> {
     this.store.next(updated);
   }
 
+  deleteAll() {
+    this.store.next(new Map());
+  }
+
   execute<R>(callback: (values: Map<K, V>) => R): R {
     return callback(
       new Map(

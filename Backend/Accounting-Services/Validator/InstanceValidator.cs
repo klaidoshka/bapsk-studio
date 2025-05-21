@@ -31,14 +31,13 @@ public class InstanceValidator : IInstanceValidator
             return new Validation("Instance must have a name.");
         }
 
-        var exists = user.InstancesCreated.Any(
-            ic => ic.Name.Equals(
-                request.Name,
-                StringComparison.OrdinalIgnoreCase
+        if (
+            user.InstancesCreated.Any(ic => !ic.IsDeleted && ic.Name.Equals(
+                    request.Name,
+                    StringComparison.OrdinalIgnoreCase
+                )
             )
-        );
-
-        if (exists)
+        )
         {
             return new Validation("You already have created an instance with this name.");
         }
@@ -72,14 +71,14 @@ public class InstanceValidator : IInstanceValidator
             .Include(i => i.CreatedBy)
             .ThenInclude(u => u.InstancesCreated)
             .FirstAsync(i => i.Id == request.InstanceId);
-        
+
         if (String.IsNullOrWhiteSpace(request.Name))
         {
             return new Validation("Instance must have a name.");
         }
 
         if (
-            instance.CreatedBy.InstancesCreated.Any(ic => ic.Name.Equals(
+            instance.CreatedBy.InstancesCreated.Any(ic => !ic.IsDeleted && ic.Name.Equals(
                     request.Name,
                     StringComparison.OrdinalIgnoreCase
                 ) && ic.Id != request.InstanceId

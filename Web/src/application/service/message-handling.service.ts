@@ -1,21 +1,14 @@
-import {Injectable, WritableSignal} from '@angular/core';
+import {inject, Injectable, WritableSignal} from '@angular/core';
 import Messages from '../model/messages.model';
 import ErrorResponse, {ErrorResponseDetails} from '../model/error-response.model';
+import {TranslateService} from '@ngx-translate/core';
 
 @Injectable({
   providedIn: 'root'
 
 })
 export class MessageHandlingService {
-  private readonly defaultErrorMessage = 'Unknown error occurred, please try again later.';
-
-  private readonly statusCodeMessages: Record<number, string> = {
-    400: 'Bad Request. Please check your inputs.',
-    401: 'Unauthorized. Please log in again.',
-    403: 'Forbidden. Please check your permissions.',
-    404: 'Not Found. The requested resource could not be found.',
-    500: this.defaultErrorMessage
-  }
+  private readonly translateService = inject(TranslateService);
 
   private isErrorResponse(obj: any): obj is ErrorResponse {
     return obj?.error?.messages !== undefined;
@@ -36,13 +29,14 @@ export class MessageHandlingService {
       return error.messages;
     } else {
       const statusCode = error?.status as number | undefined || 400;
+      const message = statusCode && this.translateService.instant("error.http-status." + statusCode);
 
-      if (statusCode && this.statusCodeMessages[statusCode]) {
-        return [this.statusCodeMessages[statusCode]];
+      if (statusCode && message) {
+        return [message];
       }
     }
 
-    return [this.defaultErrorMessage];
+    return [this.translateService.instant("error.http-status." + 500)];
   }
 
   consumeHttpErrorResponse(response: any, messages: WritableSignal<Messages>) {

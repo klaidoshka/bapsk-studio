@@ -2,12 +2,14 @@ import {inject, Injectable, signal} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {toUserIdentity, User, UserCreateRequest, UserEditRequest, UserIdentity} from '../model/user.model';
 import {first, map, Observable, of, switchMap, tap} from 'rxjs';
-import {HttpClient} from '@angular/common/http';
 import {EnumUtil} from '../util/enum.util';
 import {Role} from '../model/role.model';
 import {IsoCountryCode} from '../model/iso-country.model';
 import {DateUtil} from '../util/date.util';
 import {CacheService} from './cache.service';
+import {EventService} from './event.service';
+import {events} from '../model/event.model';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -15,9 +17,18 @@ import {CacheService} from './cache.service';
 export class UserService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly httpClient = inject(HttpClient);
+  private readonly eventService = inject(EventService);
   private readonly cacheIdentityService = new CacheService<number, UserIdentity>(identity => identity.id);
   private readonly cacheUserService = new CacheService<number, User>(user => user.id);
   private readonly usersFetched = signal<boolean>(false);
+
+  constructor() {
+    this.eventService.subscribe(events.loggedOut, () => {
+      this.cacheIdentityService.deleteAll();
+      this.cacheUserService.deleteAll();
+      this.usersFetched.set(false);
+    });
+  }
 
   private adjustRequestDateToISO<T extends UserCreateRequest | UserEditRequest>(request: T): T {
     return {

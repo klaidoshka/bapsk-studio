@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {CardComponent} from '../../component/card/card.component';
 import {Accordion, AccordionContent, AccordionHeader, AccordionPanel} from 'primeng/accordion';
 import {TranslatePipe} from '@ngx-translate/core';
+import {environment} from '../../environments/environment';
 
 @Component({
   selector: 'home-page',
@@ -17,6 +18,8 @@ import {TranslatePipe} from '@ngx-translate/core';
   styles: ``
 })
 export class HomePageComponent {
+  protected readonly supportEmail = environment.SUPPORT__EMAIL;
+
   protected readonly faqKeys = [
     'page.home.faq.data.0',
     'page.home.faq.data.1',

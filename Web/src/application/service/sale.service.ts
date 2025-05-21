@@ -10,18 +10,28 @@ import {UnitOfMeasureType} from '../model/unit-of-measure-type.model';
 import {DateUtil} from '../util/date.util';
 import {CacheService} from './cache.service';
 import {VatReturnService} from './vat-return.service';
+import {EventService} from './event.service';
+import {events} from '../model/event.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SaleService {
   private readonly apiRouter = inject(ApiRouter);
+  private readonly eventService = inject(EventService);
   private readonly customerService = inject(CustomerService);
   private readonly httpClient = inject(HttpClient);
   private readonly salesmanService = inject(SalesmanService);
   private readonly vatReturnService = inject(VatReturnService);
   private readonly cacheService = new CacheService<number, Sale>(sale => sale.id);
   private readonly instancesFetched = new Set<number>();
+
+  constructor() {
+    this.eventService.subscribe(events.loggedOut, () => {
+      this.instancesFetched.clear();
+      this.cacheService.deleteAll();
+    });
+  }
 
   private adjustRequestDateToISO<T extends SaleCreateRequest | SaleEditRequest>(request: T): T {
     return {

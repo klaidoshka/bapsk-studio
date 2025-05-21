@@ -16,17 +16,27 @@ import {FieldType} from '../model/data-type-field.model';
 import {FieldTypeUtil} from '../util/field-type.util';
 import {CacheService} from './cache.service';
 import DataType from '../model/data-type.model';
+import {events} from '../model/event.model';
+import {EventService} from './event.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DataEntryService {
   private readonly apiRouter = inject(ApiRouter);
+  private readonly eventService = inject(EventService);
   private readonly dataTypeService = inject(DataTypeService);
   private readonly httpClient = inject(HttpClient);
   private readonly userService = inject(UserService);
   private readonly cacheService = new CacheService<number, DataEntryJoined>(dataEntry => dataEntry.id);
   private readonly dataTypesFetched = new Set<number>();
+
+  constructor() {
+    this.eventService.subscribe(events.loggedOut, () => {
+      this.dataTypesFetched.clear();
+      this.cacheService.deleteAll();
+    });
+  }
 
   private adjustRequestDateToISO<T extends DataEntryCreateRequest | DataEntryEditRequest>(request: T, dataType: DataType): T {
     return {

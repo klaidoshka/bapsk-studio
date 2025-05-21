@@ -8,15 +8,25 @@ import {IsoCountryCode} from '../model/iso-country.model';
 import {IdentityDocumentType} from '../model/identity-document-type.model';
 import {DateUtil} from '../util/date.util';
 import {CacheService} from './cache.service';
+import {EventService} from './event.service';
+import {events} from '../model/event.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CustomerService {
   private readonly apiRouter = inject(ApiRouter);
+  private readonly eventService = inject(EventService);
   private readonly httpClient = inject(HttpClient);
   private readonly cacheService = new CacheService<number, Customer>(c => c.id!);
   private readonly instancesFetched = new Set<number>();
+
+  constructor() {
+    this.eventService.subscribe(events.loggedOut, () => {
+      this.instancesFetched.clear();
+      this.cacheService.deleteAll();
+    });
+  }
 
   private adjustRequestDateToISO<T extends CustomerCreateRequest | CustomerEditRequest>(request: T): T {
     return {

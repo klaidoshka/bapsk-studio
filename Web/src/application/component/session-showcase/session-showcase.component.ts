@@ -10,7 +10,6 @@ import {MessageService} from 'primeng/api';
 import {rxResource} from '@angular/core/rxjs-interop';
 import {CardComponent} from '../card/card.component';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
-import {first} from 'rxjs';
 
 @Component({
   selector: 'session-showcase',
@@ -23,7 +22,6 @@ import {first} from 'rxjs';
     TranslatePipe
   ],
   templateUrl: './session-showcase.component.html',
-  providers: [MessageService],
   styles: ``
 })
 export class SessionShowcaseComponent {
@@ -62,14 +60,16 @@ export class SessionShowcaseComponent {
 
   protected revoke(session: Session) {
     this.confirmationComponent().request(() => {
-      this.sessionService.revoke(session.id).pipe(first()).subscribe({
-        next: () => this.messageService.add({
-          key: 'root',
-          severity: 'success',
-          closable: true,
-          summary: this.translateService.instant('action.auth.summary'),
-          detail: this.translateService.instant('action.auth.session-revoked')
-        })
+      this.sessionService.revoke(session.id).subscribe({
+        next: () => {
+          this.messageService.add({
+            key: 'root',
+            severity: 'success',
+            closable: true,
+            summary: this.translateService.instant('action.auth.summary'),
+            detail: this.translateService.instant('action.auth.session-revoked')
+          });
+        }
       });
     });
   }

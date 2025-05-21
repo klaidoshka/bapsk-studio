@@ -7,11 +7,13 @@ import Instance, {
   InstanceWithUsersAndOwner
 } from '../model/instance.model';
 import {ApiRouter} from './api-router.service';
-import {combineLatest, first, map, Observable, of, switchMap, tap} from 'rxjs';
+import {combineLatest, first, map, Observable, switchMap, tap} from 'rxjs';
 import {AuthService} from './auth.service';
 import {DateUtil} from '../util/date.util';
 import {CacheService} from './cache.service';
 import {UserService} from './user.service';
+import {EventService} from './event.service';
+import {events} from '../model/event.model';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +21,7 @@ import {UserService} from './user.service';
 export class InstanceService {
   private readonly apiRouter = inject(ApiRouter);
   private readonly authService = inject(AuthService);
+  private readonly eventService = inject(EventService);
   private readonly httpClient = inject(HttpClient);
   private readonly userService = inject(UserService);
   private readonly cacheService = new CacheService<number, Instance>(instance => instance.id!);
@@ -27,20 +30,19 @@ export class InstanceService {
   private readonly activeInstance = signal<Instance | undefined>(undefined);
 
   constructor() {
+    this.eventService.subscribe(events.loggedOut, () => {
+      this.instancesFetched.set(false);
+      this.cacheService.deleteAll();
+      this.activeInstance.set(undefined);
+    });
+
     this.authService
       .getUser()
       .pipe(
-        switchMap(user => {
-          if (user == null) {
-            this.activeInstance.set(undefined);
-            this.cacheService.update([], () => true);
-            return of([]);
-          }
-
-          return this
-            .getAll()
-            .pipe(first());
-        })
+        switchMap(() => this
+          .getAll()
+          .pipe(first())
+        )
       )
       .subscribe(instances => {
         if (instances.length == 1) {
