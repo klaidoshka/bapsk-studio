@@ -67,9 +67,15 @@ export class DataEntryService {
           ...dataEntry,
           createdBy: createdBy,
           modifiedBy: modifiedBy,
-          fields: dataEntry.fields.filter(field =>
-            dataType.fields.some(dataTypeField => dataTypeField.id === field.dataTypeFieldId)
-          ),
+          fields: dataEntry.fields
+            .filter(field =>
+              dataType.fields.some(dataTypeField => dataTypeField.id === field.dataTypeFieldId)
+            )
+            .sort((a, b) => {
+              const aField = dataType.fields.findIndex(field => field.id === a.dataTypeFieldId);
+              const bField = dataType.fields.findIndex(field => field.id === b.dataTypeFieldId);
+              return aField - bField;
+            }),
           display: () => {
             if (!dataType.displayFieldId) {
               return dataEntry.id.toString();
