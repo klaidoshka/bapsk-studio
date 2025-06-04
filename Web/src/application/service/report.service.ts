@@ -55,6 +55,8 @@ export class ReportService {
             ? DateUtil.toString(field.value)
             : String(field.value))
         )
+        .map(value => value.replace('"', '""'))
+        .map(value => `"${value}"`)
         .join(',')
     );
 

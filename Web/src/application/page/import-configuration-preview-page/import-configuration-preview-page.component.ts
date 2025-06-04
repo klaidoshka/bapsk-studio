@@ -63,14 +63,17 @@ export class ImportConfigurationPreviewPageComponent {
       });
 
     const header = fields
-      .map(value => value.dataTypeField.name)
+      .map(value => value.dataTypeField.name.replace('"', '""'))
+      .map(value => `"${value}"`)
       .join(",");
 
     const values = fields
       .map(value => value.dataTypeField.type === FieldType.Date && value.field.defaultValue
         ? DateUtil.toString(value.field.defaultValue)
-        : value.field.defaultValue
+        : value.field.defaultValue?.toString()
       )
+      .map(value => value?.replace('"', '""') ?? '-')
+      .map(value => `"${value}"`)
       .join(",");
 
     return {
