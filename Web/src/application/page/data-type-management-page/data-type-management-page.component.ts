@@ -1,12 +1,11 @@
-import {Component, inject, input, signal} from '@angular/core';
+import {Component, inject, input, OnDestroy, signal} from '@angular/core';
 import {DataEntryService} from '../../service/data-entry.service';
 import {DataTypeService} from '../../service/data-type.service';
 import {MessageHandlingService} from '../../service/message-handling.service';
 import {AbstractControl, FormArray, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators} from '@angular/forms';
 import DataType, {DataTypeCreateRequest, DataTypeEditRequest} from '../../model/data-type.model';
 import {rxResource} from '@angular/core/rxjs-interop';
-import {first, of, tap} from 'rxjs';
-import Option from '../../model/options.model';
+import {debounceTime, first, of, Subscription, tap} from 'rxjs';
 import Messages from '../../model/messages.model';
 import DataTypeField, {DataTypeFieldEditRequest, FieldType, fieldTypes} from '../../model/data-type-field.model';
 import {FormInputErrorComponent} from '../../component/form-input-error/form-input-error.component';
@@ -36,6 +35,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {ReportTemplateService} from '../../service/report-template.service';
 import {ImportConfigurationService} from '../../service/import-configuration.service';
 import {TranslatePipe, TranslateService} from '@ngx-translate/core';
+import {Dialog} from 'primeng/dialog';
+import Option from '../../model/options.model';
 
 @Component({
   selector: 'data-type-management-page',
@@ -56,12 +57,13 @@ import {TranslatePipe, TranslateService} from '@ngx-translate/core';
     InputIcon,
     CardComponent,
     TableModule,
-    TranslatePipe
+    TranslatePipe,
+    Dialog
   ],
   templateUrl: './data-type-management-page.component.html',
   styles: ``
 })
-export class DataTypeManagementPageComponent {
+export class DataTypeManagementPageComponent implements OnDestroy {
   private readonly dataEntryService = inject(DataEntryService);
   private readonly dataTypeService = inject(DataTypeService);
   private readonly formBuilder = inject(FormBuilder);
@@ -72,9 +74,10 @@ export class DataTypeManagementPageComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly translateService = inject(TranslateService);
-  protected readonly dataTypeId = input<string>();
+  private fieldNameSubscriptions = new Map<number, Subscription>();
+  protected readonly dataTypeId = input<number | undefined, string>(undefined, { transform: v => NumberUtil.parse(v) });
   protected readonly form = this.createForm();
-  protected readonly instanceId = input.required<string>();
+  protected readonly instanceId = input.required<number | undefined, string>({ transform: v => NumberUtil.parse(v) });
   protected readonly messages = signal<Messages>({});
   protected readonly FieldType = FieldType;
 
@@ -85,30 +88,32 @@ export class DataTypeManagementPageComponent {
 
   protected readonly dataType = rxResource({
     request: () => ({
-      dataTypeId: NumberUtil.parse(this.dataTypeId()),
-      instanceId: NumberUtil.parse(this.instanceId())
+      dataTypeId: this.dataTypeId(),
+      instanceId: this.instanceId()
     }),
     loader: ({ request }) =>
       request.dataTypeId && request.instanceId
         ? this.dataTypeService
           .getById(request.instanceId, request.dataTypeId)
           .pipe(tap(dataType => this.patchFormValues(dataType)))
-        : of(undefined)
+        : of(undefined).pipe(tap(() => this.addField()))
   });
 
   protected readonly dataTypes = rxResource({
     request: () => ({
-      instanceId: NumberUtil.parse(this.instanceId())
+      instanceId: this.instanceId()
     }),
     loader: ({ request }) => request.instanceId
       ? this.dataTypeService.getAllByInstanceId(request.instanceId)
       : of(undefined)
   });
 
-  protected readonly displayFields = signal<Option<number>[]>([{
-    label: 'Id',
-    value: -1
-  }]);
+  protected readonly displayFields = signal<Option<number>[]>([{ label: 'ID', value: -1 }]);
+
+  ngOnDestroy() {
+    this.fieldNameSubscriptions.forEach(sub => sub.unsubscribe());
+    this.fieldNameSubscriptions.clear();
+  }
 
   private consumeResult(message: string, id?: string | number, success: boolean = true) {
     if (success) {
@@ -149,9 +154,12 @@ export class DataTypeManagementPageComponent {
         isRequired: [null as boolean | null],
         name: [null as string | null],
         referencedType: [null as number | null],
+        referencedTypeDialogVisible: [false as boolean],
         type: [null as FieldType | null]
       })
     ], [this.fieldsValidator]);
+
+    fields.clear();
 
     return this.formBuilder.group({
       name: [dataType?.name || '', Validators.required],
@@ -167,7 +175,7 @@ export class DataTypeManagementPageComponent {
       .pipe(first())
       .subscribe({
         next: () => {
-          const instanceId = NumberUtil.parse(this.instanceId())!;
+          const instanceId = this.instanceId()!;
           this.consumeResult(this.translateService.instant("action.data-type.edited"));
           this.dataEntryService.unmarkDataTypeIdAsFetched(request.dataTypeId);
 
@@ -216,19 +224,39 @@ export class DataTypeManagementPageComponent {
       displayField: displayFieldIndex
     });
 
-    dataType.fields.forEach(field => this.addField(dataType, field));
+    dataType.fields.forEach(field => this.addField(field));
+    this.updateDisplayFields();
     this.form.markAsPristine();
   }
 
-  protected consumeChange(index: number, fieldType: FieldType) {
-    const fieldControl = this.form.controls.fields.at(index);
-    if (fieldType === FieldType.Reference) {
-      fieldControl.controls.isRequired.disable();
-      fieldControl.patchValue({
-        isRequired: true
-      });
-    } else {
-      fieldControl.controls.isRequired.enable();
+  protected addField(field?: DataTypeField) {
+    const fieldGroup = this.formBuilder.group({
+      dataTypeFieldId: [field?.id],
+      defaultValue: [field?.defaultValue],
+      isRequired: [field?.isRequired || false, [Validators.required]],
+      name: [field?.name || '', [Validators.required]],
+      referencedType: [field?.referenceId || null, field?.type === FieldType.Reference ? [Validators.required] : []],
+      referencedTypeDialogVisible: [false as boolean],
+      type: [field?.type || FieldType.Text, [Validators.required]]
+    })
+
+    this.form.controls.fields.push(fieldGroup);
+
+    const sub = fieldGroup.controls.name.valueChanges.pipe(
+      debounceTime(300)
+    ).subscribe(() => {
+      this.updateDisplayFields();
+    });
+
+    this.fieldNameSubscriptions.set(this.form.controls.fields.length, sub);
+    this.form.markAsDirty();
+  }
+
+  protected clearDefaultValue(index: number) {
+    const field = this.form.controls.fields.at(index);
+    if (field) {
+      field.patchValue({ defaultValue: undefined });
+      field.markAsDirty();
     }
   }
 
@@ -236,45 +264,21 @@ export class DataTypeManagementPageComponent {
     return this.form.controls.fields.controls.at(id)?.value?.type || FieldType.Text;
   }
 
-  protected addField(dataType?: DataType, field?: DataTypeField) {
-    const isRequiredControl = this.formBuilder.control(field?.isRequired ?? true, Validators.required);
-
-    const isReference = field?.type === FieldType.Reference;
-
-    if (isReference) {
-      isRequiredControl.disable();
-    }
-
-    this.form.controls.fields.push(this.formBuilder.group({
-      dataTypeFieldId: [field?.id],
-      defaultValue: [isReference ? field?.referenceId : field?.defaultValue],
-      isRequired: isRequiredControl,
-      name: [field?.name || '', [Validators.required]],
-      referencedType: [field?.referenceId || null, isReference ? [Validators.required] : []],
-      type: [field?.type || FieldType.Text, [Validators.required]]
-    }));
-
-    if (dataType) {
-      this.displayFields.set([...this.displayFields(), {
-        label: field?.name || `#${this.form.controls.fields.length} Field`,
-        value: this.form.controls.fields.length - 1
-      }]);
-    }
-
-    this.form.markAsDirty();
-  }
-
   protected removeField(index: number) {
     this.form.controls.fields.removeAt(index);
+
+    this.updateDisplayFields();
+
+    this.fieldNameSubscriptions.get(index)?.unsubscribe();
+    this.fieldNameSubscriptions.delete(index);
+    this.fieldNameSubscriptions = new Map(
+      Array.from(this.fieldNameSubscriptions.entries()).map(([i, sub]) => [i > index ? i - 1 : i, sub])
+    );
 
     const displayFieldIndex = this.form.get('displayField')?.value;
 
     if (displayFieldIndex === index) {
       this.form.get('displayField')?.setValue(null);
-    }
-
-    if (this.dataType.value()) {
-      this.displayFields.set(this.displayFields().filter(it => it.value != index));
     }
 
     this.form.markAsDirty();
@@ -293,18 +297,16 @@ export class DataTypeManagementPageComponent {
       dataTypeId: this.dataType.value()?.id || 0,
       fields: this.form.controls.fields.controls.map(field => {
         const fieldType = field.value.type;
-        const isReference = fieldType === FieldType.Reference;
-
         return {
           dataTypeFieldId: field.value.dataTypeFieldId,
           name: field.value.name,
           type: fieldType,
-          defaultValue: isReference ? null : field.value.defaultValue,
-          referenceId: isReference ? field.value.referencedType : null,
-          isRequired: isReference ? true : field.value.isRequired
+          defaultValue: field.value.defaultValue,
+          referenceId: fieldType === FieldType.Reference ? field.value.referencedType : null,
+          isRequired: field.value.isRequired
         } as DataTypeFieldEditRequest;
       }),
-      instanceId: NumberUtil.parse(this.instanceId())!
+      instanceId: this.instanceId()!
     };
 
     if (this.dataType.value()) {
@@ -312,8 +314,17 @@ export class DataTypeManagementPageComponent {
     } else {
       this.create({
         ...request,
-        instanceId: NumberUtil.parse(this.instanceId())!
+        instanceId: this.instanceId()!
       });
     }
+  }
+
+  private updateDisplayFields() {
+    const displayFields = this.form.controls.fields.controls.map((control, index) => ({
+      label: control.value.name || `#${index + 1}`,
+      value: index
+    }));
+
+    this.displayFields.update(old => [old.at(0)!, ...displayFields]);
   }
 }

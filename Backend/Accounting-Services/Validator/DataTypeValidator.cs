@@ -109,6 +109,17 @@ public class DataTypeValidator : IDataTypeValidator
                 "Data type display field index must be between 0 and the number of fields."
             );
         }
+        
+        var displayField = request.DisplayFieldIndex is null
+            ? null
+            : request.Fields.ElementAtOrDefault(request.DisplayFieldIndex.Value);
+
+        if (displayField is not null && displayField.ReferenceId == request.DataTypeId)
+        {
+            return new Validation(
+                "Data type display field cannot be a reference to itself."
+            );
+        }
 
         var failures = new List<string>();
 

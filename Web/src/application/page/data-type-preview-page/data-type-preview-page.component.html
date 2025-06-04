@@ -35,6 +35,7 @@
         <card>
           <p card-header>{{ 'page.data-type-preview.fields.title' | translate }}</p>
           <p card-subHeader>{{ 'page.data-type-preview.fields.description' | translate }}</p>
+          @let hasReferenceField = this.hasReferenceField();
           <p-table card-body [value]="dataType.fields || []">
             <ng-template #header>
               <tr>
@@ -42,10 +43,12 @@
                 <th>{{ 'page.data-type-preview.fields.header.type' | translate }}</th>
                 <th>{{ 'page.data-type-preview.fields.header.required' | translate }}</th>
                 <th>{{ 'page.data-type-preview.fields.header.default-value' | translate }}</th>
+                @if (hasReferenceField) {
+                  <th>{{ 'page.data-type-preview.fields.label.referenced-type' | translate }}</th>
+                }
               </tr>
             </ng-template>
             <ng-template #body let-field>
-              @let isReferenceField = field.type === FieldType.Reference;
               <tr>
                 <td><p>{{ field.name }}</p></td>
                 <td>
@@ -58,16 +61,12 @@
                            [value]="('misc.state.' + (field.isRequired ? 'required' : 'optional')) | translate"/>
                 </td>
                 <td>
-                  @if (isReferenceField) {
-                    <div class="flex flex-col gap-1">
-                      <label class="font-semibold">{{ 'page.data-type-preview.fields.label.referenced-type' | translate }}</label>
-                      {{ getReferencedDataTypeName(field) }}
-                    </div>
-                  } @else {
-                    <data-type-entry-field-display [dataType]="dataType!" [value]="field.defaultValue"
-                                                   [dataTypeFieldId]="field.id" [instanceId]="instanceIdAsNumber()"/>
-                  }
+                  <data-type-entry-field-display [dataType]="dataType!" [value]="field.defaultValue"
+                                                 [dataTypeFieldId]="field.id" [instanceId]="instanceIdAsNumber()"/>
                 </td>
+                @if (hasReferenceField) {
+                  <td>{{ getReferencedDataTypeName(field) }}</td>
+                }
               </tr>
             </ng-template>
           </p-table>
