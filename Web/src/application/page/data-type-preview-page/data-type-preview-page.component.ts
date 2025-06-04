@@ -47,27 +47,31 @@ export class DataTypePreviewPageComponent {
       dataTypeId: NumberUtil.parse(this.dataTypeId()),
       instanceId: this.instanceIdAsNumber()
     }),
-    loader: ({request}) => request.dataTypeId && request.instanceId
+    loader: ({ request }) => request.dataTypeId && request.instanceId
       ? this.dataTypeService.getById(request.instanceId, request.dataTypeId)
       : of(undefined)
   });
 
-  dataTypes = rxResource({
+  protected readonly dataTypes = rxResource({
     request: () => ({
       instanceId: this.instanceIdAsNumber()
     }),
-    loader: ({request}) => request.instanceId
+    loader: ({ request }) => request.instanceId
       ? this.dataTypeService.getAllByInstanceId(request.instanceId)
       : of([])
   });
 
-  getDisplayFieldName(): string {
+  protected getDisplayFieldName(): string {
     const displayFieldId = this.dataType.value()?.displayFieldId;
 
     return this.dataType.value()?.fields?.find(it => it.id === displayFieldId)?.name || 'Id';
   }
 
-  getReferencedDataTypeName(field: DataTypeField) {
-    return this.dataTypes.value()!.find(it => it.id === field.referenceId)!.name;
+  protected getReferencedDataTypeName(field: DataTypeField): string | undefined {
+    return this.dataTypes.value()?.find(it => it.id === field.referenceId)?.name;
+  }
+
+  protected hasReferenceField(): boolean {
+    return this.dataType.value()?.fields?.some(it => it.type === FieldType.Reference) ?? false;
   }
 }

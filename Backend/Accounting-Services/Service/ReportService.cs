@@ -11,6 +11,7 @@ using Accounting.Contract.Dto.Sale;
 using Accounting.Contract.Entity;
 using Accounting.Contract.Service;
 using DataEntry = Accounting.Contract.Entity.DataEntry;
+using DataType = Accounting.Contract.Entity.DataType;
 using DataTypeField = Accounting.Contract.Entity.DataTypeField;
 using Sale = Accounting.Contract.Entity.Sale;
 using SoldGood = Accounting.Contract.Entity.SoldGood;
@@ -189,6 +190,50 @@ public class ReportService : IReportService
         };
     }
 
+    private async Task<ReportEntryField> ResolveReferenceFieldDisplayAsync(DataEntry dataEntry, DataType dataType, int? displayFieldId, int requesterId)
+    {
+        // If no display field, showcase ID
+        if (displayFieldId is null)
+        {
+            return new ReportEntryField
+            {
+                Type = FieldType.Text,
+                Value = dataEntry.Id.ToString()
+            };
+        }
+        
+        var dataEntryDisplayField = dataEntry.Fields.First(f => f.DataTypeFieldId == displayFieldId);
+        
+        // If display field is not another reference, return its value
+        var dataTypeDisplayField = dataType.Fields.First(f => f.Id == displayFieldId);
+
+        if (dataTypeDisplayField.Type != FieldType.Reference)
+        {
+            
+            return new ReportEntryField
+            {
+                Type = dataEntryDisplayField.DataTypeField.Type,
+                Value = dataEntryDisplayField.Value
+            };
+        }
+        
+        // If display field of this dataEntry is another reference, we need to resolve it recursively
+        var nextDataEntry = await _dataEntryService.GetAsync(
+            new DataEntryGetRequest
+            {
+                DataEntryId = Int32.Parse(dataEntryDisplayField.Value),
+                RequesterId = requesterId
+            }
+        );
+
+        return await ResolveReferenceFieldDisplayAsync(
+            nextDataEntry,
+            nextDataEntry.DataType,
+            nextDataEntry.DataType.DisplayFieldId,
+            requesterId
+        );
+    }
+
     public async Task<Report> GenerateDataEntriesReportAsync(ReportByDataEntriesGenerateRequest request)
     {
         var template = await _reportTemplateService.GetAsync(
@@ -272,13 +317,12 @@ public class ReportService : IReportService
                 }
             );
 
-            var dataEntryField = dataEntry.Fields.FirstOrDefault(f => f.DataTypeFieldId == field.ReferenceDisplayFieldId);
-
-            referenceReportEntryFields[field.DataEntryFieldId] = new ReportEntryField
-            {
-                Type = dataEntryField?.DataTypeField.Type ?? FieldType.Text,
-                Value = dataEntryField?.Value ?? dataEntry.Id.ToString()
-            };
+            referenceReportEntryFields[field.DataEntryFieldId] = await ResolveReferenceFieldDisplayAsync(
+                dataEntry,
+                dataEntry.DataType,
+                field.ReferenceDisplayFieldId,
+                request.RequesterId
+            );
         }
 
         var reportEntries = dataEntries

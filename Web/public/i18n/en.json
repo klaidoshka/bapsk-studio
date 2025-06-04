@@ -697,22 +697,29 @@
         },
         "title": "Details"
       },
+      "dialog": {
+        "referenced-type": {
+          "header": "Select Referenced Type",
+          "input": {
+            "referenced-type": "Referenced Type"
+          }
+        }
+      },
       "fields": {
         "button": {
           "add": "Add Field",
-          "remove": "Remove"
+          "remove": "Remove",
+          "select-referenced-type": "Select Referenced Type"
         },
         "description": "Fields of this data type.",
         "header": {
           "default-value": "Default Value",
           "name": "Name",
-          "referenced-type": "Referenced Type",
           "required": "Required",
           "type": "Type"
         },
         "placeholder": {
-          "type": "Select type",
-          "referenced-type": "Select referenced type"
+          "type": "Select type"
         },
         "title": "Fields"
       },

@@ -19,6 +19,11 @@
     <p-select (onChange)="callOnChange()" (onBlur)="markAsTouched()" [(ngModel)]="value" [options]="IsoCountries"
               optionLabel="name" optionValue="code" appendTo="body" class="w-full" dropdownIcon="pi pi-globe"/>
   }
+  @case (FieldType.Reference) {
+    <p-select (onChange)="callOnChange()" (onBlur)="markAsTouched()" [(ngModel)]="value" [options]="dataEntries.value() || []"
+              optionLabel="displayLabel" optionValue="id" appendTo="body" class="w-full" dropdownIcon="pi pi-tag"
+              showClear="true"/>
+  }
   @case (FieldType.Number) {
     <p-input-number (onInput)="callOnChange()" (onBlur)="markAsTouched()" [(ngModel)]="value" class="w-full"/>
   }

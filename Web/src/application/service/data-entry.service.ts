@@ -1,7 +1,7 @@
 import {inject, Injectable} from '@angular/core';
 import {ApiRouter} from './api-router.service';
 import {HttpClient} from '@angular/common/http';
-import {combineLatest, first, map, Observable, startWith, switchMap, tap} from 'rxjs';
+import {combineLatest, first, map, Observable, of, startWith, switchMap, tap} from 'rxjs';
 import DataEntry, {
   DataEntryCreateRequest,
   DataEntryEditRequest,
@@ -18,6 +18,7 @@ import {CacheService} from './cache.service';
 import DataType from '../model/data-type.model';
 import {events} from '../model/event.model';
 import {EventService} from './event.service';
+import {NumberUtil} from '../util/number.util';
 
 @Injectable({
   providedIn: 'root'
@@ -63,26 +64,66 @@ export class DataEntryService {
       this.dataTypeService.getById(instanceId, dataEntry.dataTypeId)
     ])
       .pipe(
-        map(([createdBy, modifiedBy, dataType]) => ({
-          ...dataEntry,
-          createdBy: createdBy,
-          modifiedBy: modifiedBy,
-          fields: dataEntry.fields.filter(field =>
-            dataType.fields.some(dataTypeField => dataTypeField.id === field.dataTypeFieldId)
-          ),
-          display: () => {
-            if (!dataType.displayFieldId) {
-              return dataEntry.id.toString();
-            }
+        switchMap(([createdBy, modifiedBy, dataType]) => {
+          const entry = {
+            ...dataEntry,
+            createdBy: createdBy,
+            modifiedBy: modifiedBy,
+            fields: dataEntry.fields
+              .filter(field =>
+                dataType.fields.some(dataTypeField => dataTypeField.id === field.dataTypeFieldId)
+              )
+              .sort((a, b) => {
+                const aField = dataType.fields.findIndex(field => field.id === a.dataTypeFieldId);
+                const bField = dataType.fields.findIndex(field => field.id === b.dataTypeFieldId);
+                return aField - bField;
+              }),
+            display: () => dataEntry.id.toString()
+          };
 
-            const displayField = dataEntry.fields.find(field =>
-              field.dataTypeFieldId === dataType.displayFieldId
-            );
-
-            return displayField ? displayField.value : '';
-          }
-        }))
+          return this.resolveDisplayFieldRecursively(instanceId, entry, dataType).pipe(
+            map(display => ({
+              ...entry,
+              display: () => display
+            }))
+          );
+        })
       );
+  }
+
+  private resolveDisplayFieldRecursively(
+    instanceId: number,
+    dataEntry: DataEntry,
+    dataType: DataType
+  ): Observable<string> {
+    if (!dataType.displayFieldId) {
+      return of(dataEntry.id.toString());
+    }
+
+    const displayField = dataEntry.fields.find(f => f.dataTypeFieldId === dataType.displayFieldId);
+    const dataTypeField = dataType.fields.find(f => f.id === dataType.displayFieldId);
+
+    if (!displayField || !dataTypeField) {
+      return of(dataEntry.id.toString());
+    }
+
+    if (dataTypeField.type !== FieldType.Reference) {
+      return of(displayField.value);
+    }
+
+    const referenceId = NumberUtil.parse(displayField.value);
+
+    if (!referenceId) {
+      return of(displayField.value);
+    }
+
+    return this.getById(instanceId, referenceId).pipe(
+      switchMap(referencedEntry =>
+        this.dataTypeService.getById(instanceId, referencedEntry.dataTypeId).pipe(
+          switchMap(referencedDataType => this.resolveDisplayFieldRecursively(instanceId, referencedEntry, referencedDataType))
+        )
+      )
+    );
   }
 
   create(request: DataEntryCreateRequest): Observable<DataEntryJoined> {

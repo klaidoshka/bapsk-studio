@@ -7,7 +7,10 @@ namespace Accounting.Services.FieldHandler;
 
 public class DateFieldHandler() : FieldHandler(FieldType.Date)
 {
-    private static readonly string[] DateFormats = ["s", "u", "r", "yyyy-MM-ddTHH:mm:ss.fffZ"];
+    private static readonly string[] DateFormats = [
+        "d", "g", "G", "s", "u", "r", "o", "yyyy-MM-ddTHH:mm:ss.fffZ",
+        "yyyy-MM-dd", "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH:mm:ss",
+    ];
 
     public override object Deserialize(string value)
     {

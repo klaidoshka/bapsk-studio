@@ -697,16 +697,24 @@
         },
         "title": "Informacija"
       },
+      "dialog": {
+        "referenced-type": {
+          "header": "Pasirinkite susietą tipą",
+          "input": {
+            "referenced-type": "Susietas tipas"
+          }
+        }
+      },
       "fields": {
         "button": {
           "add": "Pridėti lauką",
-          "remove": "Pašalinti"
+          "remove": "Pašalinti",
+          "select-referenced-type": "Pasirinkti susietą tipą"
         },
         "description": "Šio duomenų tipo laukai.",
         "header": {
           "default-value": "Numatyta reikšmė",
           "name": "Pavadinimas",
-          "referenced-type": "Susietas tipas",
           "required": "Privalomas",
           "type": "Tipas"
         },

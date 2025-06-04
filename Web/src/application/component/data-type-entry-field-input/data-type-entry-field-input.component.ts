@@ -1,4 +1,4 @@
-import {Component, effect, input, signal, untracked} from '@angular/core';
+import {Component, effect, inject, input, signal, untracked} from '@angular/core';
 import {FieldType} from '../../model/data-type-field.model';
 import {Checkbox} from 'primeng/checkbox';
 import {DatePicker} from 'primeng/datepicker';
@@ -9,6 +9,9 @@ import {IsoCountries} from '../../model/iso-country.model';
 import {Select} from 'primeng/select';
 import {IconField} from 'primeng/iconfield';
 import {InputIcon} from 'primeng/inputicon';
+import {DataEntryService} from '../../service/data-entry.service';
+import {rxResource} from '@angular/core/rxjs-interop';
+import {map, of} from 'rxjs';
 
 @Component({
   selector: 'data-type-entry-field-input',
@@ -34,10 +37,13 @@ import {InputIcon} from 'primeng/inputicon';
   ]
 })
 export class DataTypeEntryFieldInputComponent implements ControlValueAccessor {
+  private readonly dataEntryService = inject(DataEntryService);
   protected readonly FieldType = FieldType;
   protected readonly IsoCountries = IsoCountries;
   readonly type = input.required<FieldType>();
   readonly inputId = input<string>();
+  readonly referencedDataTypeId = input<number>();
+  readonly referencedDataTypeInstanceId = input<number>();
   protected readonly oldType = signal<FieldType | undefined>(undefined);
 
   protected readonly onChange = signal<(value: string) => void>(() => {
@@ -47,6 +53,21 @@ export class DataTypeEntryFieldInputComponent implements ControlValueAccessor {
   protected readonly touched = signal<boolean>(false);
   protected readonly disabled = signal<boolean>(false);
   protected readonly value = signal<any>(undefined);
+
+  protected readonly dataEntries = rxResource({
+    request: () => ({
+      dataTypeId: this.referencedDataTypeId(),
+      instanceId: this.referencedDataTypeInstanceId()
+    }),
+    loader: ({ request }) => request.dataTypeId && request.instanceId
+      ? this.dataEntryService.getAllByDataTypeId(request.instanceId, request.dataTypeId).pipe(
+        map(entries => entries.map(entry => ({
+          ...entry,
+          displayLabel: entry.display()
+        })))
+      )
+      : of(undefined)
+  });
 
   constructor() {
     effect(() => {
